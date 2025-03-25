@@ -5,21 +5,6 @@ Hello World!
 
 Ex)
 
-/Search-of-the-Alien
-  |-/src/
-    |-main.c
-    |-something.h
-  |-/build/
-    |-main.o
-    |-something.o
-  |-/docs/
-  |-/assets/
-    |-/images/
-    |-/sound/
-    |-/fonts/
-  |-.gitignore
-  |-README.md
-  |-Makefile
 
 eller
 
@@ -29,8 +14,13 @@ eller
   |-/build/
     |-main.o
     |-something.o
-  |-/docs/
+  |-/docs/  (dokument för oss själva)
+    |-install.md
+    |-ToDo.md
+    |-changelog.md
+  |-/data/   (speldata, config, logs)
     |-saveFile
+    |-logFile
   |-/include/
     |-filer.h
   |-/assets/
