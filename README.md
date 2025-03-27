@@ -1,12 +1,12 @@
 # Search of the Älien
-Hello World!
+<!-- Hello World! -->
 
 ### Hur vill vi ha filträdet??
 ## Hello World
-Ex)
+<!-- Ex)
 
 
-eller
+eller -->
 
 /Search-of-the-Alien
   |-/source/
@@ -30,5 +30,3 @@ eller
   |-.gitignore
   |-README.md
   |-Makefile
-
-Hej
