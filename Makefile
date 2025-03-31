@@ -1,5 +1,5 @@
 # Makefile-exempel: bygger server/client med SDL2-stöd
-OBJ = build/main.o
+OBJ = build/main.o build/game.o
 # ==== OS-detektering ====
 OS := $(shell uname -s 2>/dev/null)
 ifeq ($(OS),)
@@ -50,7 +50,7 @@ $(SERVER_TARGET): $(NETDIR)/server.c
 	$(CC) $(CFLAGS) $(NETDIR)/server.c $(NETDIR)/shared.c -o $(SERVER_TARGET) $(LDFLAGS)
 
 main: $(SRCDIR)/main.c 
-	$(CC) $(CFLAGS) $(SRCDIR)/main.c -o $(CLIENT_TARGET) $(LDFLAGS)
+	$(CC) $(CFLAGS) $(SRCDIR)/main.c $(SRCDIR)/game.c -o $(CLIENT_TARGET) $(LDFLAGS)
 
 clean:
 	$(REMOV) *.o $(SERVER_TARGET) $(CLIENT_TARGET)

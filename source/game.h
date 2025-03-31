@@ -1,0 +1,26 @@
+#ifndef GAME_H
+#define GAME_H
+#include <stdio.h>
+#include <SDL.h>
+#include <stdbool.h>
+
+
+typedef struct{
+    SDL_Window *pWin;
+    SDL_Renderer *pRend;
+    int windowHeight,windowWidth;
+}ClientView; 
+
+typedef struct {
+    bool isRunning;
+    SDL_Event event;
+    bool keys[SDL_NUM_SCANCODES];
+}ClientControl;
+
+
+
+void reder(ClientView *pView);
+void eventHandel(ClientControl *pControl);
+void gameLoop(ClientControl control, ClientView view);
+
+#endif
