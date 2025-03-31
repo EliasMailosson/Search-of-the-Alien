@@ -1,5 +1,5 @@
 # Makefile-exempel: bygger server/client med SDL2-stöd
-
+OBJ = build/main.o
 # ==== OS-detektering ====
 OS := $(shell uname -s 2>/dev/null)
 ifeq ($(OS),)
@@ -19,8 +19,8 @@ ifeq ($(OS), Darwin)
               -L/opt/homebrew/lib \
               -lSDL2main -lSDL2 -lSDL2_image -lSDL2_ttf -lSDL2_mixer -lSDL2_net
     REMOV = rm -f
-    SERVER_TARGET = server
-    CLIENT_TARGET = client
+    SERVER_TARGET = build/server
+    CLIENT_TARGET = build/main
     RUN = ./
     PREFORM = 
 #MallocNanoZone=0 
@@ -32,9 +32,9 @@ else ifeq ($(OS), Windows_NT)
     CFLAGS = -g -Wall -Wextra -I$(INCLUDE)
     LDFLAGS = -lmingw32 -lSDL2main -lSDL2 -lSDL2_image -lSDL2_ttf \
               -lSDL2_mixer -lSDL2_net -lws2_32
-    REMOV = del /f
-    SERVER_TARGET =server.exe
-    CLIENT_TARGET =client.exe
+    REMOV = del /build -f *.o
+    SERVER_TARGET =build/server.exe
+    CLIENT_TARGET =build/main.exe
     RUN = ./
     PREFORM =
 endif
@@ -49,9 +49,8 @@ all: $(SERVER_TARGET) $(CLIENT_TARGET)
 $(SERVER_TARGET): $(NETDIR)/server.c
 	$(CC) $(CFLAGS) $(NETDIR)/server.c $(NETDIR)/shared.c -o $(SERVER_TARGET) $(LDFLAGS)
 
-
-$(CLIENT_TARGET): $(NETDIR)/client.c $(NETDIR)/shared.c 
-	$(CC) $(CFLAGS) $(NETDIR)/client.c $(NETDIR)/shared.c -o $(CLIENT_TARGET) $(LDFLAGS)
+main: $(SRCDIR)/main.c 
+	$(CC) $(CFLAGS) $(SRCDIR)/main.c -o $(CLIENT_TARGET) $(LDFLAGS)
 
 clean:
 	$(REMOV) *.o $(SERVER_TARGET) $(CLIENT_TARGET)
