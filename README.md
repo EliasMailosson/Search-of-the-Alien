@@ -1,35 +1,34 @@
-# Search of the Älien
-<!-- Hello World! -->
+# standard code
 
-### Hur vill vi ha filträdet??
-## Hello World
-<!-- Ex)
+# funktioner
 
-HEJ SARDOR!
-eller -->
+BIBLOTEK_datatypOperaton
+ex:
+UI_buttonCreate
+NET_clientSend
 
-/Search-of-the-Alien
-  |-/source/
-    |-filer.c
-  |-/build/
-    |-main.o
-    |-something.o
-  |-/docs/  (dokument för oss själva)
-    |-install.md
-    |-ToDo.md
-    |-changelog.md
-  |-/data/   (speldata, config, logs)
-    |-saveFile
-    |-logFile
-  |-/include/
-    |-filer.h
-  |-/assets/
-    |-/images/
-    |-/sound/
-    |-/fonts/
-  |-.gitignore
-  |-README.md
-  |-Makefile
+# variabler
+datatyp (struct)
+ex:
+GameModel (struct)
 
+primetiv datatyp (int, char, bool)
+ex:
+playerCount (variable namn)
 
-  hej, Elias
+not /* nr_of_player */
+    /* playerCount */
+    /* isTrue */ (bool)
+
+pVariabel (pekare)
+aAbstrakt (abstrakt)
+
+fVec2d (float)
+iVec2d (int)
+
+# HEAP
+free(pPlayre);
+pPlayer = NULL;
+
+# tab
+storlek 4

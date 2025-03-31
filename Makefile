@@ -42,7 +42,7 @@ endif
 # ==== Vanliga variabler ====
 
 SRCDIR = source
-NETDIR = source/network
+NETDIR = source/NET
 
 all: $(SERVER_TARGET) $(CLIENT_TARGET)
 
