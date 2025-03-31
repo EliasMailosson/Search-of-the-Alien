@@ -1,13 +1,13 @@
 #include "game.h"
 
-void gameLoop(ClientControl control, ClientView view){
-    while (control.isRunning){
-        eventHandel(&control);
-        reder(&view);
+void gameLoop(ClientControl *control, ClientView *view){
+    while (control->isRunning){
+        eventHandler(control);
+        render(view);
     }
 }
 
-void eventHandel(ClientControl *pControl){
+void eventHandler(ClientControl *pControl){
     while (SDL_PollEvent(&pControl->event)){
         switch (pControl->event.type){
         case SDL_QUIT: pControl->isRunning = false;
@@ -21,7 +21,7 @@ void eventHandel(ClientControl *pControl){
     }
 }
 
-void reder(ClientView *pView){
+void render(ClientView *pView){
     SDL_RenderClear(pView->pRend);
 
     SDL_RenderPresent(pView->pRend);
