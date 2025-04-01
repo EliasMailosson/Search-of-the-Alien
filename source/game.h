@@ -5,11 +5,10 @@
 #include <SDL.h>
 #include <SDL_image.h>
 
-
-typedef struct{
+typedef struct {
     SDL_Window *pWin;
     SDL_Renderer *pRend;
-    int windowHeight,windowWidth;
+    int windowHeight, windowWidth;
 }ClientView; 
 
 typedef struct {
@@ -18,10 +17,8 @@ typedef struct {
     bool keys[SDL_NUM_SCANCODES];
 }ClientControl;
 
-
-
 void render(ClientView *pView);
-void eventHandel(ClientControl *pControl);
-void gameLoop(ClientControl control, ClientView view);
+void eventHandler(ClientControl *pControl);
+void gameLoop(ClientControl *control, ClientView *view);
 
 #endif
