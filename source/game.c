@@ -2,7 +2,6 @@
 #include "../include/menu.h"
 
 void gameLoop(ClientControl *control, ClientView *view){
-    // Panel aPanel = NULL;
     Panel aPanel = initMenu();
     while (control->isRunning){
         eventHandler(control);
