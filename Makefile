@@ -73,7 +73,7 @@ $(BUILDDIR)/main.o: $(SRCDIR)/main.c
 $(BUILDDIR)/game.o: $(SRCDIR)/game.c
 	$(CC) $(CFLAGS) -c $< -o $@
 
-$(BUILDDIR)/game.o: $(SRCDIR)/clientLife.c
+$(BUILDDIR)/clientLife.o: $(SRCDIR)/clientLife.c
 	$(CC) $(CFLAGS) -c $< -o $@
 
 
