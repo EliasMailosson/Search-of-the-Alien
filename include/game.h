@@ -4,6 +4,8 @@
 #include <stdbool.h>
 #include <SDL.h>
 #include <SDL_image.h>
+#include <SDL_ttf.h>
+#include "../include/UI/panel.h"
 
 typedef struct {
     SDL_Window *pWin;
@@ -17,7 +19,7 @@ typedef struct {
     bool keys[SDL_NUM_SCANCODES];
 }ClientControl;
 
-void render(ClientView *pView);
+void render(ClientView *pView, Panel aPanel);
 void eventHandler(ClientControl *pControl);
 void gameLoop(ClientControl *control, ClientView *view);
 
