@@ -1,5 +1,6 @@
 #ifndef CLIENT_H
 #define CLIENT_H
+#include <stdbool.h>
 
 struct client;
 typedef struct client *Client;

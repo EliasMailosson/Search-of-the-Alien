@@ -43,7 +43,7 @@ SRCDIR = source
 NETDIR = source/NET
 UIDIR = source/UI
 BUILDDIR = build
-OBJ_CLIENT = $(BUILDDIR)/main.o $(BUILDDIR)/game.o $(BUILDDIR)/clientLife.o $(BUILDDIR)/menu.o $(BUILDDIR)/panel.o
+OBJ_CLIENT = $(BUILDDIR)/main.o $(BUILDDIR)/game.o $(BUILDDIR)/clientLife.o $(BUILDDIR)/menu.o $(BUILDDIR)/panel.o $(BUILDDIR)/client.o
 OBJ_SERVER = $(BUILDDIR)/server.o $(BUILDDIR)/shared.o 
 
 # Default Goal
@@ -86,6 +86,9 @@ $(BUILDDIR)/server.o: $(NETDIR)/server.c
 	$(CC) $(CFLAGS) -c $< -o $@
 
 $(BUILDDIR)/shared.o: $(NETDIR)/shared.c
+	$(CC) $(CFLAGS) -c $< -o $@
+
+$(BUILDDIR)/client.o: $(NETDIR)/client.c
 	$(CC) $(CFLAGS) -c $< -o $@
 
 clean:
