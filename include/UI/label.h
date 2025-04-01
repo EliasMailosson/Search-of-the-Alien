@@ -8,8 +8,18 @@
 typedef struct Label *Label;
 
 Label UI_labelCreate();
-void UI_labelSetAppearance(SDL_Renderer *pRend, Label aLabel, int x, int y, SDL_Color color, TTF_Font *pFont);
-void UI_labelRender(SDL_Renderer *pRend, Label aLabel);
 void UI_labelDestroy(Label aLabel);
+
+void UI_labelRender(SDL_Renderer *pRend, Label aLabel);
+
+// Setters
+void UI_labelSetAppearance(SDL_Renderer *pRend, Label aLabel, int x, int y, SDL_Color color, TTF_Font *pFont);
+void UI_labelSetText(Label aLabel, char *text);
+void UI_labelSetPosition(Label aLabel, int x, int y);
+
+// Getters
+
+
+
 
 #endif
