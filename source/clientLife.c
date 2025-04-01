@@ -12,9 +12,9 @@ void startClient(ClientView *pView,ClientControl *pControl){
         printf("SDL_image could not initialize! SDL_image Error: %s\n", IMG_GetError());
         SDL_Quit();
   }
-  // if (TTF_Init() == -1) {
-  //     printf("TTF_Init error: %s\n", TTF_GetError());
-  // }
+  if (TTF_Init() == -1) {
+      printf("TTF_Init error: %s\n", TTF_GetError());
+  }
 
   pView->pWin = SDL_CreateWindow("main",SDL_WINDOWPOS_CENTERED,SDL_WINDOWPOS_CENTERED,pView->windowWidth,pView->windowHeight,0);
   if (!pView->pWin) {
@@ -39,7 +39,7 @@ void killClient(ClientView *pView){
   SDL_DestroyWindow(pView->pWin);
   pView->pWin = NULL;
 
-  // TTF_Quit();
+  TTF_Quit();
   IMG_Quit();
   SDL_Quit();
 }
