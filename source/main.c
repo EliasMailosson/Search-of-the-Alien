@@ -1,5 +1,5 @@
-#include "game.h"
-#include "clientLife.h"
+#include "../include/game.h"
+#include "../include/clientLife.h"
 
 
 int main(int argc, char **argv ){

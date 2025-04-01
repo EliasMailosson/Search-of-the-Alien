@@ -1,4 +1,4 @@
-#include "clientLife.h"
+#include "../include/clientLife.h"
 
 void startClient(ClientView *pView,ClientControl *pControl){
   SDL_Init(SDL_INIT_EVERYTHING);

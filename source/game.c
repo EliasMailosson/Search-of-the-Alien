@@ -1,4 +1,4 @@
-#include "game.h"
+#include "../include/game.h"
 #include "../include/menu.h"
 
 void gameLoop(ClientControl *control, ClientView *view){
