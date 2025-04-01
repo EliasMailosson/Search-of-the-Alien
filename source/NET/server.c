@@ -1,1 +1,65 @@
 #include "../../include/NET/server.h"
+#include "../../include/NET/shared.h"
+
+struct server{
+    UDPsocket serverSocket;
+    IPaddress clientIP[MAX_CLIENTS];
+    int clientConunt;
+    UDPpacket *pReceivePacket;
+    UDPpacket *pSendPacket;
+};
+
+
+
+
+int main(int argc, char **argv ){
+    (void)argc; (void)argv;
+    NET_serverInitSDL();
+    Server aServer = {0};
+    aServer = NET_serverCreate();
+    if(aServer == NULL){
+
+    }
+    NET_serverDestroy(aServer);
+}   
+
+
+void NET_serverDestroy(Server aServer){
+    if(aServer->pReceivePacket != NULL){
+        SDLNet_FreePacket(aServer->pReceivePacket);
+        aServer->pReceivePacket = NULL;
+    }
+    if(aServer->pSendPacket != NULL){
+        SDLNet_FreePacket(aServer->pSendPacket); 
+        aServer->pSendPacket = NULL;
+    }
+    if(aServer->serverSocket != NULL) {
+        SDLNet_UDP_Close(aServer->serverSocket);
+        aServer->serverSocket = NULL;
+    }
+    free(aServer);
+}
+
+Server NET_serverCreate(){
+    Server aServer = malloc(sizeof(struct server));
+    if(aServer == NULL){
+        fprintf(stderr,"Error allocating memory for server\n");
+        return NULL;
+    }
+    aServer->clientConunt = 0;
+     // Open server UDP socket
+    aServer->serverSocket = SDLNet_UDP_Open(PORT);
+    if(!aServer->serverSocket){
+        printf("Failde to open UDP socket on port %d\n",PORT);
+        return NULL;
+    }
+    // Packets for sending/receiving
+    aServer->pSendPacket = SDLNet_AllocPacket(512);
+    aServer->pReceivePacket = SDLNet_AllocPacket(512);
+    if (!aServer->pReceivePacket || !aServer->pSendPacket) {
+        printf("Failed to allocate packets\n");
+        return NULL;
+    }
+    return aServer;
+} 
+
