@@ -31,13 +31,13 @@ int main(int argc, char **argv ){
             Uint8 *data = aServer->pReceivePacket->data;
             PacketData pkg;
             pkg.gameState = (int)SDLNet_Read32(data);
-            pkg.messageType = (char)SDLNet_Read32(data + 4);
-            pkg.playerID = (int)SDLNet_Read32(data + 5);
+            pkg.messageType = (int)SDLNet_Read32(data + 4);
+            pkg.playerID = (int)SDLNet_Read32(data + 8);
             printf("game stat %d, MSG %d, id %d",pkg.gameState, pkg.messageType,pkg.playerID);
             x++;
             if(x!=0)isRunning = false;
         }
-    }   
+    }
     NET_serverDestroy(aServer);
     NET_severDestroySDL();
 }
