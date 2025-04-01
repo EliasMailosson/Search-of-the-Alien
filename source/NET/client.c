@@ -12,8 +12,8 @@ struct client{
 void NET_clientSend(Client aClient){
     Uint8 buffer[20];
     SDLNet_Write32((Uint32)2,buffer);
-    SDLNet_Write32((Uint32)2,buffer + 4);
-    SDLNet_Write32((Uint32)2,buffer + 8);
+    SDLNet_Write32((Uint32)'D',buffer + 4);
+    SDLNet_Write32((Uint32)2,buffer + 5);
     memcpy(aClient->pSendPacket->data, buffer, sizeof(buffer));
     aClient->pSendPacket->len = sizeof(buffer);
     aClient->pSendPacket->address = aClient->serverAddr;
