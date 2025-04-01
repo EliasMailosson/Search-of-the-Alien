@@ -1,5 +1,6 @@
 #include "../../include/NET/server.h"
 #include "../../include/NET/shared.h"
+#include "../../include/NET/protocol.h"
 
 struct server{
     UDPsocket serverSocket;
@@ -17,12 +18,30 @@ int main(int argc, char **argv ){
     NET_serverInitSDL();
     Server aServer = {0};
     aServer = NET_serverCreate();
+    bool isRunning;
     if(aServer == NULL){
-
-    }
+        isRunning = false;
+    }else{
+        isRunning = true;
+        printf("UDP server started on port %d\n", PORT);
+    } 
+    int x = 0;
+    while (isRunning){
+        while (SDLNet_UDP_Recv(aServer->serverSocket, aServer->pReceivePacket)){
+            Uint8 *data = aServer->pReceivePacket->data;
+            PacketData pkg;
+            pkg.gameState = (int)SDLNet_Read32(data);
+            pkg.messageType = (int)SDLNet_Read32(data + 4);
+            pkg.playerID = (int)SDLNet_Read32(data + 8);
+            printf("game stat %d, MSG %d, id %d",pkg.gameState, pkg.messageType,pkg.playerID);
+            x++;
+            if(x!=0)break;
+        }
+        if(x!=0)break;
+    }   
     NET_serverDestroy(aServer);
-}   
-
+    NET_severDestroySDL();
+}
 
 void NET_serverDestroy(Server aServer){
     if(aServer->pReceivePacket != NULL){

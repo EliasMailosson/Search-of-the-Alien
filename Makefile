@@ -44,7 +44,7 @@ NETDIR = source/NET
 UIDIR = source/UI
 BUILDDIR = build
 OBJ_CLIENT = $(BUILDDIR)/main.o $(BUILDDIR)/game.o $(BUILDDIR)/clientLife.o $(BUILDDIR)/menu.o $(BUILDDIR)/panel.o
-OBJ_SERVER = $(NETDIR)/server.o 
+OBJ_SERVER = $(BUILDDIR)/server.o $(BUILDDIR)/shared.o 
 
 # Default Goal
 all: $(BUILDDIR) $(CLIENT_TARGET) $(SERVER_TARGET)
@@ -80,6 +80,12 @@ $(BUILDDIR)/menu.o: $(SRCDIR)/menu.c
 	$(CC) $(CFLAGS) -c $< -o $@
 
 $(BUILDDIR)/panel.o: $(UIDIR)/panel.c
+	$(CC) $(CFLAGS) -c $< -o $@
+
+$(BUILDDIR)/server.o: $(NETDIR)/server.c
+	$(CC) $(CFLAGS) -c $< -o $@
+
+$(BUILDDIR)/shared.o: $(NETDIR)/shared.c
 	$(CC) $(CFLAGS) -c $< -o $@
 
 clean:

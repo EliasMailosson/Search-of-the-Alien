@@ -12,3 +12,8 @@ bool NET_serverInitSDL(){
     }
     return true;
 }
+
+void NET_severDestroySDL(){
+    SDLNet_Quit();
+    SDL_Quit();
+}
