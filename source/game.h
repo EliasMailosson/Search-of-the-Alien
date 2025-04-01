@@ -1,8 +1,9 @@
 #ifndef GAME_H
 #define GAME_H
 #include <stdio.h>
-#include <SDL.h>
 #include <stdbool.h>
+#include <SDL.h>
+#include <SDL_image.h>
 
 
 typedef struct{
@@ -19,7 +20,7 @@ typedef struct {
 
 
 
-void reder(ClientView *pView);
+void render(ClientView *pView);
 void eventHandel(ClientControl *pControl);
 void gameLoop(ClientControl control, ClientView view);
 
