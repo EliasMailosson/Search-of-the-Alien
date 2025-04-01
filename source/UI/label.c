@@ -31,8 +31,8 @@ void UI_labelSetAppearance(SDL_Renderer *pRend, Label aLabel, int x, int y, SDL_
     aLabel->y = y;
     aLabel->pFont = pFont;
 
-    SDL_Surface *surface = TTF_RenderGlyph_Blended(aLabel->pFont, aLabel->text, aLabel->color);
-    SDL_Texture *texture = SDL_CreateTextureFromSurface(pRend, surface);
+    SDL_Surface *surface = TTF_RenderText_Blended(aLabel->pFont, aLabel->text, aLabel->color);
+    aLabel->pTexture = SDL_CreateTextureFromSurface(pRend, surface);
     aLabel->textRect = (SDL_Rect){.x=aLabel->x, .y=aLabel->y, .w=surface->w, .h=surface->h};
     SDL_FreeSurface(surface);
 }

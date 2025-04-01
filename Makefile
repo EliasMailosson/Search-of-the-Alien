@@ -29,7 +29,7 @@ else ifeq ($(OS), Windows_NT)
     CFLAGS = -g -Wall -Wextra -I$(INCLUDE)
     LDFLAGS = -lmingw32 -lSDL2main -lSDL2 -lSDL2_image -lSDL2_ttf \
               -lSDL2_mixer -lSDL2_net -lws2_32
-    REMOV = del /Q build\*.o $(CLIENT_EXEC) $(SERVER_EXEC)
+    REMOV = del /Q $(BUILDDIR)\*.o & if exist $(CLIENT_EXEC) del /Q $(CLIENT_EXEC) & if exist $(SERVER_EXEC) del /Q $(SERVER_EXEC)
     SERVER_EXEC = build/server.exe
     CLIENT_EXEC = build/main.exe
     RUN = ./
@@ -43,7 +43,7 @@ SRCDIR = source
 NETDIR = source/NET
 UIDIR = source/UI
 BUILDDIR = build
-OBJ_CLIENT = $(BUILDDIR)/main.o $(BUILDDIR)/game.o $(BUILDDIR)/clientLife.o $(BUILDDIR)/menu.o $(BUILDDIR)/panel.o
+OBJ_CLIENT = $(BUILDDIR)/main.o $(BUILDDIR)/game.o $(BUILDDIR)/clientLife.o $(BUILDDIR)/menu.o $(BUILDDIR)/panel.o $(BUILDDIR)/label.o
 OBJ_SERVER = $(NETDIR)/server.o 
 
 # Default Goal
@@ -80,6 +80,9 @@ $(BUILDDIR)/menu.o: $(SRCDIR)/menu.c
 	$(CC) $(CFLAGS) -c $< -o $@
 
 $(BUILDDIR)/panel.o: $(UIDIR)/panel.c
+	$(CC) $(CFLAGS) -c $< -o $@
+
+$(BUILDDIR)/label.o: $(UIDIR)/label.c
 	$(CC) $(CFLAGS) -c $< -o $@
 
 clean:

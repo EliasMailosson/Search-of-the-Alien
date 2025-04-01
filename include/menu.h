@@ -7,6 +7,6 @@
 // #include "UI/checklist.h"
 
 void renderMenu(SDL_Renderer *pRend, Panel aPanel);
-Panel initMenu();
+Panel initMenu(SDL_Renderer *pRend);
 
 #endif
