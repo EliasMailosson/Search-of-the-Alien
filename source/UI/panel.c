@@ -5,7 +5,7 @@
 
 typedef struct component {
     void *pComp;
-    char *key;
+    char key[64];
     int type;
 } Component;
 
@@ -35,7 +35,7 @@ void UI_panelAddComponent(Panel aPanel, void *comp, int type, char *key) {
     if(aPanel->compCount < 20) {
         aPanel->compList[aPanel->compCount].pComp = comp;
         aPanel->compList[aPanel->compCount].type = type;
-        strcmp(aPanel->compList[aPanel->compCount].key, key);
+        strcpy(aPanel->compList[aPanel->compCount].key, key);
         (aPanel->compCount)++;
     }
 }

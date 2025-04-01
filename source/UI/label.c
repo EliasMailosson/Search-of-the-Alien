@@ -20,9 +20,18 @@ Label UI_labelCreate() {
     aLabel->textRect = (SDL_Rect){.x=0, .y=0, .w=1, .h=1};
     aLabel->x = 0;
     aLabel->y = 0;
-    strcpy(aLabel->text, "button");
+    strcpy(aLabel->text, "a label");
 
     return aLabel;
+}
+
+void UI_labelSetText(Label aLabel, char *text) {
+    strcpy(aLabel->text, text);
+}
+
+UI_labelSetPosition(Label aLabel, int x, int y) {
+    aLabel->x = x;
+    aLabel->y = y;
 }
 
 void UI_labelSetAppearance(SDL_Renderer *pRend, Label aLabel, int x, int y, SDL_Color color, TTF_Font *pFont) {
