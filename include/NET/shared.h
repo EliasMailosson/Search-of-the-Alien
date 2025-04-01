@@ -8,7 +8,7 @@
 
 #define MAX_CLIENTS 8
 #define PORT 1234
-#define JON_IP "130.229.176.33"
+#define JON_IP "130.229.140.39"
 
 bool NET_serverInitSDL();
 void NET_severDestroySDL();

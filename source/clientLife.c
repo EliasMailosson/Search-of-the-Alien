@@ -15,6 +15,9 @@ void startClient(ClientView *pView,ClientControl *pControl){
   if (TTF_Init() == -1) {
     printf("TTF_Init error: %s\n", TTF_GetError());
   }
+  if (SDLNet_Init() == -1) {
+      printf("SDLNet_Init failed: %s\n", SDLNet_GetError());
+  }
 
   pView->pWin = SDL_CreateWindow("main",SDL_WINDOWPOS_CENTERED,SDL_WINDOWPOS_CENTERED,pView->windowWidth,pView->windowHeight,0);
   if (!pView->pWin) {
@@ -39,6 +42,7 @@ void killClient(ClientView *pView){
   SDL_DestroyWindow(pView->pWin);
   pView->pWin = NULL;
 
+  SDLNet_Quit();
   TTF_Quit();
   IMG_Quit();
   SDL_Quit();
