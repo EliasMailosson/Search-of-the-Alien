@@ -1,5 +1,4 @@
-# Makefile-exempel: bygger server/client med SDL2-stöd
-OBJ = build/main.o build/game.o
+# Makefile: building server/client with SDL2
 # ==== OS-detektering ====
 OS := $(shell uname -s 2>/dev/null)
 ifeq ($(OS),)
@@ -18,42 +17,65 @@ ifeq ($(OS), Darwin)
     LDFLAGS = -fsanitize=address \
               -L/opt/homebrew/lib \
               -lSDL2main -lSDL2 -lSDL2_image -lSDL2_ttf -lSDL2_mixer -lSDL2_net
-    REMOV = rm -f
-    SERVER_TARGET = build/server
-    CLIENT_TARGET = build/main
+    REMOV = rm -rf build/*.o $(CLIENT_EXEC) $(SERVER_EXEC)
+    SERVER_EXEC = build/server
+    CLIENT_EXEC = build/main
     RUN = ./
-    PREFORM = 
-#MallocNanoZone=0 
+    PREFORM =
 else ifeq ($(OS), Windows_NT)
 # --- Windows (MinGW/MSYS) Settings ---
-#  -mwindows 
     CC = gcc
     INCLUDE = C:/msys64/mingw64/include/SDL2
     CFLAGS = -g -Wall -Wextra -I$(INCLUDE)
     LDFLAGS = -lmingw32 -lSDL2main -lSDL2 -lSDL2_image -lSDL2_ttf \
               -lSDL2_mixer -lSDL2_net -lws2_32
-    REMOV = del /build -f *.o
-    SERVER_TARGET =build/server.exe
-    CLIENT_TARGET =build/main.exe
+    REMOV = del /Q build\*.o $(CLIENT_EXEC) $(SERVER_EXEC)
+    SERVER_EXEC = build/server.exe
+    CLIENT_EXEC = build/main.exe
     RUN = ./
     PREFORM =
 endif
 
 # ==== Vanliga variabler ====
-
+CLIENT_TARGET = $(CLIENT_EXEC)
+SERVER_TARGET = $(SERVER_EXEC)
 SRCDIR = source
 NETDIR = source/NET
+UIDIR = source/UI
+BUILDDIR = build
+OBJ_CLIENT = $(BUILDDIR)/main.o $(BUILDDIR)/game.o
+OBJ_SERVER = $(NETDIR)/server.o 
 
-all: $(SERVER_TARGET) $(CLIENT_TARGET)
+# Default Goal
+all: $(BUILDDIR) $(CLIENT_TARGET) $(SERVER_TARGET)
 
-$(SERVER_TARGET): $(NETDIR)/server.c
-	$(CC) $(CFLAGS) $(NETDIR)/server.c $(NETDIR)/shared.c -o $(SERVER_TARGET) $(LDFLAGS)
+# Build one exe file
+client: $(CLIENT_EXEC)
 
-main: $(SRCDIR)/main.c 
-	$(CC) $(CFLAGS) $(SRCDIR)/main.c $(SRCDIR)/game.c -o $(CLIENT_TARGET) $(LDFLAGS)
+server: $(SERVER_EXEC)
+
+# Create build folder if it doesn't exist
+$(BUILDDIR):
+	mkdir -p $(BUILDDIR)
+
+# Client build rule
+$(CLIENT_TARGET): $(OBJ_CLIENT)
+	$(CC) $(CFLAGS) $(OBJ_CLIENT) -o $(CLIENT_TARGET) $(LDFLAGS)
+
+# Server build rule
+$(SERVER_TARGET): $(OBJ_SERVER)
+	$(CC) $(CFLAGS) $(OBJ_SERVER) -o $(SERVER_TARGET) $(LDFLAGS)
+
+# Individuella objektfiler
+$(BUILDDIR)/main.o: $(SRCDIR)/main.c
+	$(CC) $(CFLAGS) -c $< -o $@
+
+$(BUILDDIR)/game.o: $(SRCDIR)/game.c
+	$(CC) $(CFLAGS) -c $< -o $@
+
 
 clean:
-	$(REMOV) *.o $(SERVER_TARGET) $(CLIENT_TARGET)
+	$(REMOV)
 
 run_server:
 	$(RUN)$(SERVER_TARGET)
@@ -63,14 +85,9 @@ run_client:
 
 ifeq ($(OS), Windows_NT)
 run_clients:
-	powershell -Command "Start-Process .\$(CLIENT_TARGET)"
-	powershell -Command "Start-Process .\$(CLIENT_TARGET)"
+	powershell -Command "Start-Process .\\$(CLIENT_TARGET)"
+	powershell -Command "Start-Process .\\$(CLIENT_TARGET)"
 else
 run_clients:
 	$(PREFORM) ./$(CLIENT_TARGET) & $(PREFORM) ./$(CLIENT_TARGET)
 endif
-# main.o: $(SRCDIR)/main.c
-# 	$(CC) $(CFLAGS) $(SRCDIR)/main.c -o main.o 
-
-# initSDL.o: $(SRCDIR)/initSDL.c
-# 	$(CC) $(CFLAGS) $(SRCDIR)/initSDL.c -o initSDL.o
