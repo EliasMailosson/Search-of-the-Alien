@@ -64,7 +64,7 @@ void UI_checklistRendrer(SDL_Renderer* pRend, Checklist achecklist){
 
             int endX = checkboxRect.x + checkboxRect.w - 6;
             int endY = checkboxRect.y + 6;
-            
+
             SDL_RenderDrawLine(pRend, startX, startY, midX, midY); // "\"
             SDL_RenderDrawLine(pRend, midX, midY, endX, endY); // "/"
         }   
@@ -85,6 +85,16 @@ void UI_ChecklistDestroy(Checklist checklist) {
     free(checklist);
 }
 
-void UI_checklistSetPosition(){
+void UI_checklistToggle(Checklist achecklist, int mouseX, int mouseY){
 
+    for (int i = 0; i < achecklist->checklist_count; i++){
+        SDL_Rect checkboxRect = achecklist->Rect;
+        checkboxRect.y += i * (checkboxRect.h + 10); //mellanrum mellan checkboxerna
+        
+        if (mouseX >= checkboxRect.x && mouseX <= checkboxRect.x + checkboxRect.w && mouseY >= checkboxRect.y && mouseY <= checkboxRect.y + checkboxRect.h)
+        {
+            achecklist->items[i].is_Checked = !achecklist->items[i].is_Checked;
+            break;
+        }
+    }
 }
