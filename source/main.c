@@ -10,7 +10,7 @@ int main(int argc, char **argv ){
     ClientControl control = {0};
 
     startClient(&view, &control);
-    //gameLoop(&control, &view);
+    gameLoop(&control, &view);
     Client aClient = {0};
     aClient = NET_clientCreate();
     NET_clientConnect(aClient);

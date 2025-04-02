@@ -82,6 +82,24 @@ $(BUILDDIR)/menu.o: $(SRCDIR)/menu.c
 $(BUILDDIR)/panel.o: $(UIDIR)/panel.c
 	$(CC) $(CFLAGS) -c $< -o $@
 
+$(BUILDDIR)/label.o: $(UIDIR)/label.c
+	$(CC) $(CFLAGS) -c $< -o $@
+
+$(BUILDDIR)/button.o: $(UIDIR)/button.c
+	$(CC) $(CFLAGS) -c $< -o $@
+
+$(BUILDDIR)/checklist.o: $(UIDIR)/checklist.c
+	$(CC) $(CFLAGS) -c $< -o $@
+
+$(BUILDDIR)/server.o: $(NETDIR)/server.c
+	$(CC) $(CFLAGS) -c $< -o $@
+
+$(BUILDDIR)/shared.o: $(NETDIR)/shared.c
+	$(CC) $(CFLAGS) -c $< -o $@
+
+$(BUILDDIR)/client.o: $(NETDIR)/client.c
+	$(CC) $(CFLAGS) -c $< -o $@
+
 clean:
 	$(REMOV)
 
