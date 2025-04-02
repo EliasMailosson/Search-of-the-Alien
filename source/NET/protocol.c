@@ -15,17 +15,21 @@ Uint32 NET_stdPakegeGettMSG(StdPackage packet){
     return packet->msgType;
 }
 
-Uint8 NET_stdPakegeGettPL(StdPackage packet){
-    return *(packet)->payload;
+Uint32 NET_stdPakegeGettPL(StdPackage packet){
+    return SDLNet_Read32(packet->payload);
 }
 
 void NET_stdPakegeSetPL(StdPackage packet, Uint32 Payload){
     SDLNet_Write32(Payload, packet->payload);
 }
 
+void NET_stdPakegeSetPLstring(StdPackage aPkg,const char* str){
+    memcpy(aPkg->payload, str, strlen(str)+1);
+}
+
 
 StdPackage deserializePacket(const Uint8 *buffer, Uint32 bufferSize){
-    if(!buffer || bufferSize) return NULL;
+    if(!buffer || bufferSize < 12) return NULL;
     StdPackage pkg = malloc(sizeof(struct stdPackage));
     if(!pkg) return NULL;
     int offset = 0;

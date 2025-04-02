@@ -13,12 +13,14 @@ void NET_clientSend(Client aClient){
     // Placeholder for sending the whole packege 
     Uint32 GameState = 42;
     MessageType MSG = DISCONECT;
-    Uint32 PayloadSize = 4;
+    const char *testString = "Hello, Server!";
+    // Set payloadSize to length of string + 1 for the null terminator.
+    Uint32 payloadSize = (Uint32) (strlen(testString) + 1);
 
-    StdPackage testPkg = NET_stdPakegeCreate(GameState, MSG, PayloadSize);
+    StdPackage testPkg = NET_stdPakegeCreate(GameState, MSG, payloadSize);
 
-    Uint32 TestValue = 1234;
-    NET_stdPakegeSetPL(testPkg, TestValue);
+    //NET_stdPakegeSetPL(testPkg, (Uint32)TestValue);
+    NET_stdPakegeSetPLstring(testPkg,testString);
 
     Uint8* sBuffer = NULL;
     Uint32 serializedSize = serializePacket(testPkg, &sBuffer);

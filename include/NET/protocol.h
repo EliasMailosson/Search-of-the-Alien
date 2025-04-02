@@ -42,8 +42,9 @@ StdPackage NET_stdPakegeCreate(GameState gameState, MessageType msgType, Uint32 
 
 Uint32 NET_stdPakegeGettGS(StdPackage packet);
 Uint32 NET_stdPakegeGettMSG(StdPackage packet);
-Uint8 NET_stdPakegeGettPL(StdPackage packet);
+Uint32 NET_stdPakegeGettPL(StdPackage packet);
 void NET_stdPakegeSetPL(StdPackage packet, Uint32 Payload);
+void NET_stdPakegeSetPLstring(StdPackage aPkg,const char* str);
 
 
 #endif
