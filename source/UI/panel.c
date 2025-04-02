@@ -3,6 +3,7 @@
 #include <string.h>
 #include "../../include/UI/label.h"
 #include "../../include/UI/button.h"
+#include "../../include/UI/checklist.h"
 
 typedef struct component {
     void* pComp;
@@ -63,6 +64,11 @@ void UI_panelRender(SDL_Renderer* pRend, Panel aPanel) {
         case UI_BUTTON:
             UI_buttonRenderer(pRend, (Button)aPanel->compList[i].pComp);
             break;
+        
+        case UI_CHECKLIST:
+            UI_checklistRendrer(pRend, (Checklist)aPanel->compList[i].pComp);
+            break;
+
         }
     }
 }
