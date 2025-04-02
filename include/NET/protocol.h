@@ -1,5 +1,12 @@
 #ifndef PROTOCOL_H
 #define PROTOCOL_H
+#include <stdio.h>
+#include <string.h>
+#include <SDL_net.h>
+union {
+    float f;
+    Uint32 u;
+} floatConv;
 
 typedef enum {
     MSG_CONECT = 0,      
