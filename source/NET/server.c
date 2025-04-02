@@ -10,9 +10,6 @@ struct server{
     UDPpacket *pSendPacket;
 };
 
-
-
-
 int main(int argc, char **argv ){
     (void)argc; (void)argv;
     NET_serverInitSDL();
@@ -30,12 +27,12 @@ int main(int argc, char **argv ){
     while (isRunning){
         // Poll event checking if there is a packege to recive
         while (SDLNet_UDP_Recv(aServer->serverSocket, aServer->pReceivePacket)){
-            StdPackage aPkg = deserializePacket(aServer->pReceivePacket->data, aServer->pReceivePacket->len);
+            StdPackage aPkg = NET_stdPackageDeserialize(aServer->pReceivePacket->data, aServer->pReceivePacket->len);
             
             if(aPkg){
-                printf("GS: %u\n", NET_stdPakegeGettGS(aPkg));
-                printf("MSG: %u\n", NET_stdPakegeGettMSG(aPkg));
-                printf("PL: %u\n", NET_stdPakegeGettPL(aPkg));
+                printf("GS: %u\n", NET_stdPakegeGetGameState(aPkg));
+                printf("MSG: %u\n", NET_stdPakegeGetMessageType(aPkg));
+                printf("PL: %s\n", (char*)NET_stdPakegeGetPayload(aPkg));
 
                 NET_stdPakegeDestroy(aPkg);
             }

@@ -7,28 +7,27 @@ typedef struct stdPackage{
     Uint8 *payload; 
 }stdPackage;
 
-Uint32 NET_stdPakegeGettGS(StdPackage packet){
+Uint32 NET_stdPakegeGetGameState(StdPackage packet){
     return packet->gameState;
 }
 
-Uint32 NET_stdPakegeGettMSG(StdPackage packet){
+Uint32 NET_stdPakegeGetMessageType(StdPackage packet){
     return packet->msgType;
 }
 
-Uint32 NET_stdPakegeGettPL(StdPackage packet){
-    return SDLNet_Read32(packet->payload);
+Uint8* NET_stdPakegeGetPayload(StdPackage packet){
+    return packet->payload;
 }
 
-void NET_stdPakegeSetPL(StdPackage packet, Uint32 Payload){
+void NET_stdPakegeWrite32Payload(StdPackage packet, Uint32 Payload){
     SDLNet_Write32(Payload, packet->payload);
 }
 
-void NET_stdPakegeSetPLstring(StdPackage aPkg,const char* str){
+void NET_stdPakegeSetPayloadString(StdPackage aPkg,const char* str){
     memcpy(aPkg->payload, str, strlen(str)+1);
 }
 
-
-StdPackage deserializePacket(const Uint8 *buffer, Uint32 bufferSize){
+StdPackage NET_stdPackageDeserialize(const Uint8 *buffer, Uint32 bufferSize){
     if(!buffer || bufferSize < 12) return NULL;
     StdPackage pkg = malloc(sizeof(struct stdPackage));
     if(!pkg) return NULL;
@@ -57,7 +56,7 @@ StdPackage deserializePacket(const Uint8 *buffer, Uint32 bufferSize){
 }
 
 
-Uint32 serializePacket(const StdPackage packet, Uint8 ** buffer){
+Uint32 NET_stdPackageSerialize(const StdPackage packet, Uint8 ** buffer){
     if(!packet || !buffer)return 0;
     Uint32 totalSize = 12 + packet->payloadSize;
     *buffer = malloc(totalSize);

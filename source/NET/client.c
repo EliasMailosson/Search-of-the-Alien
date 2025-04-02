@@ -8,7 +8,6 @@ struct client{
     IPaddress serverAddr;
 }; 
 
-
 void NET_clientSend(Client aClient){
     // Placeholder for sending the whole packege 
     Uint32 GameState = 42;
@@ -20,10 +19,10 @@ void NET_clientSend(Client aClient){
     StdPackage testPkg = NET_stdPakegeCreate(GameState, MSG, payloadSize);
 
     //NET_stdPakegeSetPL(testPkg, (Uint32)TestValue);
-    NET_stdPakegeSetPLstring(testPkg,testString);
+    NET_stdPakegeSetPayloadString(testPkg,testString);
 
     Uint8* sBuffer = NULL;
-    Uint32 serializedSize = serializePacket(testPkg, &sBuffer);
+    Uint32 serializedSize = NET_stdPackageSerialize(testPkg, &sBuffer);
 
     memcpy(aClient->pSendPacket->data, sBuffer, serializedSize);
     aClient->pSendPacket->len = serializedSize;
@@ -81,3 +80,4 @@ void NET_clientDestroy(Client aClient){
     }
     free(aClient);
 }
+
