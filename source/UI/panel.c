@@ -58,25 +58,19 @@ void UI_panelUpdate(Panel aPanel, bool isMouseDown) {
         case UI_LABEL: break;
 
         case UI_BUTTON:
-            // if(UI_buttonIsHovered((Button)aPanel->compList[i].pComp, mouseX, mouseY)) {
-            //     if(isMouseDown) {
-            //         printf("Button clicked! (key: %s)\n", aPanel->compList[i].key);
-            //         return;
-            //     }
-            // }
+            if(UI_buttonIsHovered((Button)aPanel->compList[i].pComp, mouseX, mouseY)) {
+                if(isMouseDown) {
+                    printf("Button clicked! (key: %s)\n", aPanel->compList[i].key);
+                    return;
+                }
+            }
             break;
         
         case UI_CHECKLIST:
-            // bool values[20] = {false};
-            // if(UI_checklistEvent((Checklist)aPanel->compList[i].pComp, values, mouseX, mouseY)) {
-            //     if(isMouseDown) {
-            //         printf("Checklist updated! (key: %s)\n", aPanel->compList[i].key);
-            //         for(int i = 0; i < 20; i++) {
-            //             printf("Checkbox %d: (%d)", i, values[i]);
-            //         }
-            //         return;
-            //     }
-            // }
+            if(isMouseDown) {
+                UI_checklistToggle((Checklist)aPanel->compList[i].pComp, mouseX, mouseY);
+                return;
+            }
             break;
 
         }

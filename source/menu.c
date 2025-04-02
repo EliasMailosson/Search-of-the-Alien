@@ -8,8 +8,8 @@ void renderMenu(SDL_Renderer* pRend, Panel aPanel) {
 }
 
 void updateMenu(Panel aPanel, ClientControl *pControl) {
-    int isMouseDown = false;
-    UI_panelUpdate(aPanel, isMouseDown);
+    // int isMouseDown = true;
+    UI_panelUpdate(aPanel, pControl->isMouseDown);
 }
 
 Panel initMenu(SDL_Renderer* pRend) {
