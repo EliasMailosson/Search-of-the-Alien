@@ -1,14 +1,13 @@
 #include "../../include/UI/button.h"
-#include "../../include/UI/button.h"
-#include <SDL.h>
+
 #include <stdlib.h>
 #include <string.h>
-
 typedef struct Button
 {
     SDL_Rect buttonRect;
     SDL_Color backgroundColor;
 } *Button;
+
 
 Button UI_buttonCreate() {
     Button aButton = malloc(sizeof(struct Button));
@@ -19,7 +18,12 @@ Button UI_buttonCreate() {
     return aButton;
 }
 
-void UI_buttonSetAppearence(Button aButton, SDL_Color backgroundColor) {
-    aButton->backgroundColor = backgroundColor;
-    aButton->buttonRect = (SDL_Rect){ .x = aButton->buttonRect.x, .y = aButton->buttonRect.y, .w = aButton->buttonRect.w, .h = aButton->buttonRect.h };
+void UI_buttonRenderer(SDL_Renderer* pRend, Button aButton) {
+    SDL_SetRenderDrawColor(pRend, aButton->backgroundColor.r, aButton->backgroundColor.g, aButton->backgroundColor.b, aButton->backgroundColor.a);
+    SDL_RenderFillRect(pRend, &aButton->buttonRect);
 }
+
+void UI_buttonDestroy(Button aButton) {
+    free(aButton);
+}
+
