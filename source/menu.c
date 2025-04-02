@@ -7,6 +7,11 @@ void renderMenu(SDL_Renderer* pRend, Panel aPanel) {
     UI_panelRender(pRend, aPanel);
 }
 
+void updateMenu(Panel aPanel, ClientControl *pControl) {
+    int isMouseDown = false;
+    UI_panelUpdate(aPanel, isMouseDown);
+}
+
 Panel initMenu(SDL_Renderer* pRend) {
     TTF_Font* pFont = TTF_OpenFont("assets/fonts/PricedownBl-Regular 900.ttf", 20);
 

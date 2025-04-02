@@ -16,4 +16,8 @@ void UI_panelAddComponent(Panel aPanel, void *comp, int type, char *key);
 
 void UI_panelRender(SDL_Renderer *pRend, Panel aPanel);
 
+void UI_panelUpdate(Panel aPanel, bool isMouseDown);
+
+void UI_panelDestroy(Panel aPanel);
+
 #endif
