@@ -21,22 +21,21 @@ void startCLient(ClientView *pView, ClientControl *pControl){
 
     pView->pWin = SDL_CreateWindow("main",SDL_WINDOWPOS_CENTERED,SDL_WINDOWPOS_CENTERED,pView->windowWidth,pView->windowHeight,0);
     if (!pView->pWin) {
-      printf("Error creating window: %s\n", SDL_GetError());
-      SDLNet_Quit();
-      TTF_Quit();
-      IMG_Quit();
-      SDL_Quit();
+        printf("Error creating window: %s\n", SDL_GetError());
+        SDLNet_Quit();
+        TTF_Quit();
+        IMG_Quit();
+        SDL_Quit();
     }
 
     pView->pRend = SDL_CreateRenderer(pView->pWin,-1,SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
     if (!pView->pRend) {
-      SDL_DestroyWindow(pView->pWin);
-      SDLNet_Quit();
-      TTF_Quit();
-      IMG_Quit();
-      SDL_Quit();
+        SDL_DestroyWindow(pView->pWin);
+        SDLNet_Quit();
+        TTF_Quit();
+        IMG_Quit();
+        SDL_Quit();
     }
-  
     pControl->isRunning = true;
 }
 
