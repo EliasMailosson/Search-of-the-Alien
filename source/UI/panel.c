@@ -47,6 +47,42 @@ void UI_panelSetAppearance(Panel aPanel, SDL_Rect rect, SDL_Color src_bg) {
     aPanel->rect = rect;
 }
 
+void UI_panelUpdate(Panel aPanel, bool isMouseDown) {
+    if(aPanel == NULL) return;
+
+    int mouseX, mouseY;
+    SDL_GetMouseState(&mouseX, &mouseY);
+
+    for (int i = 0; i < aPanel->compCount; i++) {
+        switch (aPanel->compList[i].type) {
+        case UI_LABEL: break;
+
+        case UI_BUTTON:
+            // if(UI_buttonIsHovered((Button)aPanel->compList[i].pComp, mouseX, mouseY)) {
+            //     if(isMouseDown) {
+            //         printf("Button clicked! (key: %s)\n", aPanel->compList[i].key);
+            //         return;
+            //     }
+            // }
+            break;
+        
+        case UI_CHECKLIST:
+            // bool values[20] = {false};
+            // if(UI_checklistEvent((Checklist)aPanel->compList[i].pComp, values, mouseX, mouseY)) {
+            //     if(isMouseDown) {
+            //         printf("Checklist updated! (key: %s)\n", aPanel->compList[i].key);
+            //         for(int i = 0; i < 20; i++) {
+            //             printf("Checkbox %d: (%d)", i, values[i]);
+            //         }
+            //         return;
+            //     }
+            // }
+            break;
+
+        }
+    }
+}
+
 void UI_panelRender(SDL_Renderer* pRend, Panel aPanel) {
     if (aPanel->hasImage) {
 
@@ -71,4 +107,26 @@ void UI_panelRender(SDL_Renderer* pRend, Panel aPanel) {
 
         }
     }
+}
+
+void UI_panelDestroy(Panel aPanel) {
+    for (int i = 0; i < aPanel->compCount; i++) {
+        switch (aPanel->compList[i].type) {
+        case UI_LABEL:
+            UI_labelDestroy((Label)aPanel->compList[i].pComp);
+            break;
+
+        case UI_BUTTON:
+            UI_buttonDestroy((Button)aPanel->compList[i].pComp);
+            break;
+        
+        case UI_CHECKLIST:
+            UI_ChecklistDestroy((Checklist)aPanel->compList[i].pComp);
+            break;
+
+        }
+        aPanel->compList[i].pComp = NULL;
+    }
+    free(aPanel);
+    aPanel = NULL;
 }

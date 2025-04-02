@@ -8,6 +8,8 @@ typedef struct Button* Button;
 
 Button UI_buttonCreate();
 
+void UI_buttonDimensions(Button aButton, int newX, int newY, int newWidth, int newHeight);
+
 void UI_buttonSetText(Button aButton, char* text);
 
 void UI_buttonSetTextPosition(Button aButton);

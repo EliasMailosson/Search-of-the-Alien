@@ -5,11 +5,11 @@ void gameLoop(ClientControl *control, ClientView *view){
     Panel aPanel = initMenu(view->pRend);
     while (control->isRunning){
         eventHandler(control);
+        updateMenu(aPanel, control);
         render(view, aPanel);
     }
 
-    free(aPanel);
-    aPanel = NULL;
+    UI_panelDestroy(aPanel);
 }
 
 void eventHandler(ClientControl *pControl){
