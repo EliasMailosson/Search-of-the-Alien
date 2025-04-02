@@ -10,7 +10,6 @@ typedef struct Button
     Label buttonText;
 } *Button;
 
-
 Button UI_buttonCreate() {
     Button aButton = malloc(sizeof(struct Button));
 
@@ -20,6 +19,13 @@ Button UI_buttonCreate() {
     UI_buttonSetText(aButton, "hej");
 
     return aButton;
+}
+
+void UI_buttonDimensions(Button aButton, int newX, int newY, int newWidth, int newHeight) {
+    aButton->buttonRect.x = newX;
+    aButton->buttonRect.y = newY;
+    aButton->buttonRect.w = newWidth;
+    aButton->buttonRect.h = newHeight;
 }
 
 void UI_buttonSetText(Button aButton, char* text) {
