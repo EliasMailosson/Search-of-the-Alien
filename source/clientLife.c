@@ -1,6 +1,6 @@
 #include "../include/clientLife.h"
 
-void startCLient(ClientView *pView, ClientControl *pControl){
+void startClient(ClientView *pView, ClientControl *pControl){
     SDL_Init(SDL_INIT_EVERYTHING);
     pView->windowHeight = 600;
     pView->windowWidth = 800;

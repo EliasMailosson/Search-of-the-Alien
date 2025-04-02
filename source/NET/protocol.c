@@ -5,7 +5,7 @@ typedef struct stdPackage{
     MessageType msgType;
     Uint32 payloadSize;
     Uint8 *payload; 
-};
+}stdPackage;
 
 StdPackage deserializePacket(const Uint8 *buffer, Uint32 bufferSize){
     if(!buffer || bufferSize) return NULL;
@@ -18,7 +18,7 @@ StdPackage deserializePacket(const Uint8 *buffer, Uint32 bufferSize){
     offset += 4;
     pkg->payloadSize = SDLNet_Read32(buffer + offset);
     offset +=4;
-    if(buffer < 12 + pkg->payloadSize){
+    if(bufferSize < 12 + pkg->payloadSize){
         free(pkg);
         return NULL;
     }
