@@ -13,4 +13,6 @@ void UI_ChecklistAddItem(Checklist checklist, char *txt);
 
 void UI_ChecklistDestroy(Checklist checklist);
 
+void UI_checklistToggle(Checklist achecklist, int mouseX, int mouseY);
+
 #endif

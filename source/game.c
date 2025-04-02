@@ -19,7 +19,15 @@ void eventHandler(ClientControl *pControl){
             break;
         case SDL_KEYDOWN: pControl->keys[pControl->event.key.keysym.scancode] = true;
             break;
-        case SDL_KEYUP: pControl->keys[pControl->event.key.keysym.scancode] = false;
+        case SDL_KEYUP: 
+            pControl->keys[pControl->event.key.keysym.scancode] = false;
+            break;
+        case SDL_MOUSEBUTTONDOWN:
+            pControl->isMouseDown = true;
+            break;
+        case SDL_MOUSEBUTTONUP:
+            pControl->isMouseDown = false;
+            break;
         default:
             break;
         }
