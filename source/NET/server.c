@@ -19,6 +19,7 @@ int main(int argc, char **argv ){
     Server aServer = {0};
     aServer = NET_serverCreate();
     bool isRunning;
+    // if Server has allocated memory then the server is running on "PORT"
     if(aServer == NULL){
         isRunning = false;
     }else{
@@ -27,8 +28,10 @@ int main(int argc, char **argv ){
     } 
     int x = 0;
     while (isRunning){
+        // Poll event checking if there is a packege to recive
         while (SDLNet_UDP_Recv(aServer->serverSocket, aServer->pReceivePacket)){
             Uint8 *data = aServer->pReceivePacket->data;
+            // Assigning packege data after catching data with SDLNet_Read32
             PacketData pkg;
             pkg.gameState = (int)SDLNet_Read32(data);
             pkg.messageType = (int)SDLNet_Read32(data + 4);

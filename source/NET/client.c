@@ -10,13 +10,18 @@ struct client{
 
 
 void NET_clientSend(Client aClient){
+    // Placeholder for sending the whole packege 
     Uint8 buffer[20];
+    // Assigning a place in the buffer with SDLNet_Write32 (datatype, data, place in buffer)
+    // buffer + 4(offset for the next data position)
     SDLNet_Write32((Uint32)2,buffer);
     SDLNet_Write32((Uint32)32,buffer + 4);
     SDLNet_Write32((Uint32)2,buffer + 8);
+    // Assigning the packet to specific UDPpaket datatype with Data, length and address attributes
     memcpy(aClient->pSendPacket->data, buffer, sizeof(buffer));
     aClient->pSendPacket->len = sizeof(buffer);
     aClient->pSendPacket->address = aClient->serverAddr;
+    // Sending the packet via specific socket, channel and then the whole packege with SDLNet_UDP_Send
     SDLNet_UDP_Send(aClient->clientSocket, -1, aClient->pSendPacket);
 }
 
