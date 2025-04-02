@@ -3,6 +3,7 @@
 
 #include <stdlib.h>
 #include <string.h>
+#include <stdbool.h>
 typedef struct Button
 {
     SDL_Rect buttonRect;
@@ -51,6 +52,10 @@ void UI_buttonRenderer(SDL_Renderer* pRend, Button aButton) {
     SDL_RenderFillRect(pRend, &aButton->buttonRect);
 
     UI_labelRender(pRend, aButton->buttonText);
+}
+
+bool UI_buttonIsHovered(Button aButton, int mouseX, int mouseY) {
+    if (mouseX >= aButton->buttonRect.x && mouseX <= (aButton->buttonRect.x + aButton->buttonRect.w) && mouseY >= aButton->buttonRect.y && mouseY <= (aButton->buttonRect.y + aButton->buttonRect.h)) return true;
 }
 
 void UI_buttonDestroy(Button aButton) {

@@ -18,6 +18,8 @@ void UI_setButtonLabelappearence(SDL_Renderer* pRend, Button aButton, SDL_Color 
 
 void UI_buttonRenderer(SDL_Renderer* pRend, Button aButton);
 
+bool UI_buttonIsHovered(Button aButton, int mouseX, int mouseY);
+
 void UI_buttonDestroy(Button aButton);
 
 #endif
