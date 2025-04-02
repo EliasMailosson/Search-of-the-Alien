@@ -3,6 +3,7 @@
 
 #include <SDL.h>
 #include <SDL_ttf.h>
+#include <stdbool.h>
 
 typedef struct Button* Button;
 
