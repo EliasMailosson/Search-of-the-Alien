@@ -28,12 +28,12 @@ Checklist UI_checklistCreate(){
     aChecklist->checklist_count = 3;
     aChecklist->Rect.x = 200;
     aChecklist->Rect.y = 150;
-    aChecklist->Rect.w = 20;
-    aChecklist->Rect.h = 20;
+    aChecklist->Rect.w = 30;
+    aChecklist->Rect.h = 30;
 
     for (int i = 0; i < aChecklist->checklist_count; i++)
     {
-        aChecklist->items[i].is_Checked = false;
+        aChecklist->items[i].is_Checked = true;
     }
 
     return aChecklist;
@@ -48,15 +48,25 @@ void UI_checklistRendrer(SDL_Renderer* pRend, Checklist achecklist){
         SDL_SetRenderDrawColor(pRend, 255,255,255,255); //vit
         SDL_RenderDrawRect(pRend,&checkboxRect);
 
-        if (achecklist->items[i].is_Checked) {
-            SDL_SetRenderDrawColor(pRend, 0, 255, 0, 255);  //färg på själva checkmarken
-            SDL_RenderFillRect(pRend, &checkboxRect);
-        }
+        // if (achecklist->items[i].is_Checked) {
+        //     SDL_SetRenderDrawColor(pRend, 0, 255, 0, 255);  //färg på själva checkmarken
+        //     SDL_RenderFillRect(pRend, &checkboxRect);
+        // }
 
         if (achecklist->items[i].is_Checked){
             SDL_SetRenderDrawColor(pRend,0 ,0 ,0 ,255); //svart 
-            SDL_RenderDrawLine(pRend,checkboxRect.x,checkboxRect.y,checkboxRect.x + checkboxRect.w, checkboxRect.y+checkboxRect.h);// "/"
-            SDL_RenderDrawLine(pRend,checkboxRect.x,checkboxRect.y,checkboxRect.x + checkboxRect.w, checkboxRect.y + checkboxRect.h);// "\"
+
+            int startX = checkboxRect.x + 6;
+            int startY =  checkboxRect.y + checkboxRect.h / 2;
+
+            int midX = checkboxRect.x  + checkboxRect.w / 3;
+            int midY = checkboxRect.y + checkboxRect.h - 6;
+
+            int endX = checkboxRect.x + checkboxRect.w - 6;
+            int endY = checkboxRect.y + 6;
+            
+            SDL_RenderDrawLine(pRend, startX, startY, midX, midY); // "\"
+            SDL_RenderDrawLine(pRend, midX, midY, endX, endY); // "/"
         }   
     }
 }
