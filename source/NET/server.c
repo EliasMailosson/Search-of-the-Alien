@@ -30,13 +30,19 @@ int main(int argc, char **argv ){
     while (isRunning){
         // Poll event checking if there is a packege to recive
         while (SDLNet_UDP_Recv(aServer->serverSocket, aServer->pReceivePacket)){
-            Uint8 *data = aServer->pReceivePacket->data;
-            // Assigning packege data after catching data with SDLNet_Read32
-            PacketData pkg;
-            pkg.gameState = (int)SDLNet_Read32(data);
-            pkg.messageType = (int)SDLNet_Read32(data + 4);
-            pkg.playerID = (int)SDLNet_Read32(data + 8);
-            printf("game stat %d, MSG %d, id %d",pkg.gameState, pkg.messageType,pkg.playerID);
+            StdPackage aPkg = deserializePacket(aServer->pReceivePacket->data, aServer->pReceivePacket->len);
+            
+            if(aPkg){
+                printf("GS: %u\n", NET_stdPakegeGettGS(aPkg));
+                printf("MSG: %u\n", NET_stdPakegeGettMSG(aPkg));
+                printf("PL: %u\n", NET_stdPakegeGettPL(aPkg));
+
+                NET_stdPakegeDestroy(aPkg);
+            }
+            else{
+                printf("Failed!\n");
+            }
+
             x++;
             if(x!=0)isRunning = false;
         }

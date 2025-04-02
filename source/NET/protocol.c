@@ -7,6 +7,23 @@ typedef struct stdPackage{
     Uint8 *payload; 
 }stdPackage;
 
+Uint32 NET_stdPakegeGettGS(StdPackage packet){
+    return packet->gameState;
+}
+
+Uint32 NET_stdPakegeGettMSG(StdPackage packet){
+    return packet->msgType;
+}
+
+Uint8 NET_stdPakegeGettPL(StdPackage packet){
+    return *(packet)->payload;
+}
+
+void NET_stdPakegeSetPL(StdPackage packet, Uint32 Payload){
+    SDLNet_Write32(Payload, packet->payload);
+}
+
+
 StdPackage deserializePacket(const Uint8 *buffer, Uint32 bufferSize){
     if(!buffer || bufferSize) return NULL;
     StdPackage pkg = malloc(sizeof(struct stdPackage));
@@ -84,3 +101,4 @@ StdPackage NET_stdPakegeCreate(GameState gameState, MessageType msgType, Uint32 
     }
     return pkg;
 }
+

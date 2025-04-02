@@ -40,5 +40,10 @@ Uint32 serializePacket(const StdPackage packet, Uint8 ** buffer);
 void NET_stdPakegeDestroy(StdPackage paket);
 StdPackage NET_stdPakegeCreate(GameState gameState, MessageType msgType, Uint32 payloadSize);
 
+Uint32 NET_stdPakegeGettGS(StdPackage packet);
+Uint32 NET_stdPakegeGettMSG(StdPackage packet);
+Uint8 NET_stdPakegeGettPL(StdPackage packet);
+void NET_stdPakegeSetPL(StdPackage packet, Uint32 Payload);
+
 
 #endif

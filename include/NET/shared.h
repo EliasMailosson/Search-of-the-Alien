@@ -6,6 +6,8 @@
 #include <stdio.h>
 #include <stdbool.h>
 
+#include "../../include/NET/protocol.h"
+
 #define MAX_CLIENTS 8
 #define PORT 1234
 #define JON_IP "130.229.190.87"
