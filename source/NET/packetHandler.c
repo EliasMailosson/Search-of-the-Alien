@@ -7,23 +7,23 @@ typedef struct stdPackage{
     Uint8 *payload; 
 }stdPackage;
 
-Uint32 NET_stdPakegeGetGameState(StdPackage packet){
+Uint32 NET_stdPackageGetGameState(StdPackage packet){
     return packet->gameState;
 }
 
-Uint32 NET_stdPakegeGetMessageType(StdPackage packet){
+Uint32 NET_stdPackageGetMessageType(StdPackage packet){
     return packet->msgType;
 }
 
-Uint8* NET_stdPakegeGetPayload(StdPackage packet){
+Uint8* NET_stdPackageGetPayload(StdPackage packet){
     return packet->payload;
 }
 
-void NET_stdPakegeWrite32Payload(StdPackage packet, Uint32 Payload){
+void NET_stdPackageWrite32Payload(StdPackage packet, Uint32 Payload){
     SDLNet_Write32(Payload, packet->payload);
 }
 
-void NET_stdPakegeSetPayloadString(StdPackage aPkg,const char* str){
+void NET_stdPackageSetPayloadString(StdPackage aPkg,const char* str){
     memcpy(aPkg->payload, str, strlen(str)+1);
 }
 
@@ -80,14 +80,14 @@ Uint32 NET_stdPackageSerialize(const StdPackage packet, Uint8 ** buffer){
     return totalSize;
 }
 
-void NET_stdPakegeDestroy(StdPackage paket){
+void NET_stdPackageDestroy(StdPackage paket){
     if(paket){
         free(paket->payload);
         free(paket);
     }
 }
 
-StdPackage NET_stdPakegeCreate(GameState gameState, MessageType msgType, Uint32 payloadSize){
+StdPackage NET_stdPackageCreate(GameState gameState, MessageType msgType, Uint32 payloadSize){
     StdPackage pkg = malloc(sizeof(struct stdPackage));
     if(!pkg){
         fprintf(stderr, "Failed to allocate memory for packet header.\n");

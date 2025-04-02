@@ -16,10 +16,10 @@ void NET_clientSend(Client aClient){
     // Set payloadSize to length of string + 1 for the null terminator.
     Uint32 payloadSize = (Uint32) (strlen(testString) + 1);
 
-    StdPackage testPkg = NET_stdPakegeCreate(GameState, MSG, payloadSize);
+    StdPackage testPkg = NET_stdPackageCreate(GameState, MSG, payloadSize);
 
     //NET_stdPakegeSetPL(testPkg, (Uint32)TestValue);
-    NET_stdPakegeSetPayloadString(testPkg,testString);
+    NET_stdPackageSetPayloadString(testPkg,testString);
 
     Uint8* sBuffer = NULL;
     Uint32 serializedSize = NET_stdPackageSerialize(testPkg, &sBuffer);
@@ -31,7 +31,7 @@ void NET_clientSend(Client aClient){
     SDLNet_UDP_Send(aClient->clientSocket, -1, aClient->pSendPacket);
 
     free(sBuffer);
-    NET_stdPakegeDestroy(testPkg);
+    NET_stdPackageDestroy(testPkg);
 }
 
 
@@ -81,3 +81,6 @@ void NET_clientDestroy(Client aClient){
     free(aClient);
 }
 
+void NET_clientSendID(Client aClient, int playerID){
+    NET_protocolConectSend(aClient->pSendPacket,aClient->clientSocket,aClient->serverAddr,playerID);
+}

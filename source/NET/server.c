@@ -24,22 +24,37 @@ int main(int argc, char **argv ){
         printf("UDP server started on port %d\n", PORT);
     } 
     int x = 0;
+    int palyerID = 0; 
     while (isRunning){
         // Poll event checking if there is a packege to recive
         while (SDLNet_UDP_Recv(aServer->serverSocket, aServer->pReceivePacket)){
             StdPackage aPkg = NET_stdPackageDeserialize(aServer->pReceivePacket->data, aServer->pReceivePacket->len);
-            
-            if(aPkg){
-                printf("GS: %u\n", NET_stdPakegeGetGameState(aPkg));
-                printf("MSG: %u\n", NET_stdPakegeGetMessageType(aPkg));
-                printf("PL: %s\n", (char*)NET_stdPakegeGetPayload(aPkg));
+            //NET_stdPakegeGetGameState(aPkg);
+            switch (NET_stdPackageGetMessageType(aPkg)){
+            case CONECT:
+                palyerID = (int)SDLNet_Read32(NET_stdPackageGetPayload(aPkg));
+                printf("player id %d",palyerID);
+                break;
+            case CONECT_RESPONSE:
 
-                NET_stdPakegeDestroy(aPkg);
-            }
-            else{
+                break;
+            case DISCONECT:
+
+                break;
+            case DISCONECT_RESPONSE:
+
+                break;
+            case LOBBY_LIST:
+
+                break;
+            case LOBBY_LIST_RESPONSE:   
+
+                break;
+            default:
                 printf("Failed!\n");
+                break;
             }
-
+            if(aPkg) NET_stdPackageDestroy(aPkg);
             x++;
             if(x!=0)isRunning = false;
         }

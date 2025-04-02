@@ -14,6 +14,7 @@ Client NET_clientCreate();
 /** Freeing client memory after use and sett to NULL */
 void NET_clientDestroy(Client aClient);
 
+void NET_clientSendID(Client aClient, int playerID);
 
 
 
