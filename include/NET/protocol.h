@@ -35,7 +35,7 @@ struct stdPackage;
 typedef struct stdPackage *StdPackage;
 
 // API functions:
-StdPackage deserializePacket(const *buffer, Uint32 bufferSize);
+StdPackage deserializePacket(const Uint8 *buffer, Uint32 bufferSize);
 Uint32 serializePacket(const StdPackage packet, Uint8 ** buffer);
 void NET_stdPakegeDestroy(StdPackage paket);
 StdPackage NET_stdPakegeCreate(GameState gameState, MessageType msgType, Uint32 payloadSize);

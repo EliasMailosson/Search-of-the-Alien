@@ -7,7 +7,7 @@ typedef struct stdPackage{
     Uint8 *payload; 
 };
 
-StdPackage deserializePacket(const *buffer, Uint32 bufferSize){
+StdPackage deserializePacket(const Uint8 *buffer, Uint32 bufferSize){
     if(!buffer || bufferSize) return NULL;
     StdPackage pkg = malloc(sizeof(struct stdPackage));
     if(!pkg) return NULL;
