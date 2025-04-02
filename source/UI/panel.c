@@ -68,7 +68,12 @@ void UI_panelUpdate(Panel aPanel, bool isMouseDown) {
         
         case UI_CHECKLIST:
             if(isMouseDown) {
+                bool values[20];
                 UI_checklistToggle((Checklist)aPanel->compList[i].pComp, mouseX, mouseY);
+                UI_ChecklistGetItemValues((Checklist)aPanel->compList[i].pComp, values);
+                for(int i = 0; i < 20; i++) {
+                    printf("checkbox %d: (%s)\n", i, (values[i]) ? "true" : "false");
+                }
                 return;
             }
             break;

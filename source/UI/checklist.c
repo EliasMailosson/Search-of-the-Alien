@@ -71,10 +71,17 @@ void UI_checklistRendrer(SDL_Renderer* pRend, Checklist achecklist){
     }
 }
 
-void UI_ChecklistAddItem(Checklist checklist, bool *value) {
-    for (int i = 0; i < 20 && checklist->checklist_count < 20; i++) {
-        checklist->items[checklist->checklist_count].is_Checked = value[i];
-        checklist->checklist_count++;
+void UI_ChecklistAddItem(Checklist checklist) {
+    if(checklist == NULL) return;
+    if(checklist->checklist_count < 20) {
+        checklist->items[checklist->checklist_count].is_Checked = false;
+        (checklist->checklist_count)++;
+    }
+}
+
+void UI_ChecklistGetItemValues(Checklist checklist, bool *value) {
+    for (int i = 0; i < 20; i++) {
+        value[i] = checklist->items[i].is_Checked;
     }
 }
 

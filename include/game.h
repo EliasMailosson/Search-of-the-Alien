@@ -17,7 +17,7 @@ typedef struct {
     bool isRunning;
     SDL_Event event;
     bool keys[SDL_NUM_SCANCODES];
-    bool isMouseDown;
+    bool isMouseDown, isMouseUp;
 }ClientControl;
 
 void render(ClientView *pView, Panel aPanel);

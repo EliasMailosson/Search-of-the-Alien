@@ -13,6 +13,9 @@ void gameLoop(ClientControl *control, ClientView *view){
 }
 
 void eventHandler(ClientControl *pControl){
+    pControl->isMouseDown = false;
+    pControl->isMouseUp = false;
+    
     while (SDL_PollEvent(&pControl->event)){
         switch (pControl->event.type){
         case SDL_QUIT: pControl->isRunning = false;
@@ -26,7 +29,7 @@ void eventHandler(ClientControl *pControl){
             pControl->isMouseDown = true;
             break;
         case SDL_MOUSEBUTTONUP:
-            pControl->isMouseDown = false;
+            pControl->isMouseUp = true;
             break;
         default:
             break;
