@@ -21,5 +21,5 @@ Button UI_buttonCreate() {
 
 void UI_buttonSetAppearence(Button aButton, SDL_Color backgroundColor) {
     aButton->backgroundColor = backgroundColor;
-    aButton->buttonRect = (SDL_Rect){ .x = , .y = aButton. }
+    aButton->buttonRect = (SDL_Rect){ .x = aButton->buttonRect.x, .y = aButton->buttonRect.y, .w = aButton->buttonRect.w, .h = aButton->buttonRect.h };
 }
