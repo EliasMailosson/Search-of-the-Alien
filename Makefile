@@ -43,7 +43,7 @@ SRCDIR = source
 NETDIR = source/NET
 UIDIR = source/UI
 BUILDDIR = build
-OBJ_CLIENT = $(BUILDDIR)/main.o $(BUILDDIR)/game.o $(BUILDDIR)/clientLife.o $(BUILDDIR)/menu.o $(BUILDDIR)/panel.o $(BUILDDIR)/label.o $(BUILDDIR)/button.o
+OBJ_CLIENT = $(BUILDDIR)/main.o $(BUILDDIR)/game.o $(BUILDDIR)/clientLife.o $(BUILDDIR)/menu.o $(BUILDDIR)/panel.o $(BUILDDIR)/label.o $(BUILDDIR)/button.o $(BUILDDIR)/checklist.o
 OBJ_SERVER = $(NETDIR)/server.o 
 
 # Default Goal
