@@ -88,6 +88,9 @@ $(BUILDDIR)/label.o: $(UIDIR)/label.c
 $(BUILDDIR)/button.o: $(UIDIR)/button.c
 	$(CC) $(CFLAGS) -c $< -o $@
 
+$(BUILDDIR)/checklist.o: $(UIDIR)/checklist.c
+	$(CC) $(CFLAGS) -c $< -o $@
+
 clean:
 	$(REMOV)
 

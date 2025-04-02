@@ -1,6 +1,7 @@
 #include "../include/menu.h"
 #include "../include/UI/label.h"
 #include "../include/UI/button.h"
+#include "../include/UI/checklist.h"
 
 void renderMenu(SDL_Renderer* pRend, Panel aPanel) {
     UI_panelRender(pRend, aPanel);
@@ -18,6 +19,9 @@ Panel initMenu(SDL_Renderer* pRend) {
 
     Button aButton = UI_buttonCreate();
     UI_panelAddComponent(aPanel, aButton, UI_BUTTON, "button 1");
+
+    Checklist aChecklist = UI_checklistCreate();
+    UI_panelAddComponent(aPanel,aChecklist,UI_CHECKLIST,"Checklist");
 
     return aPanel;
 }
