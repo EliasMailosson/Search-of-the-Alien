@@ -56,6 +56,7 @@ void UI_buttonRenderer(SDL_Renderer* pRend, Button aButton) {
 
 bool UI_buttonIsHovered(Button aButton, int mouseX, int mouseY) {
     if (mouseX >= aButton->buttonRect.x && mouseX <= (aButton->buttonRect.x + aButton->buttonRect.w) && mouseY >= aButton->buttonRect.y && mouseY <= (aButton->buttonRect.y + aButton->buttonRect.h)) return true;
+    else return false;
 }
 
 void UI_buttonDestroy(Button aButton) {

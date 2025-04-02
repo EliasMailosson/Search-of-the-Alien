@@ -58,16 +58,16 @@ void UI_panelUpdate(Panel aPanel, bool isMouseDown) {
         case UI_LABEL: break;
 
         case UI_BUTTON:
-            // if(UI_buttonIsHovered((Button)aPanel->compList[i].pComp, mouseX, mouseY)) {
-            //     if(isMouseDown) {
-            //         printf("Button clicked! (key: %s)\n", aPanel->compList[i].key);
-            //         return;
-            //     }
-            // }
+            if(UI_buttonIsHovered((Button)aPanel->compList[i].pComp, mouseX, mouseY)) {
+                if(isMouseDown) {
+                    printf("Button clicked! (key: %s)\n", aPanel->compList[i].key);
+                    return;
+                }
+            }
             break;
         
         case UI_CHECKLIST:
-            if(!isMouseDown && wasMouseDown) {
+            if(isMouseDown) {
                 UI_checklistToggle((Checklist)aPanel->compList[i].pComp, mouseX, mouseY);
                 return;
             }
