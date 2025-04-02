@@ -2,22 +2,43 @@
 #define PROTOCOL_H
 #include <stdio.h>
 #include <string.h>
+#include <SDL.h>
 #include <SDL_net.h>
 union {
     float f;
     Uint32 u;
 } floatConv;
 
-typedef enum {
-    MSG_CONECT = 0,      
-    MSG_DISCONECT = 1  
+typedef enum{
+    CONECT,  
+    CONECT_RESPONSE,
+    DISCONECT,
+    DISCONECT_RESPONSE,
+    PLAYER_LIST,
+    PLAYER_LIST_RESPONSE,
 } MessageType;
 
-typedef struct {
+
+typedef enum{
+    GLOBAL,
+    MENU,
+    LOBBY
+}GameState;
+
+typedef struct{
     int gameState;
     int messageType;  // One of MessageType
     int playerID;     // Which player is sending
 } PacketData;
+
+struct stdPackage;
+typedef struct stdPackage *StdPackage;
+
+// API functions:
+StdPackage deserializePacket(const *buffer, Uint32 bufferSize);
+Uint32 serializePacket(const StdPackage packet, Uint8 ** buffer);
+void NET_stdPakegeDestroy(StdPackage paket);
+StdPackage NET_stdPakegeCreate(GameState gameState, MessageType msgType, Uint32 payloadSize);
 
 
 #endif
