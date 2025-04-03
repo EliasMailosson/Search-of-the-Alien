@@ -68,6 +68,8 @@ void NET_protocolSendArray(UDPpacket *pUDPpkg,UDPsocket Socket,IPaddress IP,
         printf("Failed to create dynamic packet.\n");
         return;
     }
+
+    NET_stdPackagePayloadArray(packet, placeHolder);
     //NET_stdPackageWrite32Payload(packet,(Uint32*)placeHolder);
     // Serialize the packet.
     Uint8 *sBuffer = NULL;

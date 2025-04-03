@@ -32,6 +32,10 @@ void NET_stdPackageSetPayloadString(StdPackage aPkg,const char* str){
     memcpy(aPkg->payload, str, strlen(str)+1);
 }
 
+void NET_stdPackagePayloadArray(StdPackage aPkg, const void* array){
+    memcpy(aPkg->payload, array, (strlen(array)+1));
+}
+
 StdPackage NET_stdPackageDeserialize(const Uint8 *buffer, Uint32 bufferSize){
     if(!buffer || bufferSize < 12) return NULL;
     StdPackage pkg = malloc(sizeof(struct stdPackage));

@@ -30,7 +30,8 @@ int main(int argc, char **argv ){
         while (SDLNet_UDP_Recv(aServer->serverSocket, aServer->pReceivePacket)){
             StdPackage aPkg = NET_stdPackageDeserialize(aServer->pReceivePacket->data, aServer->pReceivePacket->len);
             if(aPkg == NULL){
-                break;;
+                printf("Deserialization failed! Buffer might be invalid.\n");
+                break;
             } 
             //NET_stdPakegeGetGameState(aPkg);
             switch (NET_stdPackageGetMessageType(aPkg)){
