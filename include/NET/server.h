@@ -14,7 +14,7 @@ Server NET_serverCreate();
 /** Freeing memory after use, for server */
 void NET_serverDestroy(Server aServer);
 
-void NET_serverReceivePlayerList(StdPackage aPkg, PlayerList* list, int *count);
+void NET_serverReceivePlayerList(Packet aPkg, PlayerList* list, int *count);
 void NET_PlayerListPrintf(PlayerList* list, int count);
 
 

@@ -26,21 +26,21 @@ typedef enum{
     LOBBY
 }GameState;
 
-struct stdPackage;
-typedef struct stdPackage *StdPackage;
+struct packet;
+typedef struct packet *Packet;
 
 // API functions:
-StdPackage NET_stdPackageDeserialize(const Uint8 *buffer, Uint32 bufferSize);
-Uint32 NET_stdPackageSerialize(const StdPackage packet, Uint8 ** buffer);
-void NET_stdPackageDestroy(StdPackage paket);
-StdPackage NET_stdPackageCreate(GameState gameState, MessageType msgType, Uint32 payloadSize);
+Packet NET_packetDeserialize(const Uint8 *buffer, Uint32 bufferSize);
+Uint32 NET_packetSerialize(const Packet packet, Uint8 ** buffer);
+void NET_packetDestroy(Packet paket);
+Packet NET_packetCreate(GameState gameState, MessageType msgType, Uint32 payloadSize);
 
-Uint32 NET_stdPackageGetPayloadSize(StdPackage packet);
-Uint32 NET_stdPackageGetGameState(StdPackage packet);
-Uint32 NET_stdPackageGetMessageType(StdPackage packet);
-Uint8* NET_stdPackageGetPayload(StdPackage packet);
-void NET_stdPackageWrite32Payload(StdPackage packet, Uint32 Payload);
-void NET_stdPackageSetPayloadString(StdPackage aPkg,const char *str);
-void NET_stdPackagePayloadArray(StdPackage aPkg, const void* array, Uint32 size);
+Uint32 NET_packetGetPayloadSize(Packet packet);
+Uint32 NET_packetGetGameState(Packet packet);
+Uint32 NET_packetGetMessageType(Packet packet);
+Uint8* NET_packetGetPayload(Packet packet);
+void NET_packetWrite32Payload(Packet packet, Uint32 Payload);
+void NET_packetSetPayloadString(Packet aPkg,const char *str);
+void NET_packetPayloadArray(Packet aPkg, const void* array, Uint32 size);
 
 #endif

@@ -28,15 +28,15 @@ int main(int argc, char **argv ){
     while (isRunning){
         // Poll event checking if there is a packege to recive
         while (SDLNet_UDP_Recv(aServer->serverSocket, aServer->pReceivePacket)){
-            StdPackage aPkg = NET_stdPackageDeserialize(aServer->pReceivePacket->data, aServer->pReceivePacket->len);
+            Packet aPkg = NET_packetDeserialize(aServer->pReceivePacket->data, aServer->pReceivePacket->len);
             if(aPkg == NULL){
                 printf("Deserialization failed! Buffer might be invalid.\n");
                 break;
             } 
             //NET_stdPakegeGetGameState(aPkg);
-            switch (NET_stdPackageGetMessageType(aPkg)){
+            switch (NET_packetGetMessageType(aPkg)){
             case CONECT:
-                palyerID = (int)SDLNet_Read32(NET_stdPackageGetPayload(aPkg));
+                palyerID = (int)SDLNet_Read32(NET_packetGetPayload(aPkg));
                 printf("player id %d",palyerID);
                 break;
             case CONECT_RESPONSE:
@@ -49,7 +49,7 @@ int main(int argc, char **argv ){
 
                 break;
             case LOBBY_LIST:
-                printf("Hej det är %s", (char*)(NET_stdPackageGetPayload(aPkg)));
+                printf("Hej det är %s", (char*)(NET_packetGetPayload(aPkg)));
                 break;
             case LOBBY_LIST_RESPONSE:  
                 printf("hej\n");
@@ -61,7 +61,7 @@ int main(int argc, char **argv ){
                 printf("Failed!\n");
                 break;
             }
-            if(aPkg) NET_stdPackageDestroy(aPkg);
+            if(aPkg) NET_packetDestroy(aPkg);
             x++;
             if(x!=0)isRunning = false;
         }
@@ -72,9 +72,9 @@ int main(int argc, char **argv ){
     NET_severDestroySDL();
 }
 
-void NET_serverReceivePlayerList(StdPackage aPkg, PlayerList* list, int *count){
-    Uint8* raw = NET_stdPackageGetPayload(aPkg);
-    Uint32 size = NET_stdPackageGetPayloadSize(aPkg);
+void NET_serverReceivePlayerList(Packet aPkg, PlayerList* list, int *count){
+    Uint8* raw = NET_packetGetPayload(aPkg);
+    Uint32 size = NET_packetGetPayloadSize(aPkg);
     if(!raw){
         printf("RAWWWW error!");
     }
