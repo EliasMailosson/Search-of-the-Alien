@@ -32,8 +32,8 @@ void NET_stdPackageSetPayloadString(StdPackage aPkg,const char* str){
     memcpy(aPkg->payload, str, strlen(str)+1);
 }
 
-void NET_stdPackagePayloadArray(StdPackage aPkg, const void* array){
-    memcpy(aPkg->payload, array, (strlen(array)+1));
+void NET_stdPackagePayloadArray(StdPackage aPkg, const void* array, Uint32 size){
+    memcpy(aPkg->payload, array, size);
 }
 
 StdPackage NET_stdPackageDeserialize(const Uint8 *buffer, Uint32 bufferSize){
