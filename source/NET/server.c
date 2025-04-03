@@ -1,6 +1,5 @@
 #include "../../include/NET/server.h"
-#include "../../include/NET/shared.h"
-#include "../../include/NET/protocol.h"
+
 
 struct server{
     UDPsocket serverSocket;
@@ -25,6 +24,7 @@ int main(int argc, char **argv ){
     } 
     int x = 0;
     int palyerID = 0; 
+    int n = 0;
     while (isRunning){
         // Poll event checking if there is a packege to recive
         while (SDLNet_UDP_Recv(aServer->serverSocket, aServer->pReceivePacket)){
@@ -51,25 +51,10 @@ int main(int argc, char **argv ){
             case LOBBY_LIST:
                 printf("Hej det är %s", (char*)(NET_stdPackageGetPayload(aPkg)));
                 break;
-            case LOBBY_LIST_RESPONSE:{   
+            case LOBBY_LIST_RESPONSE:  
                 printf("hej\n");
-                Uint8* raw = NET_stdPackageGetPayload(aPkg);
-                Uint32 size = NET_stdPackageGetPayloadSize(aPkg);
-                if(!raw){
-                    printf("RAWWWW error!");
-                }
-                PlayerList* array = (PlayerList*)raw;
-                if(!array){
-                    printf("Array error!");
-                }
-
-                int count = size / sizeof(PlayerList);
-                for (int i = 0; i < 3; i++)
-                {
-                    printf("hej\n");
-                    printf("List: %d ID: %d pos: %d x, %d y\n", i, array[i].ID, array[i].pos.x, array[i].pos.y);
-                }
-                }
+                PlayerList list[3] = {0};
+                NET_serverReceivePlayerList(aPkg,list,&n);
                 break;
             default:
                 printf("Failed!\n");
@@ -80,8 +65,23 @@ int main(int argc, char **argv ){
             if(x!=0)isRunning = false;
         }
     }
+    printf("%d count\n",n);
+
     NET_serverDestroy(aServer);
     NET_severDestroySDL();
+}
+
+void NET_serverReceivePlayerList(StdPackage aPkg, PlayerList* list, int *count){
+    Uint8* raw = NET_stdPackageGetPayload(aPkg);
+    Uint32 size = NET_stdPackageGetPayloadSize(aPkg);
+    if(!raw){
+        printf("RAWWWW error!");
+    }
+    list = (PlayerList*)raw;
+    if(!list){
+        printf("list error!");
+    }
+    (*count) = size / sizeof(PlayerList);
 }
 
 void NET_serverDestroy(Server aServer){

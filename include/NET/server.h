@@ -1,6 +1,7 @@
 #ifndef SERVER_H
 #define SERVER_H
-
+#include "../../include/NET/shared.h"
+#include "../../include/NET/protocol.h"
 
 struct server;
 typedef struct server *Server;
@@ -13,6 +14,7 @@ Server NET_serverCreate();
 /** Freeing memory after use, for server */
 void NET_serverDestroy(Server aServer);
 
+void NET_serverReceivePlayerList(StdPackage aPkg, PlayerList* list, int *count);
 
 
 #endif
