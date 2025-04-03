@@ -11,11 +11,11 @@ int main(int argc, char **argv ){
 
     startClient(&view, &control);
     gameLoop(&control, &view);
-    Client aClient = {0};
-    aClient = NET_clientCreate();
-    NET_clientConnect(aClient);
-    NET_clientSend(aClient);
-    NET_clientDestroy(aClient);
+    // Client aClient = {0};
+    // aClient = NET_clientCreate();
+    // NET_clientConnect(aClient);
+    // NET_clientSend(aClient);
+    // NET_clientDestroy(aClient);
     killClient(&view);
     return 0;
 }

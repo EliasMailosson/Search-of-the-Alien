@@ -5,7 +5,7 @@
 #include "../include/game.h"
 
 void renderMenu(SDL_Renderer *pRend, Panel aPanel);
-Panel initMenu(SDL_Renderer *pRend);
+Panel initMenu(SDL_Renderer *pRend, ClientView *pView);
 void updateMenu(Panel aPanel, ClientControl *pControl);
 
 #endif

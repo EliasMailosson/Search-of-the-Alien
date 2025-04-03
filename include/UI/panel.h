@@ -8,16 +8,30 @@ enum CompTypes{UI_BUTTON, UI_LABEL, UI_CHECKLIST};
 
 typedef struct Panel *Panel;
 
+/*Create new empty panel*/
 Panel UI_panelCreate();
 
+/*Sets the appearance of a panel*/
 void UI_panelSetAppearance(Panel aPanel, SDL_Rect rect, SDL_Color src_bg);
 
+/**
+ * Adds a component to the panel.
+ * 
+ * \param aPanel the panel to add component to.
+ * \param comp this is the component. Can hold types: Button, Label, Checklist etc...
+ * \param type enum value for the component type. Ex) UI_BUTTON, UI_LABEL
+ * \param key unique key (char*) for the component. This is used to check for events linked to specified component.
+ * 
+*/
 void UI_panelAddComponent(Panel aPanel, void *comp, int type, char *key);
 
+/*Renders panel and all child-components*/
 void UI_panelRender(SDL_Renderer *pRend, Panel aPanel);
 
-void UI_panelUpdate(Panel aPanel, bool isMouseDown);
+/*Updates all child-components and poll for interaction*/
+void UI_panelUpdate(Panel aPanel, bool isMouseUp);
 
+/*Free's panel and all child-components*/
 void UI_panelDestroy(Panel aPanel);
 
 #endif
