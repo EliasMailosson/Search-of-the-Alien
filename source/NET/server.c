@@ -28,8 +28,8 @@ int main(int argc, char **argv ){
         printf("UDP server started on port %d\n", PORT);
     } 
     int x = 0;
-    int palyerID = 0; 
     int n = 0;
+    User newUser = {0};
     while (isRunning){
         // Poll event checking if there is a packege to recive
         while (SDLNet_UDP_Recv(aServer->serverSocket, aServer->pReceivePacket)){
@@ -40,18 +40,25 @@ int main(int argc, char **argv ){
             } 
             //NET_stdPakegeGetGameState(aPacket);
             switch (NET_packetGetMessageType(aPacket)){
-            case CONECT:
-                palyerID = (int)SDLNet_Read32(NET_packetGetPayload(aPacket));
-                printf("player id %d",palyerID);
+            case CONNECT:
+                newUser = (User){0};
+                newUser.Username = (char*)NET_packetGetPayload(aPacket);
+                newUser.IP = aServer->pReceivePacket->address;
+                newUser.LobbyID = -1;
+                newUser.State = NET_packetGetMessageType(aPacket);
+                NET_serverAddUser(aServer,newUser);
+                NET_serverSendInt(aServer,GLOBAL,CONNECT_RESPONSE,0,aServer->clientConunt-1);
+                //test
+                printf("usernam: %s\n",aServer->clients[aServer->clientConunt-1].Username);
                 break;
-            case CONECT_RESPONSE:
-
+            case CONNECT_RESPONSE:
+                // 
                 break;
-            case DISCONECT:
-
+            case DISCONNECT:
+                // fixa funtion som sökret ingeon clients och retunerar inxex
                 break;
-            case DISCONECT_RESPONSE:
-
+            case DISCONNECT_RESPONSE:
+                //brodcast till lobbyID
                 break;
             case LOBBY_LIST:
                 printf("Hej det är %s", (char*)(NET_packetGetPayload(aPacket)));

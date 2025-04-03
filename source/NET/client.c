@@ -11,7 +11,7 @@ struct client{
 void NET_clientSend(Client aClient){
     // Placeholder for sending the whole packege 
     Uint32 GameState = 42;
-    MessageType MSG = DISCONECT;
+    MessageType MSG = DISCONNECT;
     const char *testString = "Hello, Server!";
     // Set payloadSize to length of string + 1 for the null terminator.
     Uint32 payloadSize = (Uint32) (strlen(testString) + 1);
@@ -103,15 +103,22 @@ void NET_clientReceiver(Client aClient)
             break;
         } 
         //Handle recieving packets from the server
-        switch (NET_packetGetMessageType(aPacket))
-        {
-            case JOIN_LOBBY_RESPONSE:
-                // recv uppdated list 
-                break;
-            default:
-                break;
+        switch (NET_packetGetMessageType(aPacket)){
+        case CONNECT_RESPONSE:
+            printf("resivde %d",*((int*)NET_packetGetPayload(aPacket)));
+            break;
+        case DISCONNECT_RESPONSE:
+            /* code */
+            break;
+        case JOIN_LOBBY_RESPONSE:
+            /* code */
+            break;
+        case LOBBY_LIST:
+            // clientside uppdat player list
+            break;
+        default:
+            break;
         }
         if(aPacket) NET_packetDestroy(aPacket);
     }
-
 }

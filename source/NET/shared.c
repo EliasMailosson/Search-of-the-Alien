@@ -47,3 +47,11 @@ void NET_PlayerListPrintf(PlayerList* list, int count){
         printf("index %d, ID %d, pos X %d, pos Y %d",i,list[i].ID,list[i].pos.x,list[i].pos.y);
     }
 }
+
+
+void NET_PlayerListRemovPlayer(PlayerList *list,int index){
+    (void)list;(void)index;
+}
+void NET_PlayerListAddPlayer(PlayerList *list,PlayerList new_player){
+    (void)list;(void)new_player;
+}
