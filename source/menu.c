@@ -10,8 +10,23 @@ void renderMenu(SDL_Renderer *pRend, Menu *pMenu) {
 }
 
 void updateMenu(Menu *pMenu, ClientControl *pControl) {
+    static MenuEvent menuEvent;
+    static int switchDelay = 0;
+    switchDelay++;
     for(int i = 0; i < PANEL_COUNT; i++) {
-        UI_panelUpdate(pMenu->panels[i], pControl->isMouseUp);
+        UI_panelUpdate(pMenu->panels[i], &menuEvent, pControl->isMouseUp);
+
+        switch(menuEvent.eventType) {
+            case PANEL_SWITCH:
+                if(pMenu->currentPanel != menuEvent.newPanel && switchDelay > 4) {
+                    pMenu->currentPanel = menuEvent.newPanel;
+                    for(int i = 0; i < PANEL_COUNT; i++) {
+                        UI_panelSetActive(pMenu->panels[i], (i == pMenu->currentPanel));
+                    }
+                    switchDelay = 0;
+                }
+                break;
+        }
     }
 }
 
@@ -20,7 +35,7 @@ Menu initMenu(SDL_Renderer *pRend, ClientView *pView) {
     menu.fonts[0] = TTF_OpenFont("assets/fonts/PricedownBl-Regular 900.ttf", 20);
     menu.fonts[1] = TTF_OpenFont("assets/fonts/PricedownBl-Regular 900.ttf", 40);
 
-    menu.currentPanel = PANEL_SOCIAL;
+    menu.currentPanel = PANEL_START;
 
     for(int i = 0; i < PANEL_COUNT; i++) {
         menu.panels[i] = UI_panelCreate();
@@ -40,6 +55,7 @@ Menu initMenu(SDL_Renderer *pRend, ClientView *pView) {
         (SDL_Color) { .r = 0, .g = 0, .b = 0, .a = 255 }, 
         menu.fonts[1], (SDL_Color) { .r = 255, .g = 255, .b = 255, .a = 255 }
     );
+    UI_panelSetComponentLink(menu.panels[PANEL_START], "b1", PANEL_SOCIAL);
 
     // SOCIAL MENU ////////////////////////
     Button b2 = UI_buttonCreate();
@@ -50,6 +66,7 @@ Menu initMenu(SDL_Renderer *pRend, ClientView *pView) {
         (SDL_Color) { .r = 0, .g = 0, .b = 0, .a = 255 }, 
         menu.fonts[0], (SDL_Color) { .r = 255, .g = 255, .b = 255, .a = 255 }
     );
+    UI_panelSetComponentLink(menu.panels[PANEL_SOCIAL], "b2", PANEL_START);
 
     // OPTIONS MENU ////////////////////////
     

@@ -1,6 +1,7 @@
 #include "../../include/UI/panel.h"
 #include <stdlib.h>
 #include <string.h>
+#include "../../include/menu.h"
 #include "../../include/UI/label.h"
 #include "../../include/UI/button.h"
 #include "../../include/UI/checklist.h"
@@ -9,6 +10,8 @@ typedef struct component {
     void* pComp;
     char key[64];
     int type;
+    bool hasPanelLink;
+    int panelLink;
 } Component;
 
 typedef struct Panel {
@@ -44,7 +47,18 @@ void UI_panelAddComponent(Panel aPanel, void* comp, int type, char* key) {
         aPanel->compList[aPanel->compCount].pComp = comp;
         aPanel->compList[aPanel->compCount].type = type;
         strcpy(aPanel->compList[aPanel->compCount].key, key);
+        aPanel->compList[aPanel->compCount].hasPanelLink = false;
         (aPanel->compCount)++;
+    }
+}
+
+void UI_panelSetComponentLink(Panel aPanel, char* key, int panelLink) {
+    for(int i = 0; i < aPanel->compCount; i++) {
+        if(strcmp(key, aPanel->compList[i].key) == 0 && aPanel->compList[i].type == UI_BUTTON) {
+            aPanel->compList[i].panelLink = panelLink;
+            aPanel->compList[i].hasPanelLink = true;
+            break;
+        }
     }
 }
 
@@ -53,9 +67,11 @@ void UI_panelSetAppearance(Panel aPanel, SDL_Rect rect, SDL_Color src_bg) {
     aPanel->rect = rect;
 }
 
-void UI_panelUpdate(Panel aPanel, bool isMouseUp) {
+void UI_panelUpdate(Panel aPanel, MenuEvent *pEvent, bool isMouseUp) {
     if(aPanel == NULL) return;
     if(!aPanel->active) return;
+
+    pEvent->eventType = PANEL_IDLE;
 
     int mouseX, mouseY;
     SDL_GetMouseState(&mouseX, &mouseY);
@@ -67,7 +83,12 @@ void UI_panelUpdate(Panel aPanel, bool isMouseUp) {
         case UI_BUTTON:
             if(UI_buttonIsHovered((Button)aPanel->compList[i].pComp, mouseX, mouseY)) {
                 if(isMouseUp) {
+                    pEvent->eventType = BUTTON_CLICKED;
                     printf("Button Clicked! (key: %s)\n", aPanel->compList[i].key);
+                    if(aPanel->compList[i].hasPanelLink) {
+                        pEvent->eventType = PANEL_SWITCH;
+                        pEvent->newPanel = aPanel->compList[i].panelLink;
+                    }
                     return;
                 }
             }
@@ -75,6 +96,7 @@ void UI_panelUpdate(Panel aPanel, bool isMouseUp) {
         
         case UI_CHECKLIST:
             if(isMouseUp) {
+                pEvent->eventType = CHECKLIST_UPDATED;
                 bool values[20];
                 UI_checklistToggle((Checklist)aPanel->compList[i].pComp, mouseX, mouseY);
                 UI_ChecklistGetItemValues((Checklist)aPanel->compList[i].pComp, values);
@@ -91,7 +113,7 @@ void UI_panelUpdate(Panel aPanel, bool isMouseUp) {
 
 void UI_panelRender(SDL_Renderer* pRend, Panel aPanel) {
     if(!aPanel->active) return;
-    
+
     if (aPanel->hasImage) {
 
     }

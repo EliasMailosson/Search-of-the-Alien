@@ -8,6 +8,8 @@ enum CompTypes{UI_BUTTON, UI_LABEL, UI_CHECKLIST};
 
 typedef struct Panel *Panel;
 
+typedef struct menuEvent MenuEvent;
+
 /*Create new empty panel*/
 Panel UI_panelCreate();
 
@@ -29,10 +31,13 @@ void UI_panelAddComponent(Panel aPanel, void *comp, int type, char *key);
 void UI_panelRender(SDL_Renderer *pRend, Panel aPanel);
 
 /*Updates all child-components and poll for interaction*/
-void UI_panelUpdate(Panel aPanel, bool isMouseUp);
+void UI_panelUpdate(Panel aPanel, MenuEvent *pEvent, bool isMouseUp);
 
 /*Toggle the visibility and activity of a panel*/
 void UI_panelSetActive(Panel aPanel, bool active);
+
+/*Adds panel reference link to a button (Must be type Button)*/
+void UI_panelSetComponentLink(Panel aPanel, char* key, int panelLink);
 
 /*Free's panel and all child-components*/
 void UI_panelDestroy(Panel aPanel);

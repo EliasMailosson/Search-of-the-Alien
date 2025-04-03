@@ -8,6 +8,14 @@
 #define FONT_COUNT 2
 
 enum MenuPanels {PANEL_START, PANEL_SOCIAL, PANEL_OPTIONS};
+enum MenuEvents {PANEL_IDLE, BUTTON_CLICKED, CHECKLIST_UPDATED, PANEL_SWITCH};
+
+typedef struct menuEvent {
+    int eventType;
+    char key[256];
+
+    int newPanel;
+} MenuEvent;
 
 typedef struct menu {
     Panel panels[PANEL_COUNT];
