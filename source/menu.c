@@ -3,34 +3,56 @@
 #include "../include/UI/button.h"
 #include "../include/UI/checklist.h"
 
-void renderMenu(SDL_Renderer* pRend, Panel aPanel) {
-    UI_panelRender(pRend, aPanel);
+void renderMenu(SDL_Renderer *pRend, Menu *pMenu) {
+    for(int i = 0; i < PANEL_COUNT; i++) {
+        UI_panelRender(pRend, pMenu->panels[PANEL_START]);
+    }
 }
 
-void updateMenu(Panel aPanel, ClientControl *pControl) {
-    UI_panelUpdate(aPanel, pControl->isMouseUp);
+void updateMenu(Menu *pMenu, ClientControl *pControl) {
+    for(int i = 0; i < PANEL_COUNT; i++) {
+        UI_panelUpdate(pMenu->panels[i], pControl->isMouseUp);
+    }
 }
 
-Panel initMenu(SDL_Renderer* pRend, ClientView *pView) {
-    TTF_Font* pFont = TTF_OpenFont("assets/fonts/PricedownBl-Regular 900.ttf", 20);
+Menu initMenu(SDL_Renderer *pRend, ClientView *pView) {
+    Menu menu;
+    menu.fonts[0] = TTF_OpenFont("assets/fonts/PricedownBl-Regular 900.ttf", 20);
+    menu.fonts[1] = TTF_OpenFont("assets/fonts/PricedownBl-Regular 900.ttf", 40);
 
-    Panel aPanel = UI_panelCreate();
-    UI_panelSetAppearance(aPanel, 
-        (SDL_Rect) { .x = 0, .y = 0, .w = pView->windowWidth, .h = pView->windowHeight }, 
-        (SDL_Color) { .r = 0, .g = 200, .b = 255, .a = 255 }
+    menu.currentPanel = PANEL_START;
+
+    for(int i = 0; i < PANEL_COUNT; i++) {
+        menu.panels[i] = UI_panelCreate();
+        UI_panelSetAppearance(menu.panels[i], 
+            (SDL_Rect) { .x = 0, .y = 0, .w = pView->windowWidth, .h = pView->windowHeight }, 
+            (SDL_Color) { .r = 0, .g = 0, .b = 0, .a = 255 }
+        );
+    }
+
+    // START MENU /////////////////////////
+    Button b1 = UI_buttonCreate();
+    UI_panelAddComponent(menu.panels[PANEL_START], b1, UI_BUTTON, "b1");
+    UI_buttonSetText(b1, "Start Menu");
+    UI_buttonDimensions(b1, 200, 100, 300, 60);
+    UI_buttonSetLabelappearence(pRend, b1, 
+        (SDL_Color) { .r = 0, .g = 0, .b = 0, .a = 255 }, 
+        menu.fonts[1], (SDL_Color) { .r = 255, .g = 255, .b = 255, .a = 255 }
     );
+    
 
-    Label aLabel = UI_labelCreate();
-    UI_labelSetAppearance(pRend, aLabel, 100, 100, (SDL_Color) { 255, 255, 255, 255 }, pFont);
-    UI_panelAddComponent(aPanel, aLabel, UI_LABEL, "label1");
+    // SOCIAL MENU ////////////////////////
+    
+    return menu;
+}
 
-    Button aButton = UI_buttonCreate();
-    UI_panelAddComponent(aPanel, aButton, UI_BUTTON, "button 1");
-    UI_buttonDimensions(aButton, 700, 200, 50, 100);
-    UI_buttonSetLabelappearence(pRend, aButton, (SDL_Color) { 255, 255, 255, 255 }, pFont, (SDL_Color) {0, 0, 0, 0});
+void destroyMenu(Menu *pMenu) {
+    for(int i = 0; i < PANEL_COUNT; i++) {
+        UI_panelDestroy(pMenu->panels[i]);
+    }
 
-    Checklist aChecklist = UI_checklistCreate();
-    UI_panelAddComponent(aPanel, aChecklist, UI_CHECKLIST, "Checklist");
-
-    return aPanel;
+    for(int i = 0; i < FONT_COUNT; i++) {
+        TTF_CloseFont(pMenu->fonts[i]);
+        pMenu->fonts[i] = NULL;
+    }
 }

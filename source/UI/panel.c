@@ -16,6 +16,7 @@ typedef struct Panel {
     SDL_Color bg;
     SDL_Texture* pBgImage;
     bool hasImage;
+    bool hidden;
 
     Component compList[20];
     int compCount;

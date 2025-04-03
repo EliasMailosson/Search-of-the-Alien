@@ -8,6 +8,7 @@
 #include <SDL_net.h>
 #include "../include/UI/panel.h"
 
+typedef struct menu Menu;
 typedef struct {
     SDL_Window *pWin;
     SDL_Renderer *pRend;
@@ -21,7 +22,7 @@ typedef struct {
     bool isMouseDown, isMouseUp;
 }ClientControl;
 
-void render(ClientView *pView, Panel aPanel);
+void render(ClientView *pView, Menu *pMenu);
 void eventHandler(ClientControl *pControl);
 void gameLoop(ClientControl *pControl, ClientView *pView);
 

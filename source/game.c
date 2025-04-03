@@ -2,14 +2,14 @@
 #include "../include/menu.h"
 
 void gameLoop(ClientControl *pControl, ClientView *pView){
-    Panel aPanel = initMenu(pView->pRend, pView);
+    Menu menu = initMenu(pView->pRend, pView);
     while (pControl->isRunning){
         eventHandler(pControl);
-        updateMenu(aPanel, pControl);
-        render(pView, aPanel);
+        updateMenu(&menu, pControl);
+        render(pView, &menu);
     }
 
-    UI_panelDestroy(aPanel);
+    destroyMenu(&menu);
 }
 
 void eventHandler(ClientControl *pControl){
@@ -37,9 +37,9 @@ void eventHandler(ClientControl *pControl){
     }
 }
 
-void render(ClientView *pView, Panel aPanel){
+void render(ClientView *pView, Menu *pMenu){
     SDL_SetRenderDrawColor(pView->pRend, 0,0,0,0);
     SDL_RenderClear(pView->pRend);
-    renderMenu(pView->pRend, aPanel);
+    renderMenu(pView->pRend, pMenu);
     SDL_RenderPresent(pView->pRend);
 }
