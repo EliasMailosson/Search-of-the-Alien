@@ -64,12 +64,16 @@ Menu initMenu(SDL_Renderer *pRend, ClientView *pView) {
 
     Button b2 = UI_buttonCreate();
     UI_panelAddComponent(menu.panels[PANEL_SOCIAL], b2, UI_BUTTON, "b2");
-    UI_buttonSetText(b2, "Social");
-    UI_buttonDimensions(b2, 200, 100, 300, 60);
-    UI_buttonSetLabelappearence(pRend, b2, 
-        (SDL_Color) { .r = 0, .g = 0, .b = 0, .a = 255 }, 
+    UI_buttonConfigure(b2, "Social", 
+        200, 100, 300, 60, pRend, (SDL_Color) { .r = 0, .g = 0, .b = 0, .a = 255 }, 
         menu.fonts[0], (SDL_Color) { .r = 255, .g = 255, .b = 255, .a = 255 }
     );
+    // UI_buttonSetText(b2, "Social");
+    // UI_buttonDimensions(b2, 200, 100, 300, 60);
+    // UI_buttonSetLabelappearence(pRend, b2, 
+    //     (SDL_Color) { .r = 0, .g = 0, .b = 0, .a = 255 }, 
+    //     menu.fonts[0], (SDL_Color) { .r = 255, .g = 255, .b = 255, .a = 255 }
+    // );
     UI_panelSetComponentLink(menu.panels[PANEL_SOCIAL], "b2", PANEL_START);
 
     // OPTIONS MENU ////////////////////////

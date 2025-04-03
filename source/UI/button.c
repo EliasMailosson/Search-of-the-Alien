@@ -62,6 +62,12 @@ bool UI_buttonIsHovered(Button aButton, int mouseX, int mouseY) {
     else return false;
 }
 
+void UI_buttonConfigure(Button aButton, char* text, int newX, int newY, int newWidth, int newHeight, SDL_Renderer* pRend, SDL_Color textColor, TTF_Font* pFont, SDL_Color buttonColor) {
+    UI_buttonSetText(aButton, text);
+    UI_buttonDimensions(aButton, newX, newY, newWidth, newHeight);
+    UI_buttonSetLabelappearence(pRend, aButton, textColor, pFont, buttonColor);
+}
+
 void UI_buttonDestroy(Button aButton) {
     UI_labelDestroy(aButton->buttonText);
     free(aButton);
