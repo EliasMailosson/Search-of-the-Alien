@@ -16,7 +16,7 @@ typedef struct Panel {
     SDL_Color bg;
     SDL_Texture* pBgImage;
     bool hasImage;
-    bool hidden;
+    bool active;
 
     Component compList[20];
     int compCount;
@@ -30,8 +30,13 @@ Panel UI_panelCreate() {
     aPanel->rect = (SDL_Rect){ .x = 0, .y = 0, .w = 1, .h = 1 };
     aPanel->pBgImage = NULL;
     aPanel->hasImage = false;
+    aPanel->active = true;
 
     return aPanel;
+}
+
+void UI_panelSetActive(Panel aPanel, bool active) {
+    aPanel->active = active;
 }
 
 void UI_panelAddComponent(Panel aPanel, void* comp, int type, char* key) {
@@ -50,6 +55,7 @@ void UI_panelSetAppearance(Panel aPanel, SDL_Rect rect, SDL_Color src_bg) {
 
 void UI_panelUpdate(Panel aPanel, bool isMouseUp) {
     if(aPanel == NULL) return;
+    if(!aPanel->active) return;
 
     int mouseX, mouseY;
     SDL_GetMouseState(&mouseX, &mouseY);
@@ -84,6 +90,8 @@ void UI_panelUpdate(Panel aPanel, bool isMouseUp) {
 }
 
 void UI_panelRender(SDL_Renderer* pRend, Panel aPanel) {
+    if(!aPanel->active) return;
+    
     if (aPanel->hasImage) {
 
     }

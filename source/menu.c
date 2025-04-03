@@ -5,7 +5,7 @@
 
 void renderMenu(SDL_Renderer *pRend, Menu *pMenu) {
     for(int i = 0; i < PANEL_COUNT; i++) {
-        UI_panelRender(pRend, pMenu->panels[PANEL_START]);
+        UI_panelRender(pRend, pMenu->panels[i]);
     }
 }
 
@@ -20,7 +20,7 @@ Menu initMenu(SDL_Renderer *pRend, ClientView *pView) {
     menu.fonts[0] = TTF_OpenFont("assets/fonts/PricedownBl-Regular 900.ttf", 20);
     menu.fonts[1] = TTF_OpenFont("assets/fonts/PricedownBl-Regular 900.ttf", 40);
 
-    menu.currentPanel = PANEL_START;
+    menu.currentPanel = PANEL_SOCIAL;
 
     for(int i = 0; i < PANEL_COUNT; i++) {
         menu.panels[i] = UI_panelCreate();
@@ -28,6 +28,7 @@ Menu initMenu(SDL_Renderer *pRend, ClientView *pView) {
             (SDL_Rect) { .x = 0, .y = 0, .w = pView->windowWidth, .h = pView->windowHeight }, 
             (SDL_Color) { .r = 0, .g = 0, .b = 0, .a = 255 }
         );
+        UI_panelSetActive(menu.panels[i], (i == menu.currentPanel));
     }
 
     // START MENU /////////////////////////
@@ -39,9 +40,18 @@ Menu initMenu(SDL_Renderer *pRend, ClientView *pView) {
         (SDL_Color) { .r = 0, .g = 0, .b = 0, .a = 255 }, 
         menu.fonts[1], (SDL_Color) { .r = 255, .g = 255, .b = 255, .a = 255 }
     );
-    
 
     // SOCIAL MENU ////////////////////////
+    Button b2 = UI_buttonCreate();
+    UI_panelAddComponent(menu.panels[PANEL_SOCIAL], b2, UI_BUTTON, "b2");
+    UI_buttonSetText(b2, "Social");
+    UI_buttonDimensions(b2, 200, 100, 300, 60);
+    UI_buttonSetLabelappearence(pRend, b2, 
+        (SDL_Color) { .r = 0, .g = 0, .b = 0, .a = 255 }, 
+        menu.fonts[0], (SDL_Color) { .r = 255, .g = 255, .b = 255, .a = 255 }
+    );
+
+    // OPTIONS MENU ////////////////////////
     
     return menu;
 }

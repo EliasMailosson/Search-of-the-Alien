@@ -31,6 +31,9 @@ void UI_panelRender(SDL_Renderer *pRend, Panel aPanel);
 /*Updates all child-components and poll for interaction*/
 void UI_panelUpdate(Panel aPanel, bool isMouseUp);
 
+/*Toggle the visibility and activity of a panel*/
+void UI_panelSetActive(Panel aPanel, bool active);
+
 /*Free's panel and all child-components*/
 void UI_panelDestroy(Panel aPanel);
 
