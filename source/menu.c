@@ -25,7 +25,7 @@ Panel initMenu(SDL_Renderer* pRend) {
     Button aButton = UI_buttonCreate();
     UI_panelAddComponent(aPanel, aButton, UI_BUTTON, "button 1");
     UI_buttonDimensions(aButton, 700, 200, 50, 100);
-    UI_setButtonLabelappearence(pRend, aButton, (SDL_Color) { 255, 255, 255, 255 }, pFont);
+    UI_buttonSetLabelappearence(pRend, aButton, (SDL_Color) { 255, 255, 255, 255 }, pFont, (SDL_Color) {0, 0, 0, 0});
 
     Checklist aChecklist = UI_checklistCreate();
     UI_panelAddComponent(aPanel, aChecklist, UI_CHECKLIST, "Checklist");

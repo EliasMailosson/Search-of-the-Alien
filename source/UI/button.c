@@ -41,9 +41,10 @@ void UI_buttonSetTextPosition(Button aButton) {
     UI_labelSetPosition(aButton->buttonText, xPos, yPos);
 }
 
-void UI_setButtonLabelappearence(SDL_Renderer* pRend, Button aButton, SDL_Color color, TTF_Font* pFont) {
-    UI_labelSetAppearance(pRend, aButton->buttonText, aButton->buttonRect.x, aButton->buttonRect.y, color, pFont);
+void UI_buttonSetLabelappearence(SDL_Renderer* pRend, Button aButton, SDL_Color textColor, TTF_Font* pFont, SDL_Color buttonColor) {
+    UI_labelSetAppearance(pRend, aButton->buttonText, aButton->buttonRect.x, aButton->buttonRect.y, textColor, pFont);
     UI_buttonSetTextPosition(aButton);
+    aButton->backgroundColor = buttonColor;
     UI_labelRefreshTexture(pRend, aButton->buttonText);
 }
 
@@ -55,7 +56,9 @@ void UI_buttonRenderer(SDL_Renderer* pRend, Button aButton) {
 }
 
 bool UI_buttonIsHovered(Button aButton, int mouseX, int mouseY) {
-    if (mouseX >= aButton->buttonRect.x && mouseX <= (aButton->buttonRect.x + aButton->buttonRect.w) && mouseY >= aButton->buttonRect.y && mouseY <= (aButton->buttonRect.y + aButton->buttonRect.h)) return true;
+    if (mouseX >= aButton->buttonRect.x && mouseX <= (aButton->buttonRect.x + aButton->buttonRect.w) 
+    && mouseY >= aButton->buttonRect.y && mouseY <= (aButton->buttonRect.y + aButton->buttonRect.h)) 
+    return true;
     else return false;
 }
 
