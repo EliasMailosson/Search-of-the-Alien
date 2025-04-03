@@ -1,12 +1,12 @@
 #include "../include/game.h"
 #include "../include/menu.h"
 
-void gameLoop(ClientControl *control, ClientView *view){
-    Panel aPanel = initMenu(view->pRend);
-    while (control->isRunning){
-        eventHandler(control);
-        updateMenu(aPanel, control);
-        render(view, aPanel);
+void gameLoop(ClientControl *pControl, ClientView *pView){
+    Panel aPanel = initMenu(pView->pRend, pView);
+    while (pControl->isRunning){
+        eventHandler(pControl);
+        updateMenu(aPanel, pControl);
+        render(pView, aPanel);
     }
 
     UI_panelDestroy(aPanel);

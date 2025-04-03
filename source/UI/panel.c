@@ -47,7 +47,7 @@ void UI_panelSetAppearance(Panel aPanel, SDL_Rect rect, SDL_Color src_bg) {
     aPanel->rect = rect;
 }
 
-void UI_panelUpdate(Panel aPanel, bool isMouseDown) {
+void UI_panelUpdate(Panel aPanel, bool isMouseUp) {
     if(aPanel == NULL) return;
 
     int mouseX, mouseY;
@@ -59,7 +59,7 @@ void UI_panelUpdate(Panel aPanel, bool isMouseDown) {
 
         case UI_BUTTON:
             if(UI_buttonIsHovered((Button)aPanel->compList[i].pComp, mouseX, mouseY)) {
-                if(isMouseDown) {
+                if(isMouseUp) {
                     printf("Button Clicked! (key: %s)\n", aPanel->compList[i].key);
                     return;
                 }
@@ -67,13 +67,13 @@ void UI_panelUpdate(Panel aPanel, bool isMouseDown) {
             break;
         
         case UI_CHECKLIST:
-            if(isMouseDown) {
+            if(isMouseUp) {
                 bool values[20];
                 UI_checklistToggle((Checklist)aPanel->compList[i].pComp, mouseX, mouseY);
                 UI_ChecklistGetItemValues((Checklist)aPanel->compList[i].pComp, values);
-                for(int i = 0; i < 20; i++) {
-                    printf("checkbox %d: (%s)\n", i, (values[i]) ? "true" : "false");
-                }
+                // for(int i = 0; i < 20; i++) {
+                //     printf("checkbox %d: (%s)\n", i, (values[i]) ? "true" : "false");
+                // }
                 return;
             }
             break;

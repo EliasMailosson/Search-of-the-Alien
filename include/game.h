@@ -23,6 +23,6 @@ typedef struct {
 
 void render(ClientView *pView, Panel aPanel);
 void eventHandler(ClientControl *pControl);
-void gameLoop(ClientControl *control, ClientView *view);
+void gameLoop(ClientControl *pControl, ClientView *pView);
 
 #endif
