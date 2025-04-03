@@ -55,6 +55,7 @@ int main(int argc, char **argv ){
                 printf("hej\n");
                 PlayerList list[3] = {0};
                 NET_serverReceivePlayerList(aPkg,list,&n);
+                NET_PlayerListPrintf(list,3);
                 break;
             default:
                 printf("Failed!\n");
@@ -82,6 +83,12 @@ void NET_serverReceivePlayerList(StdPackage aPkg, PlayerList* list, int *count){
         printf("list error!");
     }
     (*count) = size / sizeof(PlayerList);
+}
+
+void NET_PlayerListPrintf(PlayerList* list, int count){
+    for (int i = 0; i < count; i++){
+        printf("index %d, ID %d, pos X %d, pos Y %d",i,list[i].ID,list[i].pos.x,list[i].pos.y);
+    }
 }
 
 void NET_serverDestroy(Server aServer){
