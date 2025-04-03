@@ -92,3 +92,26 @@ void NET_clientSendString(Client aClient,GameState GS, MessageType msgType,const
 void NET_clientSendArray(Client aClient,GameState GS, MessageType msgType,const void* array, Uint32 arraySize){
     NET_protocolSendArray(aClient->pSendPacket, aClient->clientSocket, aClient->serverAddr, GS, msgType, array, arraySize);
 }
+
+void NET_clientReceiver(Client aClient)
+{
+
+    while (SDLNet_UDP_Recv(aClient->clientSocket, aClient->pReceivePacket)){
+        Packet aPacket = NET_packetDeserialize(aClient->pReceivePacket->data, aClient->pReceivePacket->len);
+        if(aPacket == NULL){
+            printf("Deserialization for Client failed! Buffer might be invalid.\n");
+            break;
+        } 
+        //Handle recieving packets from the server
+        switch (NET_packetGetMessageType(aPacket))
+        {
+            case JOIN_LOBBY_RESPONSE:
+                // recv uppdated list 
+                break;
+            default:
+                break;
+        }
+        if(aPacket) NET_packetDestroy(aPacket);
+    }
+
+}

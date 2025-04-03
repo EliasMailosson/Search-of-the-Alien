@@ -3,6 +3,8 @@
 #include "../../include/NET/shared.h"
 #include "../../include/NET/protocol.h"
 
+typedef struct User User;
+
 struct server;
 typedef struct server *Server;
 
@@ -11,11 +13,14 @@ typedef struct server *Server;
  */
 Server NET_serverCreate();
 
+void NET_serverSendInt(Server aServer,GameState GS, MessageType msgType,int placeHolder, int index);
+void NET_serverSendString(Server aServer,GameState GS, MessageType msgType, const char* str, int index);
+void NET_serverSendArray(Server aServer,GameState GS, MessageType msgType, const void* array, Uint32 arraySize, int index);
+
+void NET_serverRemovUser(Server aServer,int index);
+void NET_serverAddUser(Server aServer, User newUser);
+
 /** Freeing memory after use, for server */
 void NET_serverDestroy(Server aServer);
-
-void NET_serverReceivePlayerList(Packet aPacket, PlayerList* list, int *count);
-void NET_PlayerListPrintf(PlayerList* list, int count);
-
 
 #endif

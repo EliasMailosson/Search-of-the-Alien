@@ -17,6 +17,8 @@ typedef enum{
     DISCONECT_RESPONSE,
     LOBBY_LIST,
     LOBBY_LIST_RESPONSE,
+    JOIN_LOBBY,
+    JOIN_LOBBY_RESPONSE,
 } MessageType;
 
 

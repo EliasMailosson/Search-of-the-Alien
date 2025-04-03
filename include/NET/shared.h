@@ -27,5 +27,7 @@ typedef struct{
 void NET_PlayerListRemovPlayer(PlayerList *list,int index);
 void NET_PlayerListAddPlayer(PlayerList *list,PlayerList new_player);
 void NET_PlayerListRead(PlayerList *new_player);
+void NET_PlayerListUpdate(Packet aPacket, PlayerList* list, int *count);
+void NET_PlayerListPrintf(PlayerList* list, int count);
 
 #endif

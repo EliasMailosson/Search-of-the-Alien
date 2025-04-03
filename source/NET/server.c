@@ -1,12 +1,17 @@
 #include "../../include/NET/server.h"
 
-
+struct User{
+    IPaddress IP;
+    char* Username;
+    int LobbyID;
+    GameState State;
+};
 struct server{
     UDPsocket serverSocket;
-    IPaddress clientIP[MAX_CLIENTS];
     int clientConunt;
     UDPpacket *pReceivePacket;
     UDPpacket *pSendPacket;
+    User *clients;
 };
 
 int main(int argc, char **argv ){
@@ -54,7 +59,7 @@ int main(int argc, char **argv ){
             case LOBBY_LIST_RESPONSE:  
                 printf("hej\n");
                 PlayerList list[3] = {0};
-                NET_serverReceivePlayerList(aPacket,list,&n);
+                NET_PlayerListUpdate(aPacket,list,&n);
                 NET_PlayerListPrintf(list,3);
                 break;
             default:
@@ -72,25 +77,6 @@ int main(int argc, char **argv ){
     NET_severDestroySDL();
 }
 
-void NET_serverReceivePlayerList(Packet aPacket, PlayerList* list, int *count){
-    Uint8* raw = NET_packetGetPayload(aPacket);
-    Uint32 size = NET_packetGetPayloadSize(aPacket);
-    if(!raw){
-        printf("RAWWWW error!");
-    }
-    list = (PlayerList*)raw;
-    if(!list){
-        printf("list error!");
-    }
-    (*count) = size / sizeof(PlayerList);
-}
-
-void NET_PlayerListPrintf(PlayerList* list, int count){
-    for (int i = 0; i < count; i++){
-        printf("index %d, ID %d, pos X %d, pos Y %d",i,list[i].ID,list[i].pos.x,list[i].pos.y);
-    }
-}
-
 void NET_serverDestroy(Server aServer){
     if(aServer->pReceivePacket != NULL){
         SDLNet_FreePacket(aServer->pReceivePacket);
@@ -104,6 +90,7 @@ void NET_serverDestroy(Server aServer){
         SDLNet_UDP_Close(aServer->serverSocket);
         aServer->serverSocket = NULL;
     }
+    free(aServer->clients);
     free(aServer);
 }
 
@@ -113,6 +100,7 @@ Server NET_serverCreate(){
         fprintf(stderr,"Error allocating memory for server\n");
         return NULL;
     }
+    aServer->clients = NULL;
     aServer->clientConunt = 0;
      // Open server UDP socket
     aServer->serverSocket = SDLNet_UDP_Open(PORT);
@@ -129,4 +117,55 @@ Server NET_serverCreate(){
     }
     return aServer;
 } 
+
+// Functions to send datatypes to the clients
+void NET_serverSendInt(Server aServer,GameState GS, MessageType msgType,int placeHolder, int index){
+    NET_protocolSendInt(aServer->pSendPacket, aServer->serverSocket, aServer->clients[index].IP, GS, msgType, placeHolder);
+}
+
+void NET_serverSendString(Server aServer,GameState GS, MessageType msgType, const char* str, int index){
+    NET_protocolSendString(aServer->pSendPacket, aServer->serverSocket, aServer->clients[index].IP, GS, msgType, str);
+}
+
+void NET_serverSendArray(Server aServer,GameState GS, MessageType msgType, const void* array, Uint32 arraySize, int index){
+    NET_protocolSendArray(aServer->pSendPacket, aServer->serverSocket, aServer->clients[index].IP, GS, msgType, array, arraySize);
+}
+
+void NET_serverRemovUser(Server aServer,int index){
+    if(index < 0 || index >= aServer->clientConunt){
+        printf("Invalid index\n");
+        return;
+    }
+
+    for (int i = index; i < aServer->clientConunt - 1; i++){
+        aServer->clients[i] = aServer->clients[i + 1];
+    }
+
+    User* temp = NULL;
+    if(aServer->clientConunt - 1 > 0){
+        temp = realloc(aServer->clients, (aServer->clientConunt - 1) * sizeof(User));
+        if(temp == NULL){
+            printf("Realloc failed when removing user\n");
+            return;
+        }
+    }
+    aServer->clients = temp;
+    aServer->clientConunt--;
+}
+
+void NET_serverAddUser(Server aServer, User newUser){
+    User* temp = realloc(aServer->clients, (aServer->clientConunt + 1) * sizeof(User));
+
+    if(temp != NULL){
+        aServer->clients = temp;
+        aServer->clients[aServer->clientConunt] = newUser;
+        aServer->clientConunt++;
+    }
+    else{
+        printf("Realloc failed when adding a user!\n");
+    }
+}
+
+
+
 

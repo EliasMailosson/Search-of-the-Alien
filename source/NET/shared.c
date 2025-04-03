@@ -28,3 +28,22 @@ void NET_PlayerListRead(PlayerList *new_player){
     fclose(fp);
     printf("%d\n", new_player->ID);
 }
+
+void NET_PlayerListUpdate(Packet aPacket, PlayerList* list, int *count){
+    Uint8* raw = NET_packetGetPayload(aPacket);
+    Uint32 size = NET_packetGetPayloadSize(aPacket);
+    if(!raw){
+        printf("Raw error!");
+    }
+    list = (PlayerList*)raw;
+    if(!list){
+        printf("list error!");
+    }
+    (*count) = size / sizeof(PlayerList);
+}
+
+void NET_PlayerListPrintf(PlayerList* list, int count){
+    for (int i = 0; i < count; i++){
+        printf("index %d, ID %d, pos X %d, pos Y %d",i,list[i].ID,list[i].pos.x,list[i].pos.y);
+    }
+}
