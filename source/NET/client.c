@@ -81,6 +81,10 @@ void NET_clientDestroy(Client aClient){
     free(aClient);
 }
 
-void NET_clientSendID(Client aClient,GameState GS, MessageType msgType,int playerID){
-    NET_protocolConectSend(aClient->pSendPacket,aClient->clientSocket,aClient->serverAddr,GS,msgType,playerID);
+void NET_clientSendInt(Client aClient,GameState GS, MessageType msgType,int placeHolder){
+    NET_protocolSendInt(aClient->pSendPacket,aClient->clientSocket,aClient->serverAddr,GS,msgType,placeHolder);
+}
+
+void NET_clientSendString(Client aClient,GameState GS, MessageType msgType,const char* str){
+    NET_protocolSendString(aClient->pSendPacket, aClient->clientSocket, aClient->serverAddr, GS, msgType, str);
 }

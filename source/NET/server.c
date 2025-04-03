@@ -49,7 +49,7 @@ int main(int argc, char **argv ){
 
                 break;
             case LOBBY_LIST:
-
+                printf("Hej det är %s", (char*)(NET_stdPackageGetPayload(aPkg)));
                 break;
             case LOBBY_LIST_RESPONSE:   
 
