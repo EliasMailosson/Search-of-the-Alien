@@ -15,6 +15,7 @@ Server NET_serverCreate();
 void NET_serverDestroy(Server aServer);
 
 void NET_serverReceivePlayerList(StdPackage aPkg, PlayerList* list, int *count);
+void NET_PlayerListPrintf(PlayerList* list, int count);
 
 
 #endif
