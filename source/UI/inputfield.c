@@ -51,8 +51,20 @@ void UI_inputfieldSetFocus(Inputfield aInputfield, int mouseX, int mouseY) {
 }
 
 void UI_inputfieldUpdateBuffer(Inputfield aInputfield, char *text) {
-    strcat(aInputfield->buffer, text);
-    (aInputfield->bufferLenght)++;
+    char temp[256];
+    char end[256];
+    memcpy(temp, aInputfield->buffer, aInputfield->cursorIdx);
+    temp[aInputfield->cursorIdx] = '\0';
+    memcpy(end, aInputfield->buffer + aInputfield->cursorIdx, aInputfield->bufferLenght - aInputfield->cursorIdx);
+    end[aInputfield->bufferLenght - aInputfield->cursorIdx] = '\0';
+
+    strcat(temp, text);
+    strcat(temp, end);
+    memcpy(aInputfield->buffer, temp, sizeof(temp));
+    aInputfield->buffer[sizeof(temp)] = '\0';
+
+    (aInputfield->bufferLenght) += (int)(sizeof(text)/sizeof(char*));
+    (aInputfield->cursorIdx) += (int)(sizeof(text)/sizeof(char*));
 }
 
 void UI_inputfieldDestroy(Inputfield aInputfield) {
@@ -73,6 +85,11 @@ void UI_inputfieldRender(SDL_Renderer* pRend, Inputfield aInputfield) {
     SDL_RenderFillRect(pRend, &aInputfield->boxRect);
 
     SDL_RenderCopy(pRend, aInputfield->pTexture, NULL, &aInputfield->textRect);
+
+    int cursorWidth = 2;
+    SDL_SetRenderDrawColor(pRend, aInputfield->fg.r, aInputfield->fg.g, aInputfield->fg.b, aInputfield->fg.a);
+    SDL_Rect cursor = {aInputfield->textRect.x + aInputfield->cursorX, aInputfield->textRect.y, cursorWidth, aInputfield->textRect.h};
+    SDL_RenderFillRect(pRend, &cursor);
 }
 
 void UI_inputfieldRefreshTexture(SDL_Renderer* pRend, Inputfield aInputfield) {
@@ -84,6 +101,12 @@ void UI_inputfieldRefreshTexture(SDL_Renderer* pRend, Inputfield aInputfield) {
     aInputfield->textRect.y = aInputfield->boxRect.y + 4;
     aInputfield->textRect.w = surface->w;
     aInputfield->textRect.h = surface->h;
+    SDL_FreeSurface(surface);
+
+    char temp[256];
+    memcpy(temp, aInputfield->buffer, aInputfield->cursorIdx);
+    surface = TTF_RenderText_Blended(aInputfield->pFont, temp, aInputfield->fg);
+    aInputfield->cursorX = surface->w;
     SDL_FreeSurface(surface);
 }
 
