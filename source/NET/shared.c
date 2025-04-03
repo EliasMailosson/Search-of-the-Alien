@@ -20,11 +20,11 @@ void NET_severDestroySDL(){
 
 void NET_PlayerListRead(PlayerList *new_player){
     FILE *fp;
-    fp = fopen("data/data.txt", "r");
+    fp = fopen("data/playerlist.txt", "r");
     if(fp != NULL)
     {
         fscanf(fp,"%d", &new_player->ID);
-        fclose(fp);
     }
+    fclose(fp);
     printf("%d\n", new_player->ID);
 }
