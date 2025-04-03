@@ -51,20 +51,20 @@ void UI_inputfieldSetFocus(Inputfield aInputfield, int mouseX, int mouseY) {
 }
 
 void UI_inputfieldUpdateBuffer(Inputfield aInputfield, char *text) {
-    char temp[256];
-    char end[256];
-    memcpy(temp, aInputfield->buffer, aInputfield->cursorIdx);
-    temp[aInputfield->cursorIdx] = '\0';
-    memcpy(end, aInputfield->buffer + aInputfield->cursorIdx, aInputfield->bufferLenght - aInputfield->cursorIdx);
-    end[aInputfield->bufferLenght - aInputfield->cursorIdx] = '\0';
+    // char temp[256];
+    // char end[256];
+    // memcpy(temp, aInputfield->buffer, aInputfield->cursorIdx);
+    // temp[aInputfield->cursorIdx] = '\0';
+    // memcpy(end, aInputfield->buffer + aInputfield->cursorIdx, aInputfield->bufferLenght - aInputfield->cursorIdx);
+    // end[aInputfield->bufferLenght - aInputfield->cursorIdx] = '\0';
 
-    strcat(temp, text);
-    strcat(temp, end);
-    memcpy(aInputfield->buffer, temp, sizeof(temp));
-    aInputfield->buffer[sizeof(temp)] = '\0';
+    // strcat(temp, text);
+    // strcat(temp, end);
+    // memcpy(aInputfield->buffer, temp, sizeof(temp));
+    // aInputfield->buffer[sizeof(temp)] = '\0';
 
-    (aInputfield->bufferLenght) += (int)(sizeof(text)/sizeof(char*));
-    (aInputfield->cursorIdx) += (int)(sizeof(text)/sizeof(char*));
+    // (aInputfield->bufferLenght) += (int)(sizeof(text)/sizeof(char*));
+    // (aInputfield->cursorIdx) += (int)(sizeof(text)/sizeof(char*));
 }
 
 void UI_inputfieldDestroy(Inputfield aInputfield) {
