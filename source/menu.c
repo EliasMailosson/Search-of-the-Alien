@@ -3,32 +3,83 @@
 #include "../include/UI/button.h"
 #include "../include/UI/checklist.h"
 
-void renderMenu(SDL_Renderer* pRend, Panel aPanel) {
-    UI_panelRender(pRend, aPanel);
+void renderMenu(SDL_Renderer *pRend, Menu *pMenu) {
+    for(int i = 0; i < PANEL_COUNT; i++) {
+        UI_panelRender(pRend, pMenu->panels[i]);
+    }
 }
 
-void updateMenu(Panel aPanel, ClientControl *pControl) {
-    // int isMouseDown = true;
-    UI_panelUpdate(aPanel, pControl->isMouseUp);
+void updateMenu(Menu *pMenu, ClientControl *pControl) {
+    static MenuEvent menuEvent;
+    static int switchDelay = 0;
+    switchDelay++;
+    for(int i = 0; i < PANEL_COUNT; i++) {
+        UI_panelUpdate(pMenu->panels[i], &menuEvent, pControl->isMouseUp);
+
+        switch(menuEvent.eventType) {
+            case PANEL_SWITCH:
+                if(pMenu->currentPanel != menuEvent.newPanel && switchDelay > 4) {
+                    pMenu->currentPanel = menuEvent.newPanel;
+                    for(int i = 0; i < PANEL_COUNT; i++) {
+                        UI_panelSetActive(pMenu->panels[i], (i == pMenu->currentPanel));
+                    }
+                    switchDelay = 0;
+                }
+                break;
+        }
+    }
 }
 
-Panel initMenu(SDL_Renderer* pRend) {
-    TTF_Font* pFont = TTF_OpenFont("assets/fonts/PricedownBl-Regular 900.ttf", 20);
+Menu initMenu(SDL_Renderer *pRend, ClientView *pView) {
+    Menu menu;
+    menu.fonts[0] = TTF_OpenFont("assets/fonts/PricedownBl-Regular 900.ttf", 20);
+    menu.fonts[1] = TTF_OpenFont("assets/fonts/PricedownBl-Regular 900.ttf", 40);
 
-    Panel aPanel = UI_panelCreate();
-    UI_panelSetAppearance(aPanel, (SDL_Rect) { .x = 134, .y = 0, .w = 100, .h = 400 }, (SDL_Color) { .r = 0, .g = 200, .b = 255, .a = 255 });
+    menu.currentPanel = PANEL_START;
 
-    Label aLabel = UI_labelCreate();
-    UI_labelSetAppearance(pRend, aLabel, 100, 100, (SDL_Color) { 255, 255, 255, 255 }, pFont);
-    UI_panelAddComponent(aPanel, aLabel, UI_LABEL, "label1");
+    for(int i = 0; i < PANEL_COUNT; i++) {
+        menu.panels[i] = UI_panelCreate();
+        UI_panelSetAppearance(menu.panels[i], 
+            (SDL_Rect) { .x = 0, .y = 0, .w = pView->windowWidth, .h = pView->windowHeight }, 
+            (SDL_Color) { .r = 0, .g = 0, .b = 0, .a = 255 }
+        );
+        UI_panelSetActive(menu.panels[i], (i == menu.currentPanel));
+    }
 
-    Button aButton = UI_buttonCreate();
-    UI_panelAddComponent(aPanel, aButton, UI_BUTTON, "button 1");
-    UI_buttonDimensions(aButton, 700, 200, 50, 100);
-    UI_setButtonLabelappearence(pRend, aButton, (SDL_Color) { 255, 255, 255, 255 }, pFont);
+    // START MENU /////////////////////////
+    Button b1 = UI_buttonCreate();
+    UI_panelAddComponent(menu.panels[PANEL_START], b1, UI_BUTTON, "b1");
+    UI_buttonSetText(b1, "Start Menu");
+    UI_buttonDimensions(b1, 200, 100, 300, 60);
+    UI_buttonSetLabelappearence(pRend, b1, 
+        (SDL_Color) { .r = 0, .g = 0, .b = 0, .a = 255 }, 
+        menu.fonts[1], (SDL_Color) { .r = 255, .g = 255, .b = 255, .a = 255 }
+    );
+    UI_panelSetComponentLink(menu.panels[PANEL_START], "b1", PANEL_SOCIAL);
 
-    Checklist aChecklist = UI_checklistCreate();
-    UI_panelAddComponent(aPanel, aChecklist, UI_CHECKLIST, "Checklist");
+    // SOCIAL MENU ////////////////////////
+    Button b2 = UI_buttonCreate();
+    UI_panelAddComponent(menu.panels[PANEL_SOCIAL], b2, UI_BUTTON, "b2");
+    UI_buttonSetText(b2, "Social");
+    UI_buttonDimensions(b2, 200, 100, 300, 60);
+    UI_buttonSetLabelappearence(pRend, b2, 
+        (SDL_Color) { .r = 0, .g = 0, .b = 0, .a = 255 }, 
+        menu.fonts[0], (SDL_Color) { .r = 255, .g = 255, .b = 255, .a = 255 }
+    );
+    UI_panelSetComponentLink(menu.panels[PANEL_SOCIAL], "b2", PANEL_START);
 
-    return aPanel;
+    // OPTIONS MENU ////////////////////////
+    
+    return menu;
+}
+
+void destroyMenu(Menu *pMenu) {
+    for(int i = 0; i < PANEL_COUNT; i++) {
+        UI_panelDestroy(pMenu->panels[i]);
+    }
+
+    for(int i = 0; i < FONT_COUNT; i++) {
+        TTF_CloseFont(pMenu->fonts[i]);
+        pMenu->fonts[i] = NULL;
+    }
 }
