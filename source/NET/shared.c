@@ -17,3 +17,14 @@ void NET_severDestroySDL(){
     SDLNet_Quit();
     SDL_Quit();
 }
+
+void NET_PlayerListRead(PlayerList *new_player){
+    FILE *fp;
+    fp = fopen("data/data.txt", "r");
+    if(fp != NULL)
+    {
+        fscanf(fp,"%d", &new_player->ID);
+        fclose(fp);
+    }
+    printf("%d\n", new_player->ID);
+}
