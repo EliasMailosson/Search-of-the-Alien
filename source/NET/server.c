@@ -28,15 +28,15 @@ int main(int argc, char **argv ){
     while (isRunning){
         // Poll event checking if there is a packege to recive
         while (SDLNet_UDP_Recv(aServer->serverSocket, aServer->pReceivePacket)){
-            Packet aPkg = NET_packetDeserialize(aServer->pReceivePacket->data, aServer->pReceivePacket->len);
-            if(aPkg == NULL){
+            Packet aPacket = NET_packetDeserialize(aServer->pReceivePacket->data, aServer->pReceivePacket->len);
+            if(aPacket == NULL){
                 printf("Deserialization failed! Buffer might be invalid.\n");
                 break;
             } 
-            //NET_stdPakegeGetGameState(aPkg);
-            switch (NET_packetGetMessageType(aPkg)){
+            //NET_stdPakegeGetGameState(aPacket);
+            switch (NET_packetGetMessageType(aPacket)){
             case CONECT:
-                palyerID = (int)SDLNet_Read32(NET_packetGetPayload(aPkg));
+                palyerID = (int)SDLNet_Read32(NET_packetGetPayload(aPacket));
                 printf("player id %d",palyerID);
                 break;
             case CONECT_RESPONSE:
@@ -49,19 +49,19 @@ int main(int argc, char **argv ){
 
                 break;
             case LOBBY_LIST:
-                printf("Hej det är %s", (char*)(NET_packetGetPayload(aPkg)));
+                printf("Hej det är %s", (char*)(NET_packetGetPayload(aPacket)));
                 break;
             case LOBBY_LIST_RESPONSE:  
                 printf("hej\n");
                 PlayerList list[3] = {0};
-                NET_serverReceivePlayerList(aPkg,list,&n);
+                NET_serverReceivePlayerList(aPacket,list,&n);
                 NET_PlayerListPrintf(list,3);
                 break;
             default:
                 printf("Failed!\n");
                 break;
             }
-            if(aPkg) NET_packetDestroy(aPkg);
+            if(aPacket) NET_packetDestroy(aPacket);
             x++;
             if(x!=0)isRunning = false;
         }
@@ -72,9 +72,9 @@ int main(int argc, char **argv ){
     NET_severDestroySDL();
 }
 
-void NET_serverReceivePlayerList(Packet aPkg, PlayerList* list, int *count){
-    Uint8* raw = NET_packetGetPayload(aPkg);
-    Uint32 size = NET_packetGetPayloadSize(aPkg);
+void NET_serverReceivePlayerList(Packet aPacket, PlayerList* list, int *count){
+    Uint8* raw = NET_packetGetPayload(aPacket);
+    Uint32 size = NET_packetGetPayloadSize(aPacket);
     if(!raw){
         printf("RAWWWW error!");
     }

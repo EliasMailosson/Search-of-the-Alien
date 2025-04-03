@@ -31,16 +31,16 @@ typedef struct packet *Packet;
 
 // API functions:
 Packet NET_packetDeserialize(const Uint8 *buffer, Uint32 bufferSize);
-Uint32 NET_packetSerialize(const Packet packet, Uint8 ** buffer);
+Uint32 NET_packetSerialize(const Packet aPacket, Uint8 ** buffer);
 void NET_packetDestroy(Packet paket);
 Packet NET_packetCreate(GameState gameState, MessageType msgType, Uint32 payloadSize);
 
-Uint32 NET_packetGetPayloadSize(Packet packet);
-Uint32 NET_packetGetGameState(Packet packet);
-Uint32 NET_packetGetMessageType(Packet packet);
-Uint8* NET_packetGetPayload(Packet packet);
-void NET_packetWrite32Payload(Packet packet, Uint32 Payload);
-void NET_packetSetPayloadString(Packet aPkg,const char *str);
-void NET_packetPayloadArray(Packet aPkg, const void* array, Uint32 size);
+Uint32 NET_packetGetPayloadSize(Packet aPacket);
+Uint32 NET_packetGetGameState(Packet aPacket);
+Uint32 NET_packetGetMessageType(Packet aPacket);
+Uint8* NET_packetGetPayload(Packet aPacket);
+void NET_packetWrite32Payload(Packet aPacket, Uint32 Payload);
+void NET_packetSetPayloadString(Packet aPacket,const char *str);
+void NET_packetPayloadArray(Packet aPacket, const void* array, Uint32 size);
 
 #endif

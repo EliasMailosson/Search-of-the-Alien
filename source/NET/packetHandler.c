@@ -8,24 +8,24 @@ typedef struct packet{
 }packet;
 
 
-Uint32 NET_packetGetPayloadSize(Packet packet){
-    return packet->payloadSize;
+Uint32 NET_packetGetPayloadSize(Packet aPacket){
+    return aPacket->payloadSize;
 }
 
-Uint32 NET_packetGetGameState(Packet packet){
-    return packet->gameState;
+Uint32 NET_packetGetGameState(Packet aPacket){
+    return aPacket->gameState;
 }
 
-Uint32 NET_packetGetMessageType(Packet packet){
-    return packet->msgType;
+Uint32 NET_packetGetMessageType(Packet aPacket){
+    return aPacket->msgType;
 }
 
-Uint8* NET_packetGetPayload(Packet packet){
-    return packet->payload;
+Uint8* NET_packetGetPayload(Packet aPacket){
+    return aPacket->payload;
 }
 
-void NET_packetWrite32Payload(Packet packet, Uint32 Payload){
-    SDLNet_Write32(Payload, packet->payload);
+void NET_packetWrite32Payload(Packet aPacket, Uint32 Payload){
+    SDLNet_Write32(Payload, aPacket->payload);
 }
 
 void NET_packetSetPayloadString(Packet aPkg,const char* str){
@@ -65,24 +65,24 @@ Packet NET_packetDeserialize(const Uint8 *buffer, Uint32 bufferSize){
 }
 
 
-Uint32 NET_packetSerialize(const Packet packet, Uint8 ** buffer){
-    if(!packet || !buffer)return 0;
-    Uint32 totalSize = 12 + packet->payloadSize;
+Uint32 NET_packetSerialize(const Packet aPacket, Uint8 ** buffer){
+    if(!aPacket || !buffer)return 0;
+    Uint32 totalSize = 12 + aPacket->payloadSize;
     *buffer = malloc(totalSize);
     if (!*buffer) {
         fprintf(stderr, "Failed to allocate serialization buffer.\n");
         return 0;
     }
     int offset = 0;
-    SDLNet_Write32(packet->gameState, *buffer + offset);
+    SDLNet_Write32(aPacket->gameState, *buffer + offset);
     offset += 4;
-    SDLNet_Write32(packet->msgType, *buffer + offset);
+    SDLNet_Write32(aPacket->msgType, *buffer + offset);
     offset += 4;
-    SDLNet_Write32(packet->payloadSize, *buffer + offset);
+    SDLNet_Write32(aPacket->payloadSize, *buffer + offset);
     offset += 4;
     
-    if(packet->payloadSize > 0 && packet->payload){
-        memcpy(*buffer + offset, packet->payload, packet->payloadSize);
+    if(aPacket->payloadSize > 0 && aPacket->payload){
+        memcpy(*buffer + offset, aPacket->payload, aPacket->payloadSize);
     }
     return totalSize;
 }
@@ -97,7 +97,7 @@ void NET_packetDestroy(Packet Packet){
 Packet NET_packetCreate(GameState gameState, MessageType msgType, Uint32 payloadSize){
     Packet pkg = malloc(sizeof(struct packet));
     if(!pkg){
-        fprintf(stderr, "Failed to allocate memory for packet header.\n");
+        fprintf(stderr, "Failed to allocate memory for aPacket header.\n");
         return NULL;
     }
     pkg->gameState = gameState;
