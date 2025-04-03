@@ -15,7 +15,9 @@ int main(int argc, char **argv ){
     aClient = NET_clientCreate();
     NET_clientConnect(aClient);
     //NET_clientSend(aClient);
-    NET_clientSendString(aClient, MENU, LOBBY_LIST, "Elias Mailadasson");
+    //NET_clientSendString(aClient, MENU, LOBBY_LIST, "Elias Mailadasson");
+    PlayerList placeholder[3] = {{.ID = 6543, .pos.x = 12, .pos.y = 55}, {.ID = 1235, .pos.x = 52, .pos.y = 35}, {.ID = 6435, .pos.x = 1, .pos.y = 2}};
+    NET_clientSendArray(aClient, MENU, LOBBY_LIST_RESPONSE, placeholder);
     NET_clientDestroy(aClient);
     killClient(&view);
     return 0;

@@ -88,3 +88,7 @@ void NET_clientSendInt(Client aClient,GameState GS, MessageType msgType,int plac
 void NET_clientSendString(Client aClient,GameState GS, MessageType msgType,const char* str){
     NET_protocolSendString(aClient->pSendPacket, aClient->clientSocket, aClient->serverAddr, GS, msgType, str);
 }
+
+void NET_clientSendArray(Client aClient,GameState GS, MessageType msgType,const void* array){
+    NET_protocolSendArray(aClient->pSendPacket, aClient->clientSocket, aClient->serverAddr, GS, msgType, array);
+}

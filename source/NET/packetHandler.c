@@ -7,6 +7,11 @@ typedef struct stdPackage{
     Uint8 *payload; 
 }stdPackage;
 
+
+Uint32 NET_stdPackageGetPayloadSize(StdPackage packet){
+    return packet->payloadSize;
+}
+
 Uint32 NET_stdPackageGetGameState(StdPackage packet){
     return packet->gameState;
 }

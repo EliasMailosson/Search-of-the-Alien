@@ -30,7 +30,6 @@ int main(int argc, char **argv ){
         while (SDLNet_UDP_Recv(aServer->serverSocket, aServer->pReceivePacket)){
             StdPackage aPkg = NET_stdPackageDeserialize(aServer->pReceivePacket->data, aServer->pReceivePacket->len);
             if(aPkg == NULL){
-                NET_stdPackageDestroy(aPkg);
                 break;;
             } 
             //NET_stdPakegeGetGameState(aPkg);
@@ -51,8 +50,16 @@ int main(int argc, char **argv ){
             case LOBBY_LIST:
                 printf("Hej det är %s", (char*)(NET_stdPackageGetPayload(aPkg)));
                 break;
-            case LOBBY_LIST_RESPONSE:   
-
+            case LOBBY_LIST_RESPONSE:{   
+                Uint8* raw = NET_stdPackageGetPayload(aPkg);
+                Uint32 size = NET_stdPackageGetPayloadSize(aPkg);
+                PlayerList* array = (PlayerList*)raw;
+                int count = size / sizeof(PlayerList);
+                for (int i = 0; i < count; i++)
+                {
+                    printf("List: %d ID: %d pos: %d x, %d y\n", i, array[i].ID, array[i].pos.x, array[i].pos.y);
+                }
+                }
                 break;
             default:
                 printf("Failed!\n");

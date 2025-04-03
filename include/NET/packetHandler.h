@@ -35,6 +35,7 @@ Uint32 NET_stdPackageSerialize(const StdPackage packet, Uint8 ** buffer);
 void NET_stdPackageDestroy(StdPackage paket);
 StdPackage NET_stdPackageCreate(GameState gameState, MessageType msgType, Uint32 payloadSize);
 
+Uint32 NET_stdPackageGetPayloadSize(StdPackage packet);
 Uint32 NET_stdPackageGetGameState(StdPackage packet);
 Uint32 NET_stdPackageGetMessageType(StdPackage packet);
 Uint8* NET_stdPackageGetPayload(StdPackage packet);
