@@ -4,6 +4,8 @@
 #include "../include/UI/checklist.h"
 #include "../include/UI/inputfield.h"
 
+#define OFFSET 80
+
 void renderMenu(SDL_Renderer *pRend, Menu *pMenu) {
     for(int i = 0; i < PANEL_COUNT; i++) {
         UI_panelRender(pRend, pMenu->panels[i]);
@@ -33,6 +35,12 @@ void updateMenu(Menu *pMenu, ClientControl *pControl) {
                     switchDelay = 0;
                 }
                 break;
+            case BUTTON_CLICKED:
+                if (strcmp("Quit", menuEvent.key) == 0) {
+                    pControl->isRunning = false;
+                    return;
+                }
+                break;
         }
     }
 }
@@ -57,31 +65,42 @@ Menu initMenu(SDL_Renderer *pRend, ClientView *pView) {
     UI_panelSetImage(pRend, menu.panels[PANEL_START], "assets/images/menu-background.png");
 
     Button b1 = UI_buttonCreate();
-    UI_panelAddComponent(menu.panels[PANEL_START], b1, UI_BUTTON, "b1");
-    UI_buttonSetText(b1, "Start Menu");
-    UI_buttonDimensions(b1, 200, 100, 300, 60);
-    UI_buttonSetLabelappearence(pRend, b1, 
+    UI_panelAddComponent(menu.panels[PANEL_START], b1, UI_BUTTON, "Start Game");
+    UI_buttonConfigure(b1, "Start Game", pView->windowWidth / 2 - 150, 150, 300, 60, pRend,
         (SDL_Color) { .r = 0, .g = 0, .b = 0, .a = 255 }, 
-        menu.fonts[1], (SDL_Color) { .r = 255, .g = 255, .b = 255, .a = 255 }
-    );
-    UI_panelSetComponentLink(menu.panels[PANEL_START], "b1", PANEL_SOCIAL);
+        menu.fonts[1], (SDL_Color) { .r = 255, .g = 255, .b = 255, .a = 255 });
+    UI_panelSetComponentLink(menu.panels[PANEL_START], "Start Game", PANEL_SOCIAL);
+
+    Button b2 = UI_buttonCreate();
+    UI_panelAddComponent(menu.panels[PANEL_START], b2, UI_BUTTON, "Social");
+    UI_buttonConfigure(b2, "Social", pView->windowWidth / 2 - 150, 150 + OFFSET, 300, 60, pRend,
+        (SDL_Color) { .r = 0, .g = 0, .b = 0, .a = 255 }, 
+        menu.fonts[1], (SDL_Color) { .r = 255, .g = 255, .b = 255, .a = 255 });
+    UI_panelSetComponentLink(menu.panels[PANEL_START], "Social", PANEL_SOCIAL);
+
+    Button b3 = UI_buttonCreate();
+    UI_panelAddComponent(menu.panels[PANEL_START], b3, UI_BUTTON, "Options");
+    UI_buttonConfigure(b3, "Options", pView->windowWidth / 2 - 150, 150 + OFFSET*2, 300, 60, pRend,
+        (SDL_Color) { .r = 0, .g = 0, .b = 0, .a = 255 }, 
+        menu.fonts[1], (SDL_Color) { .r = 255, .g = 255, .b = 255, .a = 255 });
+    UI_panelSetComponentLink(menu.panels[PANEL_START], "Options", PANEL_SOCIAL);
+
+    Button b4 = UI_buttonCreate();
+    UI_panelAddComponent(menu.panels[PANEL_START], b4, UI_BUTTON, "Quit");
+    UI_buttonConfigure(b4, "Quit", pView->windowWidth / 2 - 150, 150 + OFFSET*3, 300, 60, pRend,
+        (SDL_Color) { .r = 0, .g = 0, .b = 0, .a = 255 }, 
+        menu.fonts[1], (SDL_Color) { .r = 255, .g = 255, .b = 255, .a = 255 });
 
     // SOCIAL MENU ////////////////////////
     UI_panelSetImage(pRend, menu.panels[PANEL_SOCIAL], "assets/images/menu-background.png");
 
-    Button b2 = UI_buttonCreate();
-    UI_panelAddComponent(menu.panels[PANEL_SOCIAL], b2, UI_BUTTON, "b2");
-    UI_buttonConfigure(b2, "Social", 
+    Button b5 = UI_buttonCreate();
+    UI_panelAddComponent(menu.panels[PANEL_SOCIAL], b5, UI_BUTTON, "b5");
+    UI_buttonConfigure(b5, "Social", 
         200, 100, 300, 60, pRend, (SDL_Color) { .r = 0, .g = 0, .b = 0, .a = 255 }, 
         menu.fonts[0], (SDL_Color) { .r = 255, .g = 255, .b = 255, .a = 255 }
     );
-    // UI_buttonSetText(b2, "Social");
-    // UI_buttonDimensions(b2, 200, 100, 300, 60);
-    // UI_buttonSetLabelappearence(pRend, b2, 
-    //     (SDL_Color) { .r = 0, .g = 0, .b = 0, .a = 255 }, 
-    //     menu.fonts[0], (SDL_Color) { .r = 255, .g = 255, .b = 255, .a = 255 }
-    // );
-    UI_panelSetComponentLink(menu.panels[PANEL_SOCIAL], "b2", PANEL_START);
+    UI_panelSetComponentLink(menu.panels[PANEL_SOCIAL], "b5", PANEL_START);
 
     // OPTIONS MENU ////////////////////////
     
