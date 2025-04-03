@@ -38,6 +38,13 @@ Panel UI_panelCreate() {
     return aPanel;
 }
 
+void UI_panelSetImage(SDL_Renderer* pRend, Panel aPanel, char *imagePath) {
+    SDL_Surface *surface = IMG_Load(imagePath);
+    aPanel->pBgImage = SDL_CreateTextureFromSurface(pRend, surface);
+    SDL_FreeSurface(surface);
+    aPanel->hasImage = true;
+}
+
 void UI_panelSetActive(Panel aPanel, bool active) {
     aPanel->active = active;
 }
@@ -84,7 +91,7 @@ void UI_panelUpdate(Panel aPanel, MenuEvent *pEvent, bool isMouseUp) {
             if(UI_buttonIsHovered((Button)aPanel->compList[i].pComp, mouseX, mouseY)) {
                 if(isMouseUp) {
                     pEvent->eventType = BUTTON_CLICKED;
-                    printf("Button Clicked! (key: %s)\n", aPanel->compList[i].key);
+                    // printf("Button Clicked! (key: %s)\n", aPanel->compList[i].key);
                     if(aPanel->compList[i].hasPanelLink) {
                         pEvent->eventType = PANEL_SWITCH;
                         pEvent->newPanel = aPanel->compList[i].panelLink;
@@ -115,7 +122,7 @@ void UI_panelRender(SDL_Renderer* pRend, Panel aPanel) {
     if(!aPanel->active) return;
 
     if (aPanel->hasImage) {
-
+        SDL_RenderCopy(pRend, aPanel->pBgImage, NULL, &aPanel->rect);
     }
     else {
         SDL_SetRenderDrawColor(pRend, aPanel->bg.r, aPanel->bg.g, aPanel->bg.b, aPanel->bg.a);
@@ -157,6 +164,8 @@ void UI_panelDestroy(Panel aPanel) {
         }
         aPanel->compList[i].pComp = NULL;
     }
+    SDL_DestroyTexture(aPanel->pBgImage);
+    aPanel->pBgImage = NULL;
     free(aPanel);
     aPanel = NULL;
 }

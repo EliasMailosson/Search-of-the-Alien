@@ -47,6 +47,8 @@ Menu initMenu(SDL_Renderer *pRend, ClientView *pView) {
     }
 
     // START MENU /////////////////////////
+    UI_panelSetImage(pRend, menu.panels[PANEL_START], "assets/images/menu-background.png");
+
     Button b1 = UI_buttonCreate();
     UI_panelAddComponent(menu.panels[PANEL_START], b1, UI_BUTTON, "b1");
     UI_buttonSetText(b1, "Start Menu");
@@ -58,6 +60,8 @@ Menu initMenu(SDL_Renderer *pRend, ClientView *pView) {
     UI_panelSetComponentLink(menu.panels[PANEL_START], "b1", PANEL_SOCIAL);
 
     // SOCIAL MENU ////////////////////////
+    UI_panelSetImage(pRend, menu.panels[PANEL_SOCIAL], "assets/images/menu-background.png");
+
     Button b2 = UI_buttonCreate();
     UI_panelAddComponent(menu.panels[PANEL_SOCIAL], b2, UI_BUTTON, "b2");
     UI_buttonSetText(b2, "Social");
