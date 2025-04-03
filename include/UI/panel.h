@@ -4,7 +4,7 @@
 #include <stdbool.h>
 #include <SDL.h>
 
-enum CompTypes{UI_BUTTON, UI_LABEL, UI_CHECKLIST};
+enum CompTypes{UI_BUTTON, UI_LABEL, UI_CHECKLIST, UI_INPUTFIELD};
 
 typedef struct Panel *Panel;
 
@@ -38,6 +38,9 @@ void UI_panelSetActive(Panel aPanel, bool active);
 
 /*Adds panel reference link to a button (Must be type Button)*/
 void UI_panelSetComponentLink(Panel aPanel, char* key, int panelLink);
+
+/*Uses an image as background instead of a color*/
+void UI_panelSetImage(SDL_Renderer* pRend, Panel aPanel, char *imagePath);
 
 /*Free's panel and all child-components*/
 void UI_panelDestroy(Panel aPanel);

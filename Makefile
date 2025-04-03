@@ -43,7 +43,7 @@ SRCDIR = source
 NETDIR = source/NET
 UIDIR = source/UI
 BUILDDIR = build
-OBJ_CLIENT = $(BUILDDIR)/main.o $(BUILDDIR)/game.o $(BUILDDIR)/clientLife.o $(BUILDDIR)/menu.o $(BUILDDIR)/panel.o $(BUILDDIR)/client.o $(BUILDDIR)/label.o $(BUILDDIR)/button.o $(BUILDDIR)/checklist.o $(BUILDDIR)/protocol.o $(BUILDDIR)/packetHandler.o
+OBJ_CLIENT = $(BUILDDIR)/main.o $(BUILDDIR)/game.o $(BUILDDIR)/clientLife.o $(BUILDDIR)/menu.o $(BUILDDIR)/panel.o $(BUILDDIR)/client.o $(BUILDDIR)/label.o $(BUILDDIR)/button.o $(BUILDDIR)/checklist.o $(BUILDDIR)/protocol.o $(BUILDDIR)/packetHandler.o $(BUILDDIR)/inputfield.o
 OBJ_SERVER = $(BUILDDIR)/server.o $(BUILDDIR)/shared.o $(BUILDDIR)/protocol.o $(BUILDDIR)/packetHandler.o 
 
 # Default Goal
@@ -89,6 +89,9 @@ $(BUILDDIR)/button.o: $(UIDIR)/button.c
 	$(CC) $(CFLAGS) -c $< -o $@
 
 $(BUILDDIR)/checklist.o: $(UIDIR)/checklist.c
+	$(CC) $(CFLAGS) -c $< -o $@
+
+$(BUILDDIR)/inputfield.o: $(UIDIR)/inputfield.c
 	$(CC) $(CFLAGS) -c $< -o $@
 
 $(BUILDDIR)/server.o: $(NETDIR)/server.c

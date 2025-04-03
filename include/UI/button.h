@@ -55,6 +55,21 @@ void UI_buttonRenderer(SDL_Renderer* pRend, Button aButton);
 bool UI_buttonIsHovered(Button aButton, int mouseX, int mouseY);
 
 /**
+ * Three functions combined to configure a button
+ * \param abutton The targeted button to configure.
+ * \param text The text to be displayed on the targeted button.
+ * \param newX X-value the button starts on.
+ * \param newY Y-value for the button to start on.
+ * \param newWidth Total width for the button.
+ * \param newHeight Total height of the button.
+ * \param prend The renderer to use.
+ * \param textColor Color for the label inside the button.
+ * \param pFont Which font to use.
+ * \param buttonColor Background color for the button.
+*/
+void UI_buttonConfigure(Button aButton, char* text, int newX, int newY, int newWidth, int newHeight, SDL_Renderer* pRend, SDL_Color textColor, TTF_Font* pFont, SDL_Color buttonColor);
+
+/**
  * Destroys the button and label inside it.
 */
 void UI_buttonDestroy(Button aButton);

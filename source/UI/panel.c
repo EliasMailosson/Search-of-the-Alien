@@ -5,6 +5,7 @@
 #include "../../include/UI/label.h"
 #include "../../include/UI/button.h"
 #include "../../include/UI/checklist.h"
+#include "../../include/UI/inputfield.h"
 
 typedef struct component {
     void* pComp;
@@ -36,6 +37,13 @@ Panel UI_panelCreate() {
     aPanel->active = true;
 
     return aPanel;
+}
+
+void UI_panelSetImage(SDL_Renderer* pRend, Panel aPanel, char *imagePath) {
+    SDL_Surface *surface = IMG_Load(imagePath);
+    aPanel->pBgImage = SDL_CreateTextureFromSurface(pRend, surface);
+    SDL_FreeSurface(surface);
+    aPanel->hasImage = true;
 }
 
 void UI_panelSetActive(Panel aPanel, bool active) {
@@ -83,11 +91,15 @@ void UI_panelUpdate(Panel aPanel, MenuEvent *pEvent, bool isMouseUp) {
         case UI_BUTTON:
             if(UI_buttonIsHovered((Button)aPanel->compList[i].pComp, mouseX, mouseY)) {
                 if(isMouseUp) {
-                    pEvent->eventType = BUTTON_CLICKED;
-                    printf("Button Clicked! (key: %s)\n", aPanel->compList[i].key);
+                    // pEvent->eventType = BUTTON_CLICKED;
+                    // printf("Button Clicked! (key: %s)\n", aPanel->compList[i].key);
                     if(aPanel->compList[i].hasPanelLink) {
                         pEvent->eventType = PANEL_SWITCH;
                         pEvent->newPanel = aPanel->compList[i].panelLink;
+                    } 
+                    else {
+                        pEvent->eventType = BUTTON_CLICKED;
+                        strcpy(pEvent->key, aPanel->compList[i].key);
                     }
                     return;
                 }
@@ -106,6 +118,15 @@ void UI_panelUpdate(Panel aPanel, MenuEvent *pEvent, bool isMouseUp) {
                 return;
             }
             break;
+        
+        case UI_INPUTFIELD:
+            if(isMouseUp) {
+                UI_inputfieldSetFocus((Inputfield)aPanel->compList[i].pComp, mouseX, mouseY);
+            }
+            if(pEvent->isTextInput && UI_inputfieldIsFocused((Inputfield)aPanel->compList[i].pComp)) {
+                UI_inputfieldUpdateBuffer((Inputfield)aPanel->compList[i].pComp, pEvent->textInput);
+            }
+            break;
 
         }
     }
@@ -115,7 +136,7 @@ void UI_panelRender(SDL_Renderer* pRend, Panel aPanel) {
     if(!aPanel->active) return;
 
     if (aPanel->hasImage) {
-
+        SDL_RenderCopy(pRend, aPanel->pBgImage, NULL, &aPanel->rect);
     }
     else {
         SDL_SetRenderDrawColor(pRend, aPanel->bg.r, aPanel->bg.g, aPanel->bg.b, aPanel->bg.a);
@@ -133,6 +154,11 @@ void UI_panelRender(SDL_Renderer* pRend, Panel aPanel) {
         
         case UI_CHECKLIST:
             UI_checklistRendrer(pRend, (Checklist)aPanel->compList[i].pComp);
+            break;
+
+        case UI_INPUTFIELD:
+            UI_inputfieldRefreshTexture(pRend, (Inputfield)aPanel->compList[i].pComp);
+            UI_inputfieldRender(pRend, (Inputfield)aPanel->compList[i].pComp);
             break;
 
         }
@@ -154,9 +180,15 @@ void UI_panelDestroy(Panel aPanel) {
             UI_ChecklistDestroy((Checklist)aPanel->compList[i].pComp);
             break;
 
+        case UI_INPUTFIELD:
+            UI_inputfieldDestroy((Inputfield)aPanel->compList[i].pComp);
+            break;
+
         }
         aPanel->compList[i].pComp = NULL;
     }
+    SDL_DestroyTexture(aPanel->pBgImage);
+    aPanel->pBgImage = NULL;
     free(aPanel);
     aPanel = NULL;
 }

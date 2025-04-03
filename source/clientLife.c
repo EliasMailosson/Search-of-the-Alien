@@ -1,9 +1,9 @@
 #include "../include/clientLife.h"
 
-void startClient(ClientView *pView, ClientControl *pControl){
-    SDL_Init(SDL_INIT_EVERYTHING);
-    pView->windowHeight = 600;
-    pView->windowWidth = 800;
+void startClient(ClientView *pView,ClientControl *pControl){
+  SDL_Init(SDL_INIT_EVERYTHING);
+  pView->windowHeight = 600;
+  pView->windowWidth = pView->windowHeight*16/9;
 
     if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_TIMER) != 0) {
         printf("Error initializing SDL: %s\n", SDL_GetError());
