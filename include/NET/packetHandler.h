@@ -41,6 +41,6 @@ Uint32 NET_stdPackageGetMessageType(StdPackage packet);
 Uint8* NET_stdPackageGetPayload(StdPackage packet);
 void NET_stdPackageWrite32Payload(StdPackage packet, Uint32 Payload);
 void NET_stdPackageSetPayloadString(StdPackage aPkg,const char *str);
-void NET_stdPackagePayloadArray(StdPackage aPkg, const void* array);
+void NET_stdPackagePayloadArray(StdPackage aPkg, const void* array, Uint32 size);
 
 #endif
