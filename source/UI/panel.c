@@ -91,11 +91,15 @@ void UI_panelUpdate(Panel aPanel, MenuEvent *pEvent, bool isMouseUp) {
         case UI_BUTTON:
             if(UI_buttonIsHovered((Button)aPanel->compList[i].pComp, mouseX, mouseY)) {
                 if(isMouseUp) {
-                    pEvent->eventType = BUTTON_CLICKED;
+                    // pEvent->eventType = BUTTON_CLICKED;
                     // printf("Button Clicked! (key: %s)\n", aPanel->compList[i].key);
                     if(aPanel->compList[i].hasPanelLink) {
                         pEvent->eventType = PANEL_SWITCH;
                         pEvent->newPanel = aPanel->compList[i].panelLink;
+                    } 
+                    else {
+                        pEvent->eventType = BUTTON_CLICKED;
+                        strcpy(pEvent->key, aPanel->compList[i].key);
                     }
                     return;
                 }
