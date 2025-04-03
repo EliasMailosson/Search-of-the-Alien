@@ -5,6 +5,7 @@
 #include "../../include/UI/label.h"
 #include "../../include/UI/button.h"
 #include "../../include/UI/checklist.h"
+#include "../../include/UI/inputfield.h"
 
 typedef struct component {
     void* pComp;
@@ -113,6 +114,15 @@ void UI_panelUpdate(Panel aPanel, MenuEvent *pEvent, bool isMouseUp) {
                 return;
             }
             break;
+        
+        case UI_INPUTFIELD:
+            if(isMouseUp) {
+                UI_inputfieldSetFocus((Inputfield)aPanel->compList[i].pComp, mouseX, mouseY);
+            }
+            if(pEvent->isTextInput && UI_inputfieldIsFocused((Inputfield)aPanel->compList[i].pComp)) {
+                UI_inputfieldUpdateBuffer((Inputfield)aPanel->compList[i].pComp, pEvent->textInput);
+            }
+            break;
 
         }
     }
@@ -142,6 +152,11 @@ void UI_panelRender(SDL_Renderer* pRend, Panel aPanel) {
             UI_checklistRendrer(pRend, (Checklist)aPanel->compList[i].pComp);
             break;
 
+        case UI_INPUTFIELD:
+            UI_inputfieldRefreshTexture(pRend, (Inputfield)aPanel->compList[i].pComp);
+            UI_inputfieldRender(pRend, (Inputfield)aPanel->compList[i].pComp);
+            break;
+
         }
     }
 }
@@ -159,6 +174,10 @@ void UI_panelDestroy(Panel aPanel) {
         
         case UI_CHECKLIST:
             UI_ChecklistDestroy((Checklist)aPanel->compList[i].pComp);
+            break;
+
+        case UI_INPUTFIELD:
+            UI_inputfieldDestroy((Inputfield)aPanel->compList[i].pComp);
             break;
 
         }

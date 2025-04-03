@@ -15,6 +15,9 @@ typedef struct menuEvent {
     char key[256];
 
     int newPanel;
+
+    bool isTextInput;
+    char textInput[32];
 } MenuEvent;
 
 typedef struct menu {

@@ -2,6 +2,7 @@
 #include "../include/UI/label.h"
 #include "../include/UI/button.h"
 #include "../include/UI/checklist.h"
+#include "../include/UI/inputfield.h"
 
 void renderMenu(SDL_Renderer *pRend, Menu *pMenu) {
     for(int i = 0; i < PANEL_COUNT; i++) {
@@ -13,6 +14,12 @@ void updateMenu(Menu *pMenu, ClientControl *pControl) {
     static MenuEvent menuEvent;
     static int switchDelay = 0;
     switchDelay++;
+
+    menuEvent.isTextInput = pControl->isTextInput;
+    if(menuEvent.isTextInput) {
+        strcpy(menuEvent.textInput, pControl->textInput);
+    }
+
     for(int i = 0; i < PANEL_COUNT; i++) {
         UI_panelUpdate(pMenu->panels[i], &menuEvent, pControl->isMouseUp);
 
