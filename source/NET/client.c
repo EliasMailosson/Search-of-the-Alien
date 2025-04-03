@@ -1,5 +1,5 @@
 #include "../../include/NET/client.h"
-#include "../../include/NET/shared.h"
+
 struct client{
     UDPsocket clientSocket;
     UDPpacket *pReceivePacket;
@@ -8,16 +8,30 @@ struct client{
     IPaddress serverAddr;
 }; 
 
-
 void NET_clientSend(Client aClient){
-    Uint8 buffer[20];
-    SDLNet_Write32((Uint32)2,buffer);
-    SDLNet_Write32((Uint32)32,buffer + 4);
-    SDLNet_Write32((Uint32)2,buffer + 8);
-    memcpy(aClient->pSendPacket->data, buffer, sizeof(buffer));
-    aClient->pSendPacket->len = sizeof(buffer);
+    // Placeholder for sending the whole packege 
+    Uint32 GameState = 42;
+    MessageType MSG = DISCONNECT;
+    const char *testString = "Hello, Server!";
+    // Set payloadSize to length of string + 1 for the null terminator.
+    Uint32 payloadSize = (Uint32) (strlen(testString) + 1);
+
+    Packet testPkg = NET_packetCreate(GameState, MSG, payloadSize);
+
+    //NET_stdPakegeSetPL(testPkg, (Uint32)TestValue);
+    NET_packetSetPayloadString(testPkg,testString);
+
+    Uint8* sBuffer = NULL;
+    Uint32 serializedSize = NET_packetSerialize(testPkg, &sBuffer);
+
+    memcpy(aClient->pSendPacket->data, sBuffer, serializedSize);
+    aClient->pSendPacket->len = serializedSize;
     aClient->pSendPacket->address = aClient->serverAddr;
+    
     SDLNet_UDP_Send(aClient->clientSocket, -1, aClient->pSendPacket);
+
+    free(sBuffer);
+    NET_packetDestroy(testPkg);
 }
 
 
@@ -65,4 +79,46 @@ void NET_clientDestroy(Client aClient){
         aClient->clientSocket = NULL;
     }
     free(aClient);
+}
+
+void NET_clientSendInt(Client aClient,GameState GS, MessageType msgType,int placeHolder){
+    NET_protocolSendInt(aClient->pSendPacket,aClient->clientSocket,aClient->serverAddr,GS,msgType,placeHolder);
+}
+
+void NET_clientSendString(Client aClient,GameState GS, MessageType msgType,const char* str){
+    NET_protocolSendString(aClient->pSendPacket, aClient->clientSocket, aClient->serverAddr, GS, msgType, str);
+}
+
+void NET_clientSendArray(Client aClient,GameState GS, MessageType msgType,const void* array, Uint32 arraySize){
+    NET_protocolSendArray(aClient->pSendPacket, aClient->clientSocket, aClient->serverAddr, GS, msgType, array, arraySize);
+}
+
+void NET_clientReceiver(Client aClient)
+{
+
+    while (SDLNet_UDP_Recv(aClient->clientSocket, aClient->pReceivePacket)){
+        Packet aPacket = NET_packetDeserialize(aClient->pReceivePacket->data, aClient->pReceivePacket->len);
+        if(aPacket == NULL){
+            printf("Deserialization for Client failed! Buffer might be invalid.\n");
+            break;
+        } 
+        //Handle recieving packets from the server
+        switch (NET_packetGetMessageType(aPacket)){
+        case CONNECT_RESPONSE:
+            printf("resivde %d",*((int*)NET_packetGetPayload(aPacket)));
+            break;
+        case DISCONNECT_RESPONSE:
+            /* code */
+            break;
+        case JOIN_LOBBY_RESPONSE:
+            /* code */
+            break;
+        case LOBBY_LIST:
+            // clientside uppdat player list
+            break;
+        default:
+            break;
+        }
+        if(aPacket) NET_packetDestroy(aPacket);
+    }
 }

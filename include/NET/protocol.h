@@ -1,16 +1,15 @@
 #ifndef PROTOCOL_H
 #define PROTOCOL_H
 
-typedef enum {
-    MSG_CONECT = 0,      
-    MSG_DISCONECT = 1  
-} MessageType;
+#include "../../include/NET/packetHandler.h"
 
-typedef struct {
-    int gameState;
-    int messageType;  // One of MessageType
-    int playerID;     // Which player is sending
-} PacketData;
+void NET_protocolSendInt(UDPpacket *pUDPpkg,UDPsocket Socket,IPaddress IP,
+                            GameState GS,MessageType msgType,int placeHolder);
 
+void NET_protocolSendString(UDPpacket *pUDPpkg,UDPsocket Socket,IPaddress IP,
+                            GameState GS,MessageType msgType,const char* str);
+
+void NET_protocolSendArray(UDPpacket *pUDPpkg,UDPsocket Socket,IPaddress IP,
+                            GameState GS,MessageType msgType,const void* array, Uint32 arraySize);
 
 #endif
