@@ -52,12 +52,21 @@ int main(int argc, char **argv ){
                 printf("Hej det är %s", (char*)(NET_stdPackageGetPayload(aPkg)));
                 break;
             case LOBBY_LIST_RESPONSE:{   
+                printf("hej\n");
                 Uint8* raw = NET_stdPackageGetPayload(aPkg);
                 Uint32 size = NET_stdPackageGetPayloadSize(aPkg);
+                if(!raw){
+                    printf("RAWWWW error!");
+                }
                 PlayerList* array = (PlayerList*)raw;
+                if(!array){
+                    printf("Array error!");
+                }
+
                 int count = size / sizeof(PlayerList);
-                for (int i = 0; i < count; i++)
+                for (int i = 0; i < 3; i++)
                 {
+                    printf("hej\n");
                     printf("List: %d ID: %d pos: %d x, %d y\n", i, array[i].ID, array[i].pos.x, array[i].pos.y);
                 }
                 }

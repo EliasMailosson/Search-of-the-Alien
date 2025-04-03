@@ -55,7 +55,7 @@ void NET_protocolSendString(UDPpacket *pUDPpkg,UDPsocket Socket,IPaddress IP,
 }
 
 void NET_protocolSendArray(UDPpacket *pUDPpkg,UDPsocket Socket,IPaddress IP,
-    GameState GS,MessageType msgType, const void* placeHolder){
+    GameState GS,MessageType msgType, const void* placeHolder, Uint32 arraySize){
     
     Uint32 payloadSize = (Uint32)sizeof(placeHolder);
     if (!placeHolder || payloadSize == 0) {
@@ -69,7 +69,7 @@ void NET_protocolSendArray(UDPpacket *pUDPpkg,UDPsocket Socket,IPaddress IP,
         return;
     }
 
-    NET_stdPackagePayloadArray(packet, placeHolder, sizeof(placeHolder));
+    NET_stdPackagePayloadArray(packet, placeHolder, arraySize);
     //NET_stdPackageWrite32Payload(packet,(Uint32*)placeHolder);
     // Serialize the packet.
     Uint8 *sBuffer = NULL;
