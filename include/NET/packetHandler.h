@@ -5,10 +5,10 @@
 #include <string.h>
 #include <SDL.h>
 #include <SDL_net.h>
-union {
-    float f;
-    Uint32 u;
-} floatConv;
+// union {
+//     float f;
+//     Uint32 u;
+// } floatConv;
 
 typedef enum{
     CONECT,  

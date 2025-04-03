@@ -19,7 +19,12 @@ bool NET_serverInitSDL();
 /** Destroying SDL network and SDL*/
 void NET_severDestroySDL();
 
+typedef struct{
+    int ID;
+    SDL_Point pos;
+}PlayerList;
 
-
+void NET_PlayerListRemovPlayer(PlayerList *list,int index);
+void NET_PlayerListAddPlayer(PlayerList *list,PlayerList new_player);
 
 #endif

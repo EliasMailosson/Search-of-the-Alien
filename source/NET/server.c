@@ -29,6 +29,10 @@ int main(int argc, char **argv ){
         // Poll event checking if there is a packege to recive
         while (SDLNet_UDP_Recv(aServer->serverSocket, aServer->pReceivePacket)){
             StdPackage aPkg = NET_stdPackageDeserialize(aServer->pReceivePacket->data, aServer->pReceivePacket->len);
+            if(aPkg == NULL){
+                NET_stdPackageDestroy(aPkg);
+                break;;
+            } 
             //NET_stdPakegeGetGameState(aPkg);
             switch (NET_stdPackageGetMessageType(aPkg)){
             case CONECT:

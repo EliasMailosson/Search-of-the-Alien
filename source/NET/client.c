@@ -1,5 +1,5 @@
 #include "../../include/NET/client.h"
-#include "../../include/NET/shared.h"
+
 struct client{
     UDPsocket clientSocket;
     UDPpacket *pReceivePacket;
@@ -81,6 +81,6 @@ void NET_clientDestroy(Client aClient){
     free(aClient);
 }
 
-void NET_clientSendID(Client aClient, int playerID){
-    NET_protocolConectSend(aClient->pSendPacket,aClient->clientSocket,aClient->serverAddr,playerID);
+void NET_clientSendID(Client aClient,GameState GS, MessageType msgType,int playerID){
+    NET_protocolConectSend(aClient->pSendPacket,aClient->clientSocket,aClient->serverAddr,GS,msgType,playerID);
 }

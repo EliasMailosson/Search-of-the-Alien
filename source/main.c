@@ -15,7 +15,7 @@ int main(int argc, char **argv ){
     aClient = NET_clientCreate();
     NET_clientConnect(aClient);
     //NET_clientSend(aClient);
-    NET_clientSendID(aClient,332);
+    NET_clientSendID(aClient,MENU,CONECT,434343);
     NET_clientDestroy(aClient);
     killClient(&view);
     return 0;

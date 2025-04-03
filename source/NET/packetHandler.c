@@ -71,9 +71,7 @@ Uint32 NET_stdPackageSerialize(const StdPackage packet, Uint8 ** buffer){
     offset += 4;
     SDLNet_Write32(packet->payloadSize, *buffer + offset);
     offset += 4;
-    // eventuelt att vi har en pekare tille en funton 
-    // eller någor annat sätt att stoppa in paload 
-    // om vi ska ha något annat en stereng ?
+    
     if(packet->payloadSize > 0 && packet->payload){
         memcpy(*buffer + offset, packet->payload, packet->payloadSize);
     }

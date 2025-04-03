@@ -1,8 +1,9 @@
 #include "../../include/NET/protocol.h"
 
-void NET_protocolConectSend(UDPpacket *pUDPpkg,UDPsocket Socket,IPaddress IP,int playerID){
+void NET_protocolConectSend(UDPpacket *pUDPpkg,UDPsocket Socket,IPaddress IP,
+                            GameState GS,MessageType msgType,int playerID){
     Uint32 payloadSize = (Uint32)sizeof(playerID);
-    StdPackage packet = NET_stdPackageCreate(MENU,CONECT,payloadSize);
+    StdPackage packet = NET_stdPackageCreate(GS,msgType,payloadSize);
     if (!packet) {
         printf("Failed to create dynamic packet.\n");
         return;
