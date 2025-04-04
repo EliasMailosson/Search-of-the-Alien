@@ -4,10 +4,16 @@
 #include "UI/panel.h"
 #include "game.h"
 
-#define PANEL_COUNT 3
+#define PANEL_COUNT 4
 #define FONT_COUNT 2
 
-enum MenuPanels {PANEL_START, PANEL_SOCIAL, PANEL_OPTIONS};
+#define OFFSET 80
+#define BIGBUTTONWIDTH 300
+#define BIGBUTTONHEIGHT 60
+#define SMALLBUTTONWIDTH 200
+#define SMALLBUTTONHEIGHT 40
+
+enum MenuPanels {PANEL_START, PANEL_GAMESELECTION, PANEL_SOCIAL, PANEL_OPTIONS};
 enum MenuEvents {PANEL_IDLE, BUTTON_CLICKED, CHECKLIST_UPDATED, PANEL_SWITCH};
 
 typedef struct menuEvent {

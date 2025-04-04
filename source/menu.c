@@ -4,8 +4,6 @@
 #include "../include/UI/checklist.h"
 #include "../include/UI/inputfield.h"
 
-#define OFFSET 80
-
 void renderMenu(SDL_Renderer *pRend, Menu *pMenu) {
     for(int i = 0; i < PANEL_COUNT; i++) {
         UI_panelRender(pRend, pMenu->panels[i]);
@@ -66,15 +64,15 @@ Menu initMenu(SDL_Renderer *pRend, ClientView *pView) {
 
     Button b1 = UI_buttonCreate();
     UI_panelAddComponent(menu.panels[PANEL_START], b1, UI_BUTTON, "Start Game");
-    UI_buttonConfigure(b1, "Start Game", pView->windowWidth / 2 - 150, 150, 300, 60, pRend,
+    UI_buttonConfigure(b1, "Start Game", pView->windowWidth / 2 - 150, 150, BIGBUTTONWIDTH, BIGBUTTONHEIGHT, pRend,
         (SDL_Color) { .r = 0, .g = 0, .b = 0, .a = 255 }, 
         menu.fonts[1], (SDL_Color) { .r = 255, .g = 255, .b = 255, .a = 255 }
     );
-    UI_panelSetComponentLink(menu.panels[PANEL_START], "Start Game", PANEL_SOCIAL);
+    UI_panelSetComponentLink(menu.panels[PANEL_START], "Start Game", PANEL_GAMESELECTION);
 
     Button b2 = UI_buttonCreate();
     UI_panelAddComponent(menu.panels[PANEL_START], b2, UI_BUTTON, "Social");
-    UI_buttonConfigure(b2, "Social", pView->windowWidth / 2 - 150, 150 + OFFSET, 300, 60, pRend,
+    UI_buttonConfigure(b2, "Social", pView->windowWidth / 2 - 150, 150 + OFFSET, BIGBUTTONWIDTH, BIGBUTTONHEIGHT, pRend,
         (SDL_Color) { .r = 0, .g = 0, .b = 0, .a = 255 }, 
         menu.fonts[1], (SDL_Color) { .r = 255, .g = 255, .b = 255, .a = 255 }
     );
@@ -82,31 +80,76 @@ Menu initMenu(SDL_Renderer *pRend, ClientView *pView) {
 
     Button b3 = UI_buttonCreate();
     UI_panelAddComponent(menu.panels[PANEL_START], b3, UI_BUTTON, "Options");
-    UI_buttonConfigure(b3, "Options", pView->windowWidth / 2 - 150, 150 + OFFSET*2, 300, 60, pRend,
+    UI_buttonConfigure(b3, "Options", pView->windowWidth / 2 - 150, 150 + OFFSET*2, BIGBUTTONWIDTH, BIGBUTTONHEIGHT, pRend,
         (SDL_Color) { .r = 0, .g = 0, .b = 0, .a = 255 }, 
         menu.fonts[1], (SDL_Color) { .r = 255, .g = 255, .b = 255, .a = 255 }
     );
-    UI_panelSetComponentLink(menu.panels[PANEL_START], "Options", PANEL_SOCIAL);
+    UI_panelSetComponentLink(menu.panels[PANEL_START], "Options", PANEL_OPTIONS);
 
     Button b4 = UI_buttonCreate();
     UI_panelAddComponent(menu.panels[PANEL_START], b4, UI_BUTTON, "Quit");
-    UI_buttonConfigure(b4, "Quit", pView->windowWidth / 2 - 150, 150 + OFFSET*3, 300, 60, pRend,
+    UI_buttonConfigure(b4, "Quit", pView->windowWidth / 2 - 150, 150 + OFFSET*3, BIGBUTTONWIDTH, BIGBUTTONHEIGHT, pRend,
         (SDL_Color) { .r = 0, .g = 0, .b = 0, .a = 255 }, 
         menu.fonts[1], (SDL_Color) { .r = 255, .g = 255, .b = 255, .a = 255 }
     );
+    
+    // START GAME MENU ////////////////////////
+    UI_panelSetImage(pRend, menu.panels[PANEL_GAMESELECTION], "assets/images/menu-background.png");
+
+    Button b8 = UI_buttonCreate();
+    UI_panelAddComponent(menu.panels[PANEL_GAMESELECTION], b8, UI_BUTTON, "Load-Game");
+    UI_buttonConfigure(b8, "Load Game", pView->windowWidth / 2 - 150, 150 + OFFSET, BIGBUTTONWIDTH, BIGBUTTONHEIGHT, pRend,
+        (SDL_Color) { .r = 0, .g = 0, .b = 0, .a = 255 }, 
+        menu.fonts[1], (SDL_Color) { .r = 255, .g = 255, .b = 255, .a = 255 }
+    );
+    UI_panelSetComponentLink(menu.panels[PANEL_GAMESELECTION], "Load-Game", PANEL_START);
+
+    Button b9 = UI_buttonCreate();
+    UI_panelAddComponent(menu.panels[PANEL_GAMESELECTION], b9, UI_BUTTON, "New-Game");
+    UI_buttonConfigure(b9, "New Game", pView->windowWidth / 2 - 150, 150 + OFFSET*2, BIGBUTTONWIDTH, BIGBUTTONHEIGHT, pRend,
+        (SDL_Color) { .r = 0, .g = 0, .b = 0, .a = 255 }, 
+        menu.fonts[1], (SDL_Color) { .r = 255, .g = 255, .b = 255, .a = 255 }
+    );
+    UI_panelSetComponentLink(menu.panels[PANEL_GAMESELECTION], "New-Game", PANEL_START);  
+
+    Button b10 = UI_buttonCreate();
+    UI_panelAddComponent(menu.panels[PANEL_GAMESELECTION], b10, UI_BUTTON, "Game-back");
+    UI_buttonConfigure(b10, "Back", 
+        pView->windowWidth*0.08, pView->windowHeight*0.85, SMALLBUTTONWIDTH, SMALLBUTTONHEIGHT, pRend, (SDL_Color) { .r = 0, .g = 0, .b = 0, .a = 255 }, 
+        menu.fonts[0], (SDL_Color) { .r = 255, .g = 255, .b = 255, .a = 255 }
+    );
+    UI_panelSetComponentLink(menu.panels[PANEL_GAMESELECTION], "Game-back", PANEL_START);
 
     // SOCIAL MENU ////////////////////////
     UI_panelSetImage(pRend, menu.panels[PANEL_SOCIAL], "assets/images/menu-background.png");
 
     Button b5 = UI_buttonCreate();
-    UI_panelAddComponent(menu.panels[PANEL_SOCIAL], b5, UI_BUTTON, "b5");
-    UI_buttonConfigure(b5, "Social", 
-        200, 100, 300, 60, pRend, (SDL_Color) { .r = 0, .g = 0, .b = 0, .a = 255 }, 
+    UI_panelAddComponent(menu.panels[PANEL_SOCIAL], b5, UI_BUTTON, "Social-back");
+    UI_buttonConfigure(b5, "Back", 
+        pView->windowWidth*0.08, pView->windowHeight*0.85, SMALLBUTTONWIDTH, SMALLBUTTONHEIGHT, pRend, (SDL_Color) { .r = 0, .g = 0, .b = 0, .a = 255 }, 
         menu.fonts[0], (SDL_Color) { .r = 255, .g = 255, .b = 255, .a = 255 }
     );
-    UI_panelSetComponentLink(menu.panels[PANEL_SOCIAL], "b5", PANEL_START);
+    UI_panelSetComponentLink(menu.panels[PANEL_SOCIAL], "Social-back", PANEL_START);
+
+    Button b6 = UI_buttonCreate();
+    UI_panelAddComponent(menu.panels[PANEL_SOCIAL], b6, UI_BUTTON, "Join-button");
+    UI_buttonConfigure(b6, "Join", pView->windowWidth / 2 - 150, 150 + OFFSET*2, BIGBUTTONWIDTH, BIGBUTTONHEIGHT, pRend,
+        (SDL_Color) { .r = 0, .g = 0, .b = 0, .a = 255 }, 
+        menu.fonts[1], (SDL_Color) { .r = 255, .g = 255, .b = 255, .a = 255 }
+    );
+    UI_panelSetComponentLink(menu.panels[PANEL_SOCIAL], "Join-button", PANEL_START);
 
     // OPTIONS MENU ////////////////////////
+    UI_panelSetImage(pRend, menu.panels[PANEL_OPTIONS], "assets/images/menu-background.png");
+
+    Button b7 = UI_buttonCreate();
+    UI_panelAddComponent(menu.panels[PANEL_OPTIONS], b7, UI_BUTTON, "Options-back");
+    UI_buttonConfigure(b7, "Back", 
+        pView->windowWidth*0.08, pView->windowHeight*0.85, SMALLBUTTONWIDTH, SMALLBUTTONHEIGHT, pRend, (SDL_Color) { .r = 0, .g = 0, .b = 0, .a = 255 }, 
+        menu.fonts[0], (SDL_Color) { .r = 255, .g = 255, .b = 255, .a = 255 }
+    );
+    UI_panelSetComponentLink(menu.panels[PANEL_OPTIONS], "Options-back", PANEL_START);
+
     
     return menu;
 }
