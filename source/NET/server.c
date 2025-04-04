@@ -27,7 +27,7 @@ int main(int argc, char **argv ){
         isRunning = true;
         printf("UDP server started on port %d\n", PORT);
     } 
-    int x = 0;
+    int startTime = SDL_GetTicks();
     int n = 0;
     int index = -1;
     int lobbyID = -1;
@@ -37,6 +37,7 @@ int main(int argc, char **argv ){
     while (isRunning){
         // Poll event checking if there is a packege to recive
         NET_eventHandler(&isRunning,keys,event);
+        if(SDL_GetTicks() - startTime < 12000)
         while (SDLNet_UDP_Recv(aServer->serverSocket, aServer->pReceivePacket)){
             Packet aPacket = NET_packetDeserialize(aServer->pReceivePacket->data, aServer->pReceivePacket->len);
             if(aPacket == NULL){
@@ -88,15 +89,16 @@ int main(int argc, char **argv ){
                 // send loby respone with list of players in lobby
                 break;
             case JOIN_LOBBY_RESPONSE:
-                
+
+                break;
+            case PRINT:
+                printf("%s\n",(char*)NET_packetGetPayload(aPacket));
                 break;
             default:
                 printf("Failed!\n");
                 break;
             }
             if(aPacket) NET_packetDestroy(aPacket);
-            x++;
-            if(x!=0)isRunning = false;
         }
     }
     printf("%d count\n",n);

@@ -19,7 +19,7 @@ int main(int argc, char **argv ){
     //NET_clientSendString(aClient, MENU, LOBBY_LIST, "Elias Mailadasson");
     //PlayerList placeholder[3] = {{.ID = 6543, .pos.x = 12, .pos.y = 55}, {.ID = 1235, .pos.x = 52, .pos.y = 35}, {.ID = 6435, .pos.x = 1, .pos.y = 2}};
     //NET_clientSendArray(aClient, MENU, LOBBY_LIST_RESPONSE, placeholder, sizeof(placeholder));
-    NET_clientSendString(aClient,MENU,CONNECT,"Caspar");
+    NET_clientSendString(aClient,MENU,CONNECT,"Caspar hej");
     bool isRunning = true;
     bool keys[SDL_NUM_SCANCODES] = {0};
     SDL_Event event ={0};
@@ -30,6 +30,7 @@ int main(int argc, char **argv ){
     while (isRunning){
         NET_clientReceiver(aClient);
         NET_eventHandler(&isRunning, keys,event);
+        if(keys[SDL_SCANCODE_P]) NET_clientSendString(aClient,MENU,PRINT,"sajksljhka hdjsk djhsk");
     }
     
     NET_clientDestroy(aClient);
