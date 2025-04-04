@@ -20,6 +20,8 @@ void NET_serverSendArray(Server aServer,GameState GS, MessageType msgType, const
 void NET_serverRemovUser(Server aServer,int index);
 void NET_serverAddUser(Server aServer, User newUser);
 
+User NET_serverClientConnected(Packet aPacket, Server aServer);
+
 /** Freeing memory after use, for server */
 void NET_serverDestroy(Server aServer);
 
