@@ -56,26 +56,18 @@ void NET_PlayerListAddPlayer(PlayerList *list,PlayerList new_player){
     (void)list;(void)new_player;
 }
 
-void NET_eventHandler(ClientControl *pControl){
-    while (SDL_PollEvent(&pControl->event)){
-        switch (pControl->event.type){
-        case SDL_QUIT: pControl->isRunning = false;
+void NET_eventHandler(bool *pIsRunning, bool *pKeys[SDL_NUM_SCANCODES]){
+
+    SDL_Event event;
+    while (SDL_PollEvent(&event)){
+        switch (event.type){
+        case SDL_QUIT: *pIsRunning = false;
             break;
-        case SDL_KEYDOWN: pControl->keys[pControl->event.key.keysym.scancode] = true;
-        if (pControl->keys[SDL_SCANCODE_ESCAPE] == true) pControl->isRunning = false;
+        case SDL_KEYDOWN: *pKeys[event.key.keysym.scancode] = true;
+        if (pKeys[SDL_SCANCODE_ESCAPE] == true) *pIsRunning = false;
             break;
         case SDL_KEYUP: 
-            pControl->keys[pControl->event.key.keysym.scancode] = false;
-            break;
-        case SDL_MOUSEBUTTONDOWN:
-            pControl->isMouseDown = true;
-            break;
-        case SDL_MOUSEBUTTONUP:
-            pControl->isMouseUp = true;
-            break;
-        case SDL_TEXTINPUT:
-            pControl->isTextInput = true;
-            strcpy(pControl->textInput, pControl->event.text.text);
+            pKeys[event.key.keysym.scancode] = false;
             break;
         default:
             break;

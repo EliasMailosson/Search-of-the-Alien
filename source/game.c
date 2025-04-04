@@ -17,6 +17,29 @@ void eventHandler(ClientControl *pControl){
     pControl->isMouseUp = false;
     pControl->isTextInput = false;
     
+    while (SDL_PollEvent(&pControl->event)){
+        switch (pControl->event.type){
+        case SDL_QUIT: pControl->isRunning = false;
+            break;
+        case SDL_KEYDOWN: pControl->keys[pControl->event.key.keysym.scancode] = true;
+            break;
+        case SDL_KEYUP: 
+            pControl->keys[pControl->event.key.keysym.scancode] = false;
+            break;
+        case SDL_MOUSEBUTTONDOWN:
+            pControl->isMouseDown = true;
+            break;
+        case SDL_MOUSEBUTTONUP:
+            pControl->isMouseUp = true;
+            break;
+        case SDL_TEXTINPUT:
+            pControl->isTextInput = true;
+            strcpy(pControl->textInput, pControl->event.text.text);
+            break;
+        default:
+            break;
+        }
+    }
 }
 
 void render(ClientView *pView, Menu *pMenu){

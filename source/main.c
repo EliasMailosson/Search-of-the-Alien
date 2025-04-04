@@ -20,11 +20,18 @@ int main(int argc, char **argv ){
     //PlayerList placeholder[3] = {{.ID = 6543, .pos.x = 12, .pos.y = 55}, {.ID = 1235, .pos.x = 52, .pos.y = 35}, {.ID = 6435, .pos.x = 1, .pos.y = 2}};
     //NET_clientSendArray(aClient, MENU, LOBBY_LIST_RESPONSE, placeholder, sizeof(placeholder));
     NET_clientSendString(aClient,MENU,CONNECT,"Caspar");
-    control.isRunning = true;
-    while (control.isRunning){
+    bool isRunning = true;
+    bool keys[SDL_NUM_SCANCODES] = {0};
+    SDL_Event event;
+    // int startTime = SDL_GetTicks();
+    // while (SDL_GetTicks() - startTime < 5000){
+    //     NET_clientReceiver(aClient);
+    // }
+    while (isRunning){
         NET_clientReceiver(aClient);
-        NET_eventHandler(&control);
+        NET_eventHandeler(&isRunning, &keys[SDL_NUM_SCANCODES]);
     }
+    
     NET_clientDestroy(aClient);
     killClient(&view);
     return 0;
