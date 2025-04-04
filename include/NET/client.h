@@ -19,5 +19,6 @@ void NET_clientSendString(Client aClient,GameState GS, MessageType msgType,const
 void NET_clientSendArray(Client aClient,GameState GS, MessageType msgType,const void* array, Uint32 arraySize);
 
 void NET_clientReceiver(Client aClient);
+int NET_clientFindePlayer(Client aClient, char* str);
 
 #endif

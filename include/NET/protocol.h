@@ -14,15 +14,7 @@ void NET_protocolSendArray(UDPpacket *pUDPpkg,UDPsocket Socket,IPaddress IP,
 
 //########## ska ligga i shaerde #########
 
-typedef struct{
-    int ID;
-    SDL_Point pos;
-    GameState state;
-}PlayerList1;
 
-
-void NET_PlayerListRemovPlayer1(PlayerList1 **list,int index, int *listCount);
-void NET_PlayerListAddPlayer1(PlayerList1 **list,PlayerList1 newPlayer,int *listCount);
 
 
 #endif

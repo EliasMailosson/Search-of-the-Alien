@@ -31,9 +31,12 @@ int main(int argc, char **argv ){
     int n = 0;
     int index = -1;
     int lobbyID = -1;
+    SDL_Event event = {0};
+    bool keys[SDL_NUM_SCANCODES] = {0};
     // User newUser = {0};
     while (isRunning){
         // Poll event checking if there is a packege to recive
+        NET_eventHandler(&isRunning,keys,event);
         while (SDLNet_UDP_Recv(aServer->serverSocket, aServer->pReceivePacket)){
             Packet aPacket = NET_packetDeserialize(aServer->pReceivePacket->data, aServer->pReceivePacket->len);
             if(aPacket == NULL){
@@ -85,8 +88,7 @@ int main(int argc, char **argv ){
                 // send loby respone with list of players in lobby
                 break;
             case JOIN_LOBBY_RESPONSE:
-
-
+                
                 break;
             default:
                 printf("Failed!\n");

@@ -61,7 +61,6 @@ void NET_protocolSendArray(UDPpacket *pUDPpkg, UDPsocket Socket, IPaddress IP,
         printf("Invalid array data.\n");
         return;
     }
-    
     Packet packet = NET_packetCreate(GS, msgType, payloadSize);
     if (!packet) {
         printf("Failed to create dynamic packet.\n");
@@ -84,37 +83,4 @@ void NET_protocolSendArray(UDPpacket *pUDPpkg, UDPsocket Socket, IPaddress IP,
     free(sBuffer);
     NET_packetDestroy(packet);
 }
-//########## ska ligga i shaerde #########
 
-void NET_PlayerListRemovePlayer1(PlayerList1 **list, int index, int *listCount){
-    if (index < 0 || index >= (*listCount)) {
-        printf("Invalid index\n");
-        return;
-    }
-    for (int i = index; i < (*listCount) - 1; i++) {
-        (*list)[i] = (*list)[i + 1];
-    }
-    (*listCount)--;
-    if ((*listCount) > 0) {
-        PlayerList1 *temp = realloc(*list, (*listCount) * sizeof(PlayerList1));
-        if (temp == NULL) {
-            printf("Realloc failed when removing PlayerList\n");
-            return;
-        }
-        *list = temp;
-    } else {
-        free(*list);
-        *list = NULL;
-    }
-}
-
-void NET_PlayerListAddPlayer1(PlayerList1 **list, PlayerList1 newPlayer, int *listCount){
-    PlayerList1 *temp = realloc(*list, ((*listCount) + 1) * sizeof(PlayerList1));
-    if (temp != NULL) {
-        *list = temp;
-        (*list)[*listCount] = newPlayer;
-        (*listCount)++;
-    } else {
-        printf("Realloc failed when adding to the PlayerList!\n");
-    }
-}

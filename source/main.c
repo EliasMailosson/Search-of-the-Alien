@@ -22,14 +22,14 @@ int main(int argc, char **argv ){
     NET_clientSendString(aClient,MENU,CONNECT,"Caspar");
     bool isRunning = true;
     bool keys[SDL_NUM_SCANCODES] = {0};
-    SDL_Event event;
+    SDL_Event event ={0};
     // int startTime = SDL_GetTicks();
     // while (SDL_GetTicks() - startTime < 5000){
     //     NET_clientReceiver(aClient);
     // }
     while (isRunning){
         NET_clientReceiver(aClient);
-        NET_eventHandeler(&isRunning, &keys[SDL_NUM_SCANCODES]);
+        NET_eventHandler(&isRunning, keys,event);
     }
     
     NET_clientDestroy(aClient);
