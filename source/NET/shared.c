@@ -97,6 +97,5 @@ void NET_eventHandler(bool *pIsRunning, bool *pKeys,SDL_Event event){
         default:
             break;
         }
-    }
-    
+    }    
 }

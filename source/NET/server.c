@@ -31,12 +31,10 @@ int main(int argc, char **argv ){
     int n = 0;
     int index = -1;
     int lobbyID = -1;
-    SDL_Event event = {0};
-    bool keys[SDL_NUM_SCANCODES] = {0};
     // User newUser = {0};
     while (isRunning){
         // Poll event checking if there is a packege to recive
-        NET_eventHandler(&isRunning,keys,event);
+        //NET_eventHandler(&isRunning,keys,event);
         if(SDL_GetTicks() - startTime < 12000)
         while (SDLNet_UDP_Recv(aServer->serverSocket, aServer->pReceivePacket)){
             Packet aPacket = NET_packetDeserialize(aServer->pReceivePacket->data, aServer->pReceivePacket->len);
@@ -93,6 +91,7 @@ int main(int argc, char **argv ){
                 break;
             case PRINT:
                 printf("%s\n",(char*)NET_packetGetPayload(aPacket));
+                NET_serverSendString(aServer,GLOBAL,PRINT,"nej va fan",NET_serverCompIP(aServer));
                 break;
             default:
                 printf("Failed!\n");
@@ -105,6 +104,16 @@ int main(int argc, char **argv ){
 
     NET_serverDestroy(aServer);
     NET_severDestroySDL();
+}
+
+int NET_serverCompIP(Server aServer){
+    for (int i = 0; i < aServer->clientConunt; i++){
+    if (aServer->clients[i].IP.host == aServer->pReceivePacket->address.host && 
+            aServer->clients[i].IP.port == aServer->pReceivePacket->address.port ){
+            return i;
+        }
+    }
+    return -1;
 }
 
 void NET_serverDestroy(Server aServer){

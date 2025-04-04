@@ -29,10 +29,24 @@ int main(int argc, char **argv ){
     // }
     while (isRunning){
         NET_clientReceiver(aClient);
-        NET_eventHandler(&isRunning, keys,event);
-        if(keys[SDL_SCANCODE_P]) NET_clientSendString(aClient,MENU,PRINT,"sajksljhka hdjsk djhsk");
+
+        while (SDL_PollEvent(&event)){
+        switch (event.type){
+        case SDL_QUIT: isRunning = false;
+            break;
+        case SDL_KEYDOWN: keys[event.key.keysym.scancode] = true;
+
+            break;
+        case SDL_KEYUP: 
+            keys[event.key.keysym.scancode] = false;
+            break;
+        default:
+            break;
+        }
+    } 
+        if (keys[SDL_SCANCODE_ESCAPE] == true) isRunning = false;
+        if(keys[SDL_SCANCODE_P]) NET_clientSendString(aClient,MENU,PRINT,"ndndndnslkks jklds");
     }
-    
     NET_clientDestroy(aClient);
     killClient(&view);
     return 0;

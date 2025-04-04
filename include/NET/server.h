@@ -23,6 +23,8 @@ void NET_serverAddUser(Server aServer, User newUser);
 void NET_serverClientConnected(Packet aPacket, Server aServer);
 int NET_serverFindPlayerID(Server aServer, const char* str);
 
+int NET_serverCompIP(Server aServer);
+
 
 /** Freeing memory after use, for server */
 void NET_serverDestroy(Server aServer);
