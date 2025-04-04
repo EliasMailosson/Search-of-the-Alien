@@ -1,6 +1,7 @@
 #include "../include/game.h"
 #include "../include/clientLife.h"
 #include "../include/NET/client.h"
+#include "../include/NET/shared.h"
 
 
 int main(int argc, char **argv ){
@@ -19,11 +20,11 @@ int main(int argc, char **argv ){
     //PlayerList placeholder[3] = {{.ID = 6543, .pos.x = 12, .pos.y = 55}, {.ID = 1235, .pos.x = 52, .pos.y = 35}, {.ID = 6435, .pos.x = 1, .pos.y = 2}};
     //NET_clientSendArray(aClient, MENU, LOBBY_LIST_RESPONSE, placeholder, sizeof(placeholder));
     NET_clientSendString(aClient,MENU,CONNECT,"Caspar");
-    int startTime = SDL_GetTicks();
-    while (SDL_GetTicks() - startTime < 5000 ){
+    control.isRunning = true;
+    while (control.isRunning){
         NET_clientReceiver(aClient);
+        NET_eventHandler(&control);
     }
-    
     NET_clientDestroy(aClient);
     killClient(&view);
     return 0;

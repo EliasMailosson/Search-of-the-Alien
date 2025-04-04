@@ -6,7 +6,8 @@
 #include <stdio.h>
 #include <stdbool.h>
 
-#include "../../include/NET/protocol.h"
+#include "protocol.h"
+#include "../game.h"
 
 #define MAX_CLIENTS 8
 #define PORT 1234
@@ -29,5 +30,6 @@ void NET_PlayerListAddPlayer(PlayerList *list,PlayerList new_player);
 void NET_PlayerListRead(PlayerList *new_player);
 void NET_PlayerListUpdate(Packet aPacket, PlayerList* list, int *count);
 void NET_PlayerListPrintf(PlayerList* list, int count);
+void NET_eventHandler(ClientControl *pControl);
 
 #endif

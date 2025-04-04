@@ -55,3 +55,31 @@ void NET_PlayerListRemovPlayer(PlayerList *list,int index){
 void NET_PlayerListAddPlayer(PlayerList *list,PlayerList new_player){
     (void)list;(void)new_player;
 }
+
+void NET_eventHandler(ClientControl *pControl){
+    while (SDL_PollEvent(&pControl->event)){
+        switch (pControl->event.type){
+        case SDL_QUIT: pControl->isRunning = false;
+            break;
+        case SDL_KEYDOWN: pControl->keys[pControl->event.key.keysym.scancode] = true;
+        if (pControl->keys[SDL_SCANCODE_ESCAPE] == true) pControl->isRunning = false;
+            break;
+        case SDL_KEYUP: 
+            pControl->keys[pControl->event.key.keysym.scancode] = false;
+            break;
+        case SDL_MOUSEBUTTONDOWN:
+            pControl->isMouseDown = true;
+            break;
+        case SDL_MOUSEBUTTONUP:
+            pControl->isMouseUp = true;
+            break;
+        case SDL_TEXTINPUT:
+            pControl->isTextInput = true;
+            strcpy(pControl->textInput, pControl->event.text.text);
+            break;
+        default:
+            break;
+        }
+    }
+    
+}
