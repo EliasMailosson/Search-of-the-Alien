@@ -68,28 +68,32 @@ Menu initMenu(SDL_Renderer *pRend, ClientView *pView) {
     UI_panelAddComponent(menu.panels[PANEL_START], b1, UI_BUTTON, "Start Game");
     UI_buttonConfigure(b1, "Start Game", pView->windowWidth / 2 - 150, 150, 300, 60, pRend,
         (SDL_Color) { .r = 0, .g = 0, .b = 0, .a = 255 }, 
-        menu.fonts[1], (SDL_Color) { .r = 255, .g = 255, .b = 255, .a = 255 });
+        menu.fonts[1], (SDL_Color) { .r = 255, .g = 255, .b = 255, .a = 255 }
+    );
     UI_panelSetComponentLink(menu.panels[PANEL_START], "Start Game", PANEL_SOCIAL);
 
     Button b2 = UI_buttonCreate();
     UI_panelAddComponent(menu.panels[PANEL_START], b2, UI_BUTTON, "Social");
     UI_buttonConfigure(b2, "Social", pView->windowWidth / 2 - 150, 150 + OFFSET, 300, 60, pRend,
         (SDL_Color) { .r = 0, .g = 0, .b = 0, .a = 255 }, 
-        menu.fonts[1], (SDL_Color) { .r = 255, .g = 255, .b = 255, .a = 255 });
+        menu.fonts[1], (SDL_Color) { .r = 255, .g = 255, .b = 255, .a = 255 }
+    );
     UI_panelSetComponentLink(menu.panels[PANEL_START], "Social", PANEL_SOCIAL);
 
     Button b3 = UI_buttonCreate();
     UI_panelAddComponent(menu.panels[PANEL_START], b3, UI_BUTTON, "Options");
     UI_buttonConfigure(b3, "Options", pView->windowWidth / 2 - 150, 150 + OFFSET*2, 300, 60, pRend,
         (SDL_Color) { .r = 0, .g = 0, .b = 0, .a = 255 }, 
-        menu.fonts[1], (SDL_Color) { .r = 255, .g = 255, .b = 255, .a = 255 });
+        menu.fonts[1], (SDL_Color) { .r = 255, .g = 255, .b = 255, .a = 255 }
+    );
     UI_panelSetComponentLink(menu.panels[PANEL_START], "Options", PANEL_SOCIAL);
 
     Button b4 = UI_buttonCreate();
     UI_panelAddComponent(menu.panels[PANEL_START], b4, UI_BUTTON, "Quit");
     UI_buttonConfigure(b4, "Quit", pView->windowWidth / 2 - 150, 150 + OFFSET*3, 300, 60, pRend,
         (SDL_Color) { .r = 0, .g = 0, .b = 0, .a = 255 }, 
-        menu.fonts[1], (SDL_Color) { .r = 255, .g = 255, .b = 255, .a = 255 });
+        menu.fonts[1], (SDL_Color) { .r = 255, .g = 255, .b = 255, .a = 255 }
+    );
 
     // SOCIAL MENU ////////////////////////
     UI_panelSetImage(pRend, menu.panels[PANEL_SOCIAL], "assets/images/menu-background.png");

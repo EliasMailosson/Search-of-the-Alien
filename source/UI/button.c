@@ -9,6 +9,7 @@ typedef struct Button
     SDL_Rect buttonRect;
     SDL_Color backgroundColor;
     Label buttonText;
+    bool isHovered;
 } *Button;
 
 Button UI_buttonCreate() {
@@ -18,6 +19,7 @@ Button UI_buttonCreate() {
     aButton->buttonRect = (SDL_Rect){ .x = 300, .y = 10, .w = 150, .h = 100 };
     aButton->buttonText = UI_labelCreate();
     UI_buttonSetText(aButton, "hej");
+    aButton->isHovered = false;
 
     return aButton;
 }
@@ -49,7 +51,10 @@ void UI_buttonSetLabelappearence(SDL_Renderer* pRend, Button aButton, SDL_Color 
 }
 
 void UI_buttonRenderer(SDL_Renderer* pRend, Button aButton) {
-    SDL_SetRenderDrawColor(pRend, aButton->backgroundColor.r, aButton->backgroundColor.g, aButton->backgroundColor.b, aButton->backgroundColor.a);
+    if(aButton->isHovered) {
+        SDL_SetRenderDrawColor(pRend, aButton->backgroundColor.r-70, aButton->backgroundColor.g-70, aButton->backgroundColor.b-70, aButton->backgroundColor.a-50);
+    }
+    else SDL_SetRenderDrawColor(pRend, aButton->backgroundColor.r, aButton->backgroundColor.g, aButton->backgroundColor.b, aButton->backgroundColor.a);
     SDL_RenderFillRect(pRend, &aButton->buttonRect);
 
     UI_labelRender(pRend, aButton->buttonText);
@@ -57,9 +62,14 @@ void UI_buttonRenderer(SDL_Renderer* pRend, Button aButton) {
 
 bool UI_buttonIsHovered(Button aButton, int mouseX, int mouseY) {
     if (mouseX >= aButton->buttonRect.x && mouseX <= (aButton->buttonRect.x + aButton->buttonRect.w) 
-    && mouseY >= aButton->buttonRect.y && mouseY <= (aButton->buttonRect.y + aButton->buttonRect.h)) 
-    return true;
-    else return false;
+    && mouseY >= aButton->buttonRect.y && mouseY <= (aButton->buttonRect.y + aButton->buttonRect.h)) {
+        aButton->isHovered = true;
+        return true;
+    }
+    else {
+        aButton->isHovered = false;
+        return false;
+    }
 }
 
 void UI_buttonConfigure(Button aButton, char* text, int newX, int newY, int newWidth, int newHeight, SDL_Renderer* pRend, SDL_Color textColor, TTF_Font* pFont, SDL_Color buttonColor) {
