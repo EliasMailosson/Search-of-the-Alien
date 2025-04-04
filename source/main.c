@@ -45,8 +45,12 @@ int main(int argc, char **argv ){
         }
     } 
         if (keys[SDL_SCANCODE_ESCAPE] == true) isRunning = false;
-        if(keys[SDL_SCANCODE_P]) NET_clientSendString(aClient,MENU,PRINT,"ndndndnslkks jklds");
+        if(keys[SDL_SCANCODE_P]){
+            NET_clientSendString(aClient,MENU,PRINT,"ndndndnslkks jklds");
+            keys[SDL_SCANCODE_P] = false;
+        } 
     }
+    //NET_clientSendString();
     NET_clientDestroy(aClient);
     killClient(&view);
     return 0;

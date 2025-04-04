@@ -122,6 +122,8 @@ void NET_clientReceiver(Client aClient){
         case LOBBY_LIST:
             // clientside uppdat player list
             break;
+        case PRINT:
+            printf("%s\n",NET_packetGetPayload(aPacket));
         default:
             break;
         }
