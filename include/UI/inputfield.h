@@ -20,6 +20,17 @@ bool UI_inputfieldIsFocused(Inputfield aInputfield);
 
 void UI_inputfieldUpdateBuffer(Inputfield aInputfield, char *text);
 
+/**
+ * \param direction true: move right , false: move left
+ */
+void UI_inputfieldMoveCursor(Inputfield aInputfield, bool direction);
+
+void UI_inputfieldBackspace(Inputfield aInputfield);
+
+void UI_inputfieldGetBuffer(Inputfield aInputfield, char *dest);
+
+void UI_inputfieldResetBuffer(Inputfield aInputfield);
+
 void UI_inputfieldSetAppearance(SDL_Renderer* pRend, Inputfield aInputfield, int x, int y, int w, SDL_Color bg, SDL_Color fg, TTF_Font* pFont);
 
 #endif

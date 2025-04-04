@@ -23,7 +23,7 @@ void updateMenu(Menu *pMenu, ClientControl *pControl) {
     }
 
     for(int i = 0; i < PANEL_COUNT; i++) {
-        UI_panelUpdate(pMenu->panels[i], &menuEvent, pControl->isMouseUp);
+        UI_panelUpdate(pMenu->panels[i], &menuEvent, pControl->isMouseUp, pControl->keys);
 
         switch(menuEvent.eventType) {
             case PANEL_SWITCH:

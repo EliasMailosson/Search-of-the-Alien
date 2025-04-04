@@ -31,7 +31,7 @@ void UI_panelAddComponent(Panel aPanel, void *comp, int type, char *key);
 void UI_panelRender(SDL_Renderer *pRend, Panel aPanel);
 
 /*Updates all child-components and poll for interaction*/
-void UI_panelUpdate(Panel aPanel, MenuEvent *pEvent, bool isMouseUp);
+void UI_panelUpdate(Panel aPanel, MenuEvent *pEvent, bool isMouseUp, bool *keys);
 
 /*Toggle the visibility and activity of a panel*/
 void UI_panelSetActive(Panel aPanel, bool active);
