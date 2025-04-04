@@ -61,7 +61,6 @@ void NET_protocolSendArray(UDPpacket *pUDPpkg, UDPsocket Socket, IPaddress IP,
         printf("Invalid array data.\n");
         return;
     }
-    
     Packet packet = NET_packetCreate(GS, msgType, payloadSize);
     if (!packet) {
         printf("Failed to create dynamic packet.\n");
@@ -84,3 +83,4 @@ void NET_protocolSendArray(UDPpacket *pUDPpkg, UDPsocket Socket, IPaddress IP,
     free(sBuffer);
     NET_packetDestroy(packet);
 }
+

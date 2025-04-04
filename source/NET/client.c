@@ -4,8 +4,10 @@ struct client{
     UDPsocket clientSocket;
     UDPpacket *pReceivePacket;
     UDPpacket *pSendPacket;
-    int clientId;
+    char* clientId;
     IPaddress serverAddr;
+    PlayerList *list;
+    int PlayerCount;
 }; 
 
 void NET_clientSend(Client aClient){
@@ -62,6 +64,8 @@ Client NET_clientCreate(){
         SDLNet_UDP_Close(aClient->clientSocket);
         return NULL;
     }
+    aClient->PlayerCount = 0;
+    aClient->list = NULL;
     return aClient;
 }
 
@@ -93,9 +97,9 @@ void NET_clientSendArray(Client aClient,GameState GS, MessageType msgType,const 
     NET_protocolSendArray(aClient->pSendPacket, aClient->clientSocket, aClient->serverAddr, GS, msgType, array, arraySize);
 }
 
-void NET_clientReceiver(Client aClient)
-{
-
+void NET_clientReceiver(Client aClient){
+    char* playerID = 0;
+    int index = 0;
     while (SDLNet_UDP_Recv(aClient->clientSocket, aClient->pReceivePacket)){
         Packet aPacket = NET_packetDeserialize(aClient->pReceivePacket->data, aClient->pReceivePacket->len);
         if(aPacket == NULL){
@@ -108,17 +112,30 @@ void NET_clientReceiver(Client aClient)
             printf("resivde %d",*((int*)NET_packetGetPayload(aPacket)));
             break;
         case DISCONNECT_RESPONSE:
-            /* code */
+            playerID = (char*)NET_packetGetPayload(aPacket);
+            index = NET_clientFindePlayer(aClient,playerID);
+            NET_PlayerListRemovePlayer(&aClient->list,index,&aClient->PlayerCount);
             break;
         case JOIN_LOBBY_RESPONSE:
-            /* code */
+            NET_PlayerListUpdate(aPacket,aClient->list,&aClient->PlayerCount);
             break;
         case LOBBY_LIST:
             // clientside uppdat player list
             break;
+        case PRINT:
+            printf("%s\n",NET_packetGetPayload(aPacket));
         default:
             break;
         }
         if(aPacket) NET_packetDestroy(aPacket);
     }
+}
+
+int NET_clientFindePlayer(Client aClient, char* str){
+    for (int i = 0; i < aClient->PlayerCount; i++){
+        if(strcmp(str,aClient->list[i].ID)){
+            return i;
+        }   
+    }
+    return -1;
 }

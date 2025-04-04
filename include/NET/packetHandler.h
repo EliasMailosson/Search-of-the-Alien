@@ -19,6 +19,7 @@ typedef enum{
     LOBBY_LIST_RESPONSE,
     JOIN_LOBBY,
     JOIN_LOBBY_RESPONSE,
+    PRINT,
 } MessageType;
 
 

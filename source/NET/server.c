@@ -27,11 +27,15 @@ int main(int argc, char **argv ){
         isRunning = true;
         printf("UDP server started on port %d\n", PORT);
     } 
-    int x = 0;
+    int startTime = SDL_GetTicks();
     int n = 0;
-    User newUser = {0};
+    int index = -1;
+    int lobbyID = -1;
+    // User newUser = {0};
     while (isRunning){
         // Poll event checking if there is a packege to recive
+        //NET_eventHandler(&isRunning,keys,event);
+        if(SDL_GetTicks() - startTime < 12000)
         while (SDLNet_UDP_Recv(aServer->serverSocket, aServer->pReceivePacket)){
             Packet aPacket = NET_packetDeserialize(aServer->pReceivePacket->data, aServer->pReceivePacket->len);
             if(aPacket == NULL){
@@ -41,21 +45,24 @@ int main(int argc, char **argv ){
             //NET_stdPakegeGetGameState(aPacket);
             switch (NET_packetGetMessageType(aPacket)){
             case CONNECT:
-                newUser = (User){0};
-                newUser.Username = (char*)NET_packetGetPayload(aPacket);
-                newUser.IP = aServer->pReceivePacket->address;
-                newUser.LobbyID = -1;
-                newUser.State = NET_packetGetMessageType(aPacket);
-                NET_serverAddUser(aServer,newUser);
-                NET_serverSendInt(aServer,GLOBAL,CONNECT_RESPONSE,0,aServer->clientConunt-1);
-                //test
-                printf("usernam: %s\n",aServer->clients[aServer->clientConunt-1].Username);
+                NET_serverClientConnected(aPacket, aServer);
                 break;
             case CONNECT_RESPONSE:
                 // 
                 break;
             case DISCONNECT:
-                // fixa funtion som sökret ingeon clients och retunerar inxex
+                // sends string of disconnected players to everyone in lobby
+                for (int i = 0; i < aServer->clientConunt; i++){
+                    if (aServer->clients[i].IP.host == aServer->pReceivePacket->address.host && 
+                            aServer->clients[i].IP.port == aServer->pReceivePacket->address.port ){
+                            lobbyID = aServer->clients[i].LobbyID;
+                            index = i;
+                    }
+                }
+                for (int i = 0; i < aServer->clientConunt; i++){
+                        if(aServer->clients[i].LobbyID == lobbyID) NET_serverSendString(aServer, GLOBAL, DISCONNECT_RESPONSE, aServer->clients[index].Username, i);
+                    }
+                NET_serverRemoveUser(aServer, index);
                 break;
             case DISCONNECT_RESPONSE:
                 //brodcast till lobbyID
@@ -69,19 +76,44 @@ int main(int argc, char **argv ){
                 NET_PlayerListUpdate(aPacket,list,&n);
                 NET_PlayerListPrintf(list,3);
                 break;
+            case JOIN_LOBBY:
+                lobbyID = (*(int*)NET_packetGetPayload(aPacket));
+                for (int i = 0; i < aServer->clientConunt; i++){
+                    if (aServer->clients[i].IP.host == aServer->pReceivePacket->address.host && 
+                            aServer->clients[i].IP.port == aServer->pReceivePacket->address.port ){
+                        aServer->clients[i].LobbyID = lobbyID;
+                    }
+                }
+                // send loby respone with list of players in lobby
+                break;
+            case JOIN_LOBBY_RESPONSE:
+
+                break;
+            case PRINT:
+                printf("%s\n",(char*)NET_packetGetPayload(aPacket));
+                NET_serverSendString(aServer,GLOBAL,PRINT,"nej va fan",NET_serverCompIP(aServer));
+                break;
             default:
                 printf("Failed!\n");
                 break;
             }
             if(aPacket) NET_packetDestroy(aPacket);
-            x++;
-            if(x!=0)isRunning = false;
         }
     }
     printf("%d count\n",n);
 
     NET_serverDestroy(aServer);
     NET_severDestroySDL();
+}
+
+int NET_serverCompIP(Server aServer){
+    for (int i = 0; i < aServer->clientConunt; i++){
+    if (aServer->clients[i].IP.host == aServer->pReceivePacket->address.host && 
+            aServer->clients[i].IP.port == aServer->pReceivePacket->address.port ){
+            return i;
+        }
+    }
+    return -1;
 }
 
 void NET_serverDestroy(Server aServer){
@@ -138,7 +170,7 @@ void NET_serverSendArray(Server aServer,GameState GS, MessageType msgType, const
     NET_protocolSendArray(aServer->pSendPacket, aServer->serverSocket, aServer->clients[index].IP, GS, msgType, array, arraySize);
 }
 
-void NET_serverRemovUser(Server aServer,int index){
+void NET_serverRemoveUser(Server aServer,int index){
     if(index < 0 || index >= aServer->clientConunt){
         printf("Invalid index\n");
         return;
@@ -172,6 +204,29 @@ void NET_serverAddUser(Server aServer, User newUser){
         printf("Realloc failed when adding a user!\n");
     }
 }
+
+void NET_serverClientConnected(Packet aPacket, Server aServer){
+    User newUser = {0};
+    newUser.Username = (char*)NET_packetGetPayload(aPacket);
+    newUser.IP = aServer->pReceivePacket->address;
+    newUser.LobbyID = -1;
+    newUser.State = NET_packetGetMessageType(aPacket);
+    NET_serverAddUser(aServer,newUser);
+    NET_serverSendInt(aServer,GLOBAL,CONNECT_RESPONSE,0,aServer->clientConunt-1);
+    // Test output:
+    printf("username: %s\n",aServer->clients[aServer->clientConunt-1].Username);
+    //
+}
+
+int NET_serverFindPlayerID(Server aServer, const char* str){
+    for (int i = 0; i < aServer->clientConunt; i++){
+        if(strcmp(str, aServer->clients[i].Username) == 0){
+            return (i);
+        }
+    }
+    return -1;
+}
+
 
 
 

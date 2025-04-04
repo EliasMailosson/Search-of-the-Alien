@@ -12,4 +12,9 @@ void NET_protocolSendString(UDPpacket *pUDPpkg,UDPsocket Socket,IPaddress IP,
 void NET_protocolSendArray(UDPpacket *pUDPpkg,UDPsocket Socket,IPaddress IP,
                             GameState GS,MessageType msgType,const void* array, Uint32 arraySize);
 
+//########## ska ligga i shaerde #########
+
+
+
+
 #endif

@@ -19,15 +19,19 @@ bool NET_serverInitSDL();
 /** Destroying SDL network and SDL*/
 void NET_severDestroySDL();
 
+
 typedef struct{
-    int ID;
+    char* ID;
     SDL_Point pos;
+    GameState state;
 }PlayerList;
 
-void NET_PlayerListRemovPlayer(PlayerList *list,int index);
-void NET_PlayerListAddPlayer(PlayerList *list,PlayerList new_player);
+void NET_PlayerListRemovePlayer(PlayerList **list, int index, int *listCount);
+void NET_PlayerListAddPlayer(PlayerList **list,PlayerList newPlayer,int *listCount);
+
 void NET_PlayerListRead(PlayerList *new_player);
 void NET_PlayerListUpdate(Packet aPacket, PlayerList* list, int *count);
 void NET_PlayerListPrintf(PlayerList* list, int count);
+void NET_eventHandler(bool *pIsRunning, bool *pKeys,SDL_Event event);
 
 #endif
