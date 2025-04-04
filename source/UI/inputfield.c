@@ -105,7 +105,7 @@ void UI_inputfieldBackspace(Inputfield aInputfield) {
     delay++;
 
     if(delay > 3) {
-        if(aInputfield->bufferLenght <= 0) {
+        if(aInputfield->bufferLenght <= 0 || aInputfield->cursorIdx <= 0) {
             return;
         }
         char temp[256];

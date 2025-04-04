@@ -123,6 +123,11 @@ Menu initMenu(SDL_Renderer *pRend, ClientView *pView) {
     // SOCIAL MENU ////////////////////////
     UI_panelSetImage(pRend, menu.panels[PANEL_SOCIAL], "assets/images/menu-background.png");
 
+    Inputfield f1 = UI_inputfieldCreate();
+    UI_panelAddComponent(menu.panels[PANEL_SOCIAL], f1, UI_INPUTFIELD, "Social-input");
+    UI_inputfieldSetAppearance(pRend, f1, pView->windowWidth / 2 - 150, 150 + OFFSET, BIGBUTTONWIDTH,
+        (SDL_Color) {.r = 0, .b = 0, .g = 0, .a = 0}, (SDL_Color) {.r = 255, .b = 255, .g = 255, .a =255}, menu.fonts[0]);
+
     Button b5 = UI_buttonCreate();
     UI_panelAddComponent(menu.panels[PANEL_SOCIAL], b5, UI_BUTTON, "Social-back");
     UI_buttonConfigure(b5, "Back", 
