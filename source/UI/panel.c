@@ -75,7 +75,7 @@ void UI_panelSetAppearance(Panel aPanel, SDL_Rect rect, SDL_Color src_bg) {
     aPanel->rect = rect;
 }
 
-void UI_panelUpdate(Panel aPanel, MenuEvent *pEvent, bool isMouseUp) {
+void UI_panelUpdate(Panel aPanel, MenuEvent *pEvent, bool isMouseUp, bool *keys) {
     if(aPanel == NULL) return;
     if(!aPanel->active) return;
 
@@ -123,9 +123,18 @@ void UI_panelUpdate(Panel aPanel, MenuEvent *pEvent, bool isMouseUp) {
             if(isMouseUp) {
                 UI_inputfieldSetFocus((Inputfield)aPanel->compList[i].pComp, mouseX, mouseY);
             }
-            if(pEvent->isTextInput && UI_inputfieldIsFocused((Inputfield)aPanel->compList[i].pComp)) {
-                UI_inputfieldUpdateBuffer((Inputfield)aPanel->compList[i].pComp, pEvent->textInput);
+            if(UI_inputfieldIsFocused((Inputfield)aPanel->compList[i].pComp)) {
+                if(keys[SDL_SCANCODE_RIGHT]) {
+                    UI_inputfieldMoveCursor((Inputfield)aPanel->compList[i].pComp, true);
+                } else if(keys[SDL_SCANCODE_LEFT]) {
+                    UI_inputfieldMoveCursor((Inputfield)aPanel->compList[i].pComp, false);
+                } else if(keys[SDL_SCANCODE_BACKSPACE]) {
+                    UI_inputfieldBackspace((Inputfield)aPanel->compList[i].pComp);
+                } else if(pEvent->isTextInput) {
+                    UI_inputfieldUpdateBuffer((Inputfield)aPanel->compList[i].pComp, pEvent->textInput);
+                }
             }
+            
             break;
 
         }
