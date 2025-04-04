@@ -29,7 +29,7 @@ int main(int argc, char **argv ){
     } 
     int x = 0;
     int n = 0;
-    User newUser = {0};
+    // User newUser = {0};
     while (isRunning){
         // Poll event checking if there is a packege to recive
         while (SDLNet_UDP_Recv(aServer->serverSocket, aServer->pReceivePacket)){
@@ -41,15 +41,17 @@ int main(int argc, char **argv ){
             //NET_stdPakegeGetGameState(aPacket);
             switch (NET_packetGetMessageType(aPacket)){
             case CONNECT:
-                newUser = (User){0};
-                newUser.Username = (char*)NET_packetGetPayload(aPacket);
-                newUser.IP = aServer->pReceivePacket->address;
-                newUser.LobbyID = -1;
-                newUser.State = NET_packetGetMessageType(aPacket);
-                NET_serverAddUser(aServer,newUser);
-                NET_serverSendInt(aServer,GLOBAL,CONNECT_RESPONSE,0,aServer->clientConunt-1);
-                //test
-                printf("usernam: %s\n",aServer->clients[aServer->clientConunt-1].Username);
+
+                aServer->clients[aServer->clientConunt - 1] = NET_serverClientConnected(aPacket, aServer);
+                // newUser = (User){0};
+                // newUser.Username = (char*)NET_packetGetPayload(aPacket);
+                // newUser.IP = aServer->pReceivePacket->address;
+                // newUser.LobbyID = -1;
+                // newUser.State = NET_packetGetMessageType(aPacket);
+                // NET_serverAddUser(aServer,newUser);
+                // NET_serverSendInt(aServer,GLOBAL,CONNECT_RESPONSE,0,aServer->clientConunt-1);
+                // //test
+                // printf("username: %s\n",aServer->clients[aServer->clientConunt-1].Username);
                 break;
             case CONNECT_RESPONSE:
                 // 
@@ -172,6 +174,22 @@ void NET_serverAddUser(Server aServer, User newUser){
         printf("Realloc failed when adding a user!\n");
     }
 }
+
+User NET_serverClientConnected(Packet aPacket, Server aServer){
+    User newUser = {0};
+    newUser.Username = (char*)NET_packetGetPayload(aPacket);
+    newUser.IP = aServer->pReceivePacket->address;
+    newUser.LobbyID = -1;
+    newUser.State = NET_packetGetMessageType(aPacket);
+    NET_serverAddUser(aServer,newUser);
+    NET_serverSendInt(aServer,GLOBAL,CONNECT_RESPONSE,0,aServer->clientConunt-1);
+    // Test output:
+    printf("username: %s\n",aServer->clients[aServer->clientConunt-1].Username);
+    //
+    
+    return newUser;
+}
+
 
 
 
