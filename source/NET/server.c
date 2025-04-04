@@ -27,15 +27,14 @@ int main(int argc, char **argv ){
         isRunning = true;
         printf("UDP server started on port %d\n", PORT);
     } 
-    int startTime = SDL_GetTicks();
     int n = 0;
     int index = -1;
     int lobbyID = -1;
+    bool quit = false;
     // User newUser = {0};
     while (isRunning){
         // Poll event checking if there is a packege to recive
         //NET_eventHandler(&isRunning,keys,event);
-        if(SDL_GetTicks() - startTime < 12000)
         while (SDLNet_UDP_Recv(aServer->serverSocket, aServer->pReceivePacket)){
             Packet aPacket = NET_packetDeserialize(aServer->pReceivePacket->data, aServer->pReceivePacket->len);
             if(aPacket == NULL){
@@ -63,6 +62,7 @@ int main(int argc, char **argv ){
                         if(aServer->clients[i].LobbyID == lobbyID) NET_serverSendString(aServer, GLOBAL, DISCONNECT_RESPONSE, aServer->clients[index].Username, i);
                     }
                 NET_serverRemoveUser(aServer, index);
+                if(aServer->clientConunt == 0) quit = true;
                 break;
             case DISCONNECT_RESPONSE:
                 //brodcast till lobbyID
@@ -99,6 +99,7 @@ int main(int argc, char **argv ){
             }
             if(aPacket) NET_packetDestroy(aPacket);
         }
+        if(quit)break;
     }
     printf("%d count\n",n);
 
