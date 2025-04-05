@@ -13,18 +13,20 @@ typedef struct server *Server;
  */
 Server NET_serverCreate();
 
+//server send
 void NET_serverSendInt(Server aServer,GameState GS, MessageType msgType,int placeHolder, int index);
 void NET_serverSendString(Server aServer,GameState GS, MessageType msgType, const char* str, int index);
 void NET_serverSendArray(Server aServer,GameState GS, MessageType msgType, const void* array, Uint32 arraySize, int index);
 
+//server respons
+void NET_serverClientConnected(Packet aPacket, Server aServer);
+void NET_serverClientDisconnect(Server aServer){
+
+//server util
+int NET_serverFindPlayerID(Server aServer, const char* str);
+int NET_serverCompIP(Server aServer);
 void NET_serverRemoveUser(Server aServer,int index);
 void NET_serverAddUser(Server aServer, User newUser);
-
-void NET_serverClientConnected(Packet aPacket, Server aServer);
-int NET_serverFindPlayerID(Server aServer, const char* str);
-
-int NET_serverCompIP(Server aServer);
-
 
 /** Freeing memory after use, for server */
 void NET_serverDestroy(Server aServer);

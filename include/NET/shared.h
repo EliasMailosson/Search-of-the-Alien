@@ -10,7 +10,7 @@
 
 #define MAX_CLIENTS 8
 #define PORT 1234
-#define JON_IP "130.229.190.87"
+#define JON_IP "10.0.0.17"
 
 /** Initializes SDL network 
  * ex use: While true then the network is running
