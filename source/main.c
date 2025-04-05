@@ -22,7 +22,6 @@ int main(int argc, char **argv ){
     bool isRunning = true;
     bool keys[SDL_NUM_SCANCODES] = {false};
     NET_clientSendString(aClient,MENU,CONNECT,"Caspar");
-    int startTime = SDL_GetTicks();
     SDL_Event event ={0};
     while (isRunning){
         NET_clientReceiver(aClient);

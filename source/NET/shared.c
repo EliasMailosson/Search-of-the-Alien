@@ -18,8 +18,8 @@ void NET_severDestroySDL(){
     SDL_Quit();
 }
 
-
 // beöver fixa
+// när vi gör player list
 void NET_PlayerListRead(PlayerList *new_player){
     FILE *fp;
     fp = fopen("data/playerlist.txt", "r");

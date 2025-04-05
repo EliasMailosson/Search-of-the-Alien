@@ -20,7 +20,7 @@ void NET_serverSendArray(Server aServer,GameState GS, MessageType msgType, const
 
 //server respons
 void NET_serverClientConnected(Packet aPacket, Server aServer);
-void NET_serverClientDisconnect(Server aServer){
+void NET_serverClientDisconnect(Server aServer);
 
 //server util
 int NET_serverFindPlayerID(Server aServer, const char* str);

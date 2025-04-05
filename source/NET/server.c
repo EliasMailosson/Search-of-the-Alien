@@ -28,10 +28,6 @@ int main(int argc, char **argv ){
         isRunning = true;
         printf("UDP server started on port %d\n", PORT);
     } 
-    int n = 0;
-    int index = -1;
-    int lobbyID = -1;
-    bool quit = false;
     while (isRunning){
         while (SDLNet_UDP_Recv(aServer->serverSocket, aServer->pReceivePacket)){
             Packet aPacket = NET_packetDeserialize(aServer->pReceivePacket->data, aServer->pReceivePacket->len);
