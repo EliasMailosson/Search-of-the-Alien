@@ -39,9 +39,6 @@ int main(int argc, char **argv ){
             case CONNECT:
                 NET_serverClientConnected(aPacket, aServer);
                 break;
-            case CONNECT_RESPONSE:
-                // 
-                break;
             case DISCONNECT:
                 NET_serverClientDisconnect(aServer);
                 // nedds to be addede when frendlist is a ting 
@@ -50,7 +47,7 @@ int main(int argc, char **argv ){
             case LOBBY_LIST:
                 printf("Hej det är %s", (char*)(NET_packetGetPayload(aPacket)));
                 break;
-            case LOBBY_LIST_RESPONSE:  
+            case LOBBY_LIST_RESPONSE:// server kommer inte ta emot detta  
                 //PlayerList list[3] = {0};
                 //NET_PlayerListUpdate(aPacket,list,&n);
                 //NET_PlayerListPrintf(list,3);
@@ -76,6 +73,7 @@ int main(int argc, char **argv ){
     }
     NET_serverDestroy(aServer);
     NET_severDestroySDL();
+    return 0;
 }
 
 void NET_serverClientDisconnect(Server aServer){

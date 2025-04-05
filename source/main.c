@@ -45,7 +45,7 @@ int main(int argc, char **argv ){
             keys[SDL_SCANCODE_P] = false;
         } 
     }
-    NET_clientSendString(aClient,MENU,DISCONNECT,"hej hej");
+    NET_clientSendString(aClient,MENU,DISCONNECT,"Caspar");
     NET_clientDestroy(aClient);
     killClient(&view);
     return 0;
