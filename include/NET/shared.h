@@ -17,7 +17,7 @@
  */
 bool NET_serverInitSDL();
 /** Destroying SDL network and SDL*/
-void NET_severDestroySDL();
+void NET_serverDestroySDL();
 
 
 typedef struct{
