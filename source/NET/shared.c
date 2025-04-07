@@ -13,13 +13,13 @@ bool NET_serverInitSDL(){
     return true;
 }
 
-void NET_severDestroySDL(){
+void NET_serverDestroySDL(){
     SDLNet_Quit();
     SDL_Quit();
 }
 
-
 // beöver fixa
+// när vi gör player list (sträng)
 void NET_PlayerListRead(PlayerList *new_player){
     FILE *fp;
     fp = fopen("data/playerlist.txt", "r");

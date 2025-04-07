@@ -11,7 +11,7 @@ int main(int argc, char **argv ){
     ClientControl control = {0};
 
     startClient(&view, &control);
-    gameLoop(&control, &view);
+    //gameLoop(&control, &view);
     Client aClient = {0};
     aClient = NET_clientCreate();
     NET_clientConnect(aClient);
@@ -22,11 +22,9 @@ int main(int argc, char **argv ){
     bool isRunning = true;
     bool keys[SDL_NUM_SCANCODES] = {false};
     NET_clientSendString(aClient,MENU,CONNECT,"Caspar");
-    int startTime = SDL_GetTicks();
     SDL_Event event ={0};
-    while (SDL_GetTicks() - startTime < 5000 ){
+    while (isRunning){
         NET_clientReceiver(aClient);
-
         while (SDL_PollEvent(&event)){
         switch (event.type){
         case SDL_QUIT: isRunning = false;
@@ -47,7 +45,7 @@ int main(int argc, char **argv ){
             keys[SDL_SCANCODE_P] = false;
         } 
     }
-    //NET_clientSendString();
+    NET_clientSendString(aClient,MENU,DISCONNECT,"Caspar");
     NET_clientDestroy(aClient);
     killClient(&view);
     return 0;

@@ -109,11 +109,11 @@ void NET_clientReceiver(Client aClient){
         //Handle recieving packets from the server
         switch (NET_packetGetMessageType(aPacket)){
         case CONNECT_RESPONSE:
-            printf("resivde %d",*((int*)NET_packetGetPayload(aPacket)));
+            printf("received %d",*((int*)NET_packetGetPayload(aPacket)));
             break;
         case DISCONNECT_RESPONSE:
             playerID = (char*)NET_packetGetPayload(aPacket);
-            index = NET_clientFindePlayer(aClient,playerID);
+            index = NET_clientFindPlayer(aClient,playerID);
             NET_PlayerListRemovePlayer(&aClient->list,index,&aClient->PlayerCount);
             break;
         case JOIN_LOBBY_RESPONSE:
@@ -131,7 +131,7 @@ void NET_clientReceiver(Client aClient){
     }
 }
 
-int NET_clientFindePlayer(Client aClient, char* str){
+int NET_clientFindPlayer(Client aClient, char* str){
     for (int i = 0; i < aClient->PlayerCount; i++){
         if(strcmp(str,aClient->list[i].ID)){
             return i;

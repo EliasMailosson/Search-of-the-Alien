@@ -10,14 +10,14 @@
 
 #define MAX_CLIENTS 8
 #define PORT 1234
-#define JON_IP "130.229.190.87"
+#define JON_IP "130.229.142.108"
 
 /** Initializes SDL network 
  * ex use: While true then the network is running
  */
 bool NET_serverInitSDL();
 /** Destroying SDL network and SDL*/
-void NET_severDestroySDL();
+void NET_serverDestroySDL();
 
 
 typedef struct{
