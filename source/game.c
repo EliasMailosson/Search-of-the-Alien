@@ -25,6 +25,9 @@ void gameLoop(Client aClient, ClientControl *pControl, ClientView *pView){
 
 void runMenu(Client aClient, ClientControl *pControl, ClientView *pView, Menu *pMenu) {
     updateMenu(pMenu, pControl);
+    if (pMenu->isGameStarted) {
+        NET_clientSendString(aClient, MENU, PRINT, "New Game");
+    }
     NET_clientReceiver(aClient);
     renderMenu(pView->pRend, pMenu);
 

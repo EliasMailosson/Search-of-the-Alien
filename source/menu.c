@@ -23,6 +23,8 @@ void updateMenu(Menu *pMenu, ClientControl *pControl) {
         strcpy(menuEvent.textInput, pControl->textInput);
     }
 
+    pMenu->isGameStarted = false;
+
     for(int i = 0; i < PANEL_COUNT; i++) {
         UI_panelUpdate(pMenu->panels[i], &menuEvent, pControl->isMouseUp, pControl->keys);
 
@@ -41,6 +43,10 @@ void updateMenu(Menu *pMenu, ClientControl *pControl) {
                     pControl->isRunning = false;
                     return;
                 }
+                if (strcmp("New-Game", menuEvent.key) == 0) {
+                    pMenu->isGameStarted = true;
+                }
+                
                 break;
         }
     }
@@ -105,7 +111,6 @@ Menu initMenu(SDL_Renderer *pRend, ClientView *pView) {
         (SDL_Color) { .r = 0, .g = 0, .b = 0, .a = 255 }, 
         menu.fonts[1], (SDL_Color) { .r = 255, .g = 255, .b = 255, .a = 255 }
     );
-    UI_panelSetComponentLink(menu.panels[PANEL_GAMESELECTION], "Load-Game", PANEL_START);
 
     Button b9 = UI_buttonCreate();
     UI_panelAddComponent(menu.panels[PANEL_GAMESELECTION], b9, UI_BUTTON, "New-Game");
@@ -113,7 +118,6 @@ Menu initMenu(SDL_Renderer *pRend, ClientView *pView) {
         (SDL_Color) { .r = 0, .g = 0, .b = 0, .a = 255 }, 
         menu.fonts[1], (SDL_Color) { .r = 255, .g = 255, .b = 255, .a = 255 }
     );
-    UI_panelSetComponentLink(menu.panels[PANEL_GAMESELECTION], "New-Game", PANEL_START);  
 
     Button b10 = UI_buttonCreate();
     UI_panelAddComponent(menu.panels[PANEL_GAMESELECTION], b10, UI_BUTTON, "Game-back");

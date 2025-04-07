@@ -29,6 +29,7 @@ typedef struct menuEvent {
 typedef struct menu {
     Panel panels[PANEL_COUNT];
     int currentPanel;
+    bool isGameStarted;
 
     TTF_Font *fonts[FONT_COUNT];
 } Menu;
