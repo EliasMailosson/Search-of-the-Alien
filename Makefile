@@ -1,5 +1,6 @@
 # Makefile: building server/client with SDL2
 # ==== OS-detektering ====
+# $(info === Detekterat OS: $(OS))
 OS := $(shell uname -s 2>/dev/null)
 ifeq ($(OS),)
     OS := Windows_NT
