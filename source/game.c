@@ -3,7 +3,7 @@
 
 void gameLoop(Client aClient, ClientControl *pControl, ClientView *pView){
     NET_clientConnect(aClient);
-    NET_clientSendString(aClient,MENU,CONNECT,"Caspar");
+    NET_clientSendString(aClient,MENU,CONNECT,"Jonatan");
 
     Menu menu = initMenu(pView->pRend, pView);
     while (pControl->isRunning){
@@ -20,7 +20,7 @@ void gameLoop(Client aClient, ClientControl *pControl, ClientView *pView){
     }
 
     destroyMenu(&menu);
-    NET_clientSendString(aClient,MENU,DISCONNECT,"Jonatan");
+    NET_clientSendString(aClient,MENU,DISCONNECT,"Jonatan"); //någonting knasigt gör att den inte körs
 }
 
 void runMenu(Client aClient, ClientControl *pControl, ClientView *pView, Menu *pMenu) {
