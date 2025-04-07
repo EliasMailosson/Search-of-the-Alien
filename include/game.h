@@ -7,6 +7,8 @@
 #include <SDL_ttf.h>
 #include <SDL_net.h>
 #include "../include/UI/panel.h"
+#include "../include/NET/client.h"
+#include "../include/NET/shared.h"
 
 typedef struct menu Menu;
 typedef struct {
@@ -27,6 +29,7 @@ typedef struct {
 
 void render(ClientView *pView, Menu *pMenu);
 void eventHandler(ClientControl *pControl);
-void gameLoop(ClientControl *pControl, ClientView *pView);
+void gameLoop(Client aClient, ClientControl *pControl, ClientView *pView);
+void runMenu(Client aClient, ClientControl *pControl, ClientView *pView, Menu *pMenu);
 
 #endif

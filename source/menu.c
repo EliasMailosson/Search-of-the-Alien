@@ -5,9 +5,12 @@
 #include "../include/UI/inputfield.h"
 
 void renderMenu(SDL_Renderer *pRend, Menu *pMenu) {
+    SDL_SetRenderDrawColor(pRend, 0,0,0,0);
+    SDL_RenderClear(pRend);
     for(int i = 0; i < PANEL_COUNT; i++) {
         UI_panelRender(pRend, pMenu->panels[i]);
     }
+    SDL_RenderPresent(pRend);
 }
 
 void updateMenu(Menu *pMenu, ClientControl *pControl) {

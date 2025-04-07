@@ -8,6 +8,7 @@ struct client{
     IPaddress serverAddr;
     PlayerList *list;
     int PlayerCount;
+    GameState state;
 }; 
 
 void NET_clientSend(Client aClient){
@@ -66,7 +67,12 @@ Client NET_clientCreate(){
     }
     aClient->PlayerCount = 0;
     aClient->list = NULL;
+    aClient->state = MENU;
     return aClient;
+}
+
+int NET_clientGetState(Client aClient) {
+    return aClient->state;
 }
 
 void NET_clientDestroy(Client aClient){

@@ -23,7 +23,7 @@ ifeq ($(OS), Darwin)
     CLIENT_EXEC = build/main
     RUN = ./
     PREFORM =
-else ifeq ($(OS), Windows_NT)
+else ifeq ($(OS), MSYS_NT-10.0-22631)
 # --- Windows (MinGW/MSYS) Settings ---
     CC = gcc
     INCLUDE = C:/msys64/mingw64/include/SDL2

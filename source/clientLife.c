@@ -1,6 +1,6 @@
 #include "../include/clientLife.h"
 
-void startClient(ClientView *pView,ClientControl *pControl){
+void startClient(Client *aClient, ClientView *pView,ClientControl *pControl){
   SDL_Init(SDL_INIT_EVERYTHING);
   pView->windowHeight = 600;
   pView->windowWidth = pView->windowHeight*16/9;
@@ -37,9 +37,12 @@ void startClient(ClientView *pView,ClientControl *pControl){
         SDL_Quit();
     }
     pControl->isRunning = true;
+
+    *aClient = NET_clientCreate();
 }
 
-void killClient(ClientView *pView){
+void killClient(Client *aClient, ClientView *pView){
+    NET_clientDestroy(*aClient);
     SDL_DestroyRenderer(pView->pRend);
     pView->pRend = NULL;
     SDL_DestroyWindow(pView->pWin);
@@ -48,4 +51,5 @@ void killClient(ClientView *pView){
     TTF_Quit();
     IMG_Quit();
     SDL_Quit();
+    
 }

@@ -1,15 +1,33 @@
 #include "../include/game.h"
 #include "../include/menu.h"
 
-void gameLoop(ClientControl *pControl, ClientView *pView){
+void gameLoop(Client aClient, ClientControl *pControl, ClientView *pView){
+    NET_clientConnect(aClient);
+    NET_clientSendString(aClient,MENU,CONNECT,"Caspar");
+
     Menu menu = initMenu(pView->pRend, pView);
     while (pControl->isRunning){
         eventHandler(pControl);
-        updateMenu(&menu, pControl);
-        render(pView, &menu);
+        switch (NET_clientGetState(aClient))
+        {
+        case MENU:
+            runMenu(aClient, pControl, pView, &menu);
+            break;
+        
+        default:
+            break;
+        }
     }
 
     destroyMenu(&menu);
+    NET_clientSendString(aClient,MENU,DISCONNECT,"Jonatan");
+}
+
+void runMenu(Client aClient, ClientControl *pControl, ClientView *pView, Menu *pMenu) {
+    updateMenu(pMenu, pControl);
+    NET_clientReceiver(aClient);
+    renderMenu(pView->pRend, pMenu);
+
 }
 
 void eventHandler(ClientControl *pControl){
