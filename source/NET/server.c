@@ -80,7 +80,7 @@ void NET_serverClientDisconnect(Server aServer){
     int lobbyID = aServer->clients[NET_serverCompIP(aServer)].LobbyID;
     for (int i = 0; i < aServer->clientCount; i++){
         if(aServer->clients[i].LobbyID == lobbyID){
-            NET_serverSendString(aServer, GLOBAL, DISCONNECT_RESPONSE, aServer->clients[NET_serverCompIP(aServer)].Username, i);
+            //NET_serverSendString(aServer, GLOBAL, DISCONNECT_RESPONSE, aServer->clients[NET_serverCompIP(aServer)].Username, i);
         } 
     }
     printf("username: %s disconnected to server",aServer->clients[NET_serverCompIP(aServer)].Username);
@@ -187,15 +187,22 @@ void NET_serverAddUser(Server aServer, User newUser){
 
 void NET_serverClientConnected(Packet aPacket, Server aServer){
     User newUser = {0};
-    newUser.Username = (char*)NET_packetGetPayload(aPacket);
+    // Make a copy of the username string to avoid use-after-free
+    char *usernameFromPacket = (char*)NET_packetGetPayload(aPacket);
+    newUser.Username = strdup(usernameFromPacket);
+    if(newUser.Username == NULL){
+        fprintf(stderr, "Failed to allocate memory for username\n");
+        return;
+    }
     newUser.IP = aServer->pReceivePacket->address;
     newUser.LobbyID = -1;
     newUser.State = NET_packetGetMessageType(aPacket);
-    NET_serverAddUser(aServer,newUser);
-    NET_serverSendInt(aServer,GLOBAL,CONNECT_RESPONSE,0,aServer->clientCount-1);
-    // Test output:
-    printf("username: %s connected to server\n",aServer->clients[aServer->clientCount-1].Username);
+    
+    NET_serverAddUser(aServer, newUser);
+    NET_serverSendInt(aServer, GLOBAL, CONNECT_RESPONSE, 0, aServer->clientCount - 1);
+    printf("username: %s connected to server\n", aServer->clients[aServer->clientCount - 1].Username);
 }
+
 
 int NET_serverFindPlayerID(Server aServer, const char* str){
     for (int i = 0; i < aServer->clientCount; i++){
