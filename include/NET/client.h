@@ -25,4 +25,7 @@ void NET_clientSendArray(Client aClient,GameState GS, MessageType msgType,const 
 void NET_clientReceiver(Client aClient);
 int NET_clientFindPlayer(Client aClient, char* str);
 
+void NET_clientUpdateGameState(Client aClient,Packet aPacket);
+
+
 #endif

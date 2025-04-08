@@ -20,8 +20,9 @@ typedef enum{
     JOIN_LOBBY,
     JOIN_LOBBY_RESPONSE,
     PRINT,
+    CHANGE_GAME_STATE,
+    CHANGE_GAME_STATE_RESPONSE,
 } MessageType;
-
 
 typedef enum{
     GLOBAL,

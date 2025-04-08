@@ -110,11 +110,19 @@ void NET_clientReceiver(Client aClient){
             break;
         case PRINT:
             printf("%s\n",NET_packetGetPayload(aPacket));
+            break;
+        case CHANGE_GAME_STATE_RESPONSE:
+            NET_clientUpdateGameState(aClient,aPacket);
         default:
             break;
         }
         if(aPacket) NET_packetDestroy(aPacket);
     }
+}
+
+void NET_clientUpdateGameState(Client aClient,Packet aPacket){
+    int newState = *(int*)NET_packetGetPayload(aPacket);
+    aClient->state = newState;
 }
 
 int NET_clientFindPlayer(Client aClient, char* str){

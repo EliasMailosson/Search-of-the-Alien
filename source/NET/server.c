@@ -67,6 +67,8 @@ int main(int argc, char **argv ){
                 printf("%s\n",(char*)NET_packetGetPayload(aPacket));
                 NET_serverSendString(aServer,GLOBAL,PRINT,"nej va fan",NET_serverCompIP(aServer));
                 break;
+            case CHANGE_GAME_STATE:
+                NET_serverChangeGameStateOnClient(aServer, aPacket);
             default:
                 printf("Failed!\n");
                 break;
@@ -78,6 +80,11 @@ int main(int argc, char **argv ){
     NET_serverDestroy(aServer);
     NET_serverDestroySDL();
     return 0;
+}
+
+void NET_serverChangeGameStateOnClient(Server aServer,Packet aPacket){
+    int newState = *(int*)NET_packetGetPayload(aPacket);
+    NET_serverSendInt(aServer,GLOBAL,CHANGE_GAME_STATE_RESPONSE,newState,NET_serverCompIP(aServer));
 }
 
 void NET_serverClientDisconnect(Server aServer){
