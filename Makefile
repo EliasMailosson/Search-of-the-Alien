@@ -1,10 +1,11 @@
 # Makefile: building server/client with SDL2
 # ==== OS-detektering ====
-# $(info === Detekterat OS: $(OS))
-OS := $(shell uname -s 2>/dev/null)
-ifeq ($(OS),)
+ifeq ($(OS), Windows_NT)
     OS := Windows_NT
+else 
+    OS := $(shell uname -s 2>/dev/null)
 endif
+# $(info === Detekterat OS: $(OS))
 
 ifeq ($(OS), Darwin)
 # --- macOS Settings ---
