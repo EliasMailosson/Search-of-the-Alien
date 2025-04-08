@@ -49,7 +49,7 @@ int main(int argc, char **argv ){
                 // updating the clients in the sesific lobby
                 break;
             case LOBBY_LIST:
-                printf("Hej det är %s", (char*)(NET_packetGetPayload(aPacket)));
+                printf("Hej det är %s\n", (char*)(NET_packetGetPayload(aPacket)));
                 break;
             case LOBBY_LIST_RESPONSE:// server kommer inte ta emot detta  
                 //PlayerPacket list[3] = {0};
@@ -65,7 +65,7 @@ int main(int argc, char **argv ){
                 break;
             case PRINT:
                 printf("%s\n",(char*)NET_packetGetPayload(aPacket));
-                NET_serverSendString(aServer,GLOBAL,PRINT,"nej va fan",NET_serverCompIP(aServer));
+                NET_serverSendString(aServer,GLOBAL,PRINT,"nej va fan\n",NET_serverCompIP(aServer));
                 break;
             case CHANGE_GAME_STATE:
                 NET_serverChangeGameStateOnClient(aServer, aPacket);
@@ -86,6 +86,7 @@ int main(int argc, char **argv ){
 void NET_serverChangeGameStateOnClient(Server aServer,Packet aPacket){
     int newState = *(int*)NET_packetGetPayload(aPacket);
     NET_serverSendInt(aServer,GLOBAL,CHANGE_GAME_STATE_RESPONSE,newState,NET_serverCompIP(aServer));
+    printf("username: %s gameState is now %d\n",aServer->clients[NET_serverCompIP(aServer)].Username,newState);
 }
 
 void NET_serverClientDisconnect(Server aServer){
@@ -95,7 +96,7 @@ void NET_serverClientDisconnect(Server aServer){
             //NET_serverSendString(aServer, GLOBAL, DISCONNECT_RESPONSE, aServer->clients[NET_serverCompIP(aServer)].Username, i);
         } 
     }
-    printf("username: %s disconnected to server",aServer->clients[NET_serverCompIP(aServer)].Username);
+    printf("username: %s disconnected to server\n",aServer->clients[NET_serverCompIP(aServer)].Username);
     NET_serverRemoveUser(aServer, NET_serverCompIP(aServer));
     if(aServer->clientCount == 0) aServer->isOff = true;
 }
