@@ -69,7 +69,7 @@ Menu initMenu(SDL_Renderer *pRend, ClientView *pView) {
     }
 
     // START MENU /////////////////////////
-    UI_panelSetImage(pRend, menu.panels[PANEL_START], "assets/images/menu/menu-background.png");
+    UI_panelSetImage(pRend, menu.panels[PANEL_START], "assets/images/menu/background2.png");
 
     Button b1 = UI_buttonCreate();
     UI_panelAddComponent(menu.panels[PANEL_START], b1, UI_BUTTON, "Start Game");
@@ -103,7 +103,7 @@ Menu initMenu(SDL_Renderer *pRend, ClientView *pView) {
     );
     
     // START GAME MENU ////////////////////////
-    UI_panelSetImage(pRend, menu.panels[PANEL_GAMESELECTION], "assets/images/menu/menu-background.png");
+    UI_panelSetImage(pRend, menu.panels[PANEL_GAMESELECTION], "assets/images/menu/background2.png");
 
     Button b8 = UI_buttonCreate();
     UI_panelAddComponent(menu.panels[PANEL_GAMESELECTION], b8, UI_BUTTON, "Load-Game");
@@ -128,7 +128,7 @@ Menu initMenu(SDL_Renderer *pRend, ClientView *pView) {
     UI_panelSetComponentLink(menu.panels[PANEL_GAMESELECTION], "Game-back", PANEL_START);
 
     // SOCIAL MENU ////////////////////////
-    UI_panelSetImage(pRend, menu.panels[PANEL_SOCIAL], "assets/images/menu/menu-background.png");
+    UI_panelSetImage(pRend, menu.panels[PANEL_SOCIAL], "assets/images/menu/background2.png");
 
     Inputfield f1 = UI_inputfieldCreate();
     UI_panelAddComponent(menu.panels[PANEL_SOCIAL], f1, UI_INPUTFIELD, "Social-input");
@@ -152,7 +152,7 @@ Menu initMenu(SDL_Renderer *pRend, ClientView *pView) {
     UI_panelSetComponentLink(menu.panels[PANEL_SOCIAL], "Join-button", PANEL_START);
 
     // OPTIONS MENU ////////////////////////
-    UI_panelSetImage(pRend, menu.panels[PANEL_OPTIONS], "assets/images/menu/menu-background.png");
+    UI_panelSetImage(pRend, menu.panels[PANEL_OPTIONS], "assets/images/menu/background3.png");
 
     Button b7 = UI_buttonCreate();
     UI_panelAddComponent(menu.panels[PANEL_OPTIONS], b7, UI_BUTTON, "Options-back");
