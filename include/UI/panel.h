@@ -39,6 +39,8 @@ void UI_panelSetActive(Panel aPanel, bool active);
 /*Adds panel reference link to a button (Must be type Button)*/
 void UI_panelSetComponentLink(Panel aPanel, char* key, int panelLink);
 
+void* UI_panelGetComponent(Panel aPanel, char *key);
+
 /*Uses an image as background instead of a color*/
 void UI_panelSetImage(SDL_Renderer* pRend, Panel aPanel, char *imagePath);
 
