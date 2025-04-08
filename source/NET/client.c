@@ -1,42 +1,22 @@
 #include "../../include/NET/client.h"
 
+struct Player{
+    GameState state;
+    char* username;
+    SDL_Point pos;
+};
 struct client{
     UDPsocket clientSocket;
     UDPpacket *pReceivePacket;
     UDPpacket *pSendPacket;
     char* clientId;
     IPaddress serverAddr;
-    PlayerList *list;
-    int PlayerCount;
-    GameState state;
-}; 
-
-void NET_clientSend(Client aClient){
-    // Placeholder for sending the whole packege 
-    Uint32 GameState = 42;
-    MessageType MSG = DISCONNECT;
-    const char *testString = "Hello, Server!";
-    // Set payloadSize to length of string + 1 for the null terminator.
-    Uint32 payloadSize = (Uint32) (strlen(testString) + 1);
-
-    Packet testPkg = NET_packetCreate(GameState, MSG, payloadSize);
-
-    //NET_stdPakegeSetPL(testPkg, (Uint32)TestValue);
-    NET_packetSetPayloadString(testPkg,testString);
-
-    Uint8* sBuffer = NULL;
-    Uint32 serializedSize = NET_packetSerialize(testPkg, &sBuffer);
-
-    memcpy(aClient->pSendPacket->data, sBuffer, serializedSize);
-    aClient->pSendPacket->len = serializedSize;
-    aClient->pSendPacket->address = aClient->serverAddr;
     
-    SDLNet_UDP_Send(aClient->clientSocket, -1, aClient->pSendPacket);
-
-    free(sBuffer);
-    NET_packetDestroy(testPkg);
-}
-
+    PlayerPacket *list; //temporary
+    int PlayerCount;
+    GameState state; // rm
+    Player playerList[MAX_CLIENTS];
+}; 
 
 bool NET_clientConnect(Client aClient){
     if (SDLNet_ResolveHost(&aClient->serverAddr,JON_IP, PORT) < 0) {

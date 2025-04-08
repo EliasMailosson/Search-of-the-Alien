@@ -24,14 +24,15 @@ typedef struct{
     char* ID;
     SDL_Point pos;
     GameState state;
-}PlayerList;
+    bool isActive;
+}PlayerPacket;    
 
-void NET_PlayerListRemovePlayer(PlayerList **list, int index, int *listCount);
-void NET_PlayerListAddPlayer(PlayerList **list,PlayerList newPlayer,int *listCount);
+void NET_PlayerListRemovePlayer(PlayerPacket **list, int index, int *listCount);
+void NET_PlayerListAddPlayer(PlayerPacket **list,PlayerPacket newPlayer,int *listCount);
 
-void NET_PlayerListRead(PlayerList *new_player);
-void NET_PlayerListUpdate(Packet aPacket, PlayerList* list, int *count);
-void NET_PlayerListPrintf(PlayerList* list, int count);
+void NET_PlayerListRead(PlayerPacket *new_player);
+void NET_PlayerListUpdate(Packet aPacket, PlayerPacket* list, int *count);
+void NET_PlayerListPrintf(PlayerPacket* list, int count);
 void NET_eventHandler(bool *pIsRunning, bool *pKeys,SDL_Event event);
 
 #endif

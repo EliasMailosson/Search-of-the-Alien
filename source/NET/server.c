@@ -1,10 +1,14 @@
 #include "../../include/NET/server.h"
+struct Player{
+    SDL_Rect hitBox;
+};
 
 struct User{
     IPaddress IP;
     char* Username;
     int LobbyID;
     GameState State;
+    Player player;
 };
 struct server{
     UDPsocket serverSocket;
@@ -48,7 +52,7 @@ int main(int argc, char **argv ){
                 printf("Hej det är %s", (char*)(NET_packetGetPayload(aPacket)));
                 break;
             case LOBBY_LIST_RESPONSE:// server kommer inte ta emot detta  
-                //PlayerList list[3] = {0};
+                //PlayerPacket list[3] = {0};
                 //NET_PlayerListUpdate(aPacket,list,&n);
                 //NET_PlayerListPrintf(list,3);
                 break;
@@ -202,7 +206,6 @@ void NET_serverClientConnected(Packet aPacket, Server aServer){
     NET_serverSendInt(aServer, GLOBAL, CONNECT_RESPONSE, 0, aServer->clientCount - 1);
     printf("username: %s connected to server\n", aServer->clients[aServer->clientCount - 1].Username);
 }
-
 
 int NET_serverFindPlayerID(Server aServer, const char* str){
     for (int i = 0; i < aServer->clientCount; i++){

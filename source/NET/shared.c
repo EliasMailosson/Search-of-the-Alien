@@ -20,37 +20,37 @@ void NET_serverDestroySDL(){
 
 // beöver fixa
 // när vi gör player list (sträng)
-void NET_PlayerListRead(PlayerList *new_player){
+void NET_PlayerListRead(PlayerPacket *new_player){
     FILE *fp;
     fp = fopen("data/playerlist.txt", "r");
     if(fp != NULL)
     {
-        fscanf(fp,"%c", &new_player->ID);
+        fscanf(fp,"%c", new_player->ID);
     }
     fclose(fp);
     printf("%s\n", new_player->ID);
 }
 
-void NET_PlayerListUpdate(Packet aPacket, PlayerList* list, int *count){
+void NET_PlayerListUpdate(Packet aPacket, PlayerPacket* list, int *count){
     Uint8* raw = NET_packetGetPayload(aPacket);
     Uint32 size = NET_packetGetPayloadSize(aPacket);
     if(!raw){
         printf("Raw error!");
     }
-    list = (PlayerList*)raw;
+    list = (PlayerPacket*)raw;
     if(!list){
         printf("list error!");
     }
-    (*count) = size / sizeof(PlayerList);
+    (*count) = size / sizeof(PlayerPacket);
 }
 
-void NET_PlayerListPrintf(PlayerList* list, int count){
+void NET_PlayerListPrintf(PlayerPacket* list, int count){
     for (int i = 0; i < count; i++){
         printf("index %d, ID %s, pos X %d, pos Y %d",i,list[i].ID,list[i].pos.x,list[i].pos.y);
     }
 }
 
-void NET_PlayerListRemovePlayer(PlayerList **list, int index, int *listCount){
+void NET_PlayerListRemovePlayer(PlayerPacket **list, int index, int *listCount){
     if (index < 0 || index >= (*listCount)) {
         printf("Invalid index\n");
         return;
@@ -60,9 +60,9 @@ void NET_PlayerListRemovePlayer(PlayerList **list, int index, int *listCount){
     }
     (*listCount)--;
     if ((*listCount) > 0) {
-        PlayerList *temp = realloc(*list, (*listCount) * sizeof(PlayerList));
+        PlayerPacket *temp = realloc(*list, (*listCount) * sizeof(PlayerPacket));
         if (temp == NULL) {
-            printf("Realloc failed when removing PlayerList\n");
+            printf("Realloc failed when removing PlayerPacket\n");
             return;
         }
         *list = temp;
@@ -72,14 +72,14 @@ void NET_PlayerListRemovePlayer(PlayerList **list, int index, int *listCount){
     }
 }
 
-void NET_PlayerListAddPlayer(PlayerList **list, PlayerList newPlayer, int *listCount){
-    PlayerList *temp = realloc(*list, ((*listCount) + 1) * sizeof(PlayerList));
+void NET_PlayerListAddPlayer(PlayerPacket **list, PlayerPacket newPlayer, int *listCount){
+    PlayerPacket *temp = realloc(*list, ((*listCount) + 1) * sizeof(PlayerPacket));
     if (temp != NULL) {
         *list = temp;
         (*list)[*listCount] = newPlayer;
         (*listCount)++;
     } else {
-        printf("Realloc failed when adding to the PlayerList!\n");
+        printf("Realloc failed when adding to the PlayerPacket!\n");
     }
 }
 

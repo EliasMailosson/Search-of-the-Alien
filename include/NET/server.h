@@ -3,6 +3,9 @@
 #include "../../include/NET/shared.h"
 #include "../../include/NET/protocol.h"
 
+
+typedef struct Player Player;
+
 typedef struct User User;
 
 struct server;

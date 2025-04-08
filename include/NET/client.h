@@ -2,6 +2,9 @@
 #define CLIENT_H
 #include <stdbool.h>
 #include "../../include/NET/shared.h"
+
+typedef struct Player Player;
+
 struct client;
 typedef struct client *Client;
 
