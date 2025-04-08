@@ -13,7 +13,9 @@ void gameLoop(Client aClient, ClientControl *pControl, ClientView *pView){
         case MENU:
             runMenu(aClient, pControl, pView, &menu);
             break;
-        
+        case LOBBY:
+            printf("LOBBY\n");
+            break;
         default:
             break;
         }

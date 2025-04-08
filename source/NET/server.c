@@ -69,6 +69,7 @@ int main(int argc, char **argv ){
                 break;
             case CHANGE_GAME_STATE:
                 NET_serverChangeGameStateOnClient(aServer, aPacket);
+                break;
             default:
                 printf("Failed!\n");
                 break;
