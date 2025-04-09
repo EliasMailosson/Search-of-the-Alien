@@ -70,6 +70,15 @@ void UI_panelSetComponentLink(Panel aPanel, char* key, int panelLink) {
     }
 }
 
+void* UI_panelGetComponent(Panel aPanel, char *key) {
+    for(int i = 0; i < aPanel->compCount; i++) {
+        if(strcmp(key, aPanel->compList[i].key) == 0) {
+            return aPanel->compList[i].pComp;
+        }
+    }
+    return NULL;
+}
+
 void UI_panelSetAppearance(Panel aPanel, SDL_Rect rect, SDL_Color src_bg) {
     aPanel->bg = src_bg;
     aPanel->rect = rect;

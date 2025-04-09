@@ -8,6 +8,7 @@ void gameLoop(Client aClient, ClientControl *pControl, ClientView *pView){
     Menu menu = initMenu(pView->pRend, pView);
     while (pControl->isRunning){
         eventHandler(pControl);
+
         switch (NET_clientGetState(aClient))
         {
         case MENU:
@@ -26,13 +27,33 @@ void gameLoop(Client aClient, ClientControl *pControl, ClientView *pView){
 }
 
 void runMenu(Client aClient, ClientControl *pControl, ClientView *pView, Menu *pMenu) {
+    static int toggleDelay = 0;
+    toggleDelay++;
+    if(pControl->keys[SDL_SCANCODE_F11] && toggleDelay > 12) {
+        toggleFullscreen(pView);
+        refreshMenu(pView->pRend, pMenu, pView);
+        toggleDelay = 0;
+    }
+
     updateMenu(pMenu, pControl);
     if (pMenu->isGameStarted) {
         NET_clientSendInt(aClient, MENU, CHANGE_GAME_STATE, LOBBY);
     }
     NET_clientReceiver(aClient);
     renderMenu(pView->pRend, pMenu);
+}
 
+void toggleFullscreen(ClientView *pView) {
+    pView->windowFullscreen = !pView->windowFullscreen;
+
+    if(pView->windowFullscreen) {
+        SDL_SetWindowFullscreen(pView->pWin, SDL_WINDOW_FULLSCREEN_DESKTOP);
+    }
+    else {
+        SDL_SetWindowFullscreen(pView->pWin, 0);
+    }
+
+    SDL_GetWindowSize(pView->pWin, &pView->windowWidth, &pView->windowHeight);
 }
 
 void eventHandler(ClientControl *pControl){

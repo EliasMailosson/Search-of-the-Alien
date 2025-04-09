@@ -15,6 +15,7 @@ typedef struct {
     SDL_Window *pWin;
     SDL_Renderer *pRend;
     int windowHeight, windowWidth;
+    bool windowFullscreen;
 }ClientView; 
 
 typedef struct {
@@ -31,5 +32,6 @@ void render(ClientView *pView, Menu *pMenu);
 void eventHandler(ClientControl *pControl);
 void gameLoop(Client aClient, ClientControl *pControl, ClientView *pView);
 void runMenu(Client aClient, ClientControl *pControl, ClientView *pView, Menu *pMenu);
+void toggleFullscreen(ClientView *pView);
 
 #endif
