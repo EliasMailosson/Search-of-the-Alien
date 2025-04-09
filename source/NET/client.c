@@ -66,7 +66,7 @@ int NET_clientGetPlayerCount(Client aClient) {
 
 SDL_Point NET_clientGetPlayerPos(Client aClient, int playerIdx) {
     if(playerIdx < MAX_CLIENTS) {
-        return aClient->playerList->pos;
+        return aClient->playerList[playerIdx].pos;
     }
     else return (SDL_Point) {.x=-1, .y=-1};
 }

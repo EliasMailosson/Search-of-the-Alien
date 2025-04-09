@@ -3,6 +3,7 @@
 
 #include <stdio.h>
 #include <string.h>
+#include <stdbool.h>
 #include <SDL.h>
 #include <SDL_net.h>
 // union {
@@ -22,6 +23,7 @@ typedef enum{
     PRINT,
     CHANGE_GAME_STATE,
     CHANGE_GAME_STATE_RESPONSE,
+    PLAYER_INPUT
 } MessageType;
 
 typedef enum{
@@ -29,6 +31,13 @@ typedef enum{
     MENU,
     LOBBY
 }GameState;
+
+#define NUM_PLAYER_INPUTS 6
+enum PlayerInput{PLAYER_INPUT_UP, PLAYER_INPUT_DOWN, PLAYER_INPUT_RIGHT, PLAYER_INPUT_LEFT, PLAYER_INPUT_MOUSEDOWN, PLAYER_INPUT_MOUSEUP};
+
+typedef struct playerInputPacket {
+    bool keys[NUM_PLAYER_INPUTS];
+} PlayerInputPacket;
 
 struct packet;
 typedef struct packet *Packet;

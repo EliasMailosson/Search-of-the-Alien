@@ -71,6 +71,9 @@ int main(int argc, char **argv ){
             case CHANGE_GAME_STATE:
                 NET_serverChangeGameStateOnClient(aServer, aPacket);
                 break;
+            case PLAYER_INPUT:
+                NET_serverUpdatePlayer(aServer, aPacket);
+                break;
             default:
                 printf("Failed!\n");
                 break;
@@ -103,7 +106,31 @@ void NET_serverSendPlayerPacket(Server aServer) {
     }
 }
 
+void NET_serverUpdatePlayer(Server aServer, Packet aPacket){
+    PlayerInputPacket pip;
+    Uint8* payload = NET_packetGetPayload(aPacket);
+    memcpy(&pip, payload, sizeof(PlayerInputPacket));
 
+    int playerIdx = NET_serverCompIP(aServer); 
+    int speed = 5;
+
+    if (pip.keys[PLAYER_INPUT_UP]) {
+        aServer->clients[playerIdx].player.hitBox.y -= speed;
+    }
+    if (pip.keys[PLAYER_INPUT_DOWN]) {
+        aServer->clients[playerIdx].player.hitBox.y += speed;
+    }
+    if (pip.keys[PLAYER_INPUT_LEFT]) {
+        aServer->clients[playerIdx].player.hitBox.x -= speed;
+    }
+    if (pip.keys[PLAYER_INPUT_RIGHT]) {
+        aServer->clients[playerIdx].player.hitBox.x += speed;
+    }
+    aServer->clients[playerIdx].State = LOBBY; // den här uppdaterar alla spelare till state: LOBBY. när NET_serverSendPlayerPacket(aServer) körs.
+        // måste fixa detta!!
+    
+    NET_serverSendPlayerPacket(aServer); 
+}
 
 void NET_serverChangeGameStateOnClient(Server aServer,Packet aPacket){
     int newState = *(int*)NET_packetGetPayload(aPacket);
@@ -125,7 +152,7 @@ void NET_serverClientDisconnect(Server aServer){
 
 int NET_serverCompIP(Server aServer){
     for (int i = 0; i < aServer->clientCount; i++){
-    if (aServer->clients[i].IP.host == aServer->pReceivePacket->address.host && 
+        if (aServer->clients[i].IP.host == aServer->pReceivePacket->address.host && 
             aServer->clients[i].IP.port == aServer->pReceivePacket->address.port ){
             return i;
         }
