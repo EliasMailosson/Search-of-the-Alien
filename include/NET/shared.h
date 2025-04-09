@@ -7,10 +7,18 @@
 #include <stdbool.h>
 
 #include "../../include/NET/protocol.h"
+#include "server.h"
 
 #define MAX_CLIENTS 8
 #define PORT 1234
 #define JON_IP "130.229.143.255"
+
+struct playerP
+{
+    char username[40];
+};
+
+typedef struct playerP PlayerP;
 
 /** Initializes SDL network 
  * ex use: While true then the network is running
@@ -30,9 +38,9 @@ typedef struct{
 void NET_PlayerListRemovePlayer(PlayerPacket **list, int index, int *listCount);
 void NET_PlayerListAddPlayer(PlayerPacket **list,PlayerPacket newPlayer,int *listCount);
 
-void NET_PlayerListRead(PlayerPacket *new_player, int *playerCount);
-void NET_PlayerListUpdateFile(int playerCount);
-
+void NET_PlayerListRead(int *playerCount, PlayerP player[]);
+void NET_PlayerListUpdateFile(int playerCount, PlayerP player[]);
+PlayerP newPlayer(char username[]);
 
 void NET_PlayerListUpdate(Packet aPacket, PlayerPacket* list, int *count);
 void NET_PlayerListPrintf(PlayerPacket* list, int count);

@@ -87,35 +87,40 @@ void NET_eventHandler(bool *pIsRunning, bool *pKeys,SDL_Event event){
     }    
 }
 
+PlayerP newPlayer(char username[]){
+    PlayerP p;
+    strcpy(p.username, username);
+    return p;
+}
+
 // beöver fixa
 // när vi gör player list (sträng)
-void NET_PlayerListRead(PlayerPacket *new_player, int *playerCount){
+void NET_PlayerListRead(int *playerCount, PlayerP player[]){
     FILE *fp;
     fp = fopen("data/playerlist.txt", "r");
     if(fp != NULL)
     {
-        fscanf(fp,"%d", &playerCount);
-        for (int i = 0; i < playerCount; i++)
+        char username[40];
+        fscanf(fp,"%d", &*playerCount);
+        for (int i = 0; i < *playerCount; i++)
         {
-            // fscanf(fp,"%s", username[i]);
-            // fscanf(fp,"%d", playerID[i]);
+            fscanf(fp,"%s", username);
+            player[i] = newPlayer(username);
         }
         
     }
     fclose(fp);
-    printf("%s\n", new_player->ID);
 }
 
-void NET_PlayerListUpdateFile(int playerCount){
+void NET_PlayerListUpdateFile(int playerCount, PlayerP player[]){
     FILE *fp;
-    fp = fopen("data/playerlist.txt", "r");
+    fp = fopen("data/playerlist.txt", "w");
     if (fp != NULL)
     {
       fprintf(fp,"%d\n", playerCount);
       for (int i = 0; i < playerCount; i++)
       {
-        // fprintf(fp,"%s ", username[i]);
-        // fprintf(fp,"%s ", playerID[i]);
+        fprintf(fp,"%s ", player[i].username);
 
         fprintf(fp,"\n");
       }
