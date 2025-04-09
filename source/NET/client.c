@@ -55,6 +55,17 @@ int NET_clientGetState(Client aClient) {
     return aClient->state;
 }
 
+int NET_clientGetPlayerCount(Client aClient) {
+    return aClient->PlayerCount;
+}
+
+SDL_Point NET_clientGetPlayerPos(Client aClient, int playerIdx) {
+    if(playerIdx < MAX_CLIENTS) {
+        return aClient->playerList->pos;
+    }
+    else return (SDL_Point) {.x=-1, .y=-1};
+}
+
 void NET_clientDestroy(Client aClient){
     if(aClient->pReceivePacket != NULL){
         SDLNet_FreePacket(aClient->pReceivePacket);

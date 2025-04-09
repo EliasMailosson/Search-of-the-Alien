@@ -17,6 +17,9 @@ Client NET_clientCreate();
 /** Freeing client memory after use and sett to NULL */
 void NET_clientDestroy(Client aClient);
 
+int NET_clientGetPlayerCount(Client aClient);
+SDL_Point NET_clientGetPlayerPos(Client aClient, int playerIdx);
+
 int NET_clientGetState(Client aClient);
 void NET_clientSendInt(Client aClient,GameState GS, MessageType msgType,int placeHolder);
 void NET_clientSendString(Client aClient,GameState GS, MessageType msgType,const char* str);

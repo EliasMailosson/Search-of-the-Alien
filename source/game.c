@@ -1,5 +1,6 @@
 #include "../include/game.h"
 #include "../include/menu.h"
+#include "../include/players.h"
 
 void gameLoop(Client aClient, ClientControl *pControl, ClientView *pView){
     NET_clientConnect(aClient);
@@ -15,7 +16,7 @@ void gameLoop(Client aClient, ClientControl *pControl, ClientView *pView){
             runMenu(aClient, pControl, pView, &menu);
             break;
         case LOBBY:
-            printf("LOBBY\n");
+            runLobby(aClient, pControl, pView);
             break;
         default:
             break;
@@ -24,6 +25,19 @@ void gameLoop(Client aClient, ClientControl *pControl, ClientView *pView){
 
     destroyMenu(&menu);
     NET_clientSendString(aClient,MENU,DISCONNECT,"Jonatan"); //någonting knasigt gör att den inte körs
+}
+
+void runLobby(Client aClient, ClientControl *pControl, ClientView *pView) {
+    static int toggleDelay = 0;
+    toggleDelay++;
+    if(pControl->keys[SDL_SCANCODE_F11] && toggleDelay > 12) {
+        toggleFullscreen(pView);
+        toggleDelay = 0;
+    }
+
+    NET_clientReceiver(aClient);
+    
+    renderPlayers(aClient, pView);
 }
 
 void runMenu(Client aClient, ClientControl *pControl, ClientView *pView, Menu *pMenu) {
