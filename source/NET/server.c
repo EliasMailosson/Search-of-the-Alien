@@ -85,20 +85,22 @@ int main(int argc, char **argv ){
 }
 
 void NET_serverSendPlayerPacket(Server aServer){
-    PlayerPacket packet[MAX_CLIENTS] = {0};
-    for (int i = 0; i < aServer->clientCount; i++){
+    int count = aServer->clientCount;
+    PlayerPacket packet[MAX_CLIENTS];
+
+    for (int i = 0; i < count; i++){
         packet[i].state = aServer->clients[i].State;
         packet[i].username = aServer->clients[i].username;
-        SDL_Point pos = {
-            .x=aServer->clients[i].player.hitBox.x,
-            .y=aServer->clients[i].player.hitBox.y};
+        SDL_Point pos = { 
+            .x = aServer->clients[i].player.hitBox.x, 
+            .y = aServer->clients[i].player.hitBox.y 
+        };
         packet[i].pos = pos;
     }
-    if(aServer->clientCount < MAX_CLIENTS){// to get a accuret clietn count
-        packet[aServer->clientCount].pos.x = aServer->clientCount;
-    }
-    for (int i = 0; i < aServer->clientCount; i++){
-        NET_serverSendArray(aServer,GLOBAL,LOBBY_LIST,packet,(Uint32)sizeof(packet),i);
+    Uint32 payloadSize = count * sizeof(PlayerPacket);
+
+    for (int i = 0; i < count; i++){
+        NET_serverSendArray(aServer, GLOBAL, LOBBY_LIST, packet, payloadSize, i);
     }
 }
 
