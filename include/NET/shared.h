@@ -30,7 +30,10 @@ typedef struct{
 void NET_PlayerListRemovePlayer(PlayerPacket **list, int index, int *listCount);
 void NET_PlayerListAddPlayer(PlayerPacket **list,PlayerPacket newPlayer,int *listCount);
 
-void NET_PlayerListRead(PlayerPacket *new_player);
+void NET_PlayerListRead(PlayerPacket *new_player, int *playerCount);
+void NET_PlayerListUpdateFile(int playerCount);
+
+
 void NET_PlayerListUpdate(Packet aPacket, PlayerPacket* list, int *count);
 void NET_PlayerListPrintf(PlayerPacket* list, int count);
 void NET_eventHandler(bool *pIsRunning, bool *pKeys,SDL_Event event);

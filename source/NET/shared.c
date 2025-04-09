@@ -18,19 +18,6 @@ void NET_serverDestroySDL(){
     SDL_Quit();
 }
 
-// beöver fixa
-// när vi gör player list (sträng)
-void NET_PlayerListRead(PlayerPacket *new_player){
-    FILE *fp;
-    fp = fopen("data/playerlist.txt", "r");
-    if(fp != NULL)
-    {
-        fscanf(fp,"%c", new_player->ID);
-    }
-    fclose(fp);
-    printf("%s\n", new_player->ID);
-}
-
 void NET_PlayerListUpdate(Packet aPacket, PlayerPacket* list, int *count){
     Uint8* raw = NET_packetGetPayload(aPacket);
     Uint32 size = NET_packetGetPayloadSize(aPacket);
@@ -98,4 +85,40 @@ void NET_eventHandler(bool *pIsRunning, bool *pKeys,SDL_Event event){
             break;
         }
     }    
+}
+
+// beöver fixa
+// när vi gör player list (sträng)
+void NET_PlayerListRead(PlayerPacket *new_player, int *playerCount){
+    FILE *fp;
+    fp = fopen("data/playerlist.txt", "r");
+    if(fp != NULL)
+    {
+        fscanf(fp,"%d", &playerCount);
+        for (int i = 0; i < playerCount; i++)
+        {
+            // fscanf(fp,"%s", username[i]);
+            // fscanf(fp,"%d", playerID[i]);
+        }
+        
+    }
+    fclose(fp);
+    printf("%s\n", new_player->ID);
+}
+
+void NET_PlayerListUpdateFile(int playerCount){
+    FILE *fp;
+    fp = fopen("data/playerlist.txt", "r");
+    if (fp != NULL)
+    {
+      fprintf(fp,"%d\n", playerCount);
+      for (int i = 0; i < playerCount; i++)
+      {
+        // fprintf(fp,"%s ", username[i]);
+        // fprintf(fp,"%s ", playerID[i]);
+
+        fprintf(fp,"\n");
+      }
+    }
+    fclose(fp);
 }
