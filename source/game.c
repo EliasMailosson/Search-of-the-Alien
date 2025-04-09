@@ -24,7 +24,7 @@ void gameLoop(Client aClient, ClientControl *pControl, ClientView *pView){
     }
 
     destroyMenu(&menu);
-    NET_clientSendString(aClient,MENU,DISCONNECT,"Caspar"); //någonting knasigt gör att den inte körs
+    NET_clientSendString(aClient,MENU,DISCONNECT,"Caspar");
 }
 
 void runLobby(Client aClient, ClientControl *pControl, ClientView *pView) {

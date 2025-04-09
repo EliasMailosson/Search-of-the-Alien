@@ -4,9 +4,9 @@
 #include "../../include/NET/packetHandler.h"
 #include <stdbool.h>
 
-
+#define MAX_USERNAME_LEN 40
 typedef struct PlayerPacket{
-    char* username;
+    char username[MAX_USERNAME_LEN];
     SDL_Point pos;
     GameState state;
 }PlayerPacket;  

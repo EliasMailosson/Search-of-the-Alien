@@ -85,22 +85,24 @@ int main(int argc, char **argv ){
 }
 
 void NET_serverSendPlayerPacket(Server aServer) {
-    int count = aServer->clientCount;
+    PlayerPacket packet[MAX_CLIENTS] = {0};
+    for (int i = 0; i < aServer->clientCount; i++){
+        strncpy(packet[i].username, aServer->clients[i].username, MAX_USERNAME_LEN - 1);
+        packet[i].username[MAX_USERNAME_LEN - 1] = '\0';
 
-    PlayerPacket packet[MAX_CLIENTS];
-
-    for (int i = 0; i < count; i++){
         packet[i].state = aServer->clients[i].State;
-        packet[i].username = aServer->clients[i].username;
-        packet[i].pos.x = aServer->clients[i].player.hitBox.x;
-        packet[i].pos.y = aServer->clients[i].player.hitBox.y;
+        SDL_Point pos = {
+            .x = aServer->clients[i].player.hitBox.x,
+            .y = aServer->clients[i].player.hitBox.y
+        };
+        packet[i].pos = pos;
     }
-
-    Uint32 payloadSize = count * sizeof(PlayerPacket);
-    for (int i = 0; i < count; i++){
+    Uint32 payloadSize = aServer->clientCount * sizeof(PlayerPacket);
+    for (int i = 0; i < aServer->clientCount; i++){
         NET_serverSendArray(aServer, GLOBAL, LOBBY_LIST, packet, payloadSize, i);
     }
 }
+
 
 
 void NET_serverChangeGameStateOnClient(Server aServer,Packet aPacket){
@@ -114,7 +116,6 @@ void NET_serverClientDisconnect(Server aServer){
     for (int i = 0; i < aServer->clientCount; i++){
         if(aServer->clients[i].LobbyID == lobbyID){
             NET_serverSendPlayerPacket(aServer);
-            //NET_serverSendString(aServer, GLOBAL, DISCONNECT_RESPONSE, aServer->clients[NET_serverCompIP(aServer)].Username, i);
         } 
     }
     printf("username: %s disconnected to server\n",aServer->clients[NET_serverCompIP(aServer)].username);
