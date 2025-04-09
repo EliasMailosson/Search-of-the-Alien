@@ -6,6 +6,7 @@ void gameLoop(Client aClient, ClientControl *pControl, ClientView *pView){
     NET_clientSendString(aClient,MENU,CONNECT,"Jonatan");
 
     Menu menu = initMenu(pView->pRend, pView);
+    Map aMap = MAP_CreateMap(pView->pRend);
     while (pControl->isRunning){
         eventHandler(pControl);
 
@@ -16,6 +17,7 @@ void gameLoop(Client aClient, ClientControl *pControl, ClientView *pView){
             break;
         case LOBBY:
             printf("LOBBY\n");
+            runMap(aClient, pControl, pView, aMap);
             break;
         default:
             break;
@@ -23,7 +25,8 @@ void gameLoop(Client aClient, ClientControl *pControl, ClientView *pView){
     }
 
     destroyMenu(&menu);
-    NET_clientSendString(aClient,MENU,DISCONNECT,"Jonatan"); //någonting knasigt gör att den inte körs
+    MAP_DestroyMap(aMap);
+    NET_clientSendString(aClient,MENU,DISCONNECT,"Jonatan");
 }
 
 void runMenu(Client aClient, ClientControl *pControl, ClientView *pView, Menu *pMenu) {
@@ -41,6 +44,10 @@ void runMenu(Client aClient, ClientControl *pControl, ClientView *pView, Menu *p
     }
     NET_clientReceiver(aClient);
     renderMenu(pView->pRend, pMenu);
+}
+
+void runMap(Client aClient, ClientControl *pControl, ClientView *pView, Map aMap) {
+    MAP_RenderMap(pView->pRend, aMap);
 }
 
 void toggleFullscreen(ClientView *pView) {

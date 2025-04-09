@@ -9,6 +9,8 @@
 #include "../include/UI/panel.h"
 #include "../include/NET/client.h"
 #include "../include/NET/shared.h"
+#include "../include/MAP/map.h"
+
 
 typedef struct menu Menu;
 typedef struct {
@@ -32,6 +34,7 @@ void render(ClientView *pView, Menu *pMenu);
 void eventHandler(ClientControl *pControl);
 void gameLoop(Client aClient, ClientControl *pControl, ClientView *pView);
 void runMenu(Client aClient, ClientControl *pControl, ClientView *pView, Menu *pMenu);
+void runMap(Client aClient, ClientControl *pControl, ClientView *pView, Map aMap);
 void toggleFullscreen(ClientView *pView);
 
 #endif
