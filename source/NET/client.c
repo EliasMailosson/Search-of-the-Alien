@@ -136,27 +136,27 @@ void NET_clientReceiver(Client aClient){
 
 void NET_clientUpdatePlayerList(Client aClient, Packet aPacket) {
     PlayerPacket packet[MAX_CLIENTS] = {0};
-    NET_playerPacketReceive(aPacket, packet, &aClient->PlayerCount);
+    int receivedCount = 0;
+
+    NET_playerPacketReceive(aPacket, packet, &receivedCount);
+    aClient->PlayerCount = receivedCount;
     
-    for (int i = 0; i < aClient->PlayerCount; i++) {
-        if (packet[i].pos.y == 0) {  
-            aClient->PlayerCount = packet[i].pos.x; 
-            break;// Use the count stored in pos.x
-        }
+    for (int i = 0; i < receivedCount; i++){
         aClient->playerList[i].pos = packet[i].pos;
         aClient->playerList[i].state = packet[i].state;
         aClient->playerList[i].username = packet[i].username;
     }
     
-    // Debug print
+    // Debug print 
     printf("Updated player count: %d\n", aClient->PlayerCount);
-    for (int i = 0; i < aClient->PlayerCount; i++) {
+    for (int i = 0; i < aClient->PlayerCount; i++){
         printf("index %d: username %s: state %d\n", 
-               i, 
-               aClient->playerList[i].username ? aClient->playerList[i].username : "NULL", 
-               aClient->playerList[i].state);
+            i,
+            aClient->playerList[i].username ? aClient->playerList[i].username : "NULL", 
+            aClient->playerList[i].state);
     }
 }
+
 
 
 void NET_clientUpdateGameState(Client aClient,Packet aPacket){

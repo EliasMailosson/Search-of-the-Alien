@@ -84,25 +84,24 @@ int main(int argc, char **argv ){
     return 0;
 }
 
-void NET_serverSendPlayerPacket(Server aServer){
+void NET_serverSendPlayerPacket(Server aServer) {
     int count = aServer->clientCount;
+
     PlayerPacket packet[MAX_CLIENTS];
 
     for (int i = 0; i < count; i++){
         packet[i].state = aServer->clients[i].State;
         packet[i].username = aServer->clients[i].username;
-        SDL_Point pos = { 
-            .x = aServer->clients[i].player.hitBox.x, 
-            .y = aServer->clients[i].player.hitBox.y 
-        };
-        packet[i].pos = pos;
+        packet[i].pos.x = aServer->clients[i].player.hitBox.x;
+        packet[i].pos.y = aServer->clients[i].player.hitBox.y;
     }
-    Uint32 payloadSize = count * sizeof(PlayerPacket);
 
+    Uint32 payloadSize = count * sizeof(PlayerPacket);
     for (int i = 0; i < count; i++){
         NET_serverSendArray(aServer, GLOBAL, LOBBY_LIST, packet, payloadSize, i);
     }
 }
+
 
 void NET_serverChangeGameStateOnClient(Server aServer,Packet aPacket){
     int newState = *(int*)NET_packetGetPayload(aPacket);
