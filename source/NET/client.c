@@ -46,6 +46,8 @@ Client NET_clientCreate(){
     }
     aClient->PlayerCount = 1;
     aClient->playerList[0].state = MENU;
+    aClient->playerList[0].username ="Caspar";
+    aClient->selfUsername ="Caspar";
     return aClient;
 }
 
