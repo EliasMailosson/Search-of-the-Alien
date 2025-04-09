@@ -20,6 +20,7 @@ Server NET_serverCreate();
 void NET_serverSendInt(Server aServer,GameState GS, MessageType msgType,int placeHolder, int index);
 void NET_serverSendString(Server aServer,GameState GS, MessageType msgType, const char* str, int index);
 void NET_serverSendArray(Server aServer,GameState GS, MessageType msgType, const void* array, Uint32 arraySize, int index);
+void NET_serverSendPlayerPacket(Server aServer);
 
 //server respons
 void NET_serverClientConnected(Packet aPacket, Server aServer);

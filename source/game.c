@@ -30,7 +30,7 @@ void gameLoop(Client aClient, ClientControl *pControl, ClientView *pView){
 void runLobby(Client aClient, ClientControl *pControl, ClientView *pView) {
     static int toggleDelay = 0;
     toggleDelay++;
-    if(pControl->keys[SDL_SCANCODE_F11] && toggleDelay > 12) {
+    if(pControl->keys[SDL_SCANCODE_F] && toggleDelay > 12) {
         toggleFullscreen(pView);
         toggleDelay = 0;
     }
@@ -43,7 +43,7 @@ void runLobby(Client aClient, ClientControl *pControl, ClientView *pView) {
 void runMenu(Client aClient, ClientControl *pControl, ClientView *pView, Menu *pMenu) {
     static int toggleDelay = 0;
     toggleDelay++;
-    if(pControl->keys[SDL_SCANCODE_F11] && toggleDelay > 12) {
+    if(pControl->keys[SDL_SCANCODE_F] && toggleDelay > 12) {
         toggleFullscreen(pView);
         refreshMenu(pView->pRend, pMenu, pView);
         toggleDelay = 0;

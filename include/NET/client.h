@@ -8,8 +8,6 @@ typedef struct Player Player;
 struct client;
 typedef struct client *Client;
 
-/** Initializes the whole packege and what to send */
-void NET_clientSend(Client aClient);
 /** Connecting to host server via a specefic address and port */
 bool NET_clientConnect(Client aClient);
 /** Allocation memory for the client */
@@ -29,6 +27,7 @@ void NET_clientReceiver(Client aClient);
 int NET_clientFindPlayer(Client aClient, char* str);
 
 void NET_clientUpdateGameState(Client aClient,Packet aPacket);
+void NET_clientUpdatePlayerList(Client aClient,Packet aPacket);
 
 
 #endif
