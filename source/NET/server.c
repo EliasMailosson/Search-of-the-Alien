@@ -231,7 +231,8 @@ void NET_serverClientConnected(Packet aPacket, Server aServer){
     }
     newUser.IP = aServer->pReceivePacket->address;
     newUser.LobbyID = -1;
-    newUser.State = NET_packetGetMessageType(aPacket);
+    // newUser.State = NET_packetGetMessageType(aPacket);
+    newUser.State = MENU;
     
     NET_serverAddUser(aServer, newUser);
     NET_serverSendInt(aServer, GLOBAL, CONNECT_RESPONSE, 0, aServer->clientCount - 1);
