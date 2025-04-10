@@ -39,6 +39,7 @@ void refreshMenu(SDL_Renderer *pRend, Menu *pMenu, ClientView *pView);
 Menu initMenu(SDL_Renderer *pRend, ClientView *pView);
 void updateMenu(Menu *pMenu, ClientControl *pControl);
 void destroyMenu(Menu *pMenu);
-void checkUsername(Menu *pMenu,char myUsername[]);
+void checkUsername(Menu *pMenu);
+void createNewUsername(Menu *pMenu, char *output);
 
 #endif

@@ -37,6 +37,11 @@ void updateMenu(Menu *pMenu, ClientControl *pControl) {
                     }
                     switchDelay = 0;
                 }
+                if (strcmp("MyUsername", menuEvent.key) == 0){
+                    char myUsername[40];
+                    createNewUsername(pMenu, myUsername);
+                    // Lägg in myUsername till selfUsername i client.c structen clients
+                }
                 break;
             case BUTTON_CLICKED:
                 if (strcmp("Quit", menuEvent.key) == 0) {
@@ -63,11 +68,11 @@ void refreshMenu(SDL_Renderer *pRend, Menu *pMenu, ClientView *pView) {
 
     // INPUT MY USERNAME /////////////////////////
     Inputfield f3 = (Inputfield)UI_panelGetComponent(pMenu->panels[PANEL_MYUSERNAME], "MyUsername-input");
-    UI_inputfieldSetAppearance(pRend, f3, pView->windowWidth / 2 - 150, 150, BIGBUTTONWIDTH,
-        (SDL_Color){0,0,0,0}, (SDL_Color){255,255,255,255}, pMenu->fonts[0]);
+    UI_inputfieldSetAppearance(pRend, f3, pView->windowWidth / 2 - 150, 260, BIGBUTTONWIDTH,
+        (SDL_Color){0,0,0,0}, (SDL_Color){255,255,255,255}, pMenu->fonts[1]);
 
     Button b17 = (Button)UI_panelGetComponent(pMenu->panels[PANEL_MYUSERNAME], "MyUsername");
-    UI_buttonConfigure(b17, "Submit Username", pView->windowWidth / 2 - 150, 150 + OFFSET, BIGBUTTONWIDTH, BIGBUTTONHEIGHT,
+    UI_buttonConfigure(b17, "Submit Username", pView->windowWidth / 2 - 200, 250 + OFFSET, 400, BIGBUTTONHEIGHT,
         pRend, (SDL_Color){0,0,0,255}, pMenu->fonts[1], (SDL_Color){255,255,255,255});
 
     // START MENU /////////////////////////
@@ -189,8 +194,20 @@ Menu initMenu(SDL_Renderer *pRend, ClientView *pView) {
         menu.panels[i] = UI_panelCreate();
     }
 
+    // INPUT USERNAME /////////////////////////
+
+    UI_panelSetImage(pRend, menu.panels[PANEL_MYUSERNAME], "assets/images/menu/background_username.png");
+
+    Inputfield f3 = UI_inputfieldCreate();
+    UI_panelAddComponent(menu.panels[PANEL_MYUSERNAME], f3, UI_INPUTFIELD, "MyUsername-input");
+
+    Button b17 = UI_buttonCreate();
+    UI_panelAddComponent(menu.panels[PANEL_MYUSERNAME], b17, UI_BUTTON, "MyUsername");
+    UI_panelSetComponentLink(menu.panels[PANEL_MYUSERNAME], "MyUsername", PANEL_START);
+
+    checkUsername(&menu);
+
     // START MENU /////////////////////////
-    checkUsername(&menu ,pView->myUsername);
 
     UI_panelSetImage(pRend, menu.panels[PANEL_START], "assets/images/menu/menu-background.png");
 
@@ -290,28 +307,31 @@ void destroyMenu(Menu *pMenu) {
     }
 }
 
-void checkUsername(Menu *pMenu,char myUsername[]){
-    int usernameActive;
+void checkUsername(Menu *pMenu){
     FILE *fp;
-    fp = fopen("data/myUsername.txt", "rw");
-    if (fp!= NULL)
+    fp = fopen("data/myUsername.txt", "r");
+    if (fp == NULL)
     {
-       fscanf(fp, "%d", &usernameActive);
-       if (usernameActive == 0)
-       {
-        // Här ska det finnas kod för att skapa panel och spara användar namn
         pMenu->currentPanel = PANEL_MYUSERNAME;
-        
-        Inputfield f3 = UI_inputfieldCreate();
-        UI_panelAddComponent(pMenu->panels[PANEL_MYUSERNAME], f3, UI_INPUTFIELD, "MyUsername-input");
-
-        Button b17 = UI_buttonCreate();
-        UI_panelAddComponent(pMenu->panels[PANEL_MYUSERNAME], b17, UI_BUTTON, "MyUsername");
-        UI_panelSetComponentLink(pMenu->panels[PANEL_MYUSERNAME], "MyUsername", PANEL_START);
-        usernameActive = 1;
-        fprintf(fp, "%d\n", usernameActive);
-        fprintf(fp, "%s", myUsername);
-       }
+    }
+    else
+    {
+        char username[40];
+        fgets(username, 40, fp);
+        printf("%s\n", username);
+        pMenu->currentPanel = PANEL_START;
     }
     fclose(fp);    
+}
+
+void createNewUsername(Menu *pMenu, char *output){
+    Inputfield input = UI_panelGetComponent(pMenu->panels[PANEL_MYUSERNAME], "MyUsername-input");
+    UI_inputfieldGetBuffer(input, output);
+    FILE *fp ;
+    fp = fopen("data/myUsername.txt", "w");
+    if (fp != NULL)
+    {
+        fprintf(fp, "%s", output);
+    }
+    fclose(fp);
 }

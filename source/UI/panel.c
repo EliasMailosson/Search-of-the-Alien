@@ -105,6 +105,7 @@ void UI_panelUpdate(Panel aPanel, MenuEvent *pEvent, bool isMouseUp, bool *keys)
                     if(aPanel->compList[i].hasPanelLink) {
                         pEvent->eventType = PANEL_SWITCH;
                         pEvent->newPanel = aPanel->compList[i].panelLink;
+                        strcpy(pEvent->key, aPanel->compList[i].key);
                     } 
                     else {
                         pEvent->eventType = BUTTON_CLICKED;
