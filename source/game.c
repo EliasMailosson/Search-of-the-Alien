@@ -39,7 +39,6 @@ void runLobby(Client aClient, ClientControl *pControl, ClientView *pView) {
     pip = prepareInputArray(pControl);
     if(NET_playerInputPacketCheck(pip)){
         NET_clientSendArray(aClient, LOBBY, PLAYER_INPUT, &pip, sizeof(PlayerInputPacket));
-        printf("dend\n");
     }
 
     NET_clientReceiver(aClient);

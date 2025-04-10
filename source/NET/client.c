@@ -146,13 +146,6 @@ void NET_clientUpdatePlayerList(Client aClient, Packet aPacket){
         aClient->playerList[i].state = packets[i].state;
         strcpy(aClient->playerList[i].username, packets[i].username);
     }
-    //print
-    // printf("PlayerCount %d\n",aClient->PlayerCount);
-    // for (int i = 0; i < aClient->PlayerCount; i++){
-    //     printf("index %d: username %s: state %d\n", i,
-    //             aClient->playerList[i].username,
-    //             aClient->playerList[i].state);
-    // }
 }
 
 void NET_clientUpdateGameState(Client aClient,Packet aPacket){

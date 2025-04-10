@@ -128,9 +128,6 @@ void NET_serverUpdatePlayer(Server aServer, Packet aPacket){
     if (pip.keys[PLAYER_INPUT_RIGHT]) {
         aServer->clients[playerIdx].player.hitBox.x += speed;
     }
-    //aServer->clients[playerIdx].State = LOBBY; // den här uppdaterar alla spelare till state: LOBBY. när NET_serverSendPlayerPacket(aServer) körs.
-        // måste fixa detta!!
-    
     NET_serverSendPlayerPacket(aServer,LOBBY); 
 }
 
@@ -252,7 +249,6 @@ void NET_serverAddUser(Server aServer, User newUser){
 
 void NET_serverClientConnected(Packet aPacket, Server aServer){
     User newUser = {0};
-    // Make a copy of the username string to avoid use-after-free
     char *usernameFromPacket = (char*)NET_packetGetPayload(aPacket);
     newUser.username = strdup(usernameFromPacket);
     if(newUser.username == NULL){

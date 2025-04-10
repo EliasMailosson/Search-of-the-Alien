@@ -23,7 +23,7 @@ typedef enum{
     PRINT,
     CHANGE_GAME_STATE,
     CHANGE_GAME_STATE_RESPONSE,
-    PLAYER_INPUT
+    PLAYER_INPUT,
 } MessageType;
 
 typedef enum{
