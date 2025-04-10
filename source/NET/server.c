@@ -5,7 +5,7 @@ struct Player{
 
 struct User{
     IPaddress IP;
-    char* Username;
+    char* username;
     int LobbyID;
     GameState State;
     Player player;
@@ -42,6 +42,7 @@ int main(int argc, char **argv ){
             switch (NET_packetGetMessageType(aPacket)){
             case CONNECT:
                 NET_serverClientConnected(aPacket, aServer);
+                NET_serverSendPlayerPacket(aServer,-1);
                 break;
             case DISCONNECT:
                 NET_serverClientDisconnect(aServer);
@@ -65,10 +66,13 @@ int main(int argc, char **argv ){
                 break;
             case PRINT:
                 printf("%s\n",(char*)NET_packetGetPayload(aPacket));
-                NET_serverSendString(aServer,GLOBAL,PRINT,"nej va fan\n",NET_serverCompIP(aServer));
+                NET_serverSendString(aServer,GLOBAL,PRINT,"hej hej\n",NET_serverCompIP(aServer));
                 break;
             case CHANGE_GAME_STATE:
                 NET_serverChangeGameStateOnClient(aServer, aPacket);
+                break;
+            case PLAYER_INPUT:
+                NET_serverUpdatePlayer(aServer, aPacket);
                 break;
             default:
                 printf("Failed!\n");
@@ -83,27 +87,72 @@ int main(int argc, char **argv ){
     return 0;
 }
 
+void NET_serverSendPlayerPacket(Server aServer,GameState GS){
+    PlayerPacket packet[MAX_CLIENTS] = {0};
+    for (int i = 0; i < aServer->clientCount; i++){
+        strncpy(packet[i].username, aServer->clients[i].username, MAX_USERNAME_LEN - 1);
+        packet[i].username[MAX_USERNAME_LEN - 1] = '\0';
+
+        packet[i].state = aServer->clients[i].State;
+        SDL_Point pos = {
+            .x = aServer->clients[i].player.hitBox.x,
+            .y = aServer->clients[i].player.hitBox.y
+        };
+        packet[i].pos = pos;
+    }
+    Uint32 payloadSize = aServer->clientCount * sizeof(PlayerPacket);
+    for (int i = 0; i < aServer->clientCount; i++){
+        if(aServer->clients[i].State == GS || GS == -1){
+            NET_serverSendArray(aServer, GLOBAL, LOBBY_LIST, packet, payloadSize, i);
+        }
+    }
+}
+
+void NET_serverUpdatePlayer(Server aServer, Packet aPacket){
+    PlayerInputPacket pip;
+    Uint8* payload = NET_packetGetPayload(aPacket);
+    memcpy(&pip, payload, sizeof(PlayerInputPacket));
+
+    int playerIdx = NET_serverCompIP(aServer); 
+    int speed = 5;
+
+    if (pip.keys[PLAYER_INPUT_UP]) {
+        aServer->clients[playerIdx].player.hitBox.y -= speed;
+    }
+    if (pip.keys[PLAYER_INPUT_DOWN]) {
+        aServer->clients[playerIdx].player.hitBox.y += speed;
+    }
+    if (pip.keys[PLAYER_INPUT_LEFT]) {
+        aServer->clients[playerIdx].player.hitBox.x -= speed;
+    }
+    if (pip.keys[PLAYER_INPUT_RIGHT]) {
+        aServer->clients[playerIdx].player.hitBox.x += speed;
+    }
+    NET_serverSendPlayerPacket(aServer,LOBBY); 
+}
+
 void NET_serverChangeGameStateOnClient(Server aServer,Packet aPacket){
-    int newState = *(int*)NET_packetGetPayload(aPacket);
+    GameState newState = SDLNet_Read32(NET_packetGetPayload(aPacket));
     NET_serverSendInt(aServer,GLOBAL,CHANGE_GAME_STATE_RESPONSE,newState,NET_serverCompIP(aServer));
-    printf("username: %s gameState is now %d\n",aServer->clients[NET_serverCompIP(aServer)].Username,newState);
+    printf("username: %s gameState is now %d\n",aServer->clients[NET_serverCompIP(aServer)].username,newState);
+    aServer->clients[NET_serverCompIP(aServer)].State = newState;
 }
 
 void NET_serverClientDisconnect(Server aServer){
     int lobbyID = aServer->clients[NET_serverCompIP(aServer)].LobbyID;
     for (int i = 0; i < aServer->clientCount; i++){
         if(aServer->clients[i].LobbyID == lobbyID){
-            //NET_serverSendString(aServer, GLOBAL, DISCONNECT_RESPONSE, aServer->clients[NET_serverCompIP(aServer)].Username, i);
+            NET_serverSendPlayerPacket(aServer,-1);
         } 
     }
-    printf("username: %s disconnected to server\n",aServer->clients[NET_serverCompIP(aServer)].Username);
+    printf("username: %s disconnected to server\n",aServer->clients[NET_serverCompIP(aServer)].username);
     NET_serverRemoveUser(aServer, NET_serverCompIP(aServer));
     if(aServer->clientCount == 0) aServer->isOff = true;
 }
 
 int NET_serverCompIP(Server aServer){
     for (int i = 0; i < aServer->clientCount; i++){
-    if (aServer->clients[i].IP.host == aServer->pReceivePacket->address.host && 
+        if (aServer->clients[i].IP.host == aServer->pReceivePacket->address.host && 
             aServer->clients[i].IP.port == aServer->pReceivePacket->address.port ){
             return i;
         }
@@ -200,25 +249,25 @@ void NET_serverAddUser(Server aServer, User newUser){
 
 void NET_serverClientConnected(Packet aPacket, Server aServer){
     User newUser = {0};
-    // Make a copy of the username string to avoid use-after-free
     char *usernameFromPacket = (char*)NET_packetGetPayload(aPacket);
-    newUser.Username = strdup(usernameFromPacket);
-    if(newUser.Username == NULL){
+    newUser.username = strdup(usernameFromPacket);
+    if(newUser.username == NULL){
         fprintf(stderr, "Failed to allocate memory for username\n");
         return;
     }
     newUser.IP = aServer->pReceivePacket->address;
     newUser.LobbyID = -1;
-    newUser.State = NET_packetGetMessageType(aPacket);
+    // newUser.State = NET_packetGetMessageType(aPacket);
+    newUser.State = MENU;
     
     NET_serverAddUser(aServer, newUser);
     NET_serverSendInt(aServer, GLOBAL, CONNECT_RESPONSE, 0, aServer->clientCount - 1);
-    printf("username: %s connected to server\n", aServer->clients[aServer->clientCount - 1].Username);
+    printf("username: %s connected to server\n", aServer->clients[aServer->clientCount - 1].username);
 }
 
 int NET_serverFindPlayerID(Server aServer, const char* str){
     for (int i = 0; i < aServer->clientCount; i++){
-        if(strcmp(str, aServer->clients[i].Username) == 0){
+        if(strcmp(str, aServer->clients[i].username) == 0){
             return (i);
         }
     }

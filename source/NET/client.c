@@ -2,19 +2,18 @@
 
 struct Player{
     GameState state;
-    char* username;
+    char username[MAX_USERNAME_LEN];
     SDL_Point pos;
 };
 struct client{
     UDPsocket clientSocket;
     UDPpacket *pReceivePacket;
     UDPpacket *pSendPacket;
-    char* clientId;
+    char selfUsername[MAX_USERNAME_LEN];
     IPaddress serverAddr;
     
-    PlayerPacket *list; //temporary
+    PlayerPacket playerPaket; //to send your pos
     int PlayerCount;
-    GameState state; // rm
     Player playerList[MAX_CLIENTS];
 }; 
 
@@ -45,14 +44,31 @@ Client NET_clientCreate(){
         SDLNet_UDP_Close(aClient->clientSocket);
         return NULL;
     }
-    aClient->PlayerCount = 0;
-    aClient->list = NULL;
-    aClient->state = MENU;
+    aClient->PlayerCount = 1;
+    aClient->playerList[0].state = MENU;
+    //aClient->playerList[0].username = "Caspar";
+    strcpy(aClient->playerList[0].username,"Caspar");
+    //aClient->selfUsername ="Caspar";
+    strcpy(aClient->selfUsername,"Caspar");
     return aClient;
 }
 
 int NET_clientGetState(Client aClient) {
-    return aClient->state;
+    for (int i = 0; i < aClient->PlayerCount; i++){
+        if(strcmp(aClient->selfUsername,aClient->playerList[i].username) == 0) return aClient->playerList[i].state;
+    }
+    return -1;
+}
+
+int NET_clientGetPlayerCount(Client aClient) {
+    return aClient->PlayerCount;
+}
+
+SDL_Point NET_clientGetPlayerPos(Client aClient, int playerIdx) {
+    if(playerIdx < MAX_CLIENTS) {
+        return aClient->playerList[playerIdx].pos;
+    }
+    else return (SDL_Point) {.x=-1, .y=-1};
 }
 
 void NET_clientDestroy(Client aClient){
@@ -84,8 +100,6 @@ void NET_clientSendArray(Client aClient,GameState GS, MessageType msgType,const 
 }
 
 void NET_clientReceiver(Client aClient){
-    char* playerID = 0;
-    int index = 0;
     while (SDLNet_UDP_Recv(aClient->clientSocket, aClient->pReceivePacket)){
         Packet aPacket = NET_packetDeserialize(aClient->pReceivePacket->data, aClient->pReceivePacket->len);
         if(aPacket == NULL){
@@ -95,41 +109,56 @@ void NET_clientReceiver(Client aClient){
         //Handle recieving packets from the server
         switch (NET_packetGetMessageType(aPacket)){
         case CONNECT_RESPONSE:
-            printf("received %d",*((int*)NET_packetGetPayload(aPacket)));
+            // printf("received %d\n",*((int*)NET_packetGetPayload(aPacket)));
             break;
         case DISCONNECT_RESPONSE:
-            playerID = (char*)NET_packetGetPayload(aPacket);
-            index = NET_clientFindPlayer(aClient,playerID);
-            NET_PlayerListRemovePlayer(&aClient->list,index,&aClient->PlayerCount);
+            // playerID = (char*)NET_packetGetPayload(aPacket);
+            // index = NET_clientFindPlayer(aClient,playerID);
+            // NET_PlayerListRemovePlayer(&aClient->playerList[NET_clientFindPlayer(aClient,playerID)],
+            //                             index,&aClient->PlayerCount);
+            NET_clientUpdatePlayerList(aClient,aPacket);
             break;
         case JOIN_LOBBY_RESPONSE:
-            NET_PlayerListUpdate(aPacket,aClient->list,&aClient->PlayerCount);
+            //NET_PlayerListUpdate(aPacket,aClient->list,&aClient->PlayerCount);
             break;
         case LOBBY_LIST:
-            // clientside uppdat player list
+            NET_clientUpdatePlayerList(aClient,aPacket);
             break;
         case PRINT:
             printf("%s\n",NET_packetGetPayload(aPacket));
             break;
         case CHANGE_GAME_STATE_RESPONSE:
             NET_clientUpdateGameState(aClient,aPacket);
+            break;
         default:
+            printf("client recieved invalid msgType: %d!!\n", NET_packetGetMessageType(aPacket));
             break;
         }
         if(aPacket) NET_packetDestroy(aPacket);
     }
 }
 
+void NET_clientUpdatePlayerList(Client aClient, Packet aPacket){
+    PlayerPacket packets[MAX_CLIENTS] = {0};
+    NET_playerPacketReceive(aPacket, packets, &aClient->PlayerCount);
+    for (int i = 0; i < aClient->PlayerCount; i++){
+        aClient->playerList[i].pos = packets[i].pos;
+        aClient->playerList[i].state = packets[i].state;
+        strcpy(aClient->playerList[i].username, packets[i].username);
+    }
+}
+
 void NET_clientUpdateGameState(Client aClient,Packet aPacket){
-    int newState = *(int*)NET_packetGetPayload(aPacket);
-    aClient->state = newState;
+    GameState newState = SDLNet_Read32(NET_packetGetPayload(aPacket));
+    aClient->playerList[NET_clientFindPlayer(aClient,aClient->selfUsername)].state = newState;
 }
 
 int NET_clientFindPlayer(Client aClient, char* str){
     for (int i = 0; i < aClient->PlayerCount; i++){
-        if(strcmp(str,aClient->list[i].ID)){
+        if(strcmp(str, aClient->playerList[i].username) == 0){
             return i;
         }   
     }
     return -1;
 }
+

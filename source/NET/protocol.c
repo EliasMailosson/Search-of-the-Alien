@@ -1,4 +1,22 @@
 #include "../../include/NET/protocol.h"
+#include <stdlib.h>
+#include <string.h>
+#include <stdio.h>
+
+
+void NET_playerPacketReceive(Packet aPacket, PlayerPacket *list, int *count){
+    Uint8* raw = NET_packetGetPayload(aPacket);
+    Uint32 size = NET_packetGetPayloadSize(aPacket);
+
+    if (!raw) {
+        printf("Raw error!\n");
+        return;
+    }
+
+    int playerCount = size / sizeof(PlayerPacket);
+    memcpy(list, raw, playerCount * sizeof(PlayerPacket));
+    *count = playerCount;
+}
 
 void NET_protocolSendInt(UDPpacket *pUDPpkg,UDPsocket Socket,IPaddress IP,
                             GameState GS,MessageType msgType,int placeHolder){
@@ -84,3 +102,9 @@ void NET_protocolSendArray(UDPpacket *pUDPpkg, UDPsocket Socket, IPaddress IP,
     NET_packetDestroy(packet);
 }
 
+bool NET_playerInputPacketCheck(PlayerInputPacket pip){
+    for (int i = 0; i < NUM_PLAYER_INPUTS; i++){
+        if(pip.keys[i]) return true;
+    }
+    return false;
+}
