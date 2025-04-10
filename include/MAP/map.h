@@ -2,7 +2,7 @@
 #define MAP_H
 
 #include <SDL.h>
-#include "SDL2/SDL_image.h"
+#include "SDL_image.h"
 
 typedef struct tile Tiles;
 
@@ -12,7 +12,7 @@ void MAP_RenderMap(SDL_Renderer *pRend, Map aMap);
 
 void MAP_RenderTiles(SDL_Renderer *pRend, Map aMap, int y, int x);
 
-Map MAP_CreateMap(SDL_Renderer *pRend);
+Map MAP_CreateMap(SDL_Renderer *pRend, int posX, int posY);
 
 void MAP_loadTileSheet(SDL_Renderer* pRend, char *imagePath, Map aMap);
 

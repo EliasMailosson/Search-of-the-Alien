@@ -6,7 +6,7 @@ void gameLoop(Client aClient, ClientControl *pControl, ClientView *pView){
     NET_clientSendString(aClient,MENU,CONNECT,"Jonatan");
 
     Menu menu = initMenu(pView->pRend, pView);
-    Map aMap = MAP_CreateMap(pView->pRend);
+    Map aMap = MAP_CreateMap(pView->pRend, pView->windowWidth, pView->windowHeight);
     while (pControl->isRunning){
         eventHandler(pControl);
 
@@ -16,7 +16,6 @@ void gameLoop(Client aClient, ClientControl *pControl, ClientView *pView){
             runMenu(aClient, pControl, pView, &menu);
             break;
         case LOBBY:
-            printf("LOBBY\n");
             runMap(aClient, pControl, pView, aMap);
             break;
         default:
@@ -48,6 +47,11 @@ void runMenu(Client aClient, ClientControl *pControl, ClientView *pView, Menu *p
 
 void runMap(Client aClient, ClientControl *pControl, ClientView *pView, Map aMap) {
     MAP_RenderMap(pView->pRend, aMap);
+    SDL_SetRenderDrawColor(pView->pRend, 255, 0, 0, 255);  // red
+    SDL_RenderDrawLine(pView->pRend, 0, pView->windowHeight / 2, pView->windowWidth / 2, pView->windowHeight / 2);   // diagonal line
+     SDL_RenderDrawLine(pView->pRend, pView->windowWidth / 2, 0, pView->windowWidth / 2, pView->windowHeight / 2);   // diagonal line
+    SDL_RenderPresent(pView->pRend);
+
 }
 
 void toggleFullscreen(ClientView *pView) {

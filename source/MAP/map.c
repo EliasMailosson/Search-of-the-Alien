@@ -2,8 +2,8 @@
 
 #include <stdbool.h>
 
-#define MAP_WIDTH 6
-#define MAP_HEIGHT 6
+#define MAP_WIDTH 18
+#define MAP_HEIGHT 18
 #define TILE_SIZE 64
 
 typedef struct tile { 
@@ -16,7 +16,7 @@ struct Map {
     SDL_Texture *texture;
     int tile_width;
     int tile_height;
-    SDL_Rect tileIndex[2];
+    SDL_Rect tileIndex[3];
     Tile tiles[MAP_HEIGHT][MAP_WIDTH];
 };
 
@@ -29,16 +29,15 @@ void MAP_RenderMap(SDL_Renderer *pRend, Map aMap) {
             MAP_RenderTiles(pRend, aMap, y, x);
             // aMap->tiles[i][j];
         }
-        
     }
-    SDL_RenderPresent(pRend);
+    // SDL_RenderPresent(pRend);
 }
 
 void MAP_RenderTiles(SDL_Renderer *pRend, Map aMap, int y, int x) {
-    SDL_RenderCopy(pRend, aMap->texture, &aMap->tileIndex[0], &aMap->tiles[y][x].tileRect);
+    SDL_RenderCopy(pRend, aMap->texture, &aMap->tileIndex[2], &aMap->tiles[y][x].tileRect);
 }
 
-Map MAP_CreateMap(SDL_Renderer *pRend){
+Map MAP_CreateMap(SDL_Renderer *pRend, int posX, int posY){
     Map aMap = malloc(sizeof(struct Map));
     if(aMap == NULL){
         fprintf(stderr,"Error allocating memory for server\n");
@@ -53,12 +52,14 @@ Map MAP_CreateMap(SDL_Renderer *pRend){
 
     aMap->tileIndex[0] = (SDL_Rect){.x = (TILE_SIZE*7), .y = 0, .w = TILE_SIZE, .h = TILE_SIZE};
     aMap->tileIndex[1] = (SDL_Rect){.x = (TILE_SIZE*8), .y = 0, .w = TILE_SIZE, .h = TILE_SIZE};
+    aMap->tileIndex[2] = (SDL_Rect){.x = (TILE_SIZE*0), .y = 0, .w = TILE_SIZE, .h = TILE_SIZE};
+
 
     for (int y = 0; y < MAP_HEIGHT; ++y) {
         for (int x = 0; x < MAP_WIDTH; ++x) {
             aMap->tiles[y][x].tileID = (x + y) % 2;   // alternate between tile 0 and 1
             aMap->tiles[y][x].walkable = true;        // or false for some
-            aMap->tiles[y][x].tileRect = (SDL_Rect){.w = TILE_SIZE, .h = TILE_SIZE, .x = (int)((x - y) * (TILE_SIZE/2)), .y = (int)(((x + y) * (TILE_SIZE/4)) - (TILE_SIZE/2))};
+            aMap->tiles[y][x].tileRect = (SDL_Rect){.w = TILE_SIZE, .h = TILE_SIZE, .x = (int)((x - y) * (TILE_SIZE/2)) + (posX / 2) - TILE_SIZE / 2, .y = (int)(((x + y) * (TILE_SIZE/4)) - (TILE_SIZE/2)) + posY / 2 };
         }
     }
     
