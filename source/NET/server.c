@@ -66,7 +66,7 @@ int main(int argc, char **argv ){
                 break;
             case PRINT:
                 printf("%s\n",(char*)NET_packetGetPayload(aPacket));
-                NET_serverSendString(aServer,GLOBAL,PRINT,"nej va fan\n",NET_serverCompIP(aServer));
+                NET_serverSendString(aServer,GLOBAL,PRINT,"hej hej\n",NET_serverCompIP(aServer));
                 break;
             case CHANGE_GAME_STATE:
                 NET_serverChangeGameStateOnClient(aServer, aPacket);

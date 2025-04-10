@@ -27,20 +27,6 @@ void gameLoop(Client aClient, ClientControl *pControl, ClientView *pView){
     NET_clientSendString(aClient,MENU,DISCONNECT,"Caspar");
 }
 
-PlayerInputPacket prepareInputArray(ClientControl *pControl) {
-    PlayerInputPacket pip = {
-        .keys = {
-            pControl->keys[SDL_SCANCODE_W],
-            pControl->keys[SDL_SCANCODE_S],
-            pControl->keys[SDL_SCANCODE_D],
-            pControl->keys[SDL_SCANCODE_A],
-            pControl->isMouseDown,
-            pControl->isMouseUp
-        }
-    };
-    return pip;
-}
-
 void runLobby(Client aClient, ClientControl *pControl, ClientView *pView) {
     static int toggleDelay = 0;
     toggleDelay++;

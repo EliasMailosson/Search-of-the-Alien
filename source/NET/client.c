@@ -109,7 +109,7 @@ void NET_clientReceiver(Client aClient){
         //Handle recieving packets from the server
         switch (NET_packetGetMessageType(aPacket)){
         case CONNECT_RESPONSE:
-            printf("received %d\n",*((int*)NET_packetGetPayload(aPacket)));
+            // printf("received %d\n",*((int*)NET_packetGetPayload(aPacket)));
             break;
         case DISCONNECT_RESPONSE:
             // playerID = (char*)NET_packetGetPayload(aPacket);
@@ -129,6 +129,7 @@ void NET_clientReceiver(Client aClient){
             break;
         case CHANGE_GAME_STATE_RESPONSE:
             NET_clientUpdateGameState(aClient,aPacket);
+            break;
         default:
             printf("client recieved invalid msgType: %d!!\n", NET_packetGetMessageType(aPacket));
             break;
@@ -146,12 +147,12 @@ void NET_clientUpdatePlayerList(Client aClient, Packet aPacket){
         strcpy(aClient->playerList[i].username, packets[i].username);
     }
     //print
-    printf("PlayerCount %d\n",aClient->PlayerCount);
-    for (int i = 0; i < aClient->PlayerCount; i++){
-        printf("index %d: username %s: state %d\n", i,
-                aClient->playerList[i].username,
-                aClient->playerList[i].state);
-    }
+    // printf("PlayerCount %d\n",aClient->PlayerCount);
+    // for (int i = 0; i < aClient->PlayerCount; i++){
+    //     printf("index %d: username %s: state %d\n", i,
+    //             aClient->playerList[i].username,
+    //             aClient->playerList[i].state);
+    // }
 }
 
 void NET_clientUpdateGameState(Client aClient,Packet aPacket){
