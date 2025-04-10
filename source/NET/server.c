@@ -42,7 +42,7 @@ int main(int argc, char **argv ){
             switch (NET_packetGetMessageType(aPacket)){
             case CONNECT:
                 NET_serverClientConnected(aPacket, aServer);
-                NET_serverSendPlayerPacket(aServer);
+                NET_serverSendPlayerPacket(aServer,-1);
                 break;
             case DISCONNECT:
                 NET_serverClientDisconnect(aServer);
@@ -87,7 +87,7 @@ int main(int argc, char **argv ){
     return 0;
 }
 
-void NET_serverSendPlayerPacket(Server aServer) {
+void NET_serverSendPlayerPacket(Server aServer,GameState GS){
     PlayerPacket packet[MAX_CLIENTS] = {0};
     for (int i = 0; i < aServer->clientCount; i++){
         strncpy(packet[i].username, aServer->clients[i].username, MAX_USERNAME_LEN - 1);
@@ -102,7 +102,9 @@ void NET_serverSendPlayerPacket(Server aServer) {
     }
     Uint32 payloadSize = aServer->clientCount * sizeof(PlayerPacket);
     for (int i = 0; i < aServer->clientCount; i++){
-        NET_serverSendArray(aServer, GLOBAL, LOBBY_LIST, packet, payloadSize, i);
+        if(aServer->clients[i].State == GS || GS == -1){
+            NET_serverSendArray(aServer, GLOBAL, LOBBY_LIST, packet, payloadSize, i);
+        }
     }
 }
 
@@ -126,23 +128,24 @@ void NET_serverUpdatePlayer(Server aServer, Packet aPacket){
     if (pip.keys[PLAYER_INPUT_RIGHT]) {
         aServer->clients[playerIdx].player.hitBox.x += speed;
     }
-    aServer->clients[playerIdx].State = LOBBY; // den här uppdaterar alla spelare till state: LOBBY. när NET_serverSendPlayerPacket(aServer) körs.
+    //aServer->clients[playerIdx].State = LOBBY; // den här uppdaterar alla spelare till state: LOBBY. när NET_serverSendPlayerPacket(aServer) körs.
         // måste fixa detta!!
     
-    NET_serverSendPlayerPacket(aServer); 
+    NET_serverSendPlayerPacket(aServer,LOBBY); 
 }
 
 void NET_serverChangeGameStateOnClient(Server aServer,Packet aPacket){
-    int newState = *(int*)NET_packetGetPayload(aPacket);
+    GameState newState = SDLNet_Read32(NET_packetGetPayload(aPacket));
     NET_serverSendInt(aServer,GLOBAL,CHANGE_GAME_STATE_RESPONSE,newState,NET_serverCompIP(aServer));
     printf("username: %s gameState is now %d\n",aServer->clients[NET_serverCompIP(aServer)].username,newState);
+    aServer->clients[NET_serverCompIP(aServer)].State = newState;
 }
 
 void NET_serverClientDisconnect(Server aServer){
     int lobbyID = aServer->clients[NET_serverCompIP(aServer)].LobbyID;
     for (int i = 0; i < aServer->clientCount; i++){
         if(aServer->clients[i].LobbyID == lobbyID){
-            NET_serverSendPlayerPacket(aServer);
+            NET_serverSendPlayerPacket(aServer,-1);
         } 
     }
     printf("username: %s disconnected to server\n",aServer->clients[NET_serverCompIP(aServer)].username);

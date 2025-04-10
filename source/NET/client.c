@@ -155,7 +155,7 @@ void NET_clientUpdatePlayerList(Client aClient, Packet aPacket){
 }
 
 void NET_clientUpdateGameState(Client aClient,Packet aPacket){
-    int newState = *(int*)NET_packetGetPayload(aPacket);
+    GameState newState = SDLNet_Read32(NET_packetGetPayload(aPacket));
     aClient->playerList[NET_clientFindPlayer(aClient,aClient->selfUsername)].state = newState;
 }
 
