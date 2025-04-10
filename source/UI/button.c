@@ -25,6 +25,11 @@ Button UI_buttonCreate() {
 }
 
 void UI_buttonDimensions(Button aButton, int newX, int newY, int newWidth, int newHeight) {
+    if (aButton == NULL) {
+        fprintf(stderr, "UI_buttonDimensions: NULL button passed in!\n");
+        return;
+    }
+
     aButton->buttonRect.x = newX;
     aButton->buttonRect.y = newY;
     aButton->buttonRect.w = newWidth;
@@ -32,6 +37,10 @@ void UI_buttonDimensions(Button aButton, int newX, int newY, int newWidth, int n
 }
 
 void UI_buttonSetText(Button aButton, char* text) {
+    if (aButton == NULL) {
+        fprintf(stderr, "UI_buttonSetText: NULL button passed in!\n");
+        return;
+    }
     UI_labelSetText(aButton->buttonText, text);
 }
 
@@ -73,6 +82,10 @@ bool UI_buttonIsHovered(Button aButton, int mouseX, int mouseY) {
 }
 
 void UI_buttonConfigure(Button aButton, char* text, int newX, int newY, int newWidth, int newHeight, SDL_Renderer* pRend, SDL_Color textColor, TTF_Font* pFont, SDL_Color buttonColor) {
+    if (aButton == NULL) {
+        fprintf(stderr, "UI_buttonConfigure: NULL button passed in!\n");
+        return;
+    }
     UI_buttonSetText(aButton, text);
     UI_buttonDimensions(aButton, newX, newY, newWidth, newHeight);
     UI_buttonSetLabelappearence(pRend, aButton, textColor, pFont, buttonColor);

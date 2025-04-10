@@ -61,6 +61,15 @@ void refreshMenu(SDL_Renderer *pRend, Menu *pMenu, ClientView *pView) {
         UI_panelSetActive(pMenu->panels[i], (i == pMenu->currentPanel));
     }
 
+    // INPUT MY USERNAME /////////////////////////
+    Inputfield f3 = (Inputfield)UI_panelGetComponent(pMenu->panels[PANEL_MYUSERNAME], "MyUsername-input");
+    UI_inputfieldSetAppearance(pRend, f3, pView->windowWidth / 2 - 150, 150, BIGBUTTONWIDTH,
+        (SDL_Color){0,0,0,0}, (SDL_Color){255,255,255,255}, pMenu->fonts[0]);
+
+    Button b17 = (Button)UI_panelGetComponent(pMenu->panels[PANEL_MYUSERNAME], "MyUsername");
+    UI_buttonConfigure(b17, "Submit Username", pView->windowWidth / 2 - 150, 150 + OFFSET, BIGBUTTONWIDTH, BIGBUTTONHEIGHT,
+        pRend, (SDL_Color){0,0,0,255}, pMenu->fonts[1], (SDL_Color){255,255,255,255});
+
     // START MENU /////////////////////////
     Button b1 = (Button)UI_panelGetComponent(pMenu->panels[PANEL_START], "Start Game");
     UI_buttonConfigure(b1, "Start Game", pView->windowWidth / 2 - 150, 150, BIGBUTTONWIDTH, BIGBUTTONHEIGHT, pRend,
@@ -181,6 +190,8 @@ Menu initMenu(SDL_Renderer *pRend, ClientView *pView) {
     }
 
     // START MENU /////////////////////////
+    checkUsername(&menu ,pView->myUsername);
+
     UI_panelSetImage(pRend, menu.panels[PANEL_START], "assets/images/menu/menu-background.png");
 
     Button b1 = UI_buttonCreate();
@@ -277,4 +288,30 @@ void destroyMenu(Menu *pMenu) {
         TTF_CloseFont(pMenu->fonts[i]);
         pMenu->fonts[i] = NULL;
     }
+}
+
+void checkUsername(Menu *pMenu,char myUsername[]){
+    int usernameActive;
+    FILE *fp;
+    fp = fopen("data/myUsername.txt", "rw");
+    if (fp!= NULL)
+    {
+       fscanf(fp, "%d", &usernameActive);
+       if (usernameActive == 0)
+       {
+        // Här ska det finnas kod för att skapa panel och spara användar namn
+        pMenu->currentPanel = PANEL_MYUSERNAME;
+        
+        Inputfield f3 = UI_inputfieldCreate();
+        UI_panelAddComponent(pMenu->panels[PANEL_MYUSERNAME], f3, UI_INPUTFIELD, "MyUsername-input");
+
+        Button b17 = UI_buttonCreate();
+        UI_panelAddComponent(pMenu->panels[PANEL_MYUSERNAME], b17, UI_BUTTON, "MyUsername");
+        UI_panelSetComponentLink(pMenu->panels[PANEL_MYUSERNAME], "MyUsername", PANEL_START);
+        usernameActive = 1;
+        fprintf(fp, "%d\n", usernameActive);
+        fprintf(fp, "%s", myUsername);
+       }
+    }
+    fclose(fp);    
 }

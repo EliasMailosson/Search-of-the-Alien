@@ -87,15 +87,15 @@ void NET_eventHandler(bool *pIsRunning, bool *pKeys,SDL_Event event){
     }    
 }
 
-PlayerP newPlayer(char username[]){
-    PlayerP p;
+Friends newPlayer(char username[]){
+    Friends p;
     strcpy(p.username, username);
     return p;
 }
 
 // beöver fixa
 // när vi gör player list (sträng)
-void NET_PlayerListRead(int *playerCount, PlayerP player[]){
+void NET_PlayerListRead(int *playerCount, Friends player[]){
     FILE *fp;
     fp = fopen("data/playerlist.txt", "r");
     if(fp != NULL)
@@ -112,7 +112,7 @@ void NET_PlayerListRead(int *playerCount, PlayerP player[]){
     fclose(fp);
 }
 
-void NET_PlayerListUpdateFile(int playerCount, PlayerP player[]){
+void NET_PlayerListUpdateFile(int playerCount, Friends player[]){
     FILE *fp;
     fp = fopen("data/playerlist.txt", "w");
     if (fp != NULL)
