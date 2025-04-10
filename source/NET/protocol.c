@@ -102,3 +102,9 @@ void NET_protocolSendArray(UDPpacket *pUDPpkg, UDPsocket Socket, IPaddress IP,
     NET_packetDestroy(packet);
 }
 
+bool NET_playerInputPacketCheck(PlayerInputPacket pip){
+    for (int i = 0; i < NUM_PLAYER_INPUTS; i++){
+        if(pip.keys[i]) return true;
+    }
+    return false;
+}

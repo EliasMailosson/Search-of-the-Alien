@@ -35,9 +35,12 @@ void runLobby(Client aClient, ClientControl *pControl, ClientView *pView) {
         toggleDelay = 0;
     }
 
-    PlayerInputPacket pip[1];
-    pip[0] = prepareInputArray(pControl);
-    NET_clientSendArray(aClient, LOBBY, PLAYER_INPUT, pip, sizeof(PlayerInputPacket));
+    PlayerInputPacket pip;
+    pip = prepareInputArray(pControl);
+    if(NET_playerInputPacketCheck(pip)){
+        NET_clientSendArray(aClient, LOBBY, PLAYER_INPUT, &pip, sizeof(PlayerInputPacket));
+        printf("dend\n");
+    }
 
     NET_clientReceiver(aClient);
     

@@ -22,5 +22,7 @@ void NET_protocolSendArray(UDPpacket *pUDPpkg,UDPsocket Socket,IPaddress IP,
 
 void NET_playerPacketReceive(Packet aPacket, PlayerPacket *list, int *count);
 
+bool NET_playerInputPacketCheck(PlayerInputPacket pip);
+
 
 #endif
