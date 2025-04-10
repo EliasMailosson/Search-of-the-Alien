@@ -12,7 +12,6 @@ struct client{
     char selfUsername[MAX_USERNAME_LEN];
     IPaddress serverAddr;
     
-    PlayerPacket playerPaket; //to send your pos
     int PlayerCount;
     Player playerList[MAX_CLIENTS];
 }; 

@@ -12,6 +12,7 @@ struct User{
 };
 struct server{
     UDPsocket serverSocket;
+    SDLNet_SocketSet socketSet;
     int clientCount;
     UDPpacket *pReceivePacket;
     UDPpacket *pSendPacket;
@@ -33,54 +34,61 @@ int main(int argc, char **argv ){
         printf("UDP server started on port %d\n", PORT);
     } 
     while (isRunning){
-        while (SDLNet_UDP_Recv(aServer->serverSocket, aServer->pReceivePacket)){
-            Packet aPacket = NET_packetDeserialize(aServer->pReceivePacket->data, aServer->pReceivePacket->len);
-            if(aPacket == NULL){
-                printf("Deserialization failed! Buffer might be invalid.\n");
-                break;
-            } 
-            switch (NET_packetGetMessageType(aPacket)){
-            case CONNECT:
-                NET_serverClientConnected(aPacket, aServer);
-                NET_serverSendPlayerPacket(aServer,-1);
-                break;
-            case DISCONNECT:
-                NET_serverClientDisconnect(aServer);
-                // nedds to be addede when frendlist is a ting 
-                // updating the clients in the sesific lobby
-                break;
-            case LOBBY_LIST:
-                printf("Hej det är %s\n", (char*)(NET_packetGetPayload(aPacket)));
-                break;
-            case LOBBY_LIST_RESPONSE:// server kommer inte ta emot detta  
-                //PlayerPacket list[3] = {0};
-                //NET_PlayerListUpdate(aPacket,list,&n);
-                //NET_PlayerListPrintf(list,3);
-                break;
-            case JOIN_LOBBY:
-                //lobbyID = (*(int*)NET_packetGetPayload(aPacket));
-                //aServer->clients[NET_serverCompIP(aServer)].LobbyID = lobbyID;
-                // send loby respone with list of players in lobby(brodcast till lobby)
-                break;
-            case JOIN_LOBBY_RESPONSE:
-                break;
-            case PRINT:
-                printf("%s\n",(char*)NET_packetGetPayload(aPacket));
-                NET_serverSendString(aServer,GLOBAL,PRINT,"hej hej\n",NET_serverCompIP(aServer));
-                break;
-            case CHANGE_GAME_STATE:
-                NET_serverChangeGameStateOnClient(aServer, aPacket);
-                break;
-            case PLAYER_INPUT:
-                NET_serverUpdatePlayer(aServer, aPacket);
-                break;
-            default:
-                printf("Failed!\n");
-                break;
-            }
-            if(aPacket) NET_packetDestroy(aPacket);
+        int numReady = SDLNet_CheckSockets(aServer->socketSet, 100); 
+        if (numReady == -1) {
+            fprintf(stderr, "SDLNet_CheckSockets error: %s\n", SDLNet_GetError());
+            break;
         }
-        if(aServer->isOff)break;
+        if(numReady > 0 && SDLNet_SocketReady(aServer->serverSocket)){
+            while (SDLNet_UDP_Recv(aServer->serverSocket, aServer->pReceivePacket)){
+                Packet aPacket = NET_packetDeserialize(aServer->pReceivePacket->data, aServer->pReceivePacket->len);
+                if(aPacket == NULL){
+                    printf("Deserialization failed! Buffer might be invalid.\n");
+                    break;
+                } 
+                switch (NET_packetGetMessageType(aPacket)){
+                case CONNECT:
+                    NET_serverClientConnected(aPacket, aServer);
+                    NET_serverSendPlayerPacket(aServer,-1);
+                    break;
+                case DISCONNECT:
+                    NET_serverClientDisconnect(aServer);
+                    // nedds to be addede when frendlist is a ting 
+                    // updating the clients in the sesific lobby
+                    break;
+                case LOBBY_LIST:
+                    printf("Hej det är %s\n", (char*)(NET_packetGetPayload(aPacket)));
+                    break;
+                case LOBBY_LIST_RESPONSE:// server kommer inte ta emot detta  
+                    //PlayerPacket list[3] = {0};
+                    //NET_PlayerListUpdate(aPacket,list,&n);
+                    //NET_PlayerListPrintf(list,3);
+                    break;
+                case JOIN_LOBBY:
+                    //lobbyID = (*(int*)NET_packetGetPayload(aPacket));
+                    //aServer->clients[NET_serverCompIP(aServer)].LobbyID = lobbyID;
+                    // send loby respone with list of players in lobby(brodcast till lobby)
+                    break;
+                case JOIN_LOBBY_RESPONSE:
+                    break;
+                case PRINT:
+                    printf("%s\n",(char*)NET_packetGetPayload(aPacket));
+                    NET_serverSendString(aServer,GLOBAL,PRINT,"hej hej\n",NET_serverCompIP(aServer));
+                    break;
+                case CHANGE_GAME_STATE:
+                    NET_serverChangeGameStateOnClient(aServer, aPacket);
+                    break;
+                case PLAYER_INPUT:
+                    NET_serverUpdatePlayer(aServer, aPacket);
+                    break;
+                default:
+                    printf("Failed!\n");
+                    break;
+                }
+                if(aPacket) NET_packetDestroy(aPacket);
+            }
+            if(aServer->isOff)break;
+        }
     }
     NET_serverDestroy(aServer);
     NET_serverDestroySDL();
@@ -169,6 +177,10 @@ void NET_serverDestroy(Server aServer){
         SDLNet_FreePacket(aServer->pSendPacket); 
         aServer->pSendPacket = NULL;
     }
+    if(aServer->socketSet != NULL){
+        SDLNet_FreeSocketSet(aServer->socketSet);
+        aServer->socketSet = NULL;
+    }
     if(aServer->serverSocket != NULL) {
         SDLNet_UDP_Close(aServer->serverSocket);
         aServer->serverSocket = NULL;
@@ -190,6 +202,15 @@ Server NET_serverCreate(){
     aServer->serverSocket = SDLNet_UDP_Open(PORT);
     if(!aServer->serverSocket){
         printf("Failed to open UDP socket on port %d\n",PORT);
+        return NULL;
+    }
+    aServer->socketSet = SDLNet_AllocSocketSet(1);
+    if (!aServer->socketSet) {
+        fprintf(stderr, "SDLNet_AllocSocketSet failed: %s\n", SDLNet_GetError());
+        return NULL;
+    }
+    if (SDLNet_UDP_AddSocket(aServer->socketSet, aServer->serverSocket) == -1) {
+        fprintf(stderr, "SDLNet_UDP_AddSocket failed: %s\n", SDLNet_GetError());
         return NULL;
     }
     // Packets for sending/receiving
