@@ -126,11 +126,11 @@ $(BUILDDIR)/packetHandler.o: $(NETDIR)/packetHandler.c
 	$(CC) $(CFLAGS) -c $< -o $@
 
 $(BUILDDIR)/players.o: $(SRCDIR)/players.c
-    $(CC) $(CFLAGS) -c $< -o $@
+	$(CC) $(CFLAGS) -c $< -o $@
 
 $(BUILDDIR)/map.o: $(MAPDIR)/map.c
 	$(CC) $(CFLAGS) -c $< -o $@
-
+    
 clean:
 	$(REMOV)
 

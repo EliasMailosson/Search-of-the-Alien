@@ -23,8 +23,7 @@ void gameLoop(Client aClient, ClientControl *pControl, ClientView *pView){
             runMenu(aClient, pControl, pView, &menu);
             break;
         case LOBBY:
-            runLobby(aClient, pControl, pView);
-            runMap(aClient, pControl, pView, aMap);
+            runLobby(aClient, aMap, pControl, pView);
             break;
         default:
             break;
@@ -39,11 +38,12 @@ void gameLoop(Client aClient, ClientControl *pControl, ClientView *pView){
     }
 }
 
-void runLobby(Client aClient, ClientControl *pControl, ClientView *pView) {
+void runLobby(Client aClient, Map aMap, ClientControl *pControl, ClientView *pView) {
     static int toggleDelay = 0;
     toggleDelay++;
     if(pControl->keys[SDL_SCANCODE_F] && toggleDelay > 12) {
         toggleFullscreen(pView);
+        MAP_refreshMap(aMap, pView->windowWidth, pView->windowHeight);
         toggleDelay = 0;
     }
 
@@ -55,6 +55,7 @@ void runLobby(Client aClient, ClientControl *pControl, ClientView *pView) {
 
     NET_clientReceiver(aClient);
     
+    MAP_RenderMap(pView->pRend, aMap);
     renderPlayers(aClient, pView);
     
 }
@@ -74,17 +75,6 @@ void runMenu(Client aClient, ClientControl *pControl, ClientView *pView, Menu *p
     }
     NET_clientReceiver(aClient);
     renderMenu(pView->pRend, pMenu);
-}
-
-void runMap(Client aClient, ClientControl *pControl, ClientView *pView, Map aMap) {
-    static int toggleDelay = 0;
-    toggleDelay++;
-    if(pControl->keys[SDL_SCANCODE_F] && toggleDelay > 12) {
-        toggleFullscreen(pView);
-        MAP_refreshMap(aMap, pView->windowWidth, pView->windowHeight);
-        toggleDelay = 0;
-    }
-    MAP_RenderMap(pView->pRend, aMap);
 }
 
 void toggleFullscreen(ClientView *pView) {

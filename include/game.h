@@ -34,9 +34,8 @@ typedef struct {
 void render(ClientView *pView, Menu *pMenu);
 void eventHandler(ClientControl *pControl);
 void gameLoop(Client aClient, ClientControl *pControl, ClientView *pView);
-void runLobby(Client aClient, ClientControl *pControl, ClientView *pView);
+void runLobby(Client aClient, Map aMap, ClientControl *pControl, ClientView *pView);
 void runMenu(Client aClient, ClientControl *pControl, ClientView *pView, Menu *pMenu);
-void runMap(Client aClient, ClientControl *pControl, ClientView *pView, Map aMap);
 void toggleFullscreen(ClientView *pView);
 
 #endif
