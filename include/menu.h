@@ -3,6 +3,7 @@
 
 #include "UI/panel.h"
 #include "game.h"
+#include "UI/friend.h"
 
 #define PANEL_COUNT 7
 #define FONT_COUNT 2
@@ -37,9 +38,10 @@ typedef struct menu {
 void renderMenu(SDL_Renderer *pRend, Menu *pMenu);
 void refreshMenu(SDL_Renderer *pRend, Menu *pMenu, ClientView *pView);
 Menu initMenu(SDL_Renderer *pRend, ClientView *pView, Client aClient);
-void updateMenu(Menu *pMenu, ClientControl *pControl, Client aClient);
+void updateMenu(Menu *pMenu, ClientControl *pControl, Client aClient, FriendList aFriendList);
 void destroyMenu(Menu *pMenu);
 void checkUsername(Menu *pMenu, Client aClient);
 void createNewUsername(Menu *pMenu, char *output);
+void addFriendList(Menu *pMenu, char *output);
 
 #endif

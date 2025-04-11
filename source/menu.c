@@ -20,7 +20,7 @@ void renderMenu(SDL_Renderer *pRend, Menu *pMenu) {
     SDL_RenderPresent(pRend);
 }
 
-void updateMenu(Menu *pMenu, ClientControl *pControl, Client aClient) {
+void updateMenu(Menu *pMenu, ClientControl *pControl, Client aClient, FriendList aFriendList) {
     static MenuEvent menuEvent;
     static int switchDelay = 0;
     switchDelay++;
@@ -49,6 +49,16 @@ void updateMenu(Menu *pMenu, ClientControl *pControl, Client aClient) {
                     createNewUsername(pMenu, myUsername);
                     NET_clientSetSelfName(aClient, myUsername);
                     NET_clientSendString(aClient,MENU,CONNECT,myUsername);
+                }
+                if (strcmp("AddFriend-Add", menuEvent.key) == 0){
+                    char friend[MAX_USERNAME_LEN];
+                    addFriendList(pMenu, friend);
+                    UI_clientAddFriend(aFriendList, friend);
+                    UI_updateFriendList(aFriendList);
+                }
+                if (strcmp("Friends-button", menuEvent.key) == 0)
+                {
+                    UI_readFriendList(aFriendList);
                 }
                 break;
             case BUTTON_CLICKED:
@@ -358,4 +368,9 @@ void createNewUsername(Menu *pMenu, char *output){
     }
 
     fclose(fp);
+}
+
+void addFriendList(Menu *pMenu, char *output){
+    Inputfield input = UI_panelGetComponent(pMenu->panels[PANEL_ADDFRIEND], "AddFriend-Add");
+    UI_inputfieldGetBuffer(input, output);
 }

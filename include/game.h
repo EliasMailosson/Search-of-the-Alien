@@ -10,6 +10,7 @@
 #include "../include/NET/client.h"
 #include "../include/NET/shared.h"
 #include "../include/MAP/map.h"
+#include "UI/friend.h"
 
 
 typedef struct menu Menu;
@@ -35,7 +36,7 @@ void render(ClientView *pView, Menu *pMenu);
 void eventHandler(ClientControl *pControl);
 void gameLoop(Client aClient, ClientControl *pControl, ClientView *pView);
 void runLobby(Client aClient, Map aMap, ClientControl *pControl, ClientView *pView);
-void runMenu(Client aClient, ClientControl *pControl, ClientView *pView, Menu *pMenu);
+void runMenu(Client aClient, ClientControl *pControl, ClientView *pView, Menu *pMenu, FriendList aFriendList);
 void toggleFullscreen(ClientView *pView);
 
 #endif

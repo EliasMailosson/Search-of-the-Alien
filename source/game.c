@@ -1,11 +1,13 @@
 #include "../include/game.h"
 #include "../include/menu.h"
 #include "../include/players.h"
+#include "../include/UI/friend.h"
 
 void gameLoop(Client aClient, ClientControl *pControl, ClientView *pView){
     NET_clientConnect(aClient);
 
     Menu menu = initMenu(pView->pRend, pView, aClient);
+    FriendList aFriendsList = UI_friendListCreate();
     char username[MAX_USERNAME_LEN];
     NET_getSelfname(aClient, username);
 
@@ -20,7 +22,7 @@ void gameLoop(Client aClient, ClientControl *pControl, ClientView *pView){
         switch (NET_clientGetState(aClient))
         {
         case MENU:
-            runMenu(aClient, pControl, pView, &menu);
+            runMenu(aClient, pControl, pView, &menu, aFriendsList);
             break;
         case LOBBY:
             runLobby(aClient, aMap, pControl, pView);
@@ -36,6 +38,7 @@ void gameLoop(Client aClient, ClientControl *pControl, ClientView *pView){
     if(strcmp(username, "None") != 0) {
         NET_clientSendString(aClient,MENU,DISCONNECT,username);
     }
+    UI_friendListDestroy(aFriendsList);
 }
 
 void runLobby(Client aClient, Map aMap, ClientControl *pControl, ClientView *pView) {
@@ -64,7 +67,7 @@ void runLobby(Client aClient, Map aMap, ClientControl *pControl, ClientView *pVi
     SDL_RenderPresent(pView->pRend);
 }
 
-void runMenu(Client aClient, ClientControl *pControl, ClientView *pView, Menu *pMenu) {
+void runMenu(Client aClient, ClientControl *pControl, ClientView *pView, Menu *pMenu, FriendList aFriendsList) {
     static int toggleDelay = 0;
     toggleDelay++;
     if(pControl->keys[SDL_SCANCODE_F] && toggleDelay > 12) {
@@ -73,7 +76,7 @@ void runMenu(Client aClient, ClientControl *pControl, ClientView *pView, Menu *p
         toggleDelay = 0;
     }
 
-    updateMenu(pMenu, pControl, aClient);
+    updateMenu(pMenu, pControl, aClient, aFriendsList);
     if (pMenu->isGameStarted) {
         NET_clientSendInt(aClient, MENU, CHANGE_GAME_STATE, LOBBY);
     }

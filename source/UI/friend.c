@@ -2,11 +2,8 @@
 #include <stdlib.h>
 #include <string.h>
 
-#define MAX_NAME_LENGTH 16
-#define MAX_FRIENDS 10
-
 typedef struct {
-    char name[MAX_NAME_LENGTH];
+    char name[MAX_USERNAME_LEN];
     bool isOnline;
 } Friend;
 
@@ -17,6 +14,10 @@ typedef struct FriendList {
 
 FriendList UI_friendListCreate() {
     FriendList list = malloc(sizeof(struct FriendList));
+    if (!list) {
+        SDL_Log("Misslyckades att allokera minne för vänlista");
+        return NULL;
+    }
     list->count = 0;
     return list;
 }
@@ -57,8 +58,8 @@ void UI_friendListDestroy(FriendList list) {
 bool UI_friendListAdd(FriendList list, const char* name, bool isOnline) {
     if (list->count >= MAX_FRIENDS) return false;
 
-    strncpy(list->friends[list->count].name, name, MAX_NAME_LENGTH - 1);
-    list->friends[list->count].name[MAX_NAME_LENGTH - 1] = '\0';
+    strncpy(list->friends[list->count].name, name, MAX_USERNAME_LEN - 1);
+    list->friends[list->count].name[MAX_USERNAME_LEN - 1] = '\0';
     list->friends[list->count].isOnline = isOnline;
 
     list->count++;
@@ -97,4 +98,49 @@ void UI_friendListRender(FriendList list, SDL_Renderer* renderer, TTF_Font* font
 
         y += 40;
     }
+}
+
+void UI_clientAddFriend(FriendList aFriendList, char *outputFriend){
+    if (aFriendList->count >= MAX_FRIENDS) return; // Prevent overflow
+
+    strncpy(aFriendList->friends[aFriendList->count].name, outputFriend, MAX_USERNAME_LEN - 1);
+    aFriendList->friends[aFriendList->count].name[MAX_USERNAME_LEN - 1] = '\0';
+    aFriendList->count++;
+}
+
+void UI_updateFriendList(FriendList aFriendList){
+    FILE *fp;
+    fp = fopen("data/playerlist.txt", "w");
+    if (fp != NULL)
+    {
+      fprintf(fp,"%d\n", aFriendList->count);
+      for (int i = 0; i < aFriendList->count; i++)
+      {
+        fprintf(fp,"%s ", aFriendList->friends[i].name);
+        fprintf(fp,"\n");
+      }
+    }
+    fclose(fp);
+}
+
+void UI_readFriendList(FriendList aFriendList){
+    FILE *fp;
+    fp = fopen("data/playerlist.txt", "r");
+    if(fp != NULL)
+    {
+        char username[MAX_USERNAME_LEN];
+        fscanf(fp,"%d", &aFriendList->count);
+        for (int i = 0; i < aFriendList->count; i++)
+        {
+            fscanf(fp,"%s", username);
+            strncpy(aFriendList->friends[i].name, username, MAX_USERNAME_LEN - 1);
+            aFriendList->friends[i].name[MAX_USERNAME_LEN - 1] = '\0';
+        }
+        printf("%d\n", aFriendList->count);
+        for (int i = 0; i < aFriendList->count; i++)
+        {
+            printf("%s\n", aFriendList->friends[i].name);
+        }
+    }
+    fclose(fp);
 }
