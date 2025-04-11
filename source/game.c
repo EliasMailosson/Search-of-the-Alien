@@ -6,7 +6,7 @@ void gameLoop(Client aClient, ClientControl *pControl, ClientView *pView){
     NET_clientConnect(aClient);
 
     Menu menu = initMenu(pView->pRend, pView, aClient);
-    char username[40];
+    char username[MAX_USERNAME_LEN];
     NET_getSelfname(aClient, username);
 
     if(strcmp(username, "None") != 0) {

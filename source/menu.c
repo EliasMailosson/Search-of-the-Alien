@@ -45,7 +45,7 @@ void updateMenu(Menu *pMenu, ClientControl *pControl, Client aClient) {
                     switchDelay = 0;
                 }
                 if (strcmp("MyUsername", menuEvent.key) == 0){
-                    char myUsername[40];
+                    char myUsername[MAX_USERNAME_LEN];
                     createNewUsername(pMenu, myUsername);
                     NET_clientSetSelfName(aClient, myUsername);
                     NET_clientSendString(aClient,MENU,CONNECT,myUsername);
@@ -338,8 +338,8 @@ void checkUsername(Menu *pMenu, Client aClient){
     }
     else
     {
-        char username[40];
-        fgets(username, 40, fp);
+        char username[MAX_USERNAME_LEN];
+        fgets(username, MAX_USERNAME_LEN, fp);
         printf("%s\n", username);
         pMenu->currentPanel = PANEL_START;
         NET_clientSetSelfName(aClient, username);
