@@ -33,7 +33,7 @@ void NET_PlayerListUpdate(Packet aPacket, PlayerPacket* list, int *count){
 
 void NET_PlayerListPrintf(PlayerPacket* list, int count){
     for (int i = 0; i < count; i++){
-        printf("index %d, ID %s, pos X %d, pos Y %d",i,list[i].ID,list[i].pos.x,list[i].pos.y);
+        printf("index %d, ID %s, pos X %d, pos Y %d",i,list[i].username,list[i].pos.x,list[i].pos.y);
     }
 }
 

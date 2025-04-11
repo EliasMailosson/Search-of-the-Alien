@@ -26,15 +26,7 @@ typedef struct friends Friends;
  */
 bool NET_serverInitSDL();
 /** Destroying SDL network and SDL*/
-void NET_serverDestroySDL();
-
-
-typedef struct{
-    char* ID;
-    SDL_Point pos;
-    GameState state;
-    bool isActive;
-}PlayerPacket;    
+void NET_serverDestroySDL();  
 
 void NET_PlayerListRemovePlayer(PlayerPacket **list, int index, int *listCount);
 void NET_PlayerListAddPlayer(PlayerPacket **list,PlayerPacket newPlayer,int *listCount);
