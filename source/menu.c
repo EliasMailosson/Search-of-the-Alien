@@ -3,6 +3,7 @@
 #include "../include/UI/button.h"
 #include "../include/UI/checklist.h"
 #include "../include/UI/inputfield.h"
+#include "../include/UI/friend.h"
 
 void renderMenu(SDL_Renderer *pRend, Menu *pMenu) {
     SDL_SetRenderDrawColor(pRend, 0,0,0,0);
@@ -10,6 +11,11 @@ void renderMenu(SDL_Renderer *pRend, Menu *pMenu) {
     for(int i = 0; i < PANEL_COUNT; i++) {
         UI_panelRender(pRend, pMenu->panels[i]);
     }
+
+    if (pMenu->currentPanel == PANEL_FRIENDS) {
+        UI_DrawFriendList(pRend, pMenu->fonts[0]);
+    }
+
     SDL_RenderPresent(pRend);
 }
 
@@ -46,7 +52,10 @@ void updateMenu(Menu *pMenu, ClientControl *pControl) {
                 if (strcmp("New-Game", menuEvent.key) == 0) {
                     pMenu->isGameStarted = true;
                 }
-                
+                if (strcmp("Join-Friend", menuEvent.key) == 0) {
+                    
+                    printf("Join friend clicked!\n");
+                }
                 break;
         }
     }
@@ -138,6 +147,14 @@ void refreshMenu(SDL_Renderer *pRend, Menu *pMenu, ClientView *pView) {
     UI_buttonConfigure(b16,"Add Friend", pView->windowWidth * 0.8, pView->windowHeight * 0.85, SMALLBUTTONWIDTH, SMALLBUTTONHEIGHT,
         pRend, (SDL_Color){.r = 0, .g = 0, .b = 0, .a = 255}, pMenu->fonts[0],
         (SDL_Color){.r = 255, .g = 255, .b = 255, .a = 255});
+    
+    Button b17 = (Button)UI_panelGetComponent(pMenu->panels[PANEL_FRIENDS], "Join-Friend");
+    UI_buttonConfigure(b17, "Join", pView->windowWidth * 0.8, pView->windowHeight * 0.15,
+        SMALLBUTTONWIDTH, SMALLBUTTONHEIGHT, pRend,
+        (SDL_Color){0, 0, 0, 255},
+        pMenu->fonts[1],
+        (SDL_Color){255, 255, 255, 255}
+    );
 
     //ADDFRIENDS MENU /////////////////////
     Inputfield f2 = (Inputfield)UI_panelGetComponent(pMenu->panels[PANEL_ADDFRIEND], "AddFriend-input");
@@ -229,9 +246,9 @@ Menu initMenu(SDL_Renderer *pRend, ClientView *pView) {
     UI_panelAddComponent(menu.panels[PANEL_SOCIAL], b11, UI_BUTTON, "Friends-button");
     UI_panelSetComponentLink(menu.panels[PANEL_SOCIAL], "Friends-button", PANEL_FRIENDS); 
 
-    //FRIENDS MENU ////////////////////////
+    //FRIENDS MENU //////////////////////// (HÄR)
     UI_panelSetImage(pRend,menu.panels[PANEL_FRIENDS], "assets/images/menu/background2.png");
-
+    
     Button b12 = UI_buttonCreate();
     UI_panelAddComponent(menu.panels[PANEL_FRIENDS], b12, UI_BUTTON, "Friends-back");
     UI_panelSetComponentLink(menu.panels[PANEL_FRIENDS], "Friends-back", PANEL_SOCIAL);
@@ -239,6 +256,9 @@ Menu initMenu(SDL_Renderer *pRend, ClientView *pView) {
     Button b16 = UI_buttonCreate();
     UI_panelAddComponent(menu.panels[PANEL_FRIENDS],b16, UI_BUTTON, "Friends-AddFriend");
     UI_panelSetComponentLink(menu.panels[PANEL_FRIENDS],"Friends-AddFriend",PANEL_ADDFRIEND);
+
+    Button b17 = UI_buttonCreate();
+    UI_panelAddComponent(menu.panels[PANEL_FRIENDS], b17, UI_BUTTON, "Join-Friend");
 
     //ADDFRIENDS MENU ////////////////////////
     UI_panelSetImage(pRend, menu.panels[PANEL_ADDFRIEND], "assets/images/menu/background2.png");
