@@ -15,8 +15,6 @@ void renderPlayers(Client aClient, ClientView *pView) {
         {.r = 100, .g = 100, .b = 100, .a = 0}
     };
 
-    SDL_SetRenderDrawColor(pView->pRend, 0, 0, 50, 255);
-    SDL_RenderClear(pView->pRend);
     for(int i = 0; i < playerCount; i++) {
         SDL_Point pos = NET_clientGetPlayerPos(aClient, i);
 
@@ -24,7 +22,6 @@ void renderPlayers(Client aClient, ClientView *pView) {
         SDL_SetRenderDrawColor(pView->pRend, colors[i].r, colors[i].g, colors[i].b, colors[i].a);
         SDL_RenderFillRect(pView->pRend, &playerRect);
     }
-    SDL_RenderPresent(pView->pRend);
 }
 
 PlayerInputPacket prepareInputArray(ClientControl *pControl) {

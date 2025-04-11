@@ -21,8 +21,6 @@ struct Map {
 };
 
 void MAP_RenderMap(SDL_Renderer *pRend, Map aMap) {
-    SDL_SetRenderDrawColor(pRend, 0,0,0,0);
-    SDL_RenderClear(pRend);
     
     for(int y = 0; y < MAP_HEIGHT; y++) {
         for (int x = 0; x < MAP_WIDTH; x++) {
@@ -34,8 +32,6 @@ void MAP_RenderMap(SDL_Renderer *pRend, Map aMap) {
     SDL_SetRenderDrawColor(pRend, 255, 0, 0, 255);  // red
     //SDL_RenderDrawLine(pRend, 0, pRend.windowHeight / 2, pView->windowWidth / 2, pView->windowHeight / 2);   // diagonal line
     //SDL_RenderDrawLine(pRend, pView->windowWidth / 2, 0, pView->windowWidth / 2, pView->windowHeight / 2);   // vertical line
-
-    SDL_RenderPresent(pRend);
 }
 
 void MAP_RenderTiles(SDL_Renderer *pRend, Map aMap, int y, int x) {

@@ -55,9 +55,13 @@ void runLobby(Client aClient, Map aMap, ClientControl *pControl, ClientView *pVi
 
     NET_clientReceiver(aClient);
     
+    SDL_SetRenderDrawColor(pView->pRend, 0,0,0,0);
+    SDL_RenderClear(pView->pRend);
+
     MAP_RenderMap(pView->pRend, aMap);
     renderPlayers(aClient, pView);
     
+    SDL_RenderPresent(pView->pRend);
 }
 
 void runMenu(Client aClient, ClientControl *pControl, ClientView *pView, Menu *pMenu) {
