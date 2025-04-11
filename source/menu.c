@@ -5,6 +5,7 @@
 #include "../include/UI/inputfield.h"
 #include "../include/UI/friend.h"
 
+
 void renderMenu(SDL_Renderer *pRend, Menu *pMenu) {
     SDL_SetRenderDrawColor(pRend, 0,0,0,0);
     SDL_RenderClear(pRend);
@@ -19,7 +20,7 @@ void renderMenu(SDL_Renderer *pRend, Menu *pMenu) {
     SDL_RenderPresent(pRend);
 }
 
-void updateMenu(Menu *pMenu, ClientControl *pControl) {
+void updateMenu(Menu *pMenu, ClientControl *pControl, Client aClient) {
     static MenuEvent menuEvent;
     static int switchDelay = 0;
     switchDelay++;
@@ -353,5 +354,6 @@ void createNewUsername(Menu *pMenu, char *output){
     {
         fprintf(fp, "%s", output);
     }
+
     fclose(fp);
 }
