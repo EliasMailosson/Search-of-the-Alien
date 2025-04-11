@@ -14,6 +14,8 @@ void MAP_RenderTiles(SDL_Renderer *pRend, Map aMap, int y, int x);
 
 Map MAP_CreateMap(SDL_Renderer *pRend, int posX, int posY);
 
+void MAP_refreshMap(Map aMap, int posX, int posY);
+
 void MAP_loadTileSheet(SDL_Renderer* pRend, char *imagePath, Map aMap);
 
 void MAP_DestroyMap(Map aMap);

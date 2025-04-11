@@ -46,12 +46,14 @@ void runMenu(Client aClient, ClientControl *pControl, ClientView *pView, Menu *p
 }
 
 void runMap(Client aClient, ClientControl *pControl, ClientView *pView, Map aMap) {
+    static int toggleDelay = 0;
+    toggleDelay++;
+    if(pControl->keys[SDL_SCANCODE_F] && toggleDelay > 12) {
+        toggleFullscreen(pView);
+        MAP_refreshMap(aMap, pView->windowWidth, pView->windowHeight);
+        toggleDelay = 0;
+    }
     MAP_RenderMap(pView->pRend, aMap);
-    SDL_SetRenderDrawColor(pView->pRend, 255, 0, 0, 255);  // red
-    SDL_RenderDrawLine(pView->pRend, 0, pView->windowHeight / 2, pView->windowWidth / 2, pView->windowHeight / 2);   // diagonal line
-     SDL_RenderDrawLine(pView->pRend, pView->windowWidth / 2, 0, pView->windowWidth / 2, pView->windowHeight / 2);   // diagonal line
-    SDL_RenderPresent(pView->pRend);
-
 }
 
 void toggleFullscreen(ClientView *pView) {

@@ -47,7 +47,7 @@ Client NET_clientCreate(){
     }
     aClient->PlayerCount = 0;
     aClient->list = NULL;
-    aClient->state = LOBBY;
+    aClient->state = MENU;
     return aClient;
 }
 
