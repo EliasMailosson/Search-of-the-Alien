@@ -46,10 +46,14 @@ Client NET_clientCreate(){
     aClient->PlayerCount = 1;
     aClient->playerList[0].state = MENU;
     //aClient->playerList[0].username = "Caspar";
-    strcpy(aClient->playerList[0].username,"Caspar");
+    strcpy(aClient->playerList[0].username,"None");
     //aClient->selfUsername ="Caspar";
-    strcpy(aClient->selfUsername,"Caspar");
+    strcpy(aClient->selfUsername,"None");
     return aClient;
+}
+
+void NET_clientSetSelfName(Client aClient, char* newName) {
+    strcpy(aClient->selfUsername,newName);
 }
 
 int NET_clientGetState(Client aClient) {
