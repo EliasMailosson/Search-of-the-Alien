@@ -54,6 +54,7 @@ Client NET_clientCreate(){
 
 void NET_clientSetSelfName(Client aClient, char* newName) {
     strcpy(aClient->selfUsername,newName);
+    strcpy(aClient->playerList[0].username, newName);
 }
 
 void NET_getSelfname(Client aClient, char* outputName){

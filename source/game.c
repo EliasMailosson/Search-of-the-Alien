@@ -4,11 +4,15 @@
 
 void gameLoop(Client aClient, ClientControl *pControl, ClientView *pView){
     NET_clientConnect(aClient);
+
+    Menu menu = initMenu(pView->pRend, pView, aClient);
     char username[40];
     NET_getSelfname(aClient, username);
-    NET_clientSendString(aClient,MENU,CONNECT,username);
 
-    Menu menu = initMenu(pView->pRend, pView);
+    if(strcmp(username, "None") != 0) {
+        NET_clientSendString(aClient,MENU,CONNECT,username);
+    }
+    
     while (pControl->isRunning){
         eventHandler(pControl);
 
@@ -26,7 +30,10 @@ void gameLoop(Client aClient, ClientControl *pControl, ClientView *pView){
     }
 
     destroyMenu(&menu);
-    NET_clientSendString(aClient,MENU,DISCONNECT,username);
+    NET_getSelfname(aClient, username);
+    if(strcmp(username, "None") != 0) {
+        NET_clientSendString(aClient,MENU,DISCONNECT,username);
+    }
 }
 
 void runLobby(Client aClient, ClientControl *pControl, ClientView *pView) {

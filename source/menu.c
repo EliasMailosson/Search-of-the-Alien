@@ -48,7 +48,7 @@ void updateMenu(Menu *pMenu, ClientControl *pControl, Client aClient) {
                     char myUsername[40];
                     createNewUsername(pMenu, myUsername);
                     NET_clientSetSelfName(aClient, myUsername);
-                    // Lägg in myUsername till selfUsername i client.c structen clients
+                    NET_clientSendString(aClient,MENU,CONNECT,myUsername);
                 }
                 break;
             case BUTTON_CLICKED:
@@ -202,7 +202,7 @@ void refreshMenu(SDL_Renderer *pRend, Menu *pMenu, ClientView *pView) {
     );
 }
 
-Menu initMenu(SDL_Renderer *pRend, ClientView *pView) {
+Menu initMenu(SDL_Renderer *pRend, ClientView *pView, Client aClient) {
     Menu menu;
     menu.fonts[0] = TTF_OpenFont("assets/fonts/PricedownBl-Regular 900.ttf", 20);
     menu.fonts[1] = TTF_OpenFont("assets/fonts/PricedownBl-Regular 900.ttf", 40);
@@ -224,7 +224,7 @@ Menu initMenu(SDL_Renderer *pRend, ClientView *pView) {
     UI_panelAddComponent(menu.panels[PANEL_MYUSERNAME], b17, UI_BUTTON, "MyUsername");
     UI_panelSetComponentLink(menu.panels[PANEL_MYUSERNAME], "MyUsername", PANEL_START);
 
-    checkUsername(&menu);
+    checkUsername(&menu, aClient);
 
     // START MENU /////////////////////////
 
@@ -329,7 +329,7 @@ void destroyMenu(Menu *pMenu) {
     }
 }
 
-void checkUsername(Menu *pMenu){
+void checkUsername(Menu *pMenu, Client aClient){
     FILE *fp;
     fp = fopen("data/myUsername.txt", "r");
     if (fp == NULL)
@@ -342,6 +342,7 @@ void checkUsername(Menu *pMenu){
         fgets(username, 40, fp);
         printf("%s\n", username);
         pMenu->currentPanel = PANEL_START;
+        NET_clientSetSelfName(aClient, username);
     }
     fclose(fp);    
 }

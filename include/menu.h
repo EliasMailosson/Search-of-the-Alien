@@ -36,10 +36,10 @@ typedef struct menu {
 
 void renderMenu(SDL_Renderer *pRend, Menu *pMenu);
 void refreshMenu(SDL_Renderer *pRend, Menu *pMenu, ClientView *pView);
-Menu initMenu(SDL_Renderer *pRend, ClientView *pView);
+Menu initMenu(SDL_Renderer *pRend, ClientView *pView, Client aClient);
 void updateMenu(Menu *pMenu, ClientControl *pControl, Client aClient);
 void destroyMenu(Menu *pMenu);
-void checkUsername(Menu *pMenu);
+void checkUsername(Menu *pMenu, Client aClient);
 void createNewUsername(Menu *pMenu, char *output);
 
 #endif
