@@ -6,6 +6,7 @@ struct Player{
     SDL_Point pos;
 };
 struct client{
+    SDLNet_SocketSet socketSet;
     UDPsocket clientSocket;
     UDPpacket *pReceivePacket;
     UDPpacket *pSendPacket;
@@ -33,6 +34,15 @@ Client NET_clientCreate(){
         SDLNet_UDP_Close(aClient->clientSocket);
         return NULL;
     }
+    aClient->socketSet = SDLNet_AllocSocketSet(1);
+    if (!aClient->socketSet) {
+        fprintf(stderr, "SDLNet_AllocSocketSet failed: %s\n", SDLNet_GetError());
+        return NULL;
+    }
+        if (SDLNet_UDP_AddSocket(aClient->socketSet, aClient->clientSocket) == -1) {
+        fprintf(stderr, "SDLNet_UDP_AddSocket failed: %s\n", SDLNet_GetError());
+        return NULL;
+    }
        // Allocate packets
     aClient->pReceivePacket = SDLNet_AllocPacket(512);
     aClient->pSendPacket = SDLNet_AllocPacket(512);
@@ -45,9 +55,7 @@ Client NET_clientCreate(){
     }
     aClient->PlayerCount = 1;
     aClient->playerList[0].state = MENU;
-    //aClient->playerList[0].username = "Caspar";
     strcpy(aClient->playerList[0].username,"None");
-    //aClient->selfUsername ="Caspar";
     strcpy(aClient->selfUsername,"None");
     return aClient;
 }
@@ -88,6 +96,10 @@ void NET_clientDestroy(Client aClient){
         SDLNet_FreePacket(aClient->pSendPacket); 
         aClient->pSendPacket = NULL;
     }
+    if(aClient->socketSet != NULL){
+        SDLNet_FreeSocketSet(aClient->socketSet);
+        aClient->socketSet = NULL;
+    }
     if(aClient->clientSocket != NULL) {
         SDLNet_UDP_Close(aClient->clientSocket);
         aClient->clientSocket = NULL;
@@ -108,41 +120,48 @@ void NET_clientSendArray(Client aClient,GameState GS, MessageType msgType,const 
 }
 
 void NET_clientReceiver(Client aClient){
-    while (SDLNet_UDP_Recv(aClient->clientSocket, aClient->pReceivePacket)){
-        Packet aPacket = NET_packetDeserialize(aClient->pReceivePacket->data, aClient->pReceivePacket->len);
-        if(aPacket == NULL){
-            printf("Deserialization for Client failed! Buffer might be invalid.\n");
-            break;
-        } 
-        //Handle recieving packets from the server
-        switch (NET_packetGetMessageType(aPacket)){
-        case CONNECT_RESPONSE:
-            // printf("received %d\n",*((int*)NET_packetGetPayload(aPacket)));
-            break;
-        case DISCONNECT_RESPONSE:
-            // playerID = (char*)NET_packetGetPayload(aPacket);
-            // index = NET_clientFindPlayer(aClient,playerID);
-            // NET_PlayerListRemovePlayer(&aClient->playerList[NET_clientFindPlayer(aClient,playerID)],
-            //                             index,&aClient->PlayerCount);
-            NET_clientUpdatePlayerList(aClient,aPacket);
-            break;
-        case JOIN_LOBBY_RESPONSE:
-            //NET_PlayerListUpdate(aPacket,aClient->list,&aClient->PlayerCount);
-            break;
-        case LOBBY_LIST:
-            NET_clientUpdatePlayerList(aClient,aPacket);
-            break;
-        case PRINT:
-            printf("%s\n",NET_packetGetPayload(aPacket));
-            break;
-        case CHANGE_GAME_STATE_RESPONSE:
-            NET_clientUpdateGameState(aClient,aPacket);
-            break;
-        default:
-            printf("client recieved invalid msgType: %d!!\n", NET_packetGetMessageType(aPacket));
-            break;
+    int numReady = SDLNet_CheckSockets(aClient->socketSet, 100); 
+    if (numReady == -1) {
+        fprintf(stderr, "SDLNet_CheckSockets error: %s\n", SDLNet_GetError());
+        return;
+    }
+    if(numReady > 0 && SDLNet_SocketReady(aClient->clientSocket)){
+        while (SDLNet_UDP_Recv(aClient->clientSocket, aClient->pReceivePacket)){
+            Packet aPacket = NET_packetDeserialize(aClient->pReceivePacket->data, aClient->pReceivePacket->len);
+            if(aPacket == NULL){
+                printf("Deserialization for Client failed! Buffer might be invalid.\n");
+                break;
+            } 
+            //Handle recieving packets from the server
+            switch (NET_packetGetMessageType(aPacket)){
+            case CONNECT_RESPONSE:
+                // printf("received %d\n",*((int*)NET_packetGetPayload(aPacket)));
+                break;
+            case DISCONNECT_RESPONSE:
+                // playerID = (char*)NET_packetGetPayload(aPacket);
+                // index = NET_clientFindPlayer(aClient,playerID);
+                // NET_PlayerListRemovePlayer(&aClient->playerList[NET_clientFindPlayer(aClient,playerID)],
+                //                             index,&aClient->PlayerCount);
+                NET_clientUpdatePlayerList(aClient,aPacket);
+                break;
+            case JOIN_LOBBY_RESPONSE:
+                //NET_PlayerListUpdate(aPacket,aClient->list,&aClient->PlayerCount);
+                break;
+            case LOBBY_LIST:
+                NET_clientUpdatePlayerList(aClient,aPacket);
+                break;
+            case PRINT:
+                printf("%s\n",NET_packetGetPayload(aPacket));
+                break;
+            case CHANGE_GAME_STATE_RESPONSE:
+                NET_clientUpdateGameState(aClient,aPacket);
+                break;
+            default:
+                printf("client recieved invalid msgType: %d!!\n", NET_packetGetMessageType(aPacket));
+                break;
+            }
+            if(aPacket) NET_packetDestroy(aPacket);
         }
-        if(aPacket) NET_packetDestroy(aPacket);
     }
 }
 

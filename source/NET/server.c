@@ -22,9 +22,6 @@ struct server{
 
 int main(int argc, char **argv ){
     (void)argc; (void)argv;
-    // PlayerP player[10];
-    // int playerCount;
-
     NET_serverInitSDL();
     Server aServer = {0};
     aServer = NET_serverCreate();
