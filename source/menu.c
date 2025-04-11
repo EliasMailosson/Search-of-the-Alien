@@ -43,6 +43,11 @@ void updateMenu(Menu *pMenu, ClientControl *pControl) {
                     }
                     switchDelay = 0;
                 }
+                if (strcmp("MyUsername", menuEvent.key) == 0){
+                    char myUsername[40];
+                    createNewUsername(pMenu, myUsername);
+                    // Lägg in myUsername till selfUsername i client.c structen clients
+                }
                 break;
             case BUTTON_CLICKED:
                 if (strcmp("Quit", menuEvent.key) == 0) {
@@ -69,6 +74,15 @@ void refreshMenu(SDL_Renderer *pRend, Menu *pMenu, ClientView *pView) {
         );
         UI_panelSetActive(pMenu->panels[i], (i == pMenu->currentPanel));
     }
+
+    // INPUT MY USERNAME /////////////////////////
+    Inputfield f3 = (Inputfield)UI_panelGetComponent(pMenu->panels[PANEL_MYUSERNAME], "MyUsername-input");
+    UI_inputfieldSetAppearance(pRend, f3, pView->windowWidth / 2 - 150, 260, BIGBUTTONWIDTH,
+        (SDL_Color){0,0,0,0}, (SDL_Color){255,255,255,255}, pMenu->fonts[1]);
+
+    Button b17 = (Button)UI_panelGetComponent(pMenu->panels[PANEL_MYUSERNAME], "MyUsername");
+    UI_buttonConfigure(b17, "Submit Username", pView->windowWidth / 2 - 200, 250 + OFFSET, 400, BIGBUTTONHEIGHT,
+        pRend, (SDL_Color){0,0,0,255}, pMenu->fonts[1], (SDL_Color){255,255,255,255});
 
     // START MENU /////////////////////////
     Button b1 = (Button)UI_panelGetComponent(pMenu->panels[PANEL_START], "Start Game");
@@ -197,7 +211,21 @@ Menu initMenu(SDL_Renderer *pRend, ClientView *pView) {
         menu.panels[i] = UI_panelCreate();
     }
 
+    // INPUT USERNAME /////////////////////////
+
+    UI_panelSetImage(pRend, menu.panels[PANEL_MYUSERNAME], "assets/images/menu/background_username.png");
+
+    Inputfield f3 = UI_inputfieldCreate();
+    UI_panelAddComponent(menu.panels[PANEL_MYUSERNAME], f3, UI_INPUTFIELD, "MyUsername-input");
+
+    Button b17 = UI_buttonCreate();
+    UI_panelAddComponent(menu.panels[PANEL_MYUSERNAME], b17, UI_BUTTON, "MyUsername");
+    UI_panelSetComponentLink(menu.panels[PANEL_MYUSERNAME], "MyUsername", PANEL_START);
+
+    checkUsername(&menu);
+
     // START MENU /////////////////////////
+
     UI_panelSetImage(pRend, menu.panels[PANEL_START], "assets/images/menu/menu-background.png");
 
     Button b1 = UI_buttonCreate();
@@ -297,4 +325,33 @@ void destroyMenu(Menu *pMenu) {
         TTF_CloseFont(pMenu->fonts[i]);
         pMenu->fonts[i] = NULL;
     }
+}
+
+void checkUsername(Menu *pMenu){
+    FILE *fp;
+    fp = fopen("data/myUsername.txt", "r");
+    if (fp == NULL)
+    {
+        pMenu->currentPanel = PANEL_MYUSERNAME;
+    }
+    else
+    {
+        char username[40];
+        fgets(username, 40, fp);
+        printf("%s\n", username);
+        pMenu->currentPanel = PANEL_START;
+    }
+    fclose(fp);    
+}
+
+void createNewUsername(Menu *pMenu, char *output){
+    Inputfield input = UI_panelGetComponent(pMenu->panels[PANEL_MYUSERNAME], "MyUsername-input");
+    UI_inputfieldGetBuffer(input, output);
+    FILE *fp ;
+    fp = fopen("data/myUsername.txt", "w");
+    if (fp != NULL)
+    {
+        fprintf(fp, "%s", output);
+    }
+    fclose(fp);
 }

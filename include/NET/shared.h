@@ -7,10 +7,19 @@
 #include <stdbool.h>
 
 #include "../../include/NET/protocol.h"
+#include "server.h"
 
 #define MAX_CLIENTS 8
 #define PORT 1234
 #define JON_IP "130.229.143.255"
+
+struct friends
+{
+    char username[40];
+    int friendCount;
+};
+
+typedef struct friends Friends;
 
 /** Initializes SDL network 
  * ex use: While true then the network is running
@@ -30,7 +39,10 @@ typedef struct{
 void NET_PlayerListRemovePlayer(PlayerPacket **list, int index, int *listCount);
 void NET_PlayerListAddPlayer(PlayerPacket **list,PlayerPacket newPlayer,int *listCount);
 
-void NET_PlayerListRead(PlayerPacket *new_player);
+void NET_PlayerListRead(int *playerCount, Friends player[]);
+void NET_PlayerListUpdateFile(int playerCount, Friends player[]);
+Friends newPlayer(char username[]);
+
 void NET_PlayerListUpdate(Packet aPacket, PlayerPacket* list, int *count);
 void NET_PlayerListPrintf(PlayerPacket* list, int count);
 void NET_eventHandler(bool *pIsRunning, bool *pKeys,SDL_Event event);

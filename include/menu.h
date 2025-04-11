@@ -13,7 +13,7 @@
 #define SMALLBUTTONWIDTH 200
 #define SMALLBUTTONHEIGHT 40
 
-enum MenuPanels {PANEL_START, PANEL_GAMESELECTION, PANEL_SOCIAL, PANEL_OPTIONS,PANEL_FRIENDS,PANEL_ADDFRIEND, PANEL_USERNAME};
+enum MenuPanels {PANEL_START, PANEL_GAMESELECTION, PANEL_SOCIAL, PANEL_OPTIONS,PANEL_FRIENDS,PANEL_ADDFRIEND, PANEL_MYUSERNAME};
 enum MenuEvents {PANEL_IDLE, BUTTON_CLICKED, CHECKLIST_UPDATED, PANEL_SWITCH};
 
 typedef struct menuEvent {
@@ -39,5 +39,7 @@ void refreshMenu(SDL_Renderer *pRend, Menu *pMenu, ClientView *pView);
 Menu initMenu(SDL_Renderer *pRend, ClientView *pView);
 void updateMenu(Menu *pMenu, ClientControl *pControl);
 void destroyMenu(Menu *pMenu);
+void checkUsername(Menu *pMenu);
+void createNewUsername(Menu *pMenu, char *output);
 
 #endif

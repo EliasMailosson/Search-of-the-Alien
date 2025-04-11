@@ -16,6 +16,7 @@ typedef struct {
     SDL_Renderer *pRend;
     int windowHeight, windowWidth;
     bool windowFullscreen;
+    char myUsername[40];
 }ClientView; 
 
 typedef struct {
