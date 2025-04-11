@@ -120,7 +120,7 @@ void NET_clientSendArray(Client aClient,GameState GS, MessageType msgType,const 
 }
 
 void NET_clientReceiver(Client aClient){
-    int numReady = SDLNet_CheckSockets(aClient->socketSet, 100); 
+    int numReady = SDLNet_CheckSockets(aClient->socketSet, 10); 
     if (numReady == -1) {
         fprintf(stderr, "SDLNet_CheckSockets error: %s\n", SDLNet_GetError());
         return;

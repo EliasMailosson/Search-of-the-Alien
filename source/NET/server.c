@@ -34,7 +34,7 @@ int main(int argc, char **argv ){
         printf("UDP server started on port %d\n", PORT);
     } 
     while (isRunning){
-        int numReady = SDLNet_CheckSockets(aServer->socketSet, 100); 
+        int numReady = SDLNet_CheckSockets(aServer->socketSet, 10); 
         if (numReady == -1) {
             fprintf(stderr, "SDLNet_CheckSockets error: %s\n", SDLNet_GetError());
             break;
