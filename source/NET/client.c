@@ -56,6 +56,10 @@ void NET_clientSetSelfName(Client aClient, char* newName) {
     strcpy(aClient->selfUsername,newName);
 }
 
+void NET_getSelfname(Client aClient, char* outputName){
+    strcpy(outputName, aClient->selfUsername);
+}
+
 int NET_clientGetState(Client aClient) {
     for (int i = 0; i < aClient->PlayerCount; i++){
         if(strcmp(aClient->selfUsername,aClient->playerList[i].username) == 0) return aClient->playerList[i].state;

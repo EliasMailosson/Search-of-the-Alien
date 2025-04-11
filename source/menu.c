@@ -47,6 +47,7 @@ void updateMenu(Menu *pMenu, ClientControl *pControl, Client aClient) {
                 if (strcmp("MyUsername", menuEvent.key) == 0){
                     char myUsername[40];
                     createNewUsername(pMenu, myUsername);
+                    NET_clientSetSelfName(aClient, myUsername);
                     // Lägg in myUsername till selfUsername i client.c structen clients
                 }
                 break;
