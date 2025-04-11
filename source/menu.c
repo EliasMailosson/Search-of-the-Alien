@@ -3,6 +3,7 @@
 #include "../include/UI/button.h"
 #include "../include/UI/checklist.h"
 #include "../include/UI/inputfield.h"
+#include "../include/UI/friend.h"
 
 void renderMenu(SDL_Renderer *pRend, Menu *pMenu) {
     SDL_SetRenderDrawColor(pRend, 0,0,0,0);
@@ -10,6 +11,11 @@ void renderMenu(SDL_Renderer *pRend, Menu *pMenu) {
     for(int i = 0; i < PANEL_COUNT; i++) {
         UI_panelRender(pRend, pMenu->panels[i]);
     }
+
+    if (pMenu->currentPanel == PANEL_FRIENDS) {
+        UI_DrawFriendList(pRend, pMenu->fonts[0]);
+    }
+
     SDL_RenderPresent(pRend);
 }
 
@@ -37,6 +43,11 @@ void updateMenu(Menu *pMenu, ClientControl *pControl) {
                     }
                     switchDelay = 0;
                 }
+                if (strcmp("MyUsername", menuEvent.key) == 0){
+                    char myUsername[40];
+                    createNewUsername(pMenu, myUsername);
+                    // Lägg in myUsername till selfUsername i client.c structen clients
+                }
                 break;
             case BUTTON_CLICKED:
                 if (strcmp("Quit", menuEvent.key) == 0) {
@@ -46,7 +57,10 @@ void updateMenu(Menu *pMenu, ClientControl *pControl) {
                 if (strcmp("New-Game", menuEvent.key) == 0) {
                     pMenu->isGameStarted = true;
                 }
-                
+                if (strcmp("Join-Friend", menuEvent.key) == 0) {
+                    
+                    printf("Join friend clicked!\n");
+                }
                 break;
         }
     }
@@ -60,6 +74,15 @@ void refreshMenu(SDL_Renderer *pRend, Menu *pMenu, ClientView *pView) {
         );
         UI_panelSetActive(pMenu->panels[i], (i == pMenu->currentPanel));
     }
+
+    // INPUT MY USERNAME /////////////////////////
+    Inputfield f3 = (Inputfield)UI_panelGetComponent(pMenu->panels[PANEL_MYUSERNAME], "MyUsername-input");
+    UI_inputfieldSetAppearance(pRend, f3, pView->windowWidth / 2 - 150, 260, BIGBUTTONWIDTH,
+        (SDL_Color){0,0,0,0}, (SDL_Color){255,255,255,255}, pMenu->fonts[1]);
+
+    Button b17 = (Button)UI_panelGetComponent(pMenu->panels[PANEL_MYUSERNAME], "MyUsername");
+    UI_buttonConfigure(b17, "Submit Username", pView->windowWidth / 2 - 200, 250 + OFFSET, 400, BIGBUTTONHEIGHT,
+        pRend, (SDL_Color){0,0,0,255}, pMenu->fonts[1], (SDL_Color){255,255,255,255});
 
     // START MENU /////////////////////////
     Button b1 = (Button)UI_panelGetComponent(pMenu->panels[PANEL_START], "Start Game");
@@ -106,22 +129,68 @@ void refreshMenu(SDL_Renderer *pRend, Menu *pMenu, ClientView *pView) {
     );
 
     // SOCIAL MENU ////////////////////////
-    Inputfield f1 = (Inputfield)UI_panelGetComponent(pMenu->panels[PANEL_SOCIAL], "Social-input");
-    UI_inputfieldSetAppearance(pRend, f1, pView->windowWidth / 2 - 150, 150 + OFFSET, BIGBUTTONWIDTH,
-        (SDL_Color) {.r = 0, .b = 0, .g = 0, .a = 0}, (SDL_Color) {.r = 255, .b = 255, .g = 255, .a =255}, pMenu->fonts[0]
-    );
+    // Inputfield f1 = (Inputfield)UI_panelGetComponent(pMenu->panels[PANEL_SOCIAL], "Social-input"); //Panel switch
+    // UI_inputfieldSetAppearance(pRend, f1, pView->windowWidth / 2 - 150, 150 + OFFSET, BIGBUTTONWIDTH,
+    //     (SDL_Color) {.r = 0, .b = 0, .g = 0, .a = 0}, (SDL_Color) {.r = 255, .b = 255, .g = 255, .a =255}, pMenu->fonts[0]
+    // );
 
-    Button b5 = (Button)UI_panelGetComponent(pMenu->panels[PANEL_SOCIAL], "Social-back");
+    Button b5 = (Button)UI_panelGetComponent(pMenu->panels[PANEL_SOCIAL], "Social-back"); // "back" knappen  
     UI_buttonConfigure(b5, "Back", 
         pView->windowWidth*0.08, pView->windowHeight*0.85, SMALLBUTTONWIDTH, SMALLBUTTONHEIGHT, pRend, (SDL_Color) { .r = 0, .g = 0, .b = 0, .a = 255 }, 
         pMenu->fonts[0], (SDL_Color) { .r = 255, .g = 255, .b = 255, .a = 255 }
     );
 
-    Button b6 = (Button)UI_panelGetComponent(pMenu->panels[PANEL_SOCIAL], "Join-button");
-    UI_buttonConfigure(b6, "Join", pView->windowWidth / 2 - 150, 150 + OFFSET*2, BIGBUTTONWIDTH, BIGBUTTONHEIGHT, pRend,
+    Button b6 = (Button)UI_panelGetComponent(pMenu->panels[PANEL_SOCIAL], "AddFriend-button"); //
+    UI_buttonConfigure(b6, "Add Friend", pView->windowWidth / 2 - 150, 150 + OFFSET*1, BIGBUTTONWIDTH, BIGBUTTONHEIGHT, pRend,
+        (SDL_Color) { .r = 0, .g = 0, .b = 0, .a = 255 }, 
+        pMenu->fonts[1], (SDL_Color) { .r = 255, .g = 255, .b = 255, .a = 255 } 
+    );
+
+    Button b11 = (Button)UI_panelGetComponent(pMenu->panels[PANEL_SOCIAL],"Friends-button");
+    UI_buttonConfigure(b11,"Friends", pView->windowWidth / 2 - 150, 150 + OFFSET*2, BIGBUTTONWIDTH, BIGBUTTONHEIGHT, pRend,
         (SDL_Color) { .r = 0, .g = 0, .b = 0, .a = 255 }, 
         pMenu->fonts[1], (SDL_Color) { .r = 255, .g = 255, .b = 255, .a = 255 }
     );
+    //FRIENDS MENU ////////////////////////
+    Button b12 = (Button)UI_panelGetComponent(pMenu->panels[PANEL_FRIENDS], "Friends-back");
+    UI_buttonConfigure(b12, "Back", pView->windowWidth * 0.08, pView->windowHeight * 0.85, SMALLBUTTONWIDTH, SMALLBUTTONHEIGHT,
+        pRend, (SDL_Color){.r = 0, .g = 0, .b = 0, .a = 255}, pMenu->fonts[0],
+        (SDL_Color){.r = 255, .g = 255, .b = 255, .a = 255});
+
+    Button b16 = (Button)UI_panelGetComponent(pMenu->panels[PANEL_FRIENDS], "Friends-AddFriend");
+    UI_buttonConfigure(b16,"Add Friend", pView->windowWidth * 0.8, pView->windowHeight * 0.85, SMALLBUTTONWIDTH, SMALLBUTTONHEIGHT,
+        pRend, (SDL_Color){.r = 0, .g = 0, .b = 0, .a = 255}, pMenu->fonts[0],
+        (SDL_Color){.r = 255, .g = 255, .b = 255, .a = 255});
+    
+    Button b17 = (Button)UI_panelGetComponent(pMenu->panels[PANEL_FRIENDS], "Join-Friend");
+    UI_buttonConfigure(b17, "Join", pView->windowWidth * 0.8, pView->windowHeight * 0.15,
+        SMALLBUTTONWIDTH, SMALLBUTTONHEIGHT, pRend,
+        (SDL_Color){0, 0, 0, 255},
+        pMenu->fonts[1],
+        (SDL_Color){255, 255, 255, 255}
+    );
+
+    //ADDFRIENDS MENU /////////////////////
+    Inputfield f2 = (Inputfield)UI_panelGetComponent(pMenu->panels[PANEL_ADDFRIEND], "AddFriend-input");
+    UI_inputfieldSetAppearance(pRend, f2, pView->windowWidth / 2 - 150, 150 + OFFSET,
+        BIGBUTTONWIDTH, (SDL_Color){.r = 0, .b = 0, .g = 0, .a = 0}, 
+        (SDL_Color){.r = 255, .b = 255, .g = 255, .a =255}, pMenu->fonts[0]);
+    
+    Button b14 = (Button)UI_panelGetComponent(pMenu->panels[PANEL_ADDFRIEND], "AddFriend-Add");
+    UI_buttonConfigure(b14, "Add Friend", pView->windowWidth / 2 - 150, 150 + OFFSET*2, BIGBUTTONWIDTH, BIGBUTTONHEIGHT, pRend,
+        (SDL_Color){.r = 0, .g = 0, .b = 0, .a = 255}, pMenu->fonts[1],
+        (SDL_Color){.r = 255, .g = 255, .b = 255, .a = 255});
+    
+    Button b13 = (Button)UI_panelGetComponent(pMenu->panels[PANEL_ADDFRIEND], "AddFriend-back");
+    UI_buttonConfigure(b13, "Back", pView->windowWidth * 0.08, pView->windowHeight * 0.85, SMALLBUTTONWIDTH, SMALLBUTTONHEIGHT,
+        pRend, (SDL_Color){.r = 0, .g = 0, .b = 0, .a = 255}, pMenu->fonts[0],
+        (SDL_Color){.r = 255, .g = 255, .b = 255, .a = 255});
+
+    Button b15 = (Button)UI_panelGetComponent(pMenu->panels[PANEL_ADDFRIEND], "AddFriend-Friends");
+    UI_buttonConfigure(b15,"Friends", pView->windowWidth * 0.8, pView->windowHeight * 0.85, SMALLBUTTONWIDTH, SMALLBUTTONHEIGHT,
+        pRend, (SDL_Color){.r = 0, .g = 0, .b = 0, .a = 255}, pMenu->fonts[0],
+        (SDL_Color){.r = 255, .g = 255, .b = 255, .a = 255});
+
 
     // OPTIONS MENU ////////////////////////
     Button b7 = (Button)UI_panelGetComponent(pMenu->panels[PANEL_OPTIONS], "Options-back");
@@ -142,7 +211,21 @@ Menu initMenu(SDL_Renderer *pRend, ClientView *pView) {
         menu.panels[i] = UI_panelCreate();
     }
 
+    // INPUT USERNAME /////////////////////////
+
+    UI_panelSetImage(pRend, menu.panels[PANEL_MYUSERNAME], "assets/images/menu/background_username.png");
+
+    Inputfield f3 = UI_inputfieldCreate();
+    UI_panelAddComponent(menu.panels[PANEL_MYUSERNAME], f3, UI_INPUTFIELD, "MyUsername-input");
+
+    Button b17 = UI_buttonCreate();
+    UI_panelAddComponent(menu.panels[PANEL_MYUSERNAME], b17, UI_BUTTON, "MyUsername");
+    UI_panelSetComponentLink(menu.panels[PANEL_MYUSERNAME], "MyUsername", PANEL_START);
+
+    checkUsername(&menu);
+
     // START MENU /////////////////////////
+
     UI_panelSetImage(pRend, menu.panels[PANEL_START], "assets/images/menu/menu-background.png");
 
     Button b1 = UI_buttonCreate();
@@ -176,16 +259,51 @@ Menu initMenu(SDL_Renderer *pRend, ClientView *pView) {
     // SOCIAL MENU ////////////////////////
     UI_panelSetImage(pRend, menu.panels[PANEL_SOCIAL], "assets/images/menu/background2.png");
 
-    Inputfield f1 = UI_inputfieldCreate();
-    UI_panelAddComponent(menu.panels[PANEL_SOCIAL], f1, UI_INPUTFIELD, "Social-input");
+    // Inputfield f1 = UI_inputfieldCreate();
+    // UI_panelAddComponent(menu.panels[PANEL_SOCIAL], f1, UI_INPUTFIELD, "Social-input");
 
     Button b5 = UI_buttonCreate();
     UI_panelAddComponent(menu.panels[PANEL_SOCIAL], b5, UI_BUTTON, "Social-back");
     UI_panelSetComponentLink(menu.panels[PANEL_SOCIAL], "Social-back", PANEL_START);
 
     Button b6 = UI_buttonCreate();
-    UI_panelAddComponent(menu.panels[PANEL_SOCIAL], b6, UI_BUTTON, "Join-button");
-    UI_panelSetComponentLink(menu.panels[PANEL_SOCIAL], "Join-button", PANEL_START);
+    UI_panelAddComponent(menu.panels[PANEL_SOCIAL], b6, UI_BUTTON, "AddFriend-button");
+    UI_panelSetComponentLink(menu.panels[PANEL_SOCIAL], "AddFriend-button", PANEL_ADDFRIEND);
+
+    Button b11 = UI_buttonCreate();
+    UI_panelAddComponent(menu.panels[PANEL_SOCIAL], b11, UI_BUTTON, "Friends-button");
+    UI_panelSetComponentLink(menu.panels[PANEL_SOCIAL], "Friends-button", PANEL_FRIENDS); 
+
+    //FRIENDS MENU //////////////////////// (HÄR)
+    UI_panelSetImage(pRend,menu.panels[PANEL_FRIENDS], "assets/images/menu/background2.png");
+    
+    Button b12 = UI_buttonCreate();
+    UI_panelAddComponent(menu.panels[PANEL_FRIENDS], b12, UI_BUTTON, "Friends-back");
+    UI_panelSetComponentLink(menu.panels[PANEL_FRIENDS], "Friends-back", PANEL_SOCIAL);
+
+    Button b16 = UI_buttonCreate();
+    UI_panelAddComponent(menu.panels[PANEL_FRIENDS],b16, UI_BUTTON, "Friends-AddFriend");
+    UI_panelSetComponentLink(menu.panels[PANEL_FRIENDS],"Friends-AddFriend",PANEL_ADDFRIEND);
+
+    Button b17 = UI_buttonCreate();
+    UI_panelAddComponent(menu.panels[PANEL_FRIENDS], b17, UI_BUTTON, "Join-Friend");
+
+    //ADDFRIENDS MENU ////////////////////////
+    UI_panelSetImage(pRend, menu.panels[PANEL_ADDFRIEND], "assets/images/menu/background2.png");
+
+    Inputfield f2 = UI_inputfieldCreate();
+    UI_panelAddComponent(menu.panels[PANEL_ADDFRIEND], f2, UI_INPUTFIELD, "AddFriend-input");
+    
+    Button b13 = UI_buttonCreate();
+    UI_panelAddComponent(menu.panels[PANEL_ADDFRIEND], b13, UI_BUTTON, "AddFriend-back");
+    UI_panelSetComponentLink(menu.panels[PANEL_ADDFRIEND], "AddFriend-back", PANEL_SOCIAL);
+
+    Button b14 = UI_buttonCreate();
+    UI_panelAddComponent(menu.panels[PANEL_ADDFRIEND], b14, UI_BUTTON, "AddFriend-Add");
+
+    Button b15 = UI_buttonCreate();
+    UI_panelAddComponent(menu.panels[PANEL_ADDFRIEND], b15, UI_BUTTON, "AddFriend-Friends");
+    UI_panelSetComponentLink(menu.panels[PANEL_ADDFRIEND], "AddFriend-Friends",PANEL_FRIENDS);
 
     // OPTIONS MENU ////////////////////////
     UI_panelSetImage(pRend, menu.panels[PANEL_OPTIONS], "assets/images/menu/background3.png");
@@ -207,4 +325,33 @@ void destroyMenu(Menu *pMenu) {
         TTF_CloseFont(pMenu->fonts[i]);
         pMenu->fonts[i] = NULL;
     }
+}
+
+void checkUsername(Menu *pMenu){
+    FILE *fp;
+    fp = fopen("data/myUsername.txt", "r");
+    if (fp == NULL)
+    {
+        pMenu->currentPanel = PANEL_MYUSERNAME;
+    }
+    else
+    {
+        char username[40];
+        fgets(username, 40, fp);
+        printf("%s\n", username);
+        pMenu->currentPanel = PANEL_START;
+    }
+    fclose(fp);    
+}
+
+void createNewUsername(Menu *pMenu, char *output){
+    Inputfield input = UI_panelGetComponent(pMenu->panels[PANEL_MYUSERNAME], "MyUsername-input");
+    UI_inputfieldGetBuffer(input, output);
+    FILE *fp ;
+    fp = fopen("data/myUsername.txt", "w");
+    if (fp != NULL)
+    {
+        fprintf(fp, "%s", output);
+    }
+    fclose(fp);
 }

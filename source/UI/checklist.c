@@ -3,6 +3,9 @@
 #include <string.h>
 #include <stdbool.h>
 
+#define ITEMS 20
+#define CHECKBOXES 3
+
 typedef struct Item { 
     bool is_Checked;
 } Item;
@@ -11,10 +14,8 @@ typedef struct Checklist {
     int x, y;
     int checklist_count;
     SDL_Rect Rect;
-    Item items[20];
+    Item items[ITEMS];
 } *Checklist;
-
-
 
 Checklist UI_checklistCreate(){
     Checklist aChecklist = malloc(sizeof(struct Checklist));
@@ -22,10 +23,9 @@ Checklist UI_checklistCreate(){
         return NULL;
     }
     
-
     aChecklist->x = 400;
     aChecklist->y = 300;
-    aChecklist->checklist_count = 3;
+    aChecklist->checklist_count = CHECKBOXES;
     aChecklist->Rect.x = 200;
     aChecklist->Rect.y = 150;
     aChecklist->Rect.w = 30;
@@ -39,7 +39,6 @@ Checklist UI_checklistCreate(){
     return aChecklist;
 }
 
-
 void UI_checklistRendrer(SDL_Renderer* pRend, Checklist achecklist){
     for (int i = 0; i < achecklist->checklist_count; i++){
         SDL_Rect checkboxRect = achecklist->Rect;
@@ -49,7 +48,7 @@ void UI_checklistRendrer(SDL_Renderer* pRend, Checklist achecklist){
         SDL_RenderDrawRect(pRend,&checkboxRect);
 
         // if (achecklist->items[i].is_Checked) {
-        //     SDL_SetRenderDrawColor(pRend, 0, 255, 0, 255);  //färg på själva checkmarken
+        //     SDL_SetRenderDrawColor(pRend, 0, 255, 0, 255);  //färg på bakgrunden
         //     SDL_RenderFillRect(pRend, &checkboxRect);
         // }
 

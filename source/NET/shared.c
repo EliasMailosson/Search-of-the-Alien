@@ -18,19 +18,57 @@ void NET_serverDestroySDL(){
     SDL_Quit();
 }
 
-// beöver fixa
-// när vi gör player list (sträng)
-void NET_PlayerListRead(char* selfUsername){
-    FILE *fp;
-    fp = fopen("data/playerlist.txt", "r");
-    if(fp != NULL)
-    {
-        fscanf(fp,"%c", selfUsername);
+void NET_PlayerListUpdate(Packet aPacket, PlayerPacket* list, int *count){
+    Uint8* raw = NET_packetGetPayload(aPacket);
+    Uint32 size = NET_packetGetPayloadSize(aPacket);
+    if(!raw){
+        printf("Raw error!");
     }
-    fclose(fp);
-    printf("%s\n", selfUsername);
+    list = (PlayerPacket*)raw;
+    if(!list){
+        printf("list error!");
+    }
+    (*count) = size / sizeof(PlayerPacket);
 }
 
+void NET_PlayerListPrintf(PlayerPacket* list, int count){
+    for (int i = 0; i < count; i++){
+        printf("index %d, ID %s, pos X %d, pos Y %d",i,list[i].ID,list[i].pos.x,list[i].pos.y);
+    }
+}
+
+void NET_PlayerListRemovePlayer(PlayerPacket **list, int index, int *listCount){
+    if (index < 0 || index >= (*listCount)) {
+        printf("Invalid index\n");
+        return;
+    }
+    for (int i = index; i < (*listCount) - 1; i++) {
+        (*list)[i] = (*list)[i + 1];
+    }
+    (*listCount)--;
+    if ((*listCount) > 0) {
+        PlayerPacket *temp = realloc(*list, (*listCount) * sizeof(PlayerPacket));
+        if (temp == NULL) {
+            printf("Realloc failed when removing PlayerPacket\n");
+            return;
+        }
+        *list = temp;
+    } else {
+        free(*list);
+        *list = NULL;
+    }
+}
+
+void NET_PlayerListAddPlayer(PlayerPacket **list, PlayerPacket newPlayer, int *listCount){
+    PlayerPacket *temp = realloc(*list, ((*listCount) + 1) * sizeof(PlayerPacket));
+    if (temp != NULL) {
+        *list = temp;
+        (*list)[*listCount] = newPlayer;
+        (*listCount)++;
+    } else {
+        printf("Realloc failed when adding to the PlayerPacket!\n");
+    }
+}
 
 void NET_eventHandler(bool *pIsRunning, bool *pKeys,SDL_Event event){
     while (SDL_PollEvent(&event)){
@@ -47,4 +85,45 @@ void NET_eventHandler(bool *pIsRunning, bool *pKeys,SDL_Event event){
             break;
         }
     }    
+}
+
+Friends newPlayer(char username[]){
+    Friends p;
+    strcpy(p.username, username);
+    return p;
+}
+
+// beöver fixa
+// när vi gör player list (sträng)
+void NET_PlayerListRead(int *playerCount, Friends player[]){
+    FILE *fp;
+    fp = fopen("data/playerlist.txt", "r");
+    if(fp != NULL)
+    {
+        char username[40];
+        fscanf(fp,"%d", &*playerCount);
+        for (int i = 0; i < *playerCount; i++)
+        {
+            fscanf(fp,"%s", username);
+            player[i] = newPlayer(username);
+        }
+        
+    }
+    fclose(fp);
+}
+
+void NET_PlayerListUpdateFile(int playerCount, Friends player[]){
+    FILE *fp;
+    fp = fopen("data/playerlist.txt", "w");
+    if (fp != NULL)
+    {
+      fprintf(fp,"%d\n", playerCount);
+      for (int i = 0; i < playerCount; i++)
+      {
+        fprintf(fp,"%s ", player[i].username);
+
+        fprintf(fp,"\n");
+      }
+    }
+    fclose(fp);
 }
