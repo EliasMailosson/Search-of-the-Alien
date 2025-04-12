@@ -32,8 +32,8 @@ void updateMenu(Menu *pMenu, ClientControl *pControl, Client aClient, FriendList
 
     pMenu->isGameStarted = false;
 
-    for(int i = 0; i < PANEL_COUNT; i++) {
-        UI_panelUpdate(pMenu->panels[i], &menuEvent, pControl->isMouseUp, pControl->keys);
+    // behöver dubbel kollas med UI gänget om det är hållbart istället för en for loop
+    UI_panelUpdate(pMenu->panels[pMenu->currentPanel], &menuEvent, pControl->isMouseUp, pControl->keys);
 
         switch(menuEvent.eventType) {
             case PANEL_SWITCH:
@@ -50,13 +50,7 @@ void updateMenu(Menu *pMenu, ClientControl *pControl, Client aClient, FriendList
                     NET_clientSetSelfName(aClient, myUsername);
                     NET_clientSendString(aClient,MENU,CONNECT,myUsername);
                 }
-                if (strcmp("AddFriend-Add", menuEvent.key) == 0){
-                    char friend[MAX_USERNAME_LEN];
-                    addFriendList(pMenu, friend);
-                    UI_clientAddFriend(aFriendList, friend);
-                    UI_updateFriendList(aFriendList);
-                }
-                if (strcmp("Friends-button", menuEvent.key) == 0)
+                if (strcmp("Social", menuEvent.key) == 0)
                 {
                     UI_readFriendList(aFriendList);
                 }
@@ -73,9 +67,15 @@ void updateMenu(Menu *pMenu, ClientControl *pControl, Client aClient, FriendList
                     
                     printf("Join friend clicked!\n");
                 }
+                if (strcmp("AddFriend-Add", menuEvent.key) == 0){
+                    char friend[MAX_USERNAME_LEN];
+                    addFriendList(pMenu, friend);
+                    UI_clientAddFriend(aFriendList, friend);
+                    UI_updateFriendList(aFriendList);
+                }
                 break;
         }
-    }
+    
 }
 
 void refreshMenu(SDL_Renderer *pRend, Menu *pMenu, ClientView *pView) {
@@ -371,6 +371,6 @@ void createNewUsername(Menu *pMenu, char *output){
 }
 
 void addFriendList(Menu *pMenu, char *output){
-    Inputfield input = UI_panelGetComponent(pMenu->panels[PANEL_ADDFRIEND], "AddFriend-Add");
+    Inputfield input = UI_panelGetComponent(pMenu->panels[PANEL_ADDFRIEND], "AddFriend-input");
     UI_inputfieldGetBuffer(input, output);
 }

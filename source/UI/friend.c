@@ -136,11 +136,6 @@ void UI_readFriendList(FriendList aFriendList){
             strncpy(aFriendList->friends[i].name, username, MAX_USERNAME_LEN - 1);
             aFriendList->friends[i].name[MAX_USERNAME_LEN - 1] = '\0';
         }
-        printf("%d\n", aFriendList->count);
-        for (int i = 0; i < aFriendList->count; i++)
-        {
-            printf("%s\n", aFriendList->friends[i].name);
-        }
     }
     fclose(fp);
 }

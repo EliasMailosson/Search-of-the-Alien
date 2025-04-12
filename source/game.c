@@ -7,7 +7,7 @@ void gameLoop(Client aClient, ClientControl *pControl, ClientView *pView){
     NET_clientConnect(aClient);
 
     Menu menu = initMenu(pView->pRend, pView, aClient);
-    FriendList aFriendsList = UI_friendListCreate();
+    FriendList aFriendList = UI_friendListCreate();
     char username[MAX_USERNAME_LEN];
     NET_getSelfname(aClient, username);
 
@@ -22,7 +22,7 @@ void gameLoop(Client aClient, ClientControl *pControl, ClientView *pView){
         switch (NET_clientGetState(aClient))
         {
         case MENU:
-            runMenu(aClient, pControl, pView, &menu, aFriendsList);
+            runMenu(aClient, pControl, pView, &menu, aFriendList);
             break;
         case LOBBY:
             runLobby(aClient, aMap, pControl, pView);
@@ -38,7 +38,7 @@ void gameLoop(Client aClient, ClientControl *pControl, ClientView *pView){
     if(strcmp(username, "None") != 0) {
         NET_clientSendString(aClient,MENU,DISCONNECT,username);
     }
-    UI_friendListDestroy(aFriendsList);
+    UI_friendListDestroy(aFriendList);
 }
 
 void runLobby(Client aClient, Map aMap, ClientControl *pControl, ClientView *pView) {
