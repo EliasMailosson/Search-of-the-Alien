@@ -10,7 +10,7 @@ struct User{
     GameState State;
     Player player;
 };
-struct server{
+struct server {
     UDPsocket serverSocket;
     SDLNet_SocketSet socketSet;
     int clientCount;
@@ -140,21 +140,31 @@ void NET_serverUpdatePlayer(Server aServer, Packet aPacket){
 }
 
 void NET_serverChangeGameStateOnClient(Server aServer,Packet aPacket){
+    int indexIP = NET_serverCompIP(aServer);
+    if(indexIP == -1) {
+        printf("Error NET_serverCompIP return -1\n");
+        return;
+        }
     GameState newState = SDLNet_Read32(NET_packetGetPayload(aPacket));
-    NET_serverSendInt(aServer,GLOBAL,CHANGE_GAME_STATE_RESPONSE,newState,NET_serverCompIP(aServer));
-    printf("username: %s gameState is now %d\n",aServer->clients[NET_serverCompIP(aServer)].username,newState);
-    aServer->clients[NET_serverCompIP(aServer)].State = newState;
+    NET_serverSendInt(aServer,GLOBAL,CHANGE_GAME_STATE_RESPONSE,newState,indexIP);
+    printf("username: %s gameState is now %d\n",aServer->clients[indexIP].username,newState);
+    aServer->clients[indexIP].State = newState;
 }
 
 void NET_serverClientDisconnect(Server aServer){
-    int lobbyID = aServer->clients[NET_serverCompIP(aServer)].LobbyID;
+    int indexIP = NET_serverCompIP(aServer);
+    if(indexIP == -1) {
+        printf("Error NET_serverCompIP return -1\n");
+        return;
+        }
+    int lobbyID = aServer->clients[indexIP].LobbyID;
     for (int i = 0; i < aServer->clientCount; i++){
         if(aServer->clients[i].LobbyID == lobbyID){
             NET_serverSendPlayerPacket(aServer,-1);
         } 
     }
-    printf("username: %s disconnected to server\n",aServer->clients[NET_serverCompIP(aServer)].username);
-    NET_serverRemoveUser(aServer, NET_serverCompIP(aServer));
+    printf("username: %s disconnected to server\n",aServer->clients[indexIP].username);
+    NET_serverRemoveUser(aServer, indexIP);
     if(aServer->clientCount == 0) aServer->isOff = true;
 }
 
