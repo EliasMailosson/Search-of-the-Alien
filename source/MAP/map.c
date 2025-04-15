@@ -20,11 +20,11 @@ struct Map {
     Tile tiles[MAP_HEIGHT][MAP_WIDTH];
 };
 
-void MAP_RenderMap(SDL_Renderer *pRend, Map aMap) {
+void MAP_MapRender(SDL_Renderer *pRend, Map aMap) {
     
     for(int y = 0; y < MAP_HEIGHT; y++) {
         for (int x = 0; x < MAP_WIDTH; x++) {
-            MAP_RenderTiles(pRend, aMap, y, x);
+            MAP_TileRender(pRend, aMap, y, x);
         }
     }
 
@@ -34,11 +34,11 @@ void MAP_RenderMap(SDL_Renderer *pRend, Map aMap) {
     //SDL_RenderDrawLine(pRend, pView->windowWidth / 2, 0, pView->windowWidth / 2, pView->windowHeight / 2);   // vertical line
 }
 
-void MAP_RenderTiles(SDL_Renderer *pRend, Map aMap, int y, int x) {
+void MAP_TileRender(SDL_Renderer *pRend, Map aMap, int y, int x){
     SDL_RenderCopy(pRend, aMap->texture, &aMap->tileIndex[aMap->tiles[y][x].tileID], &aMap->tiles[y][x].tileRect);
 }
 
-Map MAP_CreateMap(SDL_Renderer *pRend, int posX, int posY){
+Map MAP_MapCreate(SDL_Renderer *pRend, int posX, int posY){
     Map aMap = malloc(sizeof(struct Map));
     if(aMap == NULL){
         fprintf(stderr,"Error allocating memory for server\n");
@@ -46,7 +46,7 @@ Map MAP_CreateMap(SDL_Renderer *pRend, int posX, int posY){
     }
 
     // behöver vi gå upp i mappen?
-    MAP_loadTileSheet(pRend, "assets/images/tiles/tileset-4.png", aMap);
+    MAP_TileSheetload(pRend, "assets/images/tiles/tileset-4.png", aMap);
 
     aMap->tile_width = TILE_SIZE;
     aMap->tile_height = TILE_SIZE;
@@ -69,8 +69,7 @@ Map MAP_CreateMap(SDL_Renderer *pRend, int posX, int posY){
     return aMap;
 }
 
-void MAP_refreshMap(Map aMap, int posX, int posY){
-
+void MAP_MapRefresh(Map aMap, int posX, int posY){
     for (int y = 0; y < MAP_HEIGHT; ++y) {
         for (int x = 0; x < MAP_WIDTH; ++x) {
             aMap->tiles[y][x].tileRect.x = (int)((x - y) * (TILE_SIZE/2) + (posX/2) - TILE_SIZE/2); 
@@ -79,7 +78,7 @@ void MAP_refreshMap(Map aMap, int posX, int posY){
     }
 }
 
-void MAP_loadTileSheet(SDL_Renderer* pRend, char *imagePath, Map aMap) {
+void MAP_TileSheetload(SDL_Renderer* pRend, char *imagePath, Map aMap){
     SDL_Surface *surface = IMG_Load(imagePath);
     aMap->texture = SDL_CreateTextureFromSurface(pRend, surface);
     SDL_FreeSurface(surface);
@@ -88,7 +87,8 @@ void MAP_loadTileSheet(SDL_Renderer* pRend, char *imagePath, Map aMap) {
     }
 }
 
-void MAP_DestroyMap(Map aMap){
+void MAP_MapDestroy(Map aMap){
+    
     SDL_DestroyTexture(aMap->texture);
     aMap->texture = NULL;
     free(aMap);

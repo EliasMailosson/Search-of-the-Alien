@@ -13,7 +13,7 @@ void gameLoop(Client aClient, ClientControl *pControl, ClientView *pView){
         NET_clientSendString(aClient,MENU,CONNECT,username);
     }
     
-    Map aMap = MAP_CreateMap(pView->pRend, pView->windowWidth, pView->windowHeight);
+    Map aMap = MAP_MapCreate(pView->pRend, pView->windowWidth, pView->windowHeight);
     while (pControl->isRunning){
         eventHandler(pControl);
 
@@ -31,7 +31,7 @@ void gameLoop(Client aClient, ClientControl *pControl, ClientView *pView){
     }
 
     destroyMenu(&menu);
-    MAP_DestroyMap(aMap);
+    MAP_MapDestroy(aMap);
     NET_getSelfname(aClient, username);
     if(strcmp(username, "None") != 0) {
         NET_clientSendString(aClient,MENU,DISCONNECT,username);
@@ -43,7 +43,7 @@ void runLobby(Client aClient, Map aMap, ClientControl *pControl, ClientView *pVi
     toggleDelay++;
     if(pControl->keys[SDL_SCANCODE_F] && toggleDelay > 12) {
         toggleFullscreen(pView);
-        MAP_refreshMap(aMap, pView->windowWidth, pView->windowHeight);
+        MAP_MapRefresh(aMap, pView->windowWidth, pView->windowHeight);
         toggleDelay = 0;
     }
 
@@ -58,7 +58,7 @@ void runLobby(Client aClient, Map aMap, ClientControl *pControl, ClientView *pVi
     SDL_SetRenderDrawColor(pView->pRend, 0,0,0,0);
     SDL_RenderClear(pView->pRend);
 
-    MAP_RenderMap(pView->pRend, aMap);
+    MAP_MapRender(pView->pRend, aMap);
     renderPlayers(aClient, pView);
     
     SDL_RenderPresent(pView->pRend);
