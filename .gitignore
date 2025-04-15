@@ -2,3 +2,4 @@ build/**
 **.dSYM
 .vscode/**
 data/**
+assets/images/tiles/tileDesigns/**
