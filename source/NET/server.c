@@ -1,6 +1,10 @@
 #include "../../include/NET/server.h"
+#include "math.h"
+
 struct Player{
     SDL_Rect hitBox;
+    int cursorX;
+    int cursorY;
 };
 
 struct User{
@@ -116,26 +120,76 @@ void NET_serverSendPlayerPacket(Server aServer,GameState GS){
     }
 }
 
+void calcMovement(Server aServer, PlayerInputPacket *pip, int playerIdx){
+
+    float speed = 5.0f;
+    float dx = 0.0f;
+    float dy = 0.0f;
+
+    int up    = pip->keys[PLAYER_INPUT_UP];
+    int down  = pip->keys[PLAYER_INPUT_DOWN];
+    int left  = pip->keys[PLAYER_INPUT_LEFT];
+    int right = pip->keys[PLAYER_INPUT_RIGHT];
+
+    if (up && !down && !left && !right) { 
+        dx = 0;
+        dy = -speed;
+    } 
+    else if (down && !up && !left && !right) {
+        dx = 0;
+        dy = speed;
+    }
+    else if (left && !up && !down && !right) {
+        dx = -speed;
+        dy = 0;
+    }
+    else if (right && !up && !down && !left) {
+
+        dx = speed;
+        dy = 0;
+    }
+    else if (up && left && !right && !down) {
+        float rawX = -1.0f;
+        float rawY = -0.5f;
+        float mag = sqrtf(rawX * rawX + rawY * rawY);  
+        dx = (rawX / mag) * speed;
+        dy = (rawY / mag) * speed;
+    }
+    else if (up && right && !left && !down) {
+        float rawX = 1.0f;
+        float rawY = -0.5f;
+        float mag = sqrtf(rawX * rawX + rawY * rawY);
+        dx = (rawX / mag) * speed;
+        dy = (rawY / mag) * speed;
+    }
+    else if (down && left && !up && !right) {
+        float rawX = -1.0f;
+        float rawY = 0.5f;
+        float mag = sqrtf(rawX * rawX + rawY * rawY);
+        dx = (rawX / mag) * speed;
+        dy = (rawY / mag) * speed;
+    }
+    else if (down && right && !up && !left) {
+        float rawX = 1.0f;
+        float rawY = 0.5f;
+        float mag = sqrtf(rawX * rawX + rawY * rawY);
+        dx = (rawX / mag) * speed;
+        dy = (rawY / mag) * speed;
+    }
+
+    aServer->clients[playerIdx].player.hitBox.x += (int)dx;
+    aServer->clients[playerIdx].player.hitBox.y += (int)dy;
+}
+
 void NET_serverUpdatePlayer(Server aServer, Packet aPacket){
     PlayerInputPacket pip;
     Uint8* payload = NET_packetGetPayload(aPacket);
     memcpy(&pip, payload, sizeof(PlayerInputPacket));
 
     int playerIdx = NET_serverCompIP(aServer); 
-    int speed = 5;
 
-    if (pip.keys[PLAYER_INPUT_UP]) {
-        aServer->clients[playerIdx].player.hitBox.y -= speed;
-    }
-    if (pip.keys[PLAYER_INPUT_DOWN]) {
-        aServer->clients[playerIdx].player.hitBox.y += speed;
-    }
-    if (pip.keys[PLAYER_INPUT_LEFT]) {
-        aServer->clients[playerIdx].player.hitBox.x -= speed;
-    }
-    if (pip.keys[PLAYER_INPUT_RIGHT]) {
-        aServer->clients[playerIdx].player.hitBox.x += speed;
-    }
+    calcMovement(aServer, &pip, playerIdx);
+
     NET_serverSendPlayerPacket(aServer,LOBBY); 
 }
 
