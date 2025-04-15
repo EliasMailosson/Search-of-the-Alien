@@ -6,6 +6,7 @@
 #include "../../include/UI/button.h"
 #include "../../include/UI/checklist.h"
 #include "../../include/UI/inputfield.h"
+#include "../../include/UI/friend.h"
 
 typedef struct component {
     void* pComp;
@@ -146,6 +147,10 @@ void UI_panelUpdate(Panel aPanel, MenuEvent *pEvent, bool isMouseUp, bool *keys)
             }
             
             break;
+        
+        case UI_FRIENDLIST:
+
+            break;
 
         }
     }
@@ -180,6 +185,10 @@ void UI_panelRender(SDL_Renderer* pRend, Panel aPanel) {
             UI_inputfieldRender(pRend, (Inputfield)aPanel->compList[i].pComp);
             break;
 
+        case UI_FRIENDLIST:
+            // UI_DrawFriendList(pRend, )
+            break;
+
         }
     }
 }
@@ -201,6 +210,10 @@ void UI_panelDestroy(Panel aPanel) {
 
         case UI_INPUTFIELD:
             UI_inputfieldDestroy((Inputfield)aPanel->compList[i].pComp);
+            break;
+
+        case UI_FRIENDLIST:
+            UI_friendListDestroy((FriendList)aPanel->compList[i].pComp);
             break;
 
         }
