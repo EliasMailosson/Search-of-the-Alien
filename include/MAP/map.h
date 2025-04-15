@@ -11,7 +11,10 @@
 #define MAP_HEIGHT 30
 #define TILE_INDEX_COUNT (MAP_HEIGHT * MAP_WIDTH)+1
 #define TILE_SIZE 64
-#define FILE_PHAT_FOR_LOBBY "data/lobby.csv"
+#define TILE_SPRITE_SIZE 256
+#define MAX_COUNT_TILES 25
+#define FILE_PHAT_LOBBY_DATA "data/lobby.csv"
+#define FILE_PHAT_LOBBY_SPRITE "assets/images/tiles/new-tileset-9.png"
 
 typedef struct tile Tile;
 

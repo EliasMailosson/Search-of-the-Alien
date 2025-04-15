@@ -8,7 +8,7 @@ struct Map {
     SDL_Texture *texture;
     int tile_width;
     int tile_height;
-    SDL_Rect tileIndex[3];
+    SDL_Rect tileIndex[MAX_COUNT_TILES];
     Tile **tiles;
 };
 
@@ -65,15 +65,17 @@ Map MAP_MapCreate(SDL_Renderer *pRend, int posX, int posY){
         fprintf(stderr,"Error allocating memory for server\n");
         return NULL;
     }
-    // behöver vi gå upp i mappen?
-    MAP_TileSheetload(pRend, "assets/images/tiles/tileset-4.png", aMap);
-
+    MAP_TileSheetload(pRend, FILE_PHAT_LOBBY_SPRITE, aMap);
     aMap->tile_width = TILE_SIZE;
     aMap->tile_height = TILE_SIZE;
-
-    aMap->tileIndex[0] = (SDL_Rect){.x = (TILE_SIZE*7), .y = 0, .w = TILE_SIZE, .h = TILE_SIZE};
-    aMap->tileIndex[1] = (SDL_Rect){.x = (TILE_SIZE*8), .y = 0, .w = TILE_SIZE, .h = TILE_SIZE};
-    aMap->tileIndex[2] = (SDL_Rect){.x = (TILE_SIZE*0), .y = 0, .w = TILE_SIZE, .h = TILE_SIZE};
+    int n = 0;
+    for (int y = 0; y < 3; y++){
+        for (int x = 0; x < 6; x++){
+            aMap->tileIndex[n++] = (SDL_Rect){.x = (TILE_SPRITE_SIZE*x), .y = (TILE_SPRITE_SIZE*y), .w = TILE_SPRITE_SIZE, .h = TILE_SPRITE_SIZE};
+        }
+    }
+    aMap->tileIndex[19] = (SDL_Rect){.x = (TILE_SPRITE_SIZE*0), .y = (TILE_SPRITE_SIZE*3), .w = TILE_SPRITE_SIZE, .h = TILE_SPRITE_SIZE};
+    aMap->tileIndex[20] = (SDL_Rect){.x = (TILE_SPRITE_SIZE*1), .y = (TILE_SPRITE_SIZE*3), .w = TILE_SPRITE_SIZE, .h = TILE_SPRITE_SIZE};
     aMap->tiles = MAP_TileCreate(posX,posY);
     MAP_MapGetTilseFromLobby(aMap->tiles);
     printMap(aMap);
@@ -116,9 +118,9 @@ void MAP_MapDestroy(Map aMap){
 
 void MAP_MapGetTilseFromLobby(Tile **ppTiles) {
     char buffer[256];
-    FILE *fp = fopen(FILE_PHAT_FOR_LOBBY, "r");
+    FILE *fp = fopen(FILE_PHAT_LOBBY_DATA, "r");
     if (fp == NULL) {
-        fprintf(stderr,"Error: Could not open %s!\n", FILE_PHAT_FOR_LOBBY);
+        fprintf(stderr,"Error: Could not open %s!\n", FILE_PHAT_LOBBY_DATA);
         return;
     }
     int y = 0;
