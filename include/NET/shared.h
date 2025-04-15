@@ -10,7 +10,7 @@
 #include "server.h"
 
 #define MAX_CLIENTS 8
-#define PORT 1234
+#define PORT 12345
 #define JON_IP "127.0.0.1"
 
 struct friends
