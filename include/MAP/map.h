@@ -16,7 +16,7 @@
 #define TILE_SPRITE_SIZE 256
 #define MAX_COUNT_SPRITE_TILES 25
 #define FILE_PHAT_LOBBY_DATA "data/lobby.csv"
-#define FILE_PHAT_LOBBY_SPRITE "assets/images/tiles/new-tileset-9.png"
+#define FILE_PHAT_LOBBY_SPRITE "assets/images/tiles/tileset-9-transparent.png"
 
 typedef struct tile Tile;
 
