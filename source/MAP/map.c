@@ -8,7 +8,7 @@ struct Map {
     SDL_Texture *texture;
     int tile_width;
     int tile_height;
-    SDL_Rect tileIndex[MAX_COUNT_TILES];
+    SDL_Rect tileIndex[MAX_COUNT_SPRITE_TILES];
     Tile **tiles;
 };
 
@@ -31,6 +31,7 @@ void MAP_MapRender(SDL_Renderer *pRend, Map aMap){
 }
 
 void MAP_TileRender(SDL_Renderer *pRend, Map aMap, int y, int x){
+    if(aMap->tiles[y][x].tileID >= MAX_COUNT_SPRITE_TILES) return;
     SDL_RenderCopy(pRend, aMap->texture, &aMap->tileIndex[aMap->tiles[y][x].tileID], &aMap->tiles[y][x].tileRect);
 }
 
@@ -52,7 +53,7 @@ Tile** MAP_TileCreate(int posX,int posY){
             tiles[y][x].tileRect.h = TILE_SIZE;
             tiles[y][x].tileRect.x = (int)((x - y) * (TILE_SIZE/2) + (posX/2) - TILE_SIZE/2); 
             tiles[y][x].tileRect.y = (int)((x + y) * (TILE_SIZE/4) + (posY / 2) - (TILE_SIZE / 4) - (TILE_SIZE * MAP_HEIGHT / 4));
-            tiles[y][x].tileID = 0;
+            tiles[y][x].tileID = (MAX_COUNT_SPRITE_TILES+1);
         }
     }
     return tiles;
@@ -77,6 +78,7 @@ Map MAP_MapCreate(SDL_Renderer *pRend, int posX, int posY){
     aMap->tileIndex[19] = (SDL_Rect){.x = (TILE_SPRITE_SIZE*0), .y = (TILE_SPRITE_SIZE*3), .w = TILE_SPRITE_SIZE, .h = TILE_SPRITE_SIZE};
     aMap->tileIndex[20] = (SDL_Rect){.x = (TILE_SPRITE_SIZE*1), .y = (TILE_SPRITE_SIZE*3), .w = TILE_SPRITE_SIZE, .h = TILE_SPRITE_SIZE};
     aMap->tiles = MAP_TileCreate(posX,posY);
+    //MAP_TilesFillWithBlank(aMap->tiles);
     MAP_MapGetTilseFromLobby(aMap->tiles);
     printMap(aMap);
     return aMap;
@@ -116,7 +118,7 @@ void MAP_MapDestroy(Map aMap){
     aMap = NULL;
 }
 
-void MAP_MapGetTilseFromLobby(Tile **ppTiles) {
+void MAP_MapGetTilseFromLobby(Tile **ppTiles){
     char buffer[256];
     FILE *fp = fopen(FILE_PHAT_LOBBY_DATA, "r");
     if (fp == NULL) {
@@ -124,13 +126,13 @@ void MAP_MapGetTilseFromLobby(Tile **ppTiles) {
         return;
     }
     int y = 0;
-    while (fgets(buffer, sizeof(buffer), fp) && y < MAP_HEIGHT) {
+    while (fgets(buffer, sizeof(buffer), fp) && y < LOBBY_HEIGHT){
         MAP_StrTrimWhitespace(buffer);
         int x = 0;
         int oldIndex = 0;
         int index = 0;
         const char *ptr = buffer;
-        while ((ptr = strchr(buffer + oldIndex, ',')) != NULL && x < MAP_WIDTH) {
+        while ((ptr = strchr(buffer + oldIndex, ',')) != NULL && x < LOBBY_WIDTH){
             index = ptr - buffer;
             char tmp[32];
             substring(buffer, oldIndex, index, tmp);
@@ -139,7 +141,7 @@ void MAP_MapGetTilseFromLobby(Tile **ppTiles) {
             ppTiles[y][x++].tileID = id;
             oldIndex = index + 1;
         }
-        if (x < MAP_WIDTH && oldIndex < (int)strlen(buffer)) {
+        if (x < LOBBY_WIDTH && oldIndex < (int)strlen(buffer)){
             char tmp[32];
             substring(buffer, oldIndex, strlen(buffer), tmp);
             int id = atoi(tmp);
@@ -157,6 +159,14 @@ void substring(char *buffer, int start, int end, char* result){
     int len = end - start;
     strncpy(result, buffer + start, len);
     result[len] = '\0'; 
+}
+
+void MAP_TilesFillWithBlank(Tile **tiles){
+    for (int y = 0; y < MAP_HEIGHT; y++){
+        for (int x = 0; x < MAP_WIDTH; x++){
+            tiles[y][x].tileID = MAX_COUNT_SPRITE_TILES+1; 
+        }
+    }
 }
 
 void MAP_StrTrimWhitespace(char *str){
