@@ -121,63 +121,23 @@ void NET_serverSendPlayerPacket(Server aServer,GameState GS){
 
 static void calcMovement(Server aServer, PlayerInputPacket *pip, int playerIdx){
 
-    float speed = 5.0f;
+    float speed = 3.0f;
     float dx = 0.0f;
     float dy = 0.0f;
 
-    int up    = pip->keys[PLAYER_INPUT_UP];
-    int down  = pip->keys[PLAYER_INPUT_DOWN];
-    int left  = pip->keys[PLAYER_INPUT_LEFT];
-    int right = pip->keys[PLAYER_INPUT_RIGHT];
+    // Directional input
+    if (pip->keys[PLAYER_INPUT_UP])    dy -= 2.0f;
+    if (pip->keys[PLAYER_INPUT_DOWN])  dy += 2.0f;
+    if (pip->keys[PLAYER_INPUT_LEFT])  dx -= 2.0f;
+    if (pip->keys[PLAYER_INPUT_RIGHT]) dx += 2.0f;
 
-    if ( (up && !down && !left && !right) || (left && right && up && !down) ) { 
-        dx = 0;
-        dy = -speed;
-    } 
-    else if ( (down && !up && !left && !right) || (left && right && down && !up) ) {
-        dx = 0;
-        dy = speed;
-    }
-    else if ( (left && !up && !down && !right) || (left && up && down && !right) ) {
-        dx = -speed;
-        dy = 0;
-    }
-    else if ( (right && !up && !down && !left) || (right && up && down && !left) ) {
-
-        dx = speed;
-        dy = 0;
-    }
-    else if (up && left && !right && !down) {
-        float rawX = -1.0f;
-        float rawY = -0.5f;
-        float mag = sqrtf(rawX * rawX + rawY * rawY);  
-        dx = (rawX / mag) * speed;
-        dy = (rawY / mag) * speed;
-    }
-    else if (up && right && !left && !down) {
-        float rawX = 1.0f;
-        float rawY = -0.5f;
-        float mag = sqrtf(rawX * rawX + rawY * rawY);
-        dx = (rawX / mag) * speed;
-        dy = (rawY / mag) * speed;
-    }
-    else if (down && left && !up && !right) {
-        float rawX = -1.0f;
-        float rawY = 0.5f;
-        float mag = sqrtf(rawX * rawX + rawY * rawY);
-        dx = (rawX / mag) * speed;
-        dy = (rawY / mag) * speed;
-    }
-    else if (down && right && !up && !left) {
-        float rawX = 1.0f;
-        float rawY = 0.5f;
-        float mag = sqrtf(rawX * rawX + rawY * rawY);
-        dx = (rawX / mag) * speed;
-        dy = (rawY / mag) * speed;
+    // Normalize movement vector if diagonal
+    if(dy && dx){
+        dy = dy / 2;
     }
 
-    aServer->clients[playerIdx].player.hitBox.x += (int)dx;
-    aServer->clients[playerIdx].player.hitBox.y += (int)dy;
+    aServer->clients[playerIdx].player.hitBox.x += (int)dx * speed;
+    aServer->clients[playerIdx].player.hitBox.y += (int)dy * speed;
 }
 
 void NET_serverUpdatePlayer(Server aServer, Packet aPacket){
@@ -188,6 +148,14 @@ void NET_serverUpdatePlayer(Server aServer, Packet aPacket){
     int playerIdx = NET_serverCompIP(aServer); 
 
     calcMovement(aServer, &pip, playerIdx);
+
+    aServer->clients[playerIdx].player.mousePos.x = pip.mousePos.x;
+    aServer->clients[playerIdx].player.mousePos.y = pip.mousePos.y;
+
+    // print mouse position from packet
+    int printX = aServer->clients[playerIdx].player.mousePos.x;
+
+    printf("mouse x: %d\n", printX);
 
     NET_serverSendPlayerPacket(aServer,LOBBY); 
 }

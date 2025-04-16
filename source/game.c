@@ -105,6 +105,7 @@ void eventHandler(ClientControl *pControl){
     
     while (SDL_PollEvent(&pControl->event)){
         SDL_GetMouseState(&pControl->mousePos.x, &pControl->mousePos.y);
+
         switch (pControl->event.type){
         case SDL_QUIT: pControl->isRunning = false;
             break;
