@@ -26,6 +26,7 @@ typedef struct {
     SDL_Event event;
     bool keys[SDL_NUM_SCANCODES];
     bool isMouseDown, isMouseUp;
+    SDL_Point mousePos;
 
     bool isTextInput;
     char textInput[32];

@@ -3,8 +3,7 @@
 
 struct Player{
     SDL_Rect hitBox;
-    int cursorX;
-    int cursorY;
+    SDL_Point mousePos;
 };
 
 struct User{
@@ -120,7 +119,7 @@ void NET_serverSendPlayerPacket(Server aServer,GameState GS){
     }
 }
 
-void calcMovement(Server aServer, PlayerInputPacket *pip, int playerIdx){
+static void calcMovement(Server aServer, PlayerInputPacket *pip, int playerIdx){
 
     float speed = 5.0f;
     float dx = 0.0f;
@@ -131,19 +130,19 @@ void calcMovement(Server aServer, PlayerInputPacket *pip, int playerIdx){
     int left  = pip->keys[PLAYER_INPUT_LEFT];
     int right = pip->keys[PLAYER_INPUT_RIGHT];
 
-    if (up && !down && !left && !right) { 
+    if ( (up && !down && !left && !right) || (left && right && up && !down) ) { 
         dx = 0;
         dy = -speed;
     } 
-    else if (down && !up && !left && !right) {
+    else if ( (down && !up && !left && !right) || (left && right && down && !up) ) {
         dx = 0;
         dy = speed;
     }
-    else if (left && !up && !down && !right) {
+    else if ( (left && !up && !down && !right) || (left && up && down && !right) ) {
         dx = -speed;
         dy = 0;
     }
-    else if (right && !up && !down && !left) {
+    else if ( (right && !up && !down && !left) || (right && up && down && !left) ) {
 
         dx = speed;
         dy = 0;

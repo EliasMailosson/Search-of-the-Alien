@@ -4,6 +4,7 @@ struct Player{
     GameState state;
     char username[MAX_USERNAME_LEN];
     SDL_Point pos;
+    SDL_Point mousePos;
 };
 struct client{
     SDLNet_SocketSet socketSet;
@@ -12,7 +13,7 @@ struct client{
     UDPpacket *pSendPacket;
     char selfUsername[MAX_USERNAME_LEN];
     IPaddress serverAddr;
-    
+
     int PlayerCount;
     Player playerList[MAX_CLIENTS];
 }; 
@@ -83,6 +84,14 @@ int NET_clientGetPlayerCount(Client aClient) {
 SDL_Point NET_clientGetPlayerPos(Client aClient, int playerIdx) {
     if(playerIdx < MAX_CLIENTS) {
         return aClient->playerList[playerIdx].pos;
+    }
+    else return (SDL_Point) {.x=-1, .y=-1};
+}
+
+// behövs denna? 
+SDL_Point NET_clientGetCursorPos(Client aClient, int playerIdx){
+    if(playerIdx < MAX_CLIENTS) {
+        return aClient->playerList[playerIdx].mousePos;
     }
     else return (SDL_Point) {.x=-1, .y=-1};
 }
@@ -171,6 +180,7 @@ void NET_clientUpdatePlayerList(Client aClient, Packet aPacket){
     for (int i = 0; i < aClient->PlayerCount; i++){
         aClient->playerList[i].pos = packets[i].pos;
         aClient->playerList[i].state = packets[i].state;
+        aClient->playerList[i].mousePos = packets[i].cursorPos;
         strcpy(aClient->playerList[i].username, packets[i].username);
     }
 }

@@ -9,6 +9,7 @@ typedef struct PlayerPacket{
     char username[MAX_USERNAME_LEN];
     SDL_Point pos;
     GameState state;
+    SDL_Point cursorPos;
 }PlayerPacket;  
 
 void NET_protocolSendInt(UDPpacket *pUDPpkg,UDPsocket Socket,IPaddress IP,

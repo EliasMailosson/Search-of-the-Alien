@@ -26,6 +26,10 @@ void renderPlayers(Client aClient, ClientView *pView) {
 
 PlayerInputPacket prepareInputArray(ClientControl *pControl) {
     PlayerInputPacket pip = {
+        .mousePos = {
+            .x = pControl->mousePos.x,
+            .y = pControl->mousePos.y 
+        },
         .keys = {
             pControl->keys[SDL_SCANCODE_W],
             pControl->keys[SDL_SCANCODE_S],

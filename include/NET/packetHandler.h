@@ -37,6 +37,7 @@ enum PlayerInput{PLAYER_INPUT_UP, PLAYER_INPUT_DOWN, PLAYER_INPUT_RIGHT, PLAYER_
 
 typedef struct playerInputPacket {
     bool keys[NUM_PLAYER_INPUTS];
+    SDL_Point mousePos;
 } PlayerInputPacket;
 
 struct packet;
