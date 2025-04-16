@@ -1,26 +1,22 @@
 #include <stdio.h>
 #include "../include/players.h"
 
-void renderPlayers(Client aClient, ClientView *pView) {
-    int playerCount = NET_clientGetPlayerCount(aClient);
+#define SPRITE_SIZE 256
+#define RENDER_SIZE 128
 
-    SDL_Color colors[MAX_CLIENTS] = {
-        {.r = 255, .g = 0, .b = 0, .a = 0},
-        {.r = 0, .g = 255, .b = 0, .a = 0},
-        {.r = 0, .g = 0, .b = 255, .a = 0},
-        {.r = 255, .g = 255, .b = 0, .a = 0},
-        {.r = 255, .g = 0, .b = 255, .a = 0},
-        {.r = 0, .g = 255, .b = 255, .a = 0},
-        {.r = 255, .g = 255, .b = 255, .a = 0},
-        {.r = 100, .g = 100, .b = 100, .a = 0}
-    };
+void renderPlayers(Client aClient, ClientView *pView) {
+    static int frame = 0;
+    frame++;
+    int playerCount = NET_clientGetPlayerCount(aClient);
 
     for(int i = 0; i < playerCount; i++) {
         SDL_Point pos = NET_clientGetPlayerPos(aClient, i);
 
-        SDL_Rect playerRect = {pos.x, pos.y, 80, 80};
-        SDL_SetRenderDrawColor(pView->pRend, colors[i].r, colors[i].g, colors[i].b, colors[i].a);
-        SDL_RenderFillRect(pView->pRend, &playerRect);
+        int direction = 3;
+
+        SDL_Rect playerRect = {pos.x, pos.y, RENDER_SIZE, RENDER_SIZE};
+        SDL_Rect src = {((frame/2)%24)*SPRITE_SIZE, direction*SPRITE_SIZE, SPRITE_SIZE, SPRITE_SIZE};
+        SDL_RenderCopy(pView->pRend, pView->playerTexture, &src, &playerRect);
     }
 }
 

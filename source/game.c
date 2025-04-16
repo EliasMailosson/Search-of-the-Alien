@@ -61,9 +61,9 @@ void runLobby(Client aClient, Map aMap, ClientControl *pControl, ClientView *pVi
     MAP_RenderMap(pView->pRend, aMap);
     renderPlayers(aClient, pView);
 
-    SDL_Rect mouseTest = {.w = 16, .h = 16, .x = pControl->mousePos.x, .y = pControl->mousePos.y};
-    SDL_SetRenderDrawColor(pView->pRend, 255,255,0,0);
-    SDL_RenderFillRect(pView->pRend, &mouseTest);
+    // SDL_Rect mouseTest = {.w = 16, .h = 16, .x = pControl->mousePos.x, .y = pControl->mousePos.y};
+    // SDL_SetRenderDrawColor(pView->pRend, 255,255,0,0);
+    // SDL_RenderFillRect(pView->pRend, &mouseTest);
     
     SDL_RenderPresent(pView->pRend);
 }

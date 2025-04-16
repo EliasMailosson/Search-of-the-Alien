@@ -39,9 +39,15 @@ void startClient(Client *aClient, ClientView *pView,ClientControl *pControl){
     pControl->isRunning = true;
 
     *aClient = NET_clientCreate();
+
+    SDL_Surface *surface = IMG_Load("assets/images/player/bluethan.png");
+    pView->playerTexture = SDL_CreateTextureFromSurface(pView->pRend, surface);
+    SDL_FreeSurface(surface);
 }
 
 void killClient(Client *aClient, ClientView *pView){
+    SDL_DestroyTexture(pView->playerTexture);
+
     NET_clientDestroy(*aClient);
     SDL_DestroyRenderer(pView->pRend);
     pView->pRend = NULL;
