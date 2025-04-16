@@ -12,7 +12,7 @@ void renderPlayers(Client aClient, ClientView *pView) {
     for(int i = 0; i < playerCount; i++) {
         SDL_Point pos = NET_clientGetPlayerPos(aClient, i);
 
-        int direction = 3;
+        int direction = NET_clientGetPlayerDirection(aClient, i);
 
         SDL_Rect playerRect = {pos.x, pos.y, RENDER_SIZE, RENDER_SIZE};
         SDL_Rect src = {((frame/2)%24)*SPRITE_SIZE, direction*SPRITE_SIZE, SPRITE_SIZE, SPRITE_SIZE};

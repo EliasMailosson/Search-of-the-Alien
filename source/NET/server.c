@@ -4,6 +4,7 @@
 struct Player{
     SDL_Rect hitBox;
     SDL_Point mousePos;
+    int direction;
 };
 
 struct User{
@@ -110,6 +111,7 @@ void NET_serverSendPlayerPacket(Server aServer,GameState GS){
             .y = aServer->clients[i].player.hitBox.y
         };
         packet[i].pos = pos;
+        packet[i].direction = aServer->clients[i].player.direction;
     }
     Uint32 payloadSize = aServer->clientCount * sizeof(PlayerPacket);
     for (int i = 0; i < aServer->clientCount; i++){
@@ -149,13 +151,18 @@ void NET_serverUpdatePlayer(Server aServer, Packet aPacket){
 
     calcMovement(aServer, &pip, playerIdx);
 
-    aServer->clients[playerIdx].player.mousePos.x = pip.mousePos.x;
-    aServer->clients[playerIdx].player.mousePos.y = pip.mousePos.y;
+    int mx = aServer->clients[playerIdx].player.mousePos.x = pip.mousePos.x;
+    int my = aServer->clients[playerIdx].player.mousePos.y = pip.mousePos.y;
+    int dx = aServer->clients[playerIdx].player.hitBox.x - mx;
+    int dy = aServer->clients[playerIdx].player.hitBox.y - my;
+
+    float angle = atan2(dy, dx);
+    aServer->clients[playerIdx].player.direction = ((int)roundf(angle / (float)M_PI_4) + 8) % 8;
+    // printf("direction: %d\n", direction);
 
     // print mouse position from packet
-    int printX = aServer->clients[playerIdx].player.mousePos.x;
-
-    printf("mouse x: %d\n", printX);
+    // int printX = aServer->clients[playerIdx].player.mousePos.x;
+    // printf("mouse x: %d\n", printX);
 
     NET_serverSendPlayerPacket(aServer,LOBBY); 
 }

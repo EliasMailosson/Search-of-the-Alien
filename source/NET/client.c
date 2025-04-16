@@ -4,6 +4,7 @@ struct Player{
     GameState state;
     char username[MAX_USERNAME_LEN];
     SDL_Point pos;
+    int direction;
 };
 struct client{
     SDLNet_SocketSet socketSet;
@@ -165,12 +166,17 @@ void NET_clientReceiver(Client aClient){
     }
 }
 
+int NET_clientGetPlayerDirection(Client aClient, int playerIdx) {
+    return aClient->playerList[playerIdx].direction;
+}
+
 void NET_clientUpdatePlayerList(Client aClient, Packet aPacket){
     PlayerPacket packets[MAX_CLIENTS] = {0};
     NET_playerPacketReceive(aPacket, packets, &aClient->PlayerCount);
     for (int i = 0; i < aClient->PlayerCount; i++){
         aClient->playerList[i].pos = packets[i].pos;
         aClient->playerList[i].state = packets[i].state;
+        aClient->playerList[i].direction = packets[i].direction;
         strcpy(aClient->playerList[i].username, packets[i].username);
     }
 }
