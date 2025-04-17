@@ -10,12 +10,12 @@
 
 typedef struct FriendList *FriendList; 
 
-FriendList UI_friendListCreate();
+FriendList UI_friendListCreate(TTF_Font* font);
 void UI_friendListDestroy(FriendList list);
 
 void UI_SetFriendsOffline(FriendList list);
 void UI_friendListSetStatus(FriendList list, const char* name);
-void UI_friendListRender(FriendList list, SDL_Renderer* renderer, TTF_Font* font);
+void UI_friendListRender(FriendList list, SDL_Renderer* renderer);
 void UI_DrawFriendList(SDL_Renderer *pRend,FriendList list);
 
 void UI_clientAddFriend(FriendList aFriendList, char *outputFriend);

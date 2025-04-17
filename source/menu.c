@@ -52,7 +52,7 @@ void updateMenu(Menu *pMenu, ClientControl *pControl, Client aClient) {
                 }
                 if (strcmp("Social", menuEvent.key) == 0){
                     char outputNames[MAX_FRIENDS][MAX_USERNAME_LEN];
-                    FriendList aFriendList = (FriendList)UI_panelGetComponent(pMenu->panels[PANEL_SOCIAL],"social-friendlist");
+                    FriendList aFriendList = (FriendList)UI_panelGetComponent(pMenu->panels[PANEL_FRIENDS],"social-friendlist");
                     UI_readFriendList(aFriendList);
                     UI_SetFriendsOffline(aFriendList);
 
@@ -79,7 +79,7 @@ void updateMenu(Menu *pMenu, ClientControl *pControl, Client aClient) {
                 }
                 if (strcmp("AddFriend-Add", menuEvent.key) == 0){
                     char friend[MAX_USERNAME_LEN];
-                    FriendList aFriendList = (FriendList)UI_panelGetComponent(pMenu->panels[PANEL_SOCIAL],"social-friendlist");
+                    FriendList aFriendList = (FriendList)UI_panelGetComponent(pMenu->panels[PANEL_FRIENDS],"social-friendlist");
                     addFriendList(pMenu, friend);
                     UI_clientAddFriend(aFriendList, friend);
                     UI_updateFriendList(aFriendList);
@@ -282,8 +282,8 @@ Menu initMenu(SDL_Renderer *pRend, ClientView *pView, Client aClient) {
     // SOCIAL MENU ////////////////////////
     UI_panelSetImage(pRend, menu.panels[PANEL_SOCIAL], "assets/images/menu/background2.png");
 
-    FriendList aFriendList = UI_friendListCreate();
-    UI_panelAddComponent(menu.panels[PANEL_SOCIAL], aFriendList, UI_FRIENDLIST, "social-friendlist");
+    FriendList aFriendList = UI_friendListCreate(menu.fonts[2]);
+    UI_panelAddComponent(menu.panels[PANEL_FRIENDS], aFriendList, UI_FRIENDLIST, "social-friendlist");
 
     // Inputfield f1 = UI_inputfieldCreate();
     // UI_panelAddComponent(menu.panels[PANEL_SOCIAL], f1, UI_INPUTFIELD, "Social-input");
@@ -300,7 +300,7 @@ Menu initMenu(SDL_Renderer *pRend, ClientView *pView, Client aClient) {
     UI_panelAddComponent(menu.panels[PANEL_SOCIAL], b11, UI_BUTTON, "Friends-button");
     UI_panelSetComponentLink(menu.panels[PANEL_SOCIAL], "Friends-button", PANEL_FRIENDS); 
 
-    //FRIENDS MENU //////////////////////// (HÄR)
+    //FRIENDS MENU ////////////////////////
     UI_panelSetImage(pRend,menu.panels[PANEL_FRIENDS], "assets/images/menu/background2.png");
     
     Button b12 = UI_buttonCreate();

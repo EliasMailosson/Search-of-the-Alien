@@ -189,7 +189,7 @@ void UI_panelRender(SDL_Renderer* pRend, Panel aPanel) {
             break;
 
         case UI_FRIENDLIST:
-            // UI_DrawFriendList(pRend,(FriendList)aPanel->compList[i].pComp); 
+            UI_DrawFriendList(pRend,(FriendList)aPanel->compList[i].pComp); 
             break;
 
         }

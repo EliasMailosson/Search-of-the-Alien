@@ -32,11 +32,10 @@ typedef struct {
     char textInput[32];
 }ClientControl;
 
-void render(ClientView *pView, Menu *pMenu,FriendList aFriendList);
 void eventHandler(ClientControl *pControl);
 void gameLoop(Client aClient, ClientControl *pControl, ClientView *pView);
 void runLobby(Client aClient, Map aMap, ClientControl *pControl, ClientView *pView);
-void runMenu(Client aClient, ClientControl *pControl, ClientView *pView, Menu *pMenu, FriendList aFriendList);
+void runMenu(Client aClient, ClientControl *pControl, ClientView *pView, Menu *pMenu);
 void toggleFullscreen(ClientView *pView);
 
 #endif

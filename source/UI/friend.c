@@ -16,8 +16,9 @@ typedef struct FriendList {
     TTF_Font *fonts;
 } *FriendList;
 
-FriendList UI_friendListCreate() {
+FriendList UI_friendListCreate(TTF_Font* font) {
     FriendList list = malloc(sizeof(struct FriendList));
+    list->fonts = font;
     list->count = 0;
     list->selectedFriendIndex=-1;
     return list;
@@ -25,7 +26,7 @@ FriendList UI_friendListCreate() {
 
 void UI_DrawFriendList(SDL_Renderer *pRend, FriendList list) {
 
-    UI_friendListRender(list, pRend, list->fonts);
+    UI_friendListRender(list, pRend);
     SDL_Color textColor = {255, 255, 255, 255}; 
     const char *text = "Friends:";
 
@@ -92,7 +93,7 @@ void UI_FriendNameToggle(FriendList list, int mouseX, int mouseY) {
     }
 }
 //"Sardor"
-void UI_friendListRender(FriendList list, SDL_Renderer* renderer, TTF_Font* font) {
+void UI_friendListRender(FriendList list, SDL_Renderer* renderer) {
     int y = 150;
     for (int i = 0; i < list->count; ++i) {
         SDL_Color color = list->friends[i].isOnline ? 
@@ -102,7 +103,7 @@ void UI_friendListRender(FriendList list, SDL_Renderer* renderer, TTF_Font* font
         char statusText[64];
         snprintf(statusText, sizeof(statusText), "%s", list->friends[i].name);
 
-        SDL_Surface* surface = TTF_RenderText_Solid(font, statusText, color);
+        SDL_Surface* surface = TTF_RenderText_Solid(list->fonts, statusText, color);
         SDL_Texture* texture = SDL_CreateTextureFromSurface(renderer, surface);
 
         SDL_Rect dest = { 50, y, surface->w, surface->h };

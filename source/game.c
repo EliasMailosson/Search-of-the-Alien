@@ -125,10 +125,3 @@ void eventHandler(ClientControl *pControl){
         }
     }
 }
-
-void render(ClientView *pView, Menu *pMenu,FriendList aFriendList){
-    SDL_SetRenderDrawColor(pView->pRend, 0,0,0,0);
-    SDL_RenderClear(pView->pRend);
-    renderMenu(pView->pRend, pMenu,aFriendList);
-    SDL_RenderPresent(pView->pRend);
-}
