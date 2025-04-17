@@ -47,7 +47,7 @@ Map MAP_MapCreate(SDL_Renderer *pRend, int winW, int winH){
     }
     MAP_TileSheetload(pRend, FILE_PHAT_LOBBY_SPRITE, aMap);
     int n = 0;
-    for (int y = 0; y < 3; y++){
+    for (int y = 0; y < 4; y++){
         for (int x = 0; x < 10; x++){
             aMap->tileIndex[n++] = (SDL_Rect){.x = (TILE_SPRITE_SIZE*x), .y = (TILE_SPRITE_SIZE*y), .w = TILE_SPRITE_SIZE, .h = TILE_SPRITE_SIZE};
         }
