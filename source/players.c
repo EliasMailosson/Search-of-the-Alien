@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include "../include/players.h"
 
-void renderPlayers(Client aClient, ClientView *pView) {
+void renderPlayers(Client aClient, ClientView *pView, SDL_Rect playerCamera) {
     int playerCount = NET_clientGetPlayerCount(aClient);
 
     SDL_Color colors[MAX_CLIENTS] = {
@@ -18,7 +18,12 @@ void renderPlayers(Client aClient, ClientView *pView) {
     for(int i = 0; i < playerCount; i++) {
         SDL_Point pos = NET_clientGetPlayerPos(aClient, i);
 
-        SDL_Rect playerRect = {pos.x, pos.y, 80, 80};
+        SDL_Rect playerRect = {
+            .x = pos.x - playerCamera.x - 40,
+            .y = pos.y - playerCamera.y - 80,
+            .w = 80,
+            .h = 80
+        };
         SDL_SetRenderDrawColor(pView->pRend, colors[i].r, colors[i].g, colors[i].b, colors[i].a);
         SDL_RenderFillRect(pView->pRend, &playerRect);
     }

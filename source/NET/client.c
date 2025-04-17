@@ -69,6 +69,10 @@ void NET_getSelfname(Client aClient, char* outputName){
     strcpy(outputName, aClient->selfUsername);
 }
 
+int NET_clientGetSelfIndex(Client aClient){
+    return NET_clientFindPlayer(aClient, aClient->selfUsername);
+}
+
 int NET_clientGetState(Client aClient) {
     for (int i = 0; i < aClient->PlayerCount; i++){
         if(strcmp(aClient->selfUsername,aClient->playerList[i].username) == 0) return aClient->playerList[i].state;

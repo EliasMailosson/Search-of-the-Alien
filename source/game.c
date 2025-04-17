@@ -40,12 +40,29 @@ void gameLoop(Client aClient, ClientControl *pControl, ClientView *pView){
 
 void runLobby(Client aClient, Map aMap, ClientControl *pControl, ClientView *pView) {
     static int toggleDelay = 0;
+    int selfIndex = NET_clientGetSelfIndex(aClient);
+
+    SDL_Point playerPos = NET_clientGetPlayerPos(aClient, selfIndex);
+
+    SDL_Rect playerCamera = {
+        .x = playerPos.x - pView->windowWidth/2,
+        .y = playerPos.y - pView->windowHeight/2,
+        .w = pView->windowWidth,
+        .h = pView->windowHeight
+    };
+
+    SDL_Point cameraCenter = {
+        .x = playerPos.x,
+        .y = playerPos.y
+    };
     toggleDelay++;
     if(pControl->keys[SDL_SCANCODE_F] && toggleDelay > 12) {
         toggleFullscreen(pView);
-        MAP_MapRefresh(aMap, pView->windowWidth, pView->windowHeight);
+        MAP_MapRefresh(aMap, pView->windowWidth, pView->windowHeight, cameraCenter);
         toggleDelay = 0;
     }
+
+    MAP_MapRefresh(aMap, pView->windowWidth, pView->windowHeight, cameraCenter);
 
     PlayerInputPacket pip;
     pip = prepareInputArray(pControl);
@@ -59,7 +76,7 @@ void runLobby(Client aClient, Map aMap, ClientControl *pControl, ClientView *pVi
     SDL_RenderClear(pView->pRend);
 
     MAP_MapRender(pView->pRend, aMap);
-    renderPlayers(aClient, pView);
+    renderPlayers(aClient, pView, playerCamera);
     
     SDL_RenderPresent(pView->pRend);
 }

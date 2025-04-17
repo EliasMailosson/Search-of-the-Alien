@@ -24,6 +24,7 @@ void NET_clientSendString(Client aClient,GameState GS, MessageType msgType,const
 void NET_clientSendArray(Client aClient,GameState GS, MessageType msgType,const void* array, Uint32 arraySize);
 void NET_clientSetSelfName(Client aClient, char* newName);
 void NET_getSelfname(Client aClient, char* outputName);
+int NET_clientGetSelfIndex(Client aClient);
 
 void NET_clientReceiver(Client aClient);
 int NET_clientFindPlayer(Client aClient, char* str);
