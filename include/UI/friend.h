@@ -16,7 +16,7 @@ void UI_friendListDestroy(FriendList list);
 void UI_SetFriendsOffline(FriendList list);
 void UI_friendListSetStatus(FriendList list, const char* name);
 void UI_friendListRender(FriendList list, SDL_Renderer* renderer, TTF_Font* font);
-void UI_DrawFriendList(SDL_Renderer *pRend, TTF_Font *fonts, FriendList list);
+void UI_DrawFriendList(SDL_Renderer *pRend,FriendList list);
 
 void UI_clientAddFriend(FriendList aFriendList, char *outputFriend);
 void UI_updateFriendList(FriendList aFriendList);

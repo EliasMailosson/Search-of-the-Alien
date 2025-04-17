@@ -14,7 +14,7 @@ void renderMenu(SDL_Renderer *pRend, Menu *pMenu, FriendList aFriendList) {
     }
 
     if (pMenu->currentPanel == PANEL_FRIENDS) {
-        UI_DrawFriendList(pRend, pMenu->fonts[1], aFriendList);
+        UI_DrawFriendList(pRend, pMenu->fonts[1]);
     }
     SDL_RenderPresent(pRend);
 }

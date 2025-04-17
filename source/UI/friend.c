@@ -11,26 +11,25 @@ typedef struct {
 
 typedef struct FriendList {
     Friend friends[MAX_FRIENDS];
+    int selectedFriendIndex;
     int count;
+    TTF_Font *fonts;
 } *FriendList;
-static int selectedFriendIndex = -1;
+
 FriendList UI_friendListCreate() {
     FriendList list = malloc(sizeof(struct FriendList));
-    if (!list) {
-        SDL_Log("Misslyckades att allokera minne för vänlista");
-        return NULL;
-    }
     list->count = 0;
+    list->selectedFriendIndex=-1;
     return list;
 }
 
-void UI_DrawFriendList(SDL_Renderer *pRend, TTF_Font *fonts, FriendList list) {
+void UI_DrawFriendList(SDL_Renderer *pRend, FriendList list) {
 
-    UI_friendListRender(list, pRend, fonts);
+    UI_friendListRender(list, pRend, list->fonts);
     SDL_Color textColor = {255, 255, 255, 255}; 
     const char *text = "Friends:";
 
-    SDL_Surface *textSurface = TTF_RenderUTF8_Blended(fonts, text, textColor);
+    SDL_Surface *textSurface = TTF_RenderUTF8_Blended(list->fonts, text, textColor);
 
     SDL_Texture *textTexture = SDL_CreateTextureFromSurface(pRend, textSurface);
     if (!textTexture) {
@@ -79,11 +78,13 @@ void UI_friendListSetStatus(FriendList list, const char* name) {
 
 void UI_FriendNameToggle(FriendList list, int mouseX, int mouseY) {
     int y = 150;
+    list->selectedFriendIndex = -1;
+
     for (int i = 0; i < list->count; ++i) {
         SDL_Rect friendRect = { 50, y, 200, 40 };
         if (mouseX >= friendRect.x && mouseX <= friendRect.x + friendRect.w &&
             mouseY >= friendRect.y && mouseY <= friendRect.y + friendRect.h) {
-            selectedFriendIndex = i;
+            list->selectedFriendIndex=-1;
             printf("Vald vän: %s\n", list->friends[i].name);
             break;
         }
@@ -106,7 +107,7 @@ void UI_friendListRender(FriendList list, SDL_Renderer* renderer, TTF_Font* font
 
         SDL_Rect dest = { 50, y, surface->w, surface->h };
 
-        if (i==selectedFriendIndex)
+        if (i==list->selectedFriendIndex)
         {
             SDL_Rect highlight = {45, y - 5, 220, surface->h + 10};
             SDL_SetRenderDrawColor(renderer, 100, 100, 255, 255);
