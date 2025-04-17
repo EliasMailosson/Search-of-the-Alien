@@ -5,9 +5,6 @@ struct Map{
     int tileID[MAP_HEIGHT][MAP_WIDTH];
     SDL_Rect tileRect; 
     SDL_Rect baseRect;
-    SDL_Point cameraCenter;
-    float scale;
-    int offsetX, offsetY;
 };
 
 static void substring(char *buffer, int start, int end, char* result);
@@ -26,13 +23,11 @@ void MAP_MapRender(SDL_Renderer *pRend, Map aMap){
 
     for(int y = 0; y < MAP_HEIGHT; y++){
         for(int x = 0; x < MAP_WIDTH; x++){
-            float worldX = (x - y) * (tileW * 0.5f);
-            float worldY = (x + y) * (tileH * 0.25f);
-            
-            currentRect.x = (int)roundf((worldX - aMap->cameraCenter.x + LOGICAL_WIN_W / 2) * aMap->scale)
-                            + aMap->offsetX;
-            currentRect.y = (int)roundf((worldY - aMap->cameraCenter.y + LOGICAL_WIN_H / 2) * aMap->scale)
-                            + aMap->offsetY;
+            currentRect.x = (int)roundf((x - y) * (tileW * 0.5f)
+                                        + aMap->tileRect.x);
+            currentRect.y = (int)roundf((x + y) * (tileH * 0.25f)
+                                        + aMap->tileRect.y);
+
             MAP_TileRender(pRend, aMap, y, x, &currentRect);
         }
     }
@@ -50,15 +45,13 @@ Map MAP_MapCreate(SDL_Renderer *pRend, int winW, int winH){
         fprintf(stderr,"Error allocating memory for server\n");
         return NULL;
     }
-    
     MAP_TileSheetload(pRend, FILE_PHAT_LOBBY_SPRITE, aMap);
     int n = 0;
     for (int y = 0; y < 3; y++){
-        for (int x = 0; x < 6; x++){
+        for (int x = 0; x < 10; x++){
             aMap->tileIndex[n++] = (SDL_Rect){.x = (TILE_SPRITE_SIZE*x), .y = (TILE_SPRITE_SIZE*y), .w = TILE_SPRITE_SIZE, .h = TILE_SPRITE_SIZE};
         }
     }
-
     MAP_TilesFillWithBlank(aMap->tileID);
     MAP_MapGetTilseFromLobby(aMap->tileID);
     SDL_Rect startRect = {
@@ -69,31 +62,27 @@ Map MAP_MapCreate(SDL_Renderer *pRend, int winW, int winH){
     };
     aMap->baseRect = startRect;
     aMap->tileRect = startRect;
-
-    SDL_Point cameraCenter = {0,0};
-    MAP_MapRefresh(aMap,winW,winH, cameraCenter);
+    MAP_MapRefresh(aMap,winW,winH);
     aMap->tileID[15][15] = MAX_COUNT_SPRITE_TILES + 1;
     return aMap;
 }
 
-void MAP_MapRefresh(Map aMap, int winW, int winH, SDL_Point cameraCenter){
+void MAP_MapRefresh(Map aMap, int winW, int winH){
     float scaleX = (float)winW / LOGICAL_WIN_W;
     float scaleY = (float)winH / LOGICAL_WIN_H;
-    aMap->cameraCenter = cameraCenter;
-    aMap->scale = (scaleX < scaleY) ? scaleX : scaleY;
-    int scaledW = (int)roundf(LOGICAL_WIN_W * aMap->scale);
-    int scaledH = (int)roundf(LOGICAL_WIN_H * aMap->scale);
+    float scale  = (scaleX < scaleY) ? scaleX : scaleY;
+    int scaledW = (int)roundf(LOGICAL_WIN_W * scale);
+    int scaledH = (int)roundf(LOGICAL_WIN_H * scale);
 
-    aMap->offsetX = (int)roundf((winW - scaledW) * 0.5f);
-    aMap->offsetY = (int)roundf((winH - scaledH) * 0.5f);
-
+    int offsetX = (int)roundf((winW - scaledW) * 0.5f);
+    int offsetY = (int)roundf((winH - scaledH) * 0.5f);
     SDL_Rect base = aMap->baseRect;
-    aMap->tileRect.x = aMap->offsetX + (int)roundf((base.x - cameraCenter.x + LOGICAL_WIN_W / 2) * aMap->scale);
-    aMap->tileRect.y = aMap->offsetY + (int)roundf((base.y - cameraCenter.y + LOGICAL_WIN_H / 2) * aMap->scale);
-    aMap->tileRect.w = (int)roundf(base.w * aMap->scale);
-    aMap->tileRect.h = (int)roundf(base.h * aMap->scale);
-    
+    aMap->tileRect.x = offsetX + (int)roundf(base.x * scale);
+    aMap->tileRect.y = offsetY + (int)roundf(base.y * scale);
+    aMap->tileRect.w = (int)roundf(base.w * scale);
+    aMap->tileRect.h = (int)roundf(base.h * scale);
 }
+
 
 static void MAP_TileSheetload(SDL_Renderer* pRend, char *imagePath, Map aMap){
     SDL_Surface *surface = IMG_Load(imagePath);
@@ -146,7 +135,6 @@ void MAP_MapGetTilseFromLobby(int tileID[MAP_HEIGHT][MAP_WIDTH]){
     fclose(fp);
 }
 
-
 static void substring(char *buffer, int start, int end, char* result){
     if (start < 0 || end < 0 || end <= start || buffer == NULL)
         return;
@@ -179,4 +167,9 @@ static void printMap(Map aMap){
         }
         printf("\n");
     }
+}
+
+void MAP_MapMoveMap(Map aMap, SDL_Point playerOffset){
+    aMap->tileRect.y = - playerOffset.y;
+    aMap->tileRect.x = - playerOffset.x;
 }

@@ -51,18 +51,14 @@ void runLobby(Client aClient, Map aMap, ClientControl *pControl, ClientView *pVi
         .h = pView->windowHeight
     };
 
-    SDL_Point cameraCenter = {
-        .x = playerPos.x,
-        .y = playerPos.y
-    };
     toggleDelay++;
     if(pControl->keys[SDL_SCANCODE_F] && toggleDelay > 12) {
         toggleFullscreen(pView);
-        MAP_MapRefresh(aMap, pView->windowWidth, pView->windowHeight, cameraCenter);
+        MAP_MapRefresh(aMap, pView->windowWidth, pView->windowHeight);
         toggleDelay = 0;
     }
 
-    MAP_MapRefresh(aMap, pView->windowWidth, pView->windowHeight, cameraCenter);
+    MAP_MapRefresh(aMap, pView->windowWidth, pView->windowHeight);
 
     PlayerInputPacket pip;
     pip = prepareInputArray(pControl);
@@ -72,6 +68,8 @@ void runLobby(Client aClient, Map aMap, ClientControl *pControl, ClientView *pVi
 
     NET_clientReceiver(aClient);
     
+    MAP_MapMoveMap(aMap, playerPos);
+
     SDL_SetRenderDrawColor(pView->pRend, 0,0,0,0);
     SDL_RenderClear(pView->pRend);
 
