@@ -7,7 +7,7 @@ void gameLoop(Client aClient, ClientControl *pControl, ClientView *pView){
     NET_clientConnect(aClient);
 
     Menu menu = initMenu(pView->pRend, pView, aClient);
-    FriendList aFriendList = UI_friendListCreate();
+    
     char username[MAX_USERNAME_LEN];
     NET_clientGetSelfName(aClient, username);
 
@@ -22,7 +22,7 @@ void gameLoop(Client aClient, ClientControl *pControl, ClientView *pView){
         switch (NET_clientGetState(aClient))
         {
         case MENU:
-            runMenu(aClient, pControl, pView, &menu, aFriendList);
+            runMenu(aClient, pControl, pView, &menu);
             break;
         case LOBBY:
             runLobby(aClient, aMap, pControl, pView);
@@ -38,7 +38,6 @@ void gameLoop(Client aClient, ClientControl *pControl, ClientView *pView){
     if(strcmp(username, "None") != 0) {
         NET_clientSendString(aClient,MENU,DISCONNECT,username);
     }
-    UI_friendListDestroy(aFriendList);
 }
 
 void runLobby(Client aClient, Map aMap, ClientControl *pControl, ClientView *pView) {
@@ -67,7 +66,7 @@ void runLobby(Client aClient, Map aMap, ClientControl *pControl, ClientView *pVi
     SDL_RenderPresent(pView->pRend);
 }
 
-void runMenu(Client aClient, ClientControl *pControl, ClientView *pView, Menu *pMenu, FriendList aFriendsList) {
+void runMenu(Client aClient, ClientControl *pControl, ClientView *pView, Menu *pMenu) {
     static int toggleDelay = 0;
     toggleDelay++;
     if(pControl->keys[SDL_SCANCODE_F] && toggleDelay > 12) {
@@ -76,12 +75,12 @@ void runMenu(Client aClient, ClientControl *pControl, ClientView *pView, Menu *p
         toggleDelay = 0;
     }
 
-    updateMenu(pMenu, pControl, aClient, aFriendsList);
+    updateMenu(pMenu, pControl, aClient);
     if (pMenu->isGameStarted) {
         NET_clientSendInt(aClient, MENU, CHANGE_GAME_STATE, LOBBY);
     }
     NET_clientReceiver(aClient);
-    renderMenu(pView->pRend, pMenu, aFriendsList);
+    renderMenu(pView->pRend, pMenu);
 }
 
 void toggleFullscreen(ClientView *pView) {

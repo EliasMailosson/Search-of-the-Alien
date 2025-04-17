@@ -6,21 +6,21 @@
 #include "../include/UI/friend.h"
 #include "../include/NET/client.h"
 
-void renderMenu(SDL_Renderer *pRend, Menu *pMenu, FriendList aFriendList) {
+void renderMenu(SDL_Renderer *pRend, Menu *pMenu) {
     SDL_SetRenderDrawColor(pRend, 0,0,0,0);
     SDL_RenderClear(pRend);
     for(int i = 0; i < PANEL_COUNT; i++) {
         UI_panelRender(pRend, pMenu->panels[i]);
     }
 
-    if (pMenu->currentPanel == PANEL_FRIENDS) {
-        UI_DrawFriendList(pRend, pMenu->fonts[1]);
-    }
+    // if (pMenu->currentPanel == PANEL_FRIENDS) {
+    //     UI_DrawFriendList(pRend, pMenu->fonts[1], aFriendList);
+    // }
     SDL_RenderPresent(pRend);
 }
 
 //4. Fixa en for-loop som ska genomföra ta från GetFriendNames och FriendSetStatus ifall man trycker på "Social"
-void updateMenu(Menu *pMenu, ClientControl *pControl, Client aClient, FriendList aFriendList) {
+void updateMenu(Menu *pMenu, ClientControl *pControl, Client aClient) {
     static MenuEvent menuEvent;
     static int switchDelay = 0;
     switchDelay++;
@@ -52,7 +52,7 @@ void updateMenu(Menu *pMenu, ClientControl *pControl, Client aClient, FriendList
                 }
                 if (strcmp("Social", menuEvent.key) == 0){
                     char outputNames[MAX_FRIENDS][MAX_USERNAME_LEN];
-
+                    FriendList aFriendList = (FriendList)UI_panelGetComponent(pMenu->panels[PANEL_SOCIAL],"social-friendlist");
                     UI_readFriendList(aFriendList);
                     UI_SetFriendsOffline(aFriendList);
 
@@ -79,6 +79,7 @@ void updateMenu(Menu *pMenu, ClientControl *pControl, Client aClient, FriendList
                 }
                 if (strcmp("AddFriend-Add", menuEvent.key) == 0){
                     char friend[MAX_USERNAME_LEN];
+                    FriendList aFriendList = (FriendList)UI_panelGetComponent(pMenu->panels[PANEL_SOCIAL],"social-friendlist");
                     addFriendList(pMenu, friend);
                     UI_clientAddFriend(aFriendList, friend);
                     UI_updateFriendList(aFriendList);
@@ -280,6 +281,9 @@ Menu initMenu(SDL_Renderer *pRend, ClientView *pView, Client aClient) {
 
     // SOCIAL MENU ////////////////////////
     UI_panelSetImage(pRend, menu.panels[PANEL_SOCIAL], "assets/images/menu/background2.png");
+
+    FriendList aFriendList = UI_friendListCreate();
+    UI_panelAddComponent(menu.panels[PANEL_SOCIAL], aFriendList, UI_FRIENDLIST, "social-friendlist");
 
     // Inputfield f1 = UI_inputfieldCreate();
     // UI_panelAddComponent(menu.panels[PANEL_SOCIAL], f1, UI_INPUTFIELD, "Social-input");
