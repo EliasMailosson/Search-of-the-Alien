@@ -13,7 +13,9 @@ typedef struct FriendList {
     Friend friends[MAX_FRIENDS];
     int count;
 } *FriendList;
+
 static int selectedFriendIndex = -1;
+
 FriendList UI_friendListCreate() {
     FriendList list = malloc(sizeof(struct FriendList));
     if (!list) {
