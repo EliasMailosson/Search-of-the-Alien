@@ -22,7 +22,7 @@ void renderPlayers(Client aClient, ClientView *pView) {
         char name[MAX_USERNAME_LEN];
         NET_clientGetSelfname(aClient,name);
         if(NET_clientFindPlayer(aClient, name) == i){
-            SDL_Rect center = (SDL_Rect){pView->windowWidth/2-40,pView->windowHeight/2-80,80,80};
+            SDL_Rect center = (SDL_Rect){pos.x + pView->windowWidth/2-40,pos.y + pView->windowHeight/2-80,80,80};
             SDL_SetRenderDrawColor(pView->pRend, colors[i].r, colors[i].g, colors[i].b, colors[i].a);
             SDL_RenderFillRect(pView->pRend, &center);
             continue;
@@ -44,4 +44,8 @@ PlayerInputPacket prepareInputArray(ClientControl *pControl) {
         }
     };
     return pip;
+}
+
+void updatepos(){
+
 }
