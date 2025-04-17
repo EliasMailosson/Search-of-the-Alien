@@ -31,6 +31,7 @@ PlayerInputPacket prepareInputArray(ClientControl *pControl) {
             pControl->keys[SDL_SCANCODE_S],
             pControl->keys[SDL_SCANCODE_D],
             pControl->keys[SDL_SCANCODE_A],
+            pControl->keys[SDL_SCANCODE_SPACE],
             pControl->isMouseDown,
             pControl->isMouseUp
         }

@@ -126,6 +126,7 @@ static void calcMovement(Server aServer, PlayerInputPacket *pip, int playerIdx){
     float speed = 3.0f;
     float dx = 0.0f;
     float dy = 0.0f;
+    float dDash = 4.0f;
 
     // Directional input
     if (pip->keys[PLAYER_INPUT_UP])    dy -= 2.0f;
@@ -133,10 +134,16 @@ static void calcMovement(Server aServer, PlayerInputPacket *pip, int playerIdx){
     if (pip->keys[PLAYER_INPUT_LEFT])  dx -= 2.0f;
     if (pip->keys[PLAYER_INPUT_RIGHT]) dx += 2.0f;
 
+    // dash
+    if (pip->keys[PLAYER_INPUT_SPACE]){
+        speed *= dDash;
+    }
+
     // Normalize movement vector if diagonal
     if(dy && dx){
         dy = dy / 2;
     }
+
 
     aServer->clients[playerIdx].player.hitBox.x += (int)dx * speed;
     aServer->clients[playerIdx].player.hitBox.y += (int)dy * speed;
