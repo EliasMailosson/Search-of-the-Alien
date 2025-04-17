@@ -42,6 +42,7 @@ void MAP_MapGetTilseFromLobby(int tileID[MAP_HEIGHT][MAP_WIDTH]);
 //void MAP_MapGettOffset(int winH, int winW, SDL_Point *index);
 void MAP_TilesFillWithBlank(int tileID[MAP_HEIGHT][MAP_WIDTH]);
 
+void MAP_MapMoveMap(Map aMap, SDL_Point playerOffset);
 
 
 #endif

@@ -168,3 +168,10 @@ static void printMap(Map aMap){
         printf("\n");
     }
 }
+
+void MAP_MapMoveMap(Map aMap, SDL_Point playerOffset){
+    aMap->tileRect.y = -playerOffset.y;
+    aMap->tileRect.x = -playerOffset.x;
+    //aMap->baseRect.y = -playerOffset.y;
+    //aMap->baseRect.x = -playerOffset.x;
+}

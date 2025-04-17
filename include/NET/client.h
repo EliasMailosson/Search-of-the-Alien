@@ -23,13 +23,15 @@ void NET_clientSendInt(Client aClient,GameState GS, MessageType msgType,int plac
 void NET_clientSendString(Client aClient,GameState GS, MessageType msgType,const char* str);
 void NET_clientSendArray(Client aClient,GameState GS, MessageType msgType,const void* array, Uint32 arraySize);
 void NET_clientSetSelfName(Client aClient, char* newName);
-void NET_getSelfname(Client aClient, char* outputName);
+void NET_clientGetSelfname(Client aClient, char* outputName);
 
 void NET_clientReceiver(Client aClient);
 int NET_clientFindPlayer(Client aClient, char* str);
 
 void NET_clientUpdateGameState(Client aClient,Packet aPacket);
 void NET_clientUpdatePlayerList(Client aClient,Packet aPacket);
+//----------
+SDL_Point NET_clientGetSelfPos(Client aClient);
 
 
 #endif
