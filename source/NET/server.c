@@ -1,6 +1,10 @@
 #include "../../include/NET/server.h"
+#include "math.h"
+
 struct Player{
     SDL_Rect hitBox;
+    SDL_Point mousePos;
+    int direction;
 };
 
 struct User{
@@ -107,6 +111,7 @@ void NET_serverSendPlayerPacket(Server aServer,GameState GS){
             .y = aServer->clients[i].player.hitBox.y
         };
         packet[i].pos = pos;
+        packet[i].direction = aServer->clients[i].player.direction;
     }
     Uint32 payloadSize = aServer->clientCount * sizeof(PlayerPacket);
     for (int i = 0; i < aServer->clientCount; i++){
@@ -116,26 +121,56 @@ void NET_serverSendPlayerPacket(Server aServer,GameState GS){
     }
 }
 
+static void calcMovement(Server aServer, PlayerInputPacket *pip, int playerIdx){
+
+    float speed = 3.0f;
+    float dx = 0.0f;
+    float dy = 0.0f;
+    float dDash = 4.0f;
+
+    // Directional input
+    if (pip->keys[PLAYER_INPUT_UP])    dy -= 2.0f;
+    if (pip->keys[PLAYER_INPUT_DOWN])  dy += 2.0f;
+    if (pip->keys[PLAYER_INPUT_LEFT])  dx -= 2.0f;
+    if (pip->keys[PLAYER_INPUT_RIGHT]) dx += 2.0f;
+
+    // dash
+    if (pip->keys[PLAYER_INPUT_SPACE]){
+        speed *= dDash;
+    }
+
+    // Normalize movement vector if diagonal
+    if(dy && dx){
+        dy = dy / 2;
+    }
+
+
+    aServer->clients[playerIdx].player.hitBox.x += (int)dx * speed;
+    aServer->clients[playerIdx].player.hitBox.y += (int)dy * speed;
+}
+
 void NET_serverUpdatePlayer(Server aServer, Packet aPacket){
     PlayerInputPacket pip;
     Uint8* payload = NET_packetGetPayload(aPacket);
     memcpy(&pip, payload, sizeof(PlayerInputPacket));
 
     int playerIdx = NET_serverCompIP(aServer); 
-    int speed = 5;
 
-    if (pip.keys[PLAYER_INPUT_UP]) {
-        aServer->clients[playerIdx].player.hitBox.y -= speed;
-    }
-    if (pip.keys[PLAYER_INPUT_DOWN]) {
-        aServer->clients[playerIdx].player.hitBox.y += speed;
-    }
-    if (pip.keys[PLAYER_INPUT_LEFT]) {
-        aServer->clients[playerIdx].player.hitBox.x -= speed;
-    }
-    if (pip.keys[PLAYER_INPUT_RIGHT]) {
-        aServer->clients[playerIdx].player.hitBox.x += speed;
-    }
+    calcMovement(aServer, &pip, playerIdx);
+
+    int mx = aServer->clients[playerIdx].player.mousePos.x = pip.mousePos.x;
+    int my = aServer->clients[playerIdx].player.mousePos.y = pip.mousePos.y;
+    int dx = aServer->clients[playerIdx].player.hitBox.x - mx;
+    int dy = aServer->clients[playerIdx].player.hitBox.y - my;
+
+    float angle = atan2(dy, dx);
+    aServer->clients[playerIdx].player.direction = ((int)roundf(angle / (float)M_PI_4) + 8) % 8;
+    // printf("direction: %d\n", direction);
+
+    // print mouse position from packet
+    // int printX = aServer->clients[playerIdx].player.mousePos.x;
+    // printf("mouse x: %d\n", printX);
+
     NET_serverSendPlayerPacket(aServer,LOBBY); 
 }
 

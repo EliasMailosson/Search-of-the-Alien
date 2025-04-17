@@ -19,6 +19,9 @@ typedef struct {
     int windowHeight, windowWidth;
     bool windowFullscreen;
     char myUsername[40];
+
+    SDL_Cursor *crosshair;
+    SDL_Texture *playerTexture;
 }ClientView; 
 
 typedef struct {
@@ -26,6 +29,7 @@ typedef struct {
     SDL_Event event;
     bool keys[SDL_NUM_SCANCODES];
     bool isMouseDown, isMouseUp;
+    SDL_Point mousePos;
 
     bool isTextInput;
     char textInput[32];

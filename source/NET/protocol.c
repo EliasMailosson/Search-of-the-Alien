@@ -3,6 +3,7 @@
 #include <string.h>
 #include <stdio.h>
 
+static bool playerLastMousePosCheck(int x, int y);
 
 void NET_playerPacketReceive(Packet aPacket, PlayerPacket *list, int *count){
     Uint8* raw = NET_packetGetPayload(aPacket);
@@ -105,6 +106,20 @@ void NET_protocolSendArray(UDPpacket *pUDPpkg, UDPsocket Socket, IPaddress IP,
 bool NET_playerInputPacketCheck(PlayerInputPacket pip){
     for (int i = 0; i < NUM_PLAYER_INPUTS; i++){
         if(pip.keys[i]) return true;
+        else if(playerLastMousePosCheck(pip.mousePos.x, pip.mousePos.y)) 
+            return true;
+    }
+    return false;
+}
+
+static bool playerLastMousePosCheck(int x, int y){
+    static int lastX = -1;
+    static int lastY = -1;
+
+    if (x != lastX || y != lastY) {
+        lastX = x;
+        lastY = y;
+        return true;
     }
     return false;
 }
