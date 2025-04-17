@@ -34,8 +34,8 @@ void MAP_MapRender(SDL_Renderer *pRend, Map aMap){
 }
 
 void MAP_TileRender(SDL_Renderer *pRend, Map aMap, int y, int x, SDL_Rect *currentRect){
-    int id = aMap->tileID[y][x]; 
-    if(id < 0 || id >= MAX_COUNT_SPRITE_TILES) return;
+    int id = aMap->tileID[y][x];
+    if(id <= 0 || id >= MAX_COUNT_SPRITE_TILES) return;
     SDL_RenderCopy(pRend, aMap->texture, &aMap->tileIndex[id], currentRect);
 }
 
