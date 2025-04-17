@@ -37,10 +37,10 @@ else ifeq ($(OS), Windows_NT)
     RUN = ./
     PREFORM =
 else ifeq ($(OS), Linux)
-# --- Linux (Fedora/Ubuntu) Settings ---
-    CC = gcc
-    CFLAGS = -g -Wall -Wextra `sdl2-config --cflags` -I/usr/include/SDL2
-    LDFLAGS = `sdl2-config --libs` -lSDL2_image -lSDL2_ttf -lSDL2_mixer -lSDL2_net
+# --- Linux (Fedora/Ubuntu) Settings with clang and sanitizers ---
+    CC = clang
+    CFLAGS = -fsanitize=address -fsanitize=undefined -g -Wall -Wextra `sdl2-config --cflags`
+    LDFLAGS = -fsanitize=address `sdl2-config --libs` -lSDL2_image -lSDL2_ttf -lSDL2_mixer -lSDL2_net
     REMOV = rm -rf build/*.o $(CLIENT_EXEC) $(SERVER_EXEC)
     SERVER_EXEC = build/server
     CLIENT_EXEC = build/main
