@@ -1,5 +1,7 @@
 #include "../include/clientLife.h"
 
+SDL_Cursor* createScaledCursor(const char *filePath, int newWidth, int newHeight, int hotX, int hotY);
+
 void startClient(Client *aClient, ClientView *pView,ClientControl *pControl){
   SDL_Init(SDL_INIT_EVERYTHING);
   pView->windowHeight = 600;
@@ -43,9 +45,63 @@ void startClient(Client *aClient, ClientView *pView,ClientControl *pControl){
     SDL_Surface *surface = IMG_Load("assets/images/player/bluethan.png");
     pView->playerTexture = SDL_CreateTextureFromSurface(pView->pRend, surface);
     SDL_FreeSurface(surface);
+
+    pView->crosshair = createScaledCursor("assets/images/cursor/crosshair.png", 50, 50, 25, 25);
+
+    if(!pView->crosshair){
+        SDL_DestroyRenderer(pView->pRend);
+        SDL_DestroyWindow(pView->pWin);
+        SDLNet_Quit();
+        TTF_Quit();
+        IMG_Quit();
+        SDL_Quit();
+    }
+}
+
+SDL_Cursor* createScaledCursor(const char *filePath, int newWidth, int newHeight, int hotX, int hotY) {
+    SDL_Surface *origSurface = IMG_Load(filePath);
+    if (!origSurface) {
+        fprintf(stderr, "IMG_Load Error: %s\n", IMG_GetError());
+        return NULL;
+    }
+    
+    // Create a new surface with the desired dimensions.
+    // We use the same pixel format as the original image.
+    SDL_Surface *scaledSurface = SDL_CreateRGBSurface(0, newWidth, newHeight,
+            origSurface->format->BitsPerPixel,
+            origSurface->format->Rmask,
+            origSurface->format->Gmask,
+            origSurface->format->Bmask,
+            origSurface->format->Amask);
+    if (!scaledSurface) {
+        fprintf(stderr, "SDL_CreateRGBSurface Error: %s\n", SDL_GetError());
+        SDL_FreeSurface(origSurface);
+        return NULL;
+    }
+
+    // Define the destination rectangle which covers the entire scaled surface.
+    SDL_Rect destRect = { 0, 0, newWidth, newHeight };
+
+    if (SDL_BlitScaled(origSurface, NULL, scaledSurface, &destRect) != 0) {
+        fprintf(stderr, "SDL_BlitScaled Error: %s\n", SDL_GetError());
+        SDL_FreeSurface(origSurface);
+        SDL_FreeSurface(scaledSurface);
+        return NULL;
+    }
+    
+    SDL_Cursor* cursor = SDL_CreateColorCursor(scaledSurface, hotX, hotY);
+    if (!cursor) {
+        fprintf(stderr, "SDL_CreateColorCursor Error: %s\n", SDL_GetError());
+    }
+    
+    SDL_FreeSurface(origSurface);
+    SDL_FreeSurface(scaledSurface);
+    
+    return cursor;
 }
 
 void killClient(Client *aClient, ClientView *pView){
+    SDL_FreeCursor(pView->crosshair);
     SDL_DestroyTexture(pView->playerTexture);
 
     NET_clientDestroy(*aClient);

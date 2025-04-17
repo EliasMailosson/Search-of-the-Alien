@@ -40,6 +40,11 @@ void gameLoop(Client aClient, ClientControl *pControl, ClientView *pView){
 
 void runLobby(Client aClient, Map aMap, ClientControl *pControl, ClientView *pView) {
     static int toggleDelay = 0;
+
+    SDL_ShowCursor(SDL_DISABLE);
+    SDL_SetCursor(pView->crosshair);
+    SDL_ShowCursor(SDL_ENABLE);
+
     toggleDelay++;
     if(pControl->keys[SDL_SCANCODE_F] && toggleDelay > 12) {
         toggleFullscreen(pView);
