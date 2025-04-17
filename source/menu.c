@@ -4,9 +4,9 @@
 #include "../include/UI/checklist.h"
 #include "../include/UI/inputfield.h"
 #include "../include/UI/friend.h"
+#include "../include/NET/client.h"
 
-
-void renderMenu(SDL_Renderer *pRend, Menu *pMenu) {
+void renderMenu(SDL_Renderer *pRend, Menu *pMenu, FriendList aFriendList) {
     SDL_SetRenderDrawColor(pRend, 0,0,0,0);
     SDL_RenderClear(pRend);
     for(int i = 0; i < PANEL_COUNT; i++) {
@@ -14,12 +14,12 @@ void renderMenu(SDL_Renderer *pRend, Menu *pMenu) {
     }
 
     if (pMenu->currentPanel == PANEL_FRIENDS) {
-        UI_DrawFriendList(pRend, pMenu->fonts[0]);
+        UI_DrawFriendList(pRend, pMenu->fonts[1], aFriendList);
     }
-
     SDL_RenderPresent(pRend);
 }
 
+//4. Fixa en for-loop som ska genomföra ta från GetFriendNames och FriendSetStatus ifall man trycker på "Social"
 void updateMenu(Menu *pMenu, ClientControl *pControl, Client aClient, FriendList aFriendList) {
     static MenuEvent menuEvent;
     static int switchDelay = 0;
@@ -50,12 +50,22 @@ void updateMenu(Menu *pMenu, ClientControl *pControl, Client aClient, FriendList
                     NET_clientSetSelfName(aClient, myUsername);
                     NET_clientSendString(aClient,MENU,CONNECT,myUsername);
                 }
-                if (strcmp("Social", menuEvent.key) == 0)
-                {
+                if (strcmp("Social", menuEvent.key) == 0){
+                    char outputNames[MAX_FRIENDS][MAX_USERNAME_LEN];
+
                     UI_readFriendList(aFriendList);
+                    UI_SetFriendsOffline(aFriendList);
+
+                    int PlayerCount  = NET_clientGetPlayerCount(aClient);
+                    NET_clientGetFriendsName(aClient,outputNames);
+                    for (int i = 0; i < PlayerCount; i++)
+                    {
+                        UI_friendListSetStatus(aFriendList, outputNames[i]);
+                    }
                 }
                 break;
-            case BUTTON_CLICKED:
+                
+                case BUTTON_CLICKED:
                 if (strcmp("Quit", menuEvent.key) == 0) {
                     pControl->isRunning = false;
                     return;
@@ -75,9 +85,9 @@ void updateMenu(Menu *pMenu, ClientControl *pControl, Client aClient, FriendList
                 }
                 break;
         }
-    
 }
 
+//RefreshFriendList() 
 void refreshMenu(SDL_Renderer *pRend, Menu *pMenu, ClientView *pView) {
     for(int i = 0; i < PANEL_COUNT; i++) {
         UI_panelSetAppearance(pMenu->panels[i], 
@@ -152,7 +162,7 @@ void refreshMenu(SDL_Renderer *pRend, Menu *pMenu, ClientView *pView) {
         pMenu->fonts[0], (SDL_Color) { .r = 255, .g = 255, .b = 255, .a = 255 }
     );
 
-    Button b6 = (Button)UI_panelGetComponent(pMenu->panels[PANEL_SOCIAL], "AddFriend-button"); //
+    Button b6 = (Button)UI_panelGetComponent(pMenu->panels[PANEL_SOCIAL], "AddFriend-button"); 
     UI_buttonConfigure(b6, "Add Friend", pView->windowWidth / 2 - 150, 150 + OFFSET*1, BIGBUTTONWIDTH, BIGBUTTONHEIGHT, pRend,
         (SDL_Color) { .r = 0, .g = 0, .b = 0, .a = 255 }, 
         pMenu->fonts[1], (SDL_Color) { .r = 255, .g = 255, .b = 255, .a = 255 } 
@@ -181,7 +191,6 @@ void refreshMenu(SDL_Renderer *pRend, Menu *pMenu, ClientView *pView) {
         pMenu->fonts[1],
         (SDL_Color){255, 255, 255, 255}
     );
-
     //ADDFRIENDS MENU /////////////////////
     Inputfield f2 = (Inputfield)UI_panelGetComponent(pMenu->panels[PANEL_ADDFRIEND], "AddFriend-input");
     UI_inputfieldSetAppearance(pRend, f2, pView->windowWidth / 2 - 150, 150 + OFFSET,
@@ -211,11 +220,12 @@ void refreshMenu(SDL_Renderer *pRend, Menu *pMenu, ClientView *pView) {
         pMenu->fonts[0], (SDL_Color) { .r = 255, .g = 255, .b = 255, .a = 255 }
     );
 }
-
+//CreateFriendList() och panelAddComponent
 Menu initMenu(SDL_Renderer *pRend, ClientView *pView, Client aClient) {
     Menu menu;
     menu.fonts[0] = TTF_OpenFont("assets/fonts/PricedownBl-Regular 900.ttf", 20);
     menu.fonts[1] = TTF_OpenFont("assets/fonts/PricedownBl-Regular 900.ttf", 40);
+    menu.fonts[2] = TTF_OpenFont("assets/fonts/PricedownBl-Regular 900.ttf", 60);
 
     menu.currentPanel = PANEL_START;
 

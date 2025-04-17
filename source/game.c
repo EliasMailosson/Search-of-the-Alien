@@ -9,7 +9,7 @@ void gameLoop(Client aClient, ClientControl *pControl, ClientView *pView){
     Menu menu = initMenu(pView->pRend, pView, aClient);
     FriendList aFriendList = UI_friendListCreate();
     char username[MAX_USERNAME_LEN];
-    NET_getSelfname(aClient, username);
+    NET_clientGetSelfName(aClient, username);
 
     if(strcmp(username, "None") != 0) {
         NET_clientSendString(aClient,MENU,CONNECT,username);
@@ -34,7 +34,7 @@ void gameLoop(Client aClient, ClientControl *pControl, ClientView *pView){
 
     destroyMenu(&menu);
     MAP_DestroyMap(aMap);
-    NET_getSelfname(aClient, username);
+    NET_clientGetSelfName(aClient, username);
     if(strcmp(username, "None") != 0) {
         NET_clientSendString(aClient,MENU,DISCONNECT,username);
     }
@@ -81,7 +81,7 @@ void runMenu(Client aClient, ClientControl *pControl, ClientView *pView, Menu *p
         NET_clientSendInt(aClient, MENU, CHANGE_GAME_STATE, LOBBY);
     }
     NET_clientReceiver(aClient);
-    renderMenu(pView->pRend, pMenu);
+    renderMenu(pView->pRend, pMenu, aFriendsList);
 }
 
 void toggleFullscreen(ClientView *pView) {
@@ -127,9 +127,9 @@ void eventHandler(ClientControl *pControl){
     }
 }
 
-void render(ClientView *pView, Menu *pMenu){
+void render(ClientView *pView, Menu *pMenu,FriendList aFriendList){
     SDL_SetRenderDrawColor(pView->pRend, 0,0,0,0);
     SDL_RenderClear(pView->pRend);
-    renderMenu(pView->pRend, pMenu);
+    renderMenu(pView->pRend, pMenu,aFriendList);
     SDL_RenderPresent(pView->pRend);
 }

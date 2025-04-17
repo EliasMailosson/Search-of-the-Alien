@@ -6,7 +6,7 @@
 #include "UI/friend.h"
 
 #define PANEL_COUNT 7
-#define FONT_COUNT 2
+#define FONT_COUNT 3
 
 #define OFFSET 80
 #define BIGBUTTONWIDTH 300
@@ -35,9 +35,9 @@ typedef struct menu {
     TTF_Font *fonts[FONT_COUNT];
 } Menu;
 
-void renderMenu(SDL_Renderer *pRend, Menu *pMenu);
-void refreshMenu(SDL_Renderer *pRend, Menu *pMenu, ClientView *pView);
 Menu initMenu(SDL_Renderer *pRend, ClientView *pView, Client aClient);
+void renderMenu(SDL_Renderer *pRend, Menu *pMenu, FriendList aFriendList);
+void refreshMenu(SDL_Renderer *pRend, Menu *pMenu, ClientView *pView);
 void updateMenu(Menu *pMenu, ClientControl *pControl, Client aClient, FriendList aFriendList);
 void destroyMenu(Menu *pMenu);
 void checkUsername(Menu *pMenu, Client aClient);

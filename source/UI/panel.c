@@ -149,7 +149,10 @@ void UI_panelUpdate(Panel aPanel, MenuEvent *pEvent, bool isMouseUp, bool *keys)
             break;
         
         case UI_FRIENDLIST:
-
+                if (isMouseUp) {
+                    //här ska UI_FriendNameToggle(); va
+                }
+                
             break;
 
         }
@@ -186,7 +189,7 @@ void UI_panelRender(SDL_Renderer* pRend, Panel aPanel) {
             break;
 
         case UI_FRIENDLIST:
-            // UI_DrawFriendList(pRend, )
+            // UI_DrawFriendList(pRend,(FriendList)aPanel->compList[i].pComp); 
             break;
 
         }

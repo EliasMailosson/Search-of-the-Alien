@@ -1,5 +1,5 @@
 #include "../../include/NET/client.h"
-
+#include "../../include/UI/friend.h"
 struct Player{
     GameState state;
     char username[MAX_USERNAME_LEN];
@@ -10,9 +10,9 @@ struct client{
     UDPsocket clientSocket;
     UDPpacket *pReceivePacket;
     UDPpacket *pSendPacket;
-    char selfUsername[MAX_USERNAME_LEN];
     IPaddress serverAddr;
-    
+
+    char selfUsername[MAX_USERNAME_LEN];
     int PlayerCount;
     Player playerList[MAX_CLIENTS];
 }; 
@@ -26,6 +26,7 @@ bool NET_clientConnect(Client aClient){
 }
 
 Client NET_clientCreate(){
+
     Client aClient = malloc(sizeof(struct client));
     // Open a local UDP port (0 picks any available)
     aClient->clientSocket = SDLNet_UDP_Open(0);
@@ -65,8 +66,15 @@ void NET_clientSetSelfName(Client aClient, char* newName) {
     strcpy(aClient->playerList[0].username, newName);
 }
 
-void NET_getSelfname(Client aClient, char* outputName){
+void NET_clientGetSelfName(Client aClient, char* outputName){
     strcpy(outputName, aClient->selfUsername);
+}
+
+//1. alla Usernames, skickas till clienten. UI_friendListSetStatus()  (CHECKED) 
+void NET_clientGetFriendsName(Client aClient, char outputNames[][MAX_USERNAME_LEN]) {
+    for (int i = 0; i < aClient->PlayerCount; i++) {
+        strcpy(outputNames[i],aClient->playerList[i].username);
+    }
 }
 
 int NET_clientGetState(Client aClient) {
@@ -78,6 +86,10 @@ int NET_clientGetState(Client aClient) {
 
 int NET_clientGetPlayerCount(Client aClient) {
     return aClient->PlayerCount;
+}
+const Player *NET_clientGetPlayerList(Client aClient) {
+
+    return aClient->playerList;
 }
 
 SDL_Point NET_clientGetPlayerPos(Client aClient, int playerIdx) {
