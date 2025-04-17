@@ -15,8 +15,8 @@
 #define TILE_INDEX_COUNT (MAP_HEIGHT * MAP_WIDTH)+1
 #define TILE_SIZE 128
 #define TILE_SPRITE_SIZE 256
-#define MAX_COUNT_SPRITE_TILES 25
-#define FILE_PHAT_LOBBY_DATA "data/lobby.csv"
+#define MAX_COUNT_SPRITE_TILES 30
+#define FILE_PHAT_LOBBY_DATA "data/map01.csv"
 #define FILE_PHAT_LOBBY_SPRITE "assets/images/tiles/tileset-9-transparent.png"
 
 #define LOGICAL_WIN_W 600

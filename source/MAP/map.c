@@ -20,18 +20,18 @@ void MAP_MapRender(SDL_Renderer *pRend, Map aMap){
     SDL_Rect currentRect;
     currentRect.w = tileW;
     currentRect.h = tileH;
+
     for(int y = 0; y < MAP_HEIGHT; y++){
         for(int x = 0; x < MAP_WIDTH; x++){
             currentRect.x = (int)roundf((x - y) * (tileW * 0.5f)
-                                       + aMap->tileRect.x);
+                                        + aMap->tileRect.x);
             currentRect.y = (int)roundf((x + y) * (tileH * 0.25f)
-                                       + aMap->tileRect.y);
+                                        + aMap->tileRect.y);
 
             MAP_TileRender(pRend, aMap, y, x, &currentRect);
         }
     }
 }
-
 
 void MAP_TileRender(SDL_Renderer *pRend, Map aMap, int y, int x, SDL_Rect *currentRect){
     int id = aMap->tileID[y][x]; 
@@ -48,12 +48,10 @@ Map MAP_MapCreate(SDL_Renderer *pRend, int winW, int winH){
     MAP_TileSheetload(pRend, FILE_PHAT_LOBBY_SPRITE, aMap);
     int n = 0;
     for (int y = 0; y < 3; y++){
-        for (int x = 0; x < 6; x++){
+        for (int x = 0; x < 10; x++){
             aMap->tileIndex[n++] = (SDL_Rect){.x = (TILE_SPRITE_SIZE*x), .y = (TILE_SPRITE_SIZE*y), .w = TILE_SPRITE_SIZE, .h = TILE_SPRITE_SIZE};
         }
     }
-    aMap->tileIndex[19] = (SDL_Rect){.x = (TILE_SPRITE_SIZE*0), .y = (TILE_SPRITE_SIZE*3), .w = TILE_SPRITE_SIZE, .h = TILE_SPRITE_SIZE};
-    aMap->tileIndex[20] = (SDL_Rect){.x = (TILE_SPRITE_SIZE*1), .y = (TILE_SPRITE_SIZE*3), .w = TILE_SPRITE_SIZE, .h = TILE_SPRITE_SIZE};
     MAP_TilesFillWithBlank(aMap->tileID);
     MAP_MapGetTilseFromLobby(aMap->tileID);
     SDL_Rect startRect = {
@@ -69,7 +67,7 @@ Map MAP_MapCreate(SDL_Renderer *pRend, int winW, int winH){
     return aMap;
 }
 
-void MAP_MapRefresh(Map aMap, int winW, int winH) {
+void MAP_MapRefresh(Map aMap, int winW, int winH){
     float scaleX = (float)winW / LOGICAL_WIN_W;
     float scaleY = (float)winH / LOGICAL_WIN_H;
     float scale  = (scaleX < scaleY) ? scaleX : scaleY;
