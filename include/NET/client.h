@@ -25,12 +25,15 @@ void NET_clientSendArray(Client aClient,GameState GS, MessageType msgType,const 
 void NET_clientSetSelfName(Client aClient, char* newName);
 void NET_getSelfname(Client aClient, char* outputName);
 int NET_clientGetPlayerDirection(Client aClient, int playerIdx);
+void NET_clientGetSelfname(Client aClient, char* outputName);
 
 void NET_clientReceiver(Client aClient);
 int NET_clientFindPlayer(Client aClient, char* str);
 
 void NET_clientUpdateGameState(Client aClient,Packet aPacket);
 void NET_clientUpdatePlayerList(Client aClient,Packet aPacket);
+//----------
+SDL_Point NET_clientGetSelfPos(Client aClient);
 
 
 #endif

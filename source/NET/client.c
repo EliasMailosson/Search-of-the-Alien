@@ -66,7 +66,7 @@ void NET_clientSetSelfName(Client aClient, char* newName) {
     strcpy(aClient->playerList[0].username, newName);
 }
 
-void NET_getSelfname(Client aClient, char* outputName){
+void NET_clientGetSelfname(Client aClient, char* outputName){
     strcpy(outputName, aClient->selfUsername);
 }
 
@@ -195,3 +195,11 @@ int NET_clientFindPlayer(Client aClient, char* str){
     return -1;
 }
 
+SDL_Point NET_clientGetSelfPos(Client aClient){
+    for (int i = 0; i < aClient->PlayerCount; i++){
+        if(strcmp(aClient->selfUsername,aClient->playerList[i].username) == 0){
+            return aClient->playerList[i].pos;
+        }
+    }
+    return (SDL_Point){-1,-1};
+}

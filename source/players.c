@@ -38,3 +38,7 @@ PlayerInputPacket prepareInputArray(ClientControl *pControl) {
     };
     return pip;
 }
+
+void updatepos(){
+
+}

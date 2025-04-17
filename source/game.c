@@ -7,7 +7,7 @@ void gameLoop(Client aClient, ClientControl *pControl, ClientView *pView){
 
     Menu menu = initMenu(pView->pRend, pView, aClient);
     char username[MAX_USERNAME_LEN];
-    NET_getSelfname(aClient, username);
+    NET_clientGetSelfname(aClient, username);
 
     if(strcmp(username, "None") != 0) {
         NET_clientSendString(aClient,MENU,CONNECT,username);
@@ -32,7 +32,7 @@ void gameLoop(Client aClient, ClientControl *pControl, ClientView *pView){
 
     destroyMenu(&menu);
     MAP_MapDestroy(aMap);
-    NET_getSelfname(aClient, username);
+    NET_clientGetSelfname(aClient, username);
     if(strcmp(username, "None") != 0) {
         NET_clientSendString(aClient,MENU,DISCONNECT,username);
     }
@@ -60,6 +60,8 @@ void runLobby(Client aClient, Map aMap, ClientControl *pControl, ClientView *pVi
 
     NET_clientReceiver(aClient);
     
+    MAP_MapMoveMap(aMap,NET_clientGetSelfPos(aClient));
+
     SDL_SetRenderDrawColor(pView->pRend, 0,0,0,0);
     SDL_RenderClear(pView->pRend);
 

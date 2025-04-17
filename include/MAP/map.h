@@ -6,6 +6,7 @@
 #include <stdlib.h>
 #include <SDL.h>
 #include <SDL_image.h>
+#include <math.h>
 
 #define MAP_WIDTH 60
 #define MAP_HEIGHT 60
@@ -14,7 +15,7 @@
 #define TILE_INDEX_COUNT (MAP_HEIGHT * MAP_WIDTH)+1
 #define TILE_SIZE 128
 #define TILE_SPRITE_SIZE 256
-#define MAX_COUNT_SPRITE_TILES 25
+#define MAX_COUNT_SPRITE_TILES 40
 #define FILE_PHAT_LOBBY_DATA "data/lobby.csv"
 #define FILE_PHAT_LOBBY_SPRITE "assets/images/tiles/tileset-9-transparent.png"
 
@@ -27,19 +28,21 @@ typedef struct Map *Map;
 
 void MAP_MapRender(SDL_Renderer *pRend, Map aMap);
 
-void MAP_TileRender(SDL_Renderer *pRend, Map aMap, int y, int x);
+void MAP_TileRender(SDL_Renderer *pRend, Map aMap, int y, int x, SDL_Rect *currentRect);
 
 Map MAP_MapCreate(SDL_Renderer *pRend, int winW, int winH);
 
-Tile** MAP_TileCreate(int winW,int winH);
 
 void MAP_MapRefresh(Map aMap, int winW, int winH);
 
 void MAP_MapDestroy(Map aMap);
 
-void MAP_MapGetTilseFromLobby(Tile **ppTiles);
+void MAP_MapGetTilseFromLobby(int tileID[MAP_HEIGHT][MAP_WIDTH]);
 
-void MAP_MapGettOffset(int winH, int winW, SDL_Point *index);
+//void MAP_MapGettOffset(int winH, int winW, SDL_Point *index);
+void MAP_TilesFillWithBlank(int tileID[MAP_HEIGHT][MAP_WIDTH]);
+
+void MAP_MapMoveMap(Map aMap, SDL_Point playerOffset);
 
 
 #endif
