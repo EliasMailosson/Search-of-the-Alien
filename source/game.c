@@ -94,6 +94,10 @@ void runMenu(Client aClient, ClientControl *pControl, ClientView *pView, Menu *p
         toggleDelay = 0;
     }
 
+    // if (pControl->isMouseDown && pMenu->currentPanel == PANEL_FRIENDS) {
+    //     UI_FriendNameToggle(pMenu->friendList, pControl->mousePos.x, pControl->mousePos.y);
+    // }    
+    
     updateMenu(pMenu, pControl, aClient);
     if (pMenu->isGameStarted) {
         NET_clientSendInt(aClient, MENU, CHANGE_GAME_STATE, LOBBY);

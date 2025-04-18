@@ -67,7 +67,6 @@ void UI_SetFriendsOffline(FriendList list) {
         list->friends[i].isOnline=false;
     }
 }
-// 2. ser till ifall matchande vänner från clienten är online (CHECKED)
 void UI_friendListSetStatus(FriendList list, const char* name) { 
     for (int i = 0; i < list->count; ++i) {
         if (strcmp(list->friends[i].name, name) == 0) {
@@ -82,17 +81,19 @@ void UI_FriendNameToggle(FriendList list, int mouseX, int mouseY) {
     list->selectedFriendIndex = -1;
 
     for (int i = 0; i < list->count; ++i) {
-        SDL_Rect friendRect = { 50, y, 200, 40 };
+       
+        SDL_Rect friendRect = { 50, y, 200, FRIEND_HEIGHT};
+
         if (mouseX >= friendRect.x && mouseX <= friendRect.x + friendRect.w &&
             mouseY >= friendRect.y && mouseY <= friendRect.y + friendRect.h) {
-            list->selectedFriendIndex=-1;
+            list->selectedFriendIndex = i;
             printf("Vald vän: %s\n", list->friends[i].name);
             break;
         }
         y += 60;
     }
 }
-//"Sardor"
+
 void UI_friendListRender(FriendList list, SDL_Renderer* renderer) {
     int y = 150;
     for (int i = 0; i < list->count; ++i) {
@@ -106,7 +107,7 @@ void UI_friendListRender(FriendList list, SDL_Renderer* renderer) {
         SDL_Surface* surface = TTF_RenderText_Solid(list->fonts, statusText, color);
         SDL_Texture* texture = SDL_CreateTextureFromSurface(renderer, surface);
 
-        SDL_Rect dest = { 50, y, surface->w, surface->h };
+        SDL_Rect dest = { 50, y, surface->w, FRIEND_HEIGHT};
 
         if (i==list->selectedFriendIndex)
         {

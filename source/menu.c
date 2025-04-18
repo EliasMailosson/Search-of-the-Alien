@@ -13,13 +13,9 @@ void renderMenu(SDL_Renderer *pRend, Menu *pMenu) {
         UI_panelRender(pRend, pMenu->panels[i]);
     }
 
-    // if (pMenu->currentPanel == PANEL_FRIENDS) {
-    //     UI_DrawFriendList(pRend, pMenu->fonts[1], aFriendList);
-    // }
     SDL_RenderPresent(pRend);
 }
 
-//4. Fixa en for-loop som ska genomföra ta från GetFriendNames och FriendSetStatus ifall man trycker på "Social"
 void updateMenu(Menu *pMenu, ClientControl *pControl, Client aClient) {
     static MenuEvent menuEvent;
     static int switchDelay = 0;
@@ -78,7 +74,6 @@ void updateMenu(Menu *pMenu, ClientControl *pControl, Client aClient) {
                 break;
         }
 }
-
 
 void updateFriendList(Menu *pMenu, Client aClient) {
     FriendList aFriendList = (FriendList)UI_panelGetComponent(pMenu->panels[PANEL_FRIENDS], "social-friendlist");
@@ -159,10 +154,6 @@ void refreshMenu(SDL_Renderer *pRend, Menu *pMenu, ClientView *pView) {
     );
 
     // SOCIAL MENU ////////////////////////
-    // Inputfield f1 = (Inputfield)UI_panelGetComponent(pMenu->panels[PANEL_SOCIAL], "Social-input"); //Panel switch
-    // UI_inputfieldSetAppearance(pRend, f1, pView->windowWidth / 2 - 150, 150 + OFFSET, BIGBUTTONWIDTH,
-    //     (SDL_Color) {.r = 0, .b = 0, .g = 0, .a = 0}, (SDL_Color) {.r = 255, .b = 255, .g = 255, .a =255}, pMenu->fonts[0]
-    // );
 
     Button b5 = (Button)UI_panelGetComponent(pMenu->panels[PANEL_SOCIAL], "Social-back"); // "back" knappen  
     UI_buttonConfigure(b5, "Back", 
@@ -369,7 +360,6 @@ void checkUsername(Menu *pMenu, Client aClient){
     {
         char username[MAX_USERNAME_LEN];
         fgets(username, MAX_USERNAME_LEN, fp);
-        printf("%s\n", username);
         pMenu->currentPanel = PANEL_START;
         NET_clientSetSelfName(aClient, username);
     }

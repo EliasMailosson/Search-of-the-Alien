@@ -3,6 +3,7 @@
 
 #define MAX_USERNAME_LEN 40
 #define MAX_FRIENDS 10
+#define FRIEND_HEIGHT 40
 
 #include <stdbool.h>
 #include <SDL.h>
@@ -18,6 +19,7 @@ void UI_friendListSetStatus(FriendList list, const char* name);
 void UI_friendListRender(FriendList list, SDL_Renderer* renderer);
 void UI_DrawFriendList(SDL_Renderer *pRend,FriendList list);
 void UI_FriendremoveSpacesInBetween(char* str);
+// void UI_FriendNameToggle(FriendList list, int mouseX, int mouseY);
 
 void UI_clientAddFriend(FriendList aFriendList, char *outputFriend);
 void UI_updateFriendList(FriendList aFriendList);
