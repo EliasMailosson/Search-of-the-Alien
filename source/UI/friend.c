@@ -137,7 +137,8 @@ void UI_updateFriendList(FriendList aFriendList){
     fp = fopen("data/playerlist.txt", "w");
     if (fp != NULL)
     {
-      fprintf(fp,"%d\n", aFriendList->count);
+        fprintf(fp,"%d\n", aFriendList->count);
+
       for (int i = 0; i < aFriendList->count; i++)
       {
         fprintf(fp,"%s", aFriendList->friends[i].name);

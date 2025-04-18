@@ -50,13 +50,14 @@ void updateMenu(Menu *pMenu, ClientControl *pControl, Client aClient) {
                     NET_clientSetSelfName(aClient, myUsername);
                     NET_clientSendString(aClient,MENU,CONNECT,myUsername);
                 }
-                if (strcmp("Social", menuEvent.key) == 0){
-                    char outputNames[MAX_FRIENDS][MAX_USERNAME_LEN];
+                if (strcmp("AddFriend-Friends", menuEvent.key) == 0 || strcmp("Friends-button", menuEvent.key) == 0 || strcmp("Friends",menuEvent.key)==0) {
                     FriendList aFriendList = (FriendList)UI_panelGetComponent(pMenu->panels[PANEL_FRIENDS],"social-friendlist");
+                    
                     UI_readFriendList(aFriendList);
                     UI_SetFriendsOffline(aFriendList);
 
                     int PlayerCount  = NET_clientGetPlayerCount(aClient);
+                    char outputNames[MAX_FRIENDS][MAX_USERNAME_LEN];
                     NET_clientGetFriendsName(aClient,outputNames);
                     for (int i = 0; i < PlayerCount; i++)
                     {
@@ -282,9 +283,6 @@ Menu initMenu(SDL_Renderer *pRend, ClientView *pView, Client aClient) {
     // SOCIAL MENU ////////////////////////
     UI_panelSetImage(pRend, menu.panels[PANEL_SOCIAL], "assets/images/menu/background2.png");
 
-    // Inputfield f1 = UI_inputfieldCreate();
-    // UI_panelAddComponent(menu.panels[PANEL_SOCIAL], f1, UI_INPUTFIELD, "Social-input");
-
     Button b5 = UI_buttonCreate();
     UI_panelAddComponent(menu.panels[PANEL_SOCIAL], b5, UI_BUTTON, "Social-back");
     UI_panelSetComponentLink(menu.panels[PANEL_SOCIAL], "Social-back", PANEL_START);
@@ -303,6 +301,7 @@ Menu initMenu(SDL_Renderer *pRend, ClientView *pView, Client aClient) {
 
     FriendList aFriendList = UI_friendListCreate(menu.fonts[2]);
     UI_panelAddComponent(menu.panels[PANEL_FRIENDS], aFriendList, UI_FRIENDLIST, "social-friendlist");
+
     Button b12 = UI_buttonCreate();
     UI_panelAddComponent(menu.panels[PANEL_FRIENDS], b12, UI_BUTTON, "Friends-back");
     UI_panelSetComponentLink(menu.panels[PANEL_FRIENDS], "Friends-back", PANEL_SOCIAL);
