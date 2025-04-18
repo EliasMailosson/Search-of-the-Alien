@@ -135,6 +135,10 @@ void MAP_MapGetTilseFromLobby(int tileID[MAP_HEIGHT][MAP_WIDTH]){
     fclose(fp);
 }
 
+SDL_Rect MAP_getTileRect(Map aMap) {
+    return aMap->tileRect;
+}
+
 static void substring(char *buffer, int start, int end, char* result){
     if (start < 0 || end < 0 || end <= start || buffer == NULL)
         return;

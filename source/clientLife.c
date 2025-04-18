@@ -48,6 +48,8 @@ void startClient(Client *aClient, ClientView *pView,ClientControl *pControl){
 
     pView->crosshair = createScaledCursor("assets/images/cursor/crosshair.png", 50, 50, 25, 25);
 
+    pView->playerRenderSize = 128;
+
     if(!pView->crosshair){
         SDL_DestroyRenderer(pView->pRend);
         SDL_DestroyWindow(pView->pWin);

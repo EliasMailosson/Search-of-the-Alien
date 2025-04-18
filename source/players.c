@@ -9,25 +9,36 @@ void renderPlayers(Client aClient, ClientView *pView, SDL_Rect playerCamera) {
     frame++;
     int playerCount = NET_clientGetPlayerCount(aClient);
 
+    int selfIndex = NET_clientGetSelfIndex(aClient);
+    SDL_Point selfPos = NET_clientGetPlayerPos(aClient, selfIndex);
+    int centerX = pView->windowWidth/2;
+    int centerY = pView->windowHeight/2;
+    int renderSizeHalf = pView->playerRenderSize/2;
+
+    // TODO: sort players in "y" value, so the players in front get rendered last.
+    // for(int i = 0; i < playerCount; i++) {
+    //     SDL_Point pos = NET_clientGetPlayerPos(aClient, i);
+    // }
+
     for(int i = 0; i < playerCount; i++) {
         SDL_Point pos = NET_clientGetPlayerPos(aClient, i);
         int direction = NET_clientGetPlayerDirection(aClient, i);
 
         SDL_Rect playerRect;
-        if(NET_clientGetSelfIndex(aClient) == i) {
+        if(selfIndex == i) {
             playerRect = (SDL_Rect){
-                .x = pView->windowWidth/2 - RENDER_SIZE/2,
-                .y = pView->windowHeight/2 - RENDER_SIZE/2,
-                .w = RENDER_SIZE,
-                .h = RENDER_SIZE
+                .x = centerX - renderSizeHalf,
+                .y = centerY - renderSizeHalf,
+                .w = pView->playerRenderSize,
+                .h = pView->playerRenderSize
             };
         }
         else {
             playerRect = (SDL_Rect){
-                .x = pos.x - playerCamera.x - RENDER_SIZE/2,
-                .y = pos.y - playerCamera.y - RENDER_SIZE/2,
-                .w = RENDER_SIZE,
-                .h = RENDER_SIZE
+                .x = centerX - (selfPos.x - pos.x) - renderSizeHalf,
+                .y = centerY - (selfPos.y - pos.y) - renderSizeHalf,
+                .w = pView->playerRenderSize,
+                .h = pView->playerRenderSize
             };
         }
         

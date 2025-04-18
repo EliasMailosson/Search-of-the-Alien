@@ -30,6 +30,7 @@ void MAP_TileRender(SDL_Renderer *pRend, Map aMap, int y, int x, SDL_Rect *curre
 
 Map MAP_MapCreate(SDL_Renderer *pRend, int winW, int winH);
 
+SDL_Rect MAP_getTileRect(Map aMap);
 
 void MAP_MapRefresh(Map aMap, int winW, int winH);
 

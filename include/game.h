@@ -21,8 +21,11 @@ typedef struct {
     bool windowFullscreen;
     char myUsername[40];
 
-    SDL_Cursor *crosshair;
-    SDL_Texture *playerTexture;
+    struct Players {
+        SDL_Cursor *crosshair;
+        SDL_Texture *playerTexture;
+        int playerRenderSize;
+    };
 }ClientView; 
 
 typedef struct {

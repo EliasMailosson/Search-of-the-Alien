@@ -66,6 +66,9 @@ void runLobby(Client aClient, Map aMap, ClientControl *pControl, ClientView *pVi
 
     MAP_MapRefresh(aMap, pView->windowWidth, pView->windowHeight);
 
+    SDL_Rect tileRect = MAP_getTileRect(aMap);
+    pView->playerRenderSize = tileRect.h;
+
     PlayerInputPacket pip;
     pip = prepareInputArray(pControl);
     if(NET_playerInputPacketCheck(pip)){
