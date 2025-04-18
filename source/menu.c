@@ -53,7 +53,6 @@ void updateMenu(Menu *pMenu, ClientControl *pControl, Client aClient) {
                 if (strcmp("AddFriend-Friends", menuEvent.key) == 0 || strcmp("Friends-button", menuEvent.key) == 0 || strcmp("Friends", menuEvent.key) == 0) {
                 
                     updateFriendList(pMenu, aClient);
-                
                 }
                 break;
                 
@@ -94,7 +93,6 @@ void updateFriendList(Menu *pMenu, Client aClient) {
     for (int i = 0; i < PlayerCount; i++) {
         UI_FriendremoveSpacesInBetween(outputNames[i]);
         UI_friendListSetStatus(aFriendList, outputNames[i]);
-        printf("%s\n", outputNames[i]);
     }
 }
 
