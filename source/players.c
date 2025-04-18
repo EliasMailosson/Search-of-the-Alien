@@ -30,7 +30,7 @@ void renderPlayers(Client aClient, ClientView *pView, SDL_Rect playerCamera) {
         else {
             playerRect = (SDL_Rect){
                 .x = pos.x - playerCamera.x - 40,
-                .y = pos.y - playerCamera.y - 80,
+                .y = pos.y - playerCamera.y - 40,
                 .w = 80,
                 .h = 80
             };

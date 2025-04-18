@@ -11,7 +11,7 @@
 
 #define MAX_CLIENTS 8
 #define PORT 1234
-#define JON_IP "130.229.154.247"
+#define JON_IP "127.0.0.1"
 
 struct friends
 {
