@@ -12,6 +12,7 @@ struct client{
     UDPpacket *pReceivePacket;
     UDPpacket *pSendPacket;
     IPaddress serverAddr;
+    char selfUsername[MAX_USERNAME_LEN];
 
     int PlayerCount;
     Player playerList[MAX_CLIENTS];
