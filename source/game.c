@@ -1,11 +1,13 @@
 #include "../include/game.h"
 #include "../include/menu.h"
 #include "../include/players.h"
+#include "../include/UI/friend.h"
 
 void gameLoop(Client aClient, ClientControl *pControl, ClientView *pView){
     NET_clientConnect(aClient);
 
     Menu menu = initMenu(pView->pRend, pView, aClient);
+    
     char username[MAX_USERNAME_LEN];
     NET_clientGetSelfname(aClient, username);
 
@@ -135,11 +137,4 @@ void eventHandler(ClientControl *pControl){
             break;
         }
     }
-}
-
-void render(ClientView *pView, Menu *pMenu){
-    SDL_SetRenderDrawColor(pView->pRend, 0,0,0,0);
-    SDL_RenderClear(pView->pRend);
-    renderMenu(pView->pRend, pMenu);
-    SDL_RenderPresent(pView->pRend);
 }

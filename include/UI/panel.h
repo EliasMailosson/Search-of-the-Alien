@@ -4,7 +4,7 @@
 #include <stdbool.h>
 #include <SDL.h>
 
-enum CompTypes{UI_BUTTON, UI_LABEL, UI_CHECKLIST, UI_INPUTFIELD};
+enum CompTypes{UI_BUTTON, UI_LABEL, UI_CHECKLIST, UI_INPUTFIELD, UI_FRIENDLIST};
 
 typedef struct Panel *Panel;
 

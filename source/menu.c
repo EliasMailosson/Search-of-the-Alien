@@ -4,7 +4,7 @@
 #include "../include/UI/checklist.h"
 #include "../include/UI/inputfield.h"
 #include "../include/UI/friend.h"
-
+#include "../include/NET/client.h"
 
 void renderMenu(SDL_Renderer *pRend, Menu *pMenu) {
     SDL_SetRenderDrawColor(pRend, 0,0,0,0);
@@ -13,13 +13,13 @@ void renderMenu(SDL_Renderer *pRend, Menu *pMenu) {
         UI_panelRender(pRend, pMenu->panels[i]);
     }
 
-    if (pMenu->currentPanel == PANEL_FRIENDS) {
-        UI_DrawFriendList(pRend, pMenu->fonts[0]);
-    }
-
+    // if (pMenu->currentPanel == PANEL_FRIENDS) {
+    //     UI_DrawFriendList(pRend, pMenu->fonts[1], aFriendList);
+    // }
     SDL_RenderPresent(pRend);
 }
 
+//4. Fixa en for-loop som ska genomföra ta från GetFriendNames och FriendSetStatus ifall man trycker på "Social"
 void updateMenu(Menu *pMenu, ClientControl *pControl, Client aClient) {
     static MenuEvent menuEvent;
     static int switchDelay = 0;
@@ -32,8 +32,8 @@ void updateMenu(Menu *pMenu, ClientControl *pControl, Client aClient) {
 
     pMenu->isGameStarted = false;
 
-    for(int i = 0; i < PANEL_COUNT; i++) {
-        UI_panelUpdate(pMenu->panels[i], &menuEvent, pControl->isMouseUp, pControl->keys);
+    // behöver dubbel kollas med UI gänget om det är hållbart istället för en for loop
+    UI_panelUpdate(pMenu->panels[pMenu->currentPanel], &menuEvent, pControl->isMouseUp, pControl->keys);
 
         switch(menuEvent.eventType) {
             case PANEL_SWITCH:
@@ -50,8 +50,22 @@ void updateMenu(Menu *pMenu, ClientControl *pControl, Client aClient) {
                     NET_clientSetSelfName(aClient, myUsername);
                     NET_clientSendString(aClient,MENU,CONNECT,myUsername);
                 }
+                if (strcmp("Social", menuEvent.key) == 0){
+                    char outputNames[MAX_FRIENDS][MAX_USERNAME_LEN];
+                    FriendList aFriendList = (FriendList)UI_panelGetComponent(pMenu->panels[PANEL_FRIENDS],"social-friendlist");
+                    UI_readFriendList(aFriendList);
+                    UI_SetFriendsOffline(aFriendList);
+
+                    int PlayerCount  = NET_clientGetPlayerCount(aClient);
+                    NET_clientGetFriendsName(aClient,outputNames);
+                    for (int i = 0; i < PlayerCount; i++)
+                    {
+                        UI_friendListSetStatus(aFriendList, outputNames[i]);
+                    }
+                }
                 break;
-            case BUTTON_CLICKED:
+                
+                case BUTTON_CLICKED:
                 if (strcmp("Quit", menuEvent.key) == 0) {
                     pControl->isRunning = false;
                     return;
@@ -63,11 +77,18 @@ void updateMenu(Menu *pMenu, ClientControl *pControl, Client aClient) {
                     
                     printf("Join friend clicked!\n");
                 }
+                if (strcmp("AddFriend-Add", menuEvent.key) == 0){
+                    char friend[MAX_USERNAME_LEN];
+                    FriendList aFriendList = (FriendList)UI_panelGetComponent(pMenu->panels[PANEL_FRIENDS],"social-friendlist");
+                    addFriendList(pMenu, friend);
+                    UI_clientAddFriend(aFriendList, friend);
+                    UI_updateFriendList(aFriendList);
+                }
                 break;
         }
-    }
 }
 
+//RefreshFriendList() 
 void refreshMenu(SDL_Renderer *pRend, Menu *pMenu, ClientView *pView) {
     for(int i = 0; i < PANEL_COUNT; i++) {
         UI_panelSetAppearance(pMenu->panels[i], 
@@ -142,7 +163,7 @@ void refreshMenu(SDL_Renderer *pRend, Menu *pMenu, ClientView *pView) {
         pMenu->fonts[0], (SDL_Color) { .r = 255, .g = 255, .b = 255, .a = 255 }
     );
 
-    Button b6 = (Button)UI_panelGetComponent(pMenu->panels[PANEL_SOCIAL], "AddFriend-button"); //
+    Button b6 = (Button)UI_panelGetComponent(pMenu->panels[PANEL_SOCIAL], "AddFriend-button"); 
     UI_buttonConfigure(b6, "Add Friend", pView->windowWidth / 2 - 150, 150 + OFFSET*1, BIGBUTTONWIDTH, BIGBUTTONHEIGHT, pRend,
         (SDL_Color) { .r = 0, .g = 0, .b = 0, .a = 255 }, 
         pMenu->fonts[1], (SDL_Color) { .r = 255, .g = 255, .b = 255, .a = 255 } 
@@ -171,7 +192,6 @@ void refreshMenu(SDL_Renderer *pRend, Menu *pMenu, ClientView *pView) {
         pMenu->fonts[1],
         (SDL_Color){255, 255, 255, 255}
     );
-
     //ADDFRIENDS MENU /////////////////////
     Inputfield f2 = (Inputfield)UI_panelGetComponent(pMenu->panels[PANEL_ADDFRIEND], "AddFriend-input");
     UI_inputfieldSetAppearance(pRend, f2, pView->windowWidth / 2 - 150, 150 + OFFSET,
@@ -201,11 +221,12 @@ void refreshMenu(SDL_Renderer *pRend, Menu *pMenu, ClientView *pView) {
         pMenu->fonts[0], (SDL_Color) { .r = 255, .g = 255, .b = 255, .a = 255 }
     );
 }
-
+//CreateFriendList() och panelAddComponent
 Menu initMenu(SDL_Renderer *pRend, ClientView *pView, Client aClient) {
     Menu menu;
     menu.fonts[0] = TTF_OpenFont("assets/fonts/PricedownBl-Regular 900.ttf", 20);
     menu.fonts[1] = TTF_OpenFont("assets/fonts/PricedownBl-Regular 900.ttf", 40);
+    menu.fonts[2] = TTF_OpenFont("assets/fonts/PricedownBl-Regular 900.ttf", 60);
 
     menu.currentPanel = PANEL_START;
 
@@ -276,9 +297,12 @@ Menu initMenu(SDL_Renderer *pRend, ClientView *pView, Client aClient) {
     UI_panelAddComponent(menu.panels[PANEL_SOCIAL], b11, UI_BUTTON, "Friends-button");
     UI_panelSetComponentLink(menu.panels[PANEL_SOCIAL], "Friends-button", PANEL_FRIENDS); 
 
-    //FRIENDS MENU //////////////////////// (HÄR)
+    //FRIENDS MENU ////////////////////////
     UI_panelSetImage(pRend,menu.panels[PANEL_FRIENDS], "assets/images/menu/background2.png");
-    
+
+
+    FriendList aFriendList = UI_friendListCreate(menu.fonts[2]);
+    UI_panelAddComponent(menu.panels[PANEL_FRIENDS], aFriendList, UI_FRIENDLIST, "social-friendlist");
     Button b12 = UI_buttonCreate();
     UI_panelAddComponent(menu.panels[PANEL_FRIENDS], b12, UI_BUTTON, "Friends-back");
     UI_panelSetComponentLink(menu.panels[PANEL_FRIENDS], "Friends-back", PANEL_SOCIAL);
@@ -358,4 +382,9 @@ void createNewUsername(Menu *pMenu, char *output){
     }
 
     fclose(fp);
+}
+
+void addFriendList(Menu *pMenu, char *output){
+    Inputfield input = UI_panelGetComponent(pMenu->panels[PANEL_ADDFRIEND], "AddFriend-input");
+    UI_inputfieldGetBuffer(input, output);
 }

@@ -13,14 +13,6 @@
 #define PORT 1234
 #define JON_IP "127.0.0.1"
 
-struct friends
-{
-    char username[40];
-    int friendCount;
-};
-
-typedef struct friends Friends;
-
 /** Initializes SDL network 
  * ex use: While true then the network is running
  */
@@ -30,10 +22,6 @@ void NET_serverDestroySDL();
 
 void NET_PlayerListRemovePlayer(PlayerPacket **list, int index, int *listCount);
 void NET_PlayerListAddPlayer(PlayerPacket **list,PlayerPacket newPlayer,int *listCount);
-
-void NET_PlayerListRead(int *playerCount, Friends player[]);
-void NET_PlayerListUpdateFile(int playerCount, Friends player[]);
-Friends newPlayer(char username[]);
 
 void NET_PlayerListUpdate(Packet aPacket, PlayerPacket* list, int *count);
 void NET_PlayerListPrintf(PlayerPacket* list, int count);
