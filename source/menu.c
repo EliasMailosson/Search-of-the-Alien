@@ -282,9 +282,6 @@ Menu initMenu(SDL_Renderer *pRend, ClientView *pView, Client aClient) {
     // SOCIAL MENU ////////////////////////
     UI_panelSetImage(pRend, menu.panels[PANEL_SOCIAL], "assets/images/menu/background2.png");
 
-    FriendList aFriendList = UI_friendListCreate(menu.fonts[2]);
-    UI_panelAddComponent(menu.panels[PANEL_FRIENDS], aFriendList, UI_FRIENDLIST, "social-friendlist");
-
     // Inputfield f1 = UI_inputfieldCreate();
     // UI_panelAddComponent(menu.panels[PANEL_SOCIAL], f1, UI_INPUTFIELD, "Social-input");
 
@@ -302,7 +299,10 @@ Menu initMenu(SDL_Renderer *pRend, ClientView *pView, Client aClient) {
 
     //FRIENDS MENU ////////////////////////
     UI_panelSetImage(pRend,menu.panels[PANEL_FRIENDS], "assets/images/menu/background2.png");
-    
+
+
+    FriendList aFriendList = UI_friendListCreate(menu.fonts[2]);
+    UI_panelAddComponent(menu.panels[PANEL_FRIENDS], aFriendList, UI_FRIENDLIST, "social-friendlist");
     Button b12 = UI_buttonCreate();
     UI_panelAddComponent(menu.panels[PANEL_FRIENDS], b12, UI_BUTTON, "Friends-back");
     UI_panelSetComponentLink(menu.panels[PANEL_FRIENDS], "Friends-back", PANEL_SOCIAL);
