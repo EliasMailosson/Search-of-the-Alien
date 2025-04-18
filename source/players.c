@@ -18,12 +18,24 @@ void renderPlayers(Client aClient, ClientView *pView, SDL_Rect playerCamera) {
     for(int i = 0; i < playerCount; i++) {
         SDL_Point pos = NET_clientGetPlayerPos(aClient, i);
 
-        SDL_Rect playerRect = {
-            .x = pos.x - playerCamera.x - 40,
-            .y = pos.y - playerCamera.y - 80,
-            .w = 80,
-            .h = 80
-        };
+        SDL_Rect playerRect;
+        if(NET_clientGetSelfIndex(aClient) == i) {
+            playerRect = (SDL_Rect){
+                .x = pView->windowWidth/2 - 40,
+                .y = pView->windowHeight/2 - 40,
+                .w = 80,
+                .h = 80
+            };
+        }
+        else {
+            playerRect = (SDL_Rect){
+                .x = pos.x - playerCamera.x - 40,
+                .y = pos.y - playerCamera.y - 80,
+                .w = 80,
+                .h = 80
+            };
+        }
+        
         SDL_SetRenderDrawColor(pView->pRend, colors[i].r, colors[i].g, colors[i].b, colors[i].a);
         SDL_RenderFillRect(pView->pRend, &playerRect);
     }
