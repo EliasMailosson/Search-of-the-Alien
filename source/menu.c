@@ -50,19 +50,10 @@ void updateMenu(Menu *pMenu, ClientControl *pControl, Client aClient) {
                     NET_clientSetSelfName(aClient, myUsername);
                     NET_clientSendString(aClient,MENU,CONNECT,myUsername);
                 }
-                if (strcmp("AddFriend-Friends", menuEvent.key) == 0 || strcmp("Friends-button", menuEvent.key) == 0 || strcmp("Friends",menuEvent.key)==0) {
-                    FriendList aFriendList = (FriendList)UI_panelGetComponent(pMenu->panels[PANEL_FRIENDS],"social-friendlist");
-                    
-                    UI_readFriendList(aFriendList);
-                    UI_SetFriendsOffline(aFriendList);
-                    
-                    char outputNames[MAX_FRIENDS][MAX_USERNAME_LEN];
-                    NET_clientGetFriendsName(aClient,outputNames);
-                    
-                    for (int i = 0; i < MAX_FRIENDS; i++)
-                    {
-                        UI_friendListSetStatus(aFriendList, outputNames[i]);
-                    }
+                if (strcmp("AddFriend-Friends", menuEvent.key) == 0 || strcmp("Friends-button", menuEvent.key) == 0 || strcmp("Friends", menuEvent.key) == 0) {
+                
+                    updateFriendList(pMenu, aClient);
+                
                 }
                 break;
                 
@@ -89,7 +80,24 @@ void updateMenu(Menu *pMenu, ClientControl *pControl, Client aClient) {
         }
 }
 
-//RefreshFriendList() 
+
+void updateFriendList(Menu *pMenu, Client aClient) {
+    FriendList aFriendList = (FriendList)UI_panelGetComponent(pMenu->panels[PANEL_FRIENDS], "social-friendlist");
+    
+    UI_readFriendList(aFriendList);
+    UI_SetFriendsOffline(aFriendList);
+
+    char outputNames[MAX_FRIENDS][MAX_USERNAME_LEN];
+    int PlayerCount = NET_clientGetPlayerCount(aClient);
+    NET_clientGetFriendsName(aClient, outputNames);
+
+    for (int i = 0; i < PlayerCount; i++) {
+        UI_FriendremoveSpacesInBetween(outputNames[i]);
+        UI_friendListSetStatus(aFriendList, outputNames[i]);
+        printf("%s\n", outputNames[i]);
+    }
+}
+
 void refreshMenu(SDL_Renderer *pRend, Menu *pMenu, ClientView *pView) {
     for(int i = 0; i < PANEL_COUNT; i++) {
         UI_panelSetAppearance(pMenu->panels[i], 

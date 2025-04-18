@@ -17,6 +17,7 @@ void UI_SetFriendsOffline(FriendList list);
 void UI_friendListSetStatus(FriendList list, const char* name);
 void UI_friendListRender(FriendList list, SDL_Renderer* renderer);
 void UI_DrawFriendList(SDL_Renderer *pRend,FriendList list);
+void UI_FriendremoveSpacesInBetween(char* str);
 
 void UI_clientAddFriend(FriendList aFriendList, char *outputFriend);
 void UI_updateFriendList(FriendList aFriendList);
