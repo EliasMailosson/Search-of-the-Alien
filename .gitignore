@@ -1,5 +1,5 @@
 build/**
 **.dSYM
 .vscode/**
-data/myUsername.txt**
 assets/images/tiles/tileDesigns/**
+data/*.txt
