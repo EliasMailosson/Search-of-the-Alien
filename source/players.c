@@ -16,23 +16,23 @@ void renderPlayers(Client aClient, ClientView *pView, SDL_Rect playerCamera) {
         SDL_Rect playerRect;
         if(NET_clientGetSelfIndex(aClient) == i) {
             playerRect = (SDL_Rect){
-                .x = pView->windowWidth/2 - 40,
-                .y = pView->windowHeight/2 - 40,
-                .w = 80,
-                .h = 80
+                .x = pView->windowWidth/2 - RENDER_SIZE/2,
+                .y = pView->windowHeight/2 - RENDER_SIZE/2,
+                .w = RENDER_SIZE,
+                .h = RENDER_SIZE
             };
         }
         else {
             playerRect = (SDL_Rect){
-                .x = pos.x - playerCamera.x - 40,
-                .y = pos.y - playerCamera.y - 40,
-                .w = 80,
-                .h = 80
+                .x = pos.x - playerCamera.x - RENDER_SIZE/2,
+                .y = pos.y - playerCamera.y - RENDER_SIZE/2,
+                .w = RENDER_SIZE,
+                .h = RENDER_SIZE
             };
         }
         
-        SDL_SetRenderDrawColor(pView->pRend, colors[i].r, colors[i].g, colors[i].b, colors[i].a);
-        SDL_RenderFillRect(pView->pRend, &playerRect);
+        SDL_Rect src = {((frame/2)%24)*SPRITE_SIZE, direction*SPRITE_SIZE, SPRITE_SIZE, SPRITE_SIZE};
+        SDL_RenderCopy(pView->pRend, pView->playerTexture, &src, &playerRect);
     }
 }
 
