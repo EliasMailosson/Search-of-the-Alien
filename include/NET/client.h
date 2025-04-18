@@ -29,6 +29,7 @@ void NET_clientSendArray(Client aClient,GameState GS, MessageType msgType,const 
 void NET_clientSetSelfName(Client aClient, char* newName);
 int NET_clientGetPlayerDirection(Client aClient, int playerIdx);
 void NET_clientGetSelfname(Client aClient, char* outputName);
+int NET_clientGetSelfIndex(Client aClient);
 
 void NET_clientReceiver(Client aClient);
 int NET_clientFindPlayer(Client aClient, char* str);

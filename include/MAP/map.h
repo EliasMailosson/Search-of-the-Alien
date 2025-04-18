@@ -22,8 +22,6 @@
 #define LOGICAL_WIN_W 600
 #define LOGICAL_WIN_H (600 * 16 / 9)
 
-typedef struct tile Tile;
-
 typedef struct Map *Map;
 
 void MAP_MapRender(SDL_Renderer *pRend, Map aMap);
@@ -37,10 +35,9 @@ void MAP_MapRefresh(Map aMap, int winW, int winH);
 
 void MAP_MapDestroy(Map aMap);
 
-void MAP_MapGetTilseFromLobby(int tileID[MAP_HEIGHT][MAP_WIDTH]);
-
 //void MAP_MapGettOffset(int winH, int winW, SDL_Point *index);
 void MAP_TilesFillWithBlank(int tileID[MAP_HEIGHT][MAP_WIDTH]);
+void MAP_MapGetTilseFromLobby(int tileID[MAP_HEIGHT][MAP_WIDTH]);
 
 void MAP_MapMoveMap(Map aMap, SDL_Point playerOffset);
 

@@ -42,6 +42,16 @@ void gameLoop(Client aClient, ClientControl *pControl, ClientView *pView){
 
 void runLobby(Client aClient, Map aMap, ClientControl *pControl, ClientView *pView) {
     static int toggleDelay = 0;
+    int selfIndex = NET_clientGetSelfIndex(aClient);
+
+    SDL_Point playerPos = NET_clientGetPlayerPos(aClient, selfIndex);
+
+    SDL_Rect playerCamera = {
+        .x = playerPos.x - pView->windowWidth/2,
+        .y = playerPos.y - pView->windowHeight/2,
+        .w = pView->windowWidth,
+        .h = pView->windowHeight
+    };
 
     SDL_ShowCursor(SDL_DISABLE);
     SDL_SetCursor(pView->crosshair);
@@ -54,6 +64,8 @@ void runLobby(Client aClient, Map aMap, ClientControl *pControl, ClientView *pVi
         toggleDelay = 0;
     }
 
+    MAP_MapRefresh(aMap, pView->windowWidth, pView->windowHeight);
+
     PlayerInputPacket pip;
     pip = prepareInputArray(pControl);
     if(NET_playerInputPacketCheck(pip)){
@@ -62,17 +74,13 @@ void runLobby(Client aClient, Map aMap, ClientControl *pControl, ClientView *pVi
 
     NET_clientReceiver(aClient);
     
-    MAP_MapMoveMap(aMap,NET_clientGetSelfPos(aClient));
+    MAP_MapMoveMap(aMap, playerPos);
 
     SDL_SetRenderDrawColor(pView->pRend, 0,0,0,0);
     SDL_RenderClear(pView->pRend);
 
     MAP_MapRender(pView->pRend, aMap);
-    renderPlayers(aClient, pView);
-
-    // SDL_Rect mouseTest = {.w = 16, .h = 16, .x = pControl->mousePos.x, .y = pControl->mousePos.y};
-    // SDL_SetRenderDrawColor(pView->pRend, 255,255,0,0);
-    // SDL_RenderFillRect(pView->pRend, &mouseTest);
+    renderPlayers(aClient, pView, playerCamera);
     
     SDL_RenderPresent(pView->pRend);
 }

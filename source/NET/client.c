@@ -71,6 +71,10 @@ void NET_clientGetSelfname(Client aClient, char* outputName){
     strcpy(outputName, aClient->selfUsername);
 }
 
+int NET_clientGetSelfIndex(Client aClient){
+    return NET_clientFindPlayer(aClient, aClient->selfUsername);
+}
+
 //1. alla Usernames, skickas till clienten. UI_friendListSetStatus()  (CHECKED) 
 void NET_clientGetFriendsName(Client aClient, char outputNames[][MAX_USERNAME_LEN]) {
     for (int i = 0; i < aClient->PlayerCount; i++) {

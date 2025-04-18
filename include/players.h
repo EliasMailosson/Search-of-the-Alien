@@ -4,6 +4,6 @@
 #include "game.h"
 
 PlayerInputPacket prepareInputArray(ClientControl *pControl);
-void renderPlayers(Client aClient, ClientView *pView);
+void renderPlayers(Client aClient, ClientView *pView, SDL_Rect playerCamera);
 
 #endif
