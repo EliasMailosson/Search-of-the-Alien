@@ -55,11 +55,11 @@ void updateMenu(Menu *pMenu, ClientControl *pControl, Client aClient) {
                     
                     UI_readFriendList(aFriendList);
                     UI_SetFriendsOffline(aFriendList);
-
-                    int PlayerCount  = NET_clientGetPlayerCount(aClient);
+                    
                     char outputNames[MAX_FRIENDS][MAX_USERNAME_LEN];
                     NET_clientGetFriendsName(aClient,outputNames);
-                    for (int i = 0; i < PlayerCount; i++)
+                    
+                    for (int i = 0; i < MAX_FRIENDS; i++)
                     {
                         UI_friendListSetStatus(aFriendList, outputNames[i]);
                     }

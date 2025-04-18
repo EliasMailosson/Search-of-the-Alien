@@ -71,6 +71,7 @@ void UI_SetFriendsOffline(FriendList list) {
 void UI_friendListSetStatus(FriendList list, const char* name) { 
     for (int i = 0; i < list->count; ++i) {
         if (strcmp(list->friends[i].name, name) == 0) {
+            printf("\n is not Online: %s",list->friends[i].name);
             list->friends[i].isOnline=true;
             return;
         }
