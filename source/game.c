@@ -44,6 +44,11 @@ void runLobby(Client aClient, Map aMap, ClientControl *pControl, ClientView *pVi
     static int toggleDelay = 0;
     int selfIndex = NET_clientGetSelfIndex(aClient);
 
+    static SDL_Point lastPosition[MAX_CLIENTS];
+    for(int i = 0; i < NET_clientGetPlayerCount(aClient); i++) {
+        lastPosition[i] = NET_clientGetPlayerPos(aClient, i);
+    }
+
     SDL_Point playerPos = NET_clientGetPlayerPos(aClient, selfIndex);
 
     SDL_Rect playerCamera = {
@@ -76,6 +81,17 @@ void runLobby(Client aClient, Map aMap, ClientControl *pControl, ClientView *pVi
     }
 
     NET_clientReceiver(aClient);
+    
+    
+    for(int i = 0; i < NET_clientGetPlayerCount(aClient); i++) {
+        SDL_Point newPosition = NET_clientGetPlayerPos(aClient, i);
+        if(lastPosition[i].x == newPosition.x && lastPosition[i].y == newPosition.y) {
+            NET_clientSetPlayerAnimation(aClient, i, ANIMATION_IDLE);
+        }
+        else {
+            NET_clientSetPlayerAnimation(aClient, i, ANIMATION_RUNNING);
+        }
+    }
     
     MAP_MapMoveMap(aMap, playerPos);
 

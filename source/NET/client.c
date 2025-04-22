@@ -5,6 +5,7 @@ struct Player{
     char username[MAX_USERNAME_LEN]; //myusername
     SDL_Point pos;
     int direction;
+    int currentPlayerAnimation;
 };
 struct client{
     SDLNet_SocketSet socketSet;
@@ -68,6 +69,14 @@ void NET_clientGetPlayerName(Client aClient, int playerIndex, char* username) {
     } else {
         strcpy(username, "Starta om spelet om du vill ha ett namn bror");
     }
+}
+
+void NET_clientSetPlayerAnimation(Client aClient, int playerIdx, int newAnimation) {
+    aClient->playerList->currentPlayerAnimation = newAnimation;
+}
+
+int NET_clientGetPlayerAnimation(Client aClient, int playerIdx) {
+    return aClient->playerList->currentPlayerAnimation;
 }
 
 void NET_clientSetSelfName(Client aClient, char* newName) {

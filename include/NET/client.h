@@ -3,6 +3,8 @@
 #include <stdbool.h>
 #include "../../include/NET/shared.h"
 
+enum PlayerAnimationTypes{ANIMATION_IDLE, ANIMATION_RUNNING, EMOTE_TPOSE};
+
 typedef struct Player Player;
 
 struct client;
@@ -26,6 +28,9 @@ void NET_clientSendString(Client aClient,GameState GS, MessageType msgType,const
 void NET_clientSendArray(Client aClient,GameState GS, MessageType msgType,const void* array, Uint32 arraySize);
 
 void NET_clientSetSelfName(Client aClient, char* newName);
+
+void NET_clientSetPlayerAnimation(Client aClient, int playerIdx, int newAnimation);
+int NET_clientGetPlayerAnimation(Client aClient, int playerIdx);
 
 void NET_clientGetPlayerName(Client aClient, int playerIndex, char* username);
 int NET_clientGetPlayerDirection(Client aClient, int playerIdx);

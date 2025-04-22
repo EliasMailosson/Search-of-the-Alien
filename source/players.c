@@ -46,7 +46,18 @@ void renderPlayers(Client aClient, ClientView *pView, SDL_Rect playerCamera) {
             };
         }
         
-        SDL_Rect src = {((frame/2)%24)*SPRITE_SIZE, direction*SPRITE_SIZE, SPRITE_SIZE, SPRITE_SIZE};
+        SDL_Rect src;
+        switch(NET_clientGetPlayerAnimation(aClient, i)) {
+            case ANIMATION_IDLE:
+                src = (SDL_Rect){((frame/2)%24)*SPRITE_SIZE, (direction+8)*SPRITE_SIZE, SPRITE_SIZE, SPRITE_SIZE};
+                break;
+            case ANIMATION_RUNNING:
+                src = (SDL_Rect){((frame/2)%24)*SPRITE_SIZE, direction*SPRITE_SIZE, SPRITE_SIZE, SPRITE_SIZE};
+                break;
+            default:
+                src = (SDL_Rect){((frame/2)%24)*SPRITE_SIZE, direction*SPRITE_SIZE, SPRITE_SIZE, SPRITE_SIZE};
+        }
+        
         SDL_RenderCopy(pView->pRend, pView->playerTexture, &src, &playerRect);
         RenderPlayerName(aClient, pView, i, playerRect);
     }
