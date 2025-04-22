@@ -128,7 +128,7 @@ void RenderPlayerName(Client aClient, ClientView *pView, int i, SDL_Rect playerR
         return;
     }
 
-    SDL_Color nameColor = {255,255,255,255}; // Server ska välja färgerna på namnen
+    SDL_Color nameColor = NET_GetPlayerColor(aClient,i); // Server ska välja färgerna på namnen
     SDL_Surface* nameSurface = TTF_RenderText_Blended(pView->fonts, username, nameColor);
 
     if (!nameSurface){
