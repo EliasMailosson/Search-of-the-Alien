@@ -63,11 +63,12 @@ void renderPlayers(Client aClient, ClientView *pView, SDL_Rect playerCamera) {
     }
 }
 
-PlayerInputPacket prepareInputArray(ClientControl *pControl) {
+PlayerInputPacket prepareInputArray(ClientControl *pControl, int windowWidth, int windowHeight) {
     PlayerInputPacket pip = {
+        // Later: let mousePos x and y be float between 0.0 and 1.0, normalized to the screen size. 
         .mousePos = {
-            .x = pControl->mousePos.x,
-            .y = pControl->mousePos.y 
+            .x = pControl->mousePos.x  - (windowWidth / 2),
+            .y = pControl->mousePos.y - (windowHeight / 2)
         },
         .keys = {
             pControl->keys[SDL_SCANCODE_W],

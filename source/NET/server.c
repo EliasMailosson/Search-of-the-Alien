@@ -160,16 +160,11 @@ void NET_serverUpdatePlayer(Server aServer, Packet aPacket){
 
     int mx = aServer->clients[playerIdx].player.mousePos.x = pip.mousePos.x;
     int my = aServer->clients[playerIdx].player.mousePos.y = pip.mousePos.y;
-    int dx = aServer->clients[playerIdx].player.hitBox.x - mx;
-    int dy = aServer->clients[playerIdx].player.hitBox.y - my;
+    int dx = 0 - mx;
+    int dy = 0 - my;
 
     float angle = atan2(dy, dx);
-    aServer->clients[playerIdx].player.direction = ((int)roundf(angle / (float)M_PI_4) + 8) % 8;
-    // printf("direction: %d\n", direction);
-
-    // print mouse position from packet
-    // int printX = aServer->clients[playerIdx].player.mousePos.x;
-    // printf("mouse x: %d\n", printX);
+    aServer->clients[playerIdx].player.direction = ((int)roundf(angle / (float)M_PI_4) + 7 ) % 8;
 
     NET_serverSendPlayerPacket(aServer,LOBBY); 
 }

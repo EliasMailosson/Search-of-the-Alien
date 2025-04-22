@@ -75,7 +75,7 @@ void runLobby(Client aClient, Map aMap, ClientControl *pControl, ClientView *pVi
     pView->playerRenderSize = tileRect.h;
 
     PlayerInputPacket pip;
-    pip = prepareInputArray(pControl);
+    pip = prepareInputArray(pControl, pView->windowWidth, pView->windowHeight);
     if(NET_playerInputPacketCheck(pip)){
         NET_clientSendArray(aClient, LOBBY, PLAYER_INPUT, &pip, sizeof(PlayerInputPacket));
     }

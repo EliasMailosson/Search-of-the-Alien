@@ -3,7 +3,7 @@
 
 #include "game.h"
 
-PlayerInputPacket prepareInputArray(ClientControl *pControl);
+PlayerInputPacket prepareInputArray(ClientControl *pControl, int windowWidth, int windowHeight) ;
 void renderPlayers(Client aClient, ClientView *pView, SDL_Rect playerCamera);
 
 #endif
