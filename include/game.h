@@ -26,6 +26,7 @@ typedef struct {
         int playerRenderSize;
 
     Hud aHud;
+    SDL_Point PlayerPos[MAX_CLIENTS];
 }ClientView; 
 
 typedef struct {

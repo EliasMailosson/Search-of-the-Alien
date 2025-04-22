@@ -34,14 +34,14 @@ Arrow arrowCreate(int index, SDL_Renderer *pRend){
     SDL_FreeSurface(tmpSurface);
     SDL_Color tmpColor = {0};
     switch (index){
-    case 1:tmpColor = SDL_RED;break;
-    case 2:tmpColor = SDL_GREEN;break;
-    case 3:tmpColor = SDL_CYAN;break;// kommer behöva änras så att bägerna funkar
-    case 4:tmpColor = SDL_YELLOW;break;
-    case 5:tmpColor = SDL_BLACK;break;
-    case 6:tmpColor = SDL_BLUE;break;
+    case 0:tmpColor = SDL_RED;break;
+    case 1:tmpColor = SDL_GREEN;break;
+    case 2:tmpColor = SDL_CYAN;break;// kommer behöva änras så att bägerna funkar
+    case 3:tmpColor = SDL_YELLOW;break;
+    case 4:tmpColor = SDL_BLACK;break;
+    case 5:tmpColor = SDL_BLUE;break;
+    case 6:tmpColor = SDL_RED;break;
     case 7:tmpColor = SDL_RED;break;
-    case 8:tmpColor = SDL_RED;break;
     default:
         tmpColor = SDL_TRANSPARENT;
         break;
@@ -87,7 +87,7 @@ void hudRender(Hud aHud,SDL_Renderer *pRend, int playerCount){
     //
 }
 
-void updateArrows(Hud aHud,SDL_Window *pWin,Client aClient){
+void updateArrows(Hud aHud,SDL_Window *pWin,Client aClient, SDL_Point playerPos[MAX_CLIENTS]){
     int screenHeight = 0, screenWidth = 0;
     SDL_GetWindowSize(pWin,&screenWidth,&screenHeight);
     SDL_Point center = (SDL_Point){.x = screenWidth/2,.y = screenHeight/2};
@@ -97,9 +97,8 @@ void updateArrows(Hud aHud,SDL_Window *pWin,Client aClient){
 
     for (int i = 0; i < NET_clientGetPlayerCount(aClient); i++){
         if(selfIndex == i) continue;
-        SDL_Point pos = NET_clientGetPlayerPos(aClient,i);
 
-        if(pointInRect(screen,pos)){
+        if(pointInRect(screen,playerPos[i])){
             aHud->indicators[i]->isPlayerOnScreen = true;
             continue;
         }else{
@@ -107,15 +106,14 @@ void updateArrows(Hud aHud,SDL_Window *pWin,Client aClient){
         }
 
         SDL_Point posWithoutOffset = (SDL_Point){
-            .x = -(pos.x - center.x),
-            .y = -(pos.y - center.y)
+            .x = -(playerPos[i].x - center.x),
+            .y = -(playerPos[i].y - center.y)
         };
         radians = atan2((double)posWithoutOffset.x,(double)posWithoutOffset.y);
-        aHud->indicators[i]->angel = (double)radians/PI;
+        aHud->indicators[i]->angel = -((double)radians* 180.0 / M_PI);
         //position
-    
+        
     }
-
 }
 
 bool pointInRect(SDL_Rect rect, SDL_Point point){

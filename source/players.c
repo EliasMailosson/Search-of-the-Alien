@@ -41,7 +41,7 @@ void renderPlayers(Client aClient, ClientView *pView, SDL_Rect playerCamera) {
                 .h = pView->playerRenderSize
             };
         }
-        
+        pView->PlayerPos[i] = (SDL_Point){.x = playerRect.x, .y = playerRect.y}; 
         SDL_Rect src = {((frame/2)%24)*SPRITE_SIZE, direction*SPRITE_SIZE, SPRITE_SIZE, SPRITE_SIZE};
         SDL_RenderCopy(pView->pRend, pView->playerTexture, &src, &playerRect);
     }

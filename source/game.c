@@ -76,7 +76,7 @@ void runLobby(Client aClient, Map aMap, ClientControl *pControl, ClientView *pVi
     }
 
     NET_clientReceiver(aClient);
-    
+    updateArrows(pView->aHud,pView->pWin,aClient,pView->PlayerPos);
     MAP_MapMoveMap(aMap, playerPos);
 
     SDL_SetRenderDrawColor(pView->pRend, 0,0,0,0);
