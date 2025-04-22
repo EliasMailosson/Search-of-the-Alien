@@ -101,7 +101,9 @@ void UI_friendListRender(FriendList list, SDL_Renderer* renderer) {
             (SDL_Color){0, 255, 0, 255} : 
             (SDL_Color){255, 0, 0, 255};
 
-        char statusText[64];
+            UI_FriendremoveSpacesInBetween(list->friends[i].name); //Ska ta bort mellanslag i namn
+        char statusText[MAX_USERNAME_LEN];
+        
         snprintf(statusText, sizeof(statusText), "%s", list->friends[i].name);
 
         SDL_Surface* surface = TTF_RenderText_Solid(list->fonts, statusText, color);

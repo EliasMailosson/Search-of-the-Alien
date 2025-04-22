@@ -83,7 +83,6 @@ void MAP_MapRefresh(Map aMap, int winW, int winH){
     aMap->tileRect.h = (int)roundf(base.h * scale);
 }
 
-
 static void MAP_TileSheetload(SDL_Renderer* pRend, char *imagePath, Map aMap){
     SDL_Surface *surface = IMG_Load(imagePath);
     aMap->texture = SDL_CreateTextureFromSurface(pRend, surface);

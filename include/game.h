@@ -19,11 +19,12 @@ typedef struct {
     SDL_Renderer *pRend;
     int windowHeight, windowWidth;
     bool windowFullscreen;
-    char myUsername[40];
+    char myUsername[MAX_USERNAME_LEN];
 
         SDL_Cursor *crosshair;
         SDL_Texture *playerTexture;
         int playerRenderSize;
+        TTF_Font *fonts;
 }ClientView; 
 
 typedef struct {

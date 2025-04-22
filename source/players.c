@@ -1,5 +1,9 @@
 #include <stdio.h>
+#include<string.h>
 #include "../include/players.h"
+#include "../include/NET/client.h"
+#include "../include/game.h"
+#include "../include/clientLife.h"
 
 #define SPRITE_SIZE 256
 #define RENDER_SIZE 128
@@ -44,6 +48,7 @@ void renderPlayers(Client aClient, ClientView *pView, SDL_Rect playerCamera) {
         
         SDL_Rect src = {((frame/2)%24)*SPRITE_SIZE, direction*SPRITE_SIZE, SPRITE_SIZE, SPRITE_SIZE};
         SDL_RenderCopy(pView->pRend, pView->playerTexture, &src, &playerRect);
+        RenderPlayerName(aClient, pView, i, playerRect);
     }
 }
 
@@ -60,7 +65,7 @@ PlayerInputPacket prepareInputArray(ClientControl *pControl) {
             pControl->keys[SDL_SCANCODE_A],
             pControl->keys[SDL_SCANCODE_SPACE],
             pControl->isMouseDown,
-            pControl->isMouseUp
+            // pControl->isMouseUp, en för mycket
         }
     };
     return pip;

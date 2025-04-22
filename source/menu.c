@@ -4,6 +4,7 @@
 #include "../include/UI/checklist.h"
 #include "../include/UI/inputfield.h"
 #include "../include/UI/friend.h"
+#include "../include/players.h"
 #include "../include/NET/client.h"
 
 void renderMenu(SDL_Renderer *pRend, Menu *pMenu) {
@@ -155,7 +156,7 @@ void refreshMenu(SDL_Renderer *pRend, Menu *pMenu, ClientView *pView) {
 
     // SOCIAL MENU ////////////////////////
 
-    Button b5 = (Button)UI_panelGetComponent(pMenu->panels[PANEL_SOCIAL], "Social-back"); // "back" knappen  
+    Button b5 = (Button)UI_panelGetComponent(pMenu->panels[PANEL_SOCIAL], "Social-back"); // "back" knappen
     UI_buttonConfigure(b5, "Back", 
         pView->windowWidth*0.08, pView->windowHeight*0.85, SMALLBUTTONWIDTH, SMALLBUTTONHEIGHT, pRend, (SDL_Color) { .r = 0, .g = 0, .b = 0, .a = 255 }, 
         pMenu->fonts[0], (SDL_Color) { .r = 255, .g = 255, .b = 255, .a = 255 }
@@ -225,6 +226,8 @@ Menu initMenu(SDL_Renderer *pRend, ClientView *pView, Client aClient) {
     menu.fonts[0] = TTF_OpenFont("assets/fonts/PricedownBl-Regular 900.ttf", 20);
     menu.fonts[1] = TTF_OpenFont("assets/fonts/PricedownBl-Regular 900.ttf", 40);
     menu.fonts[2] = TTF_OpenFont("assets/fonts/PricedownBl-Regular 900.ttf", 60);
+
+    pView->fonts = menu.fonts[0];
 
     menu.currentPanel = PANEL_START;
 

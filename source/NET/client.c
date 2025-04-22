@@ -2,7 +2,7 @@
 #include "../../include/UI/friend.h"
 struct Player{
     GameState state;
-    char username[MAX_USERNAME_LEN];
+    char username[MAX_USERNAME_LEN]; //myusername
     SDL_Point pos;
     int direction;
 };
@@ -12,7 +12,7 @@ struct client{
     UDPpacket *pReceivePacket;
     UDPpacket *pSendPacket;
     IPaddress serverAddr;
-    char selfUsername[MAX_USERNAME_LEN];
+    char selfUsername[MAX_USERNAME_LEN]; //andras usernames
 
     int PlayerCount;
     Player playerList[MAX_CLIENTS];
@@ -61,6 +61,14 @@ Client NET_clientCreate(){
     strcpy(aClient->selfUsername,"None");
     return aClient;
 }
+void NET_clientGetPlayerName(Client aClient, int playerIndex, char* username) {
+    if (playerIndex >= 0 && playerIndex < aClient->PlayerCount) {
+        strncpy(username, aClient->playerList[playerIndex].username, MAX_USERNAME_LEN);
+        username[MAX_USERNAME_LEN - 1] = '\0'; 
+    } else {
+        strcpy(username, "Starta om spelet om du vill ha ett namn bror");
+    }
+}
 
 void NET_clientSetSelfName(Client aClient, char* newName) {
     strcpy(aClient->selfUsername,newName);
@@ -75,7 +83,6 @@ int NET_clientGetSelfIndex(Client aClient){
     return NET_clientFindPlayer(aClient, aClient->selfUsername);
 }
 
-//1. alla Usernames, skickas till clienten. UI_friendListSetStatus()  (CHECKED) 
 void NET_clientGetFriendsName(Client aClient, char outputNames[][MAX_USERNAME_LEN]) {
     for (int i = 0; i < aClient->PlayerCount; i++) {
         strcpy(outputNames[i],aClient->playerList[i].username);

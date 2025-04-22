@@ -18,7 +18,6 @@ void NET_clientDestroy(Client aClient);
 int NET_clientGetPlayerCount(Client aClient);
 const Player* NET_clientGetPlayerList(Client aClient);
 SDL_Point NET_clientGetPlayerPos(Client aClient, int playerIdx);
-void NET_clientGetSelfName(Client aClient, char* outputName);
 void NET_clientGetFriendsName(Client aClient, char outputNames[][MAX_USERNAME_LEN]);
 int NET_clientGetState(Client aClient);
 
@@ -27,6 +26,8 @@ void NET_clientSendString(Client aClient,GameState GS, MessageType msgType,const
 void NET_clientSendArray(Client aClient,GameState GS, MessageType msgType,const void* array, Uint32 arraySize);
 
 void NET_clientSetSelfName(Client aClient, char* newName);
+
+void NET_clientGetPlayerName(Client aClient, int playerIndex, char* username);
 int NET_clientGetPlayerDirection(Client aClient, int playerIdx);
 void NET_clientGetSelfname(Client aClient, char* outputName);
 int NET_clientGetSelfIndex(Client aClient);
