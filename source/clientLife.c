@@ -58,6 +58,7 @@ void startClient(Client *aClient, ClientView *pView,ClientControl *pControl){
         IMG_Quit();
         SDL_Quit();
     }
+    pView->aHud = hudCreate(pView->pRend);
 }
 
 SDL_Cursor* createScaledCursor(const char *filePath, int newWidth, int newHeight, int hotX, int hotY) {
@@ -106,7 +107,9 @@ void killClient(Client *aClient, ClientView *pView){
     SDL_FreeCursor(pView->crosshair);
     SDL_DestroyTexture(pView->playerTexture);
 
+    hudDestroy(pView->aHud);
     NET_clientDestroy(*aClient);
+    
     SDL_DestroyRenderer(pView->pRend);
     pView->pRend = NULL;
     SDL_DestroyWindow(pView->pWin);

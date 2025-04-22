@@ -11,7 +11,7 @@
 #include "../include/NET/shared.h"
 #include "../include/MAP/map.h"
 #include "UI/friend.h"
-
+#include "../include/hud.h"
 
 typedef struct menu Menu;
 typedef struct {
@@ -24,6 +24,8 @@ typedef struct {
         SDL_Cursor *crosshair;
         SDL_Texture *playerTexture;
         int playerRenderSize;
+
+    Hud aHud;
 }ClientView; 
 
 typedef struct {

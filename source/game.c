@@ -84,7 +84,7 @@ void runLobby(Client aClient, Map aMap, ClientControl *pControl, ClientView *pVi
 
     MAP_MapRender(pView->pRend, aMap);
     renderPlayers(aClient, pView, playerCamera);
-    
+    hudRender(pView->aHud,pView->pRend,NET_clientGetPlayerCount(aClient));
     SDL_RenderPresent(pView->pRend);
 }
 
