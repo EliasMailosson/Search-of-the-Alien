@@ -200,29 +200,13 @@ void NET_clientUpdatePlayerList(Client aClient, Packet aPacket){
     NET_playerPacketReceive(aPacket, packets, &aClient->PlayerCount);
     for (int i = 0; i < aClient->PlayerCount; i++){
 
-        // int existingIndex = -1;
-        // for (int j = 0; j < aClient->PlayerCount; j++){
-        //     if (strcmp(aClient->playerList[j].username, packets[i].username) == 0)
-        //     {
-        //         existingIndex = j;
-        //         break;
-        //     }    
-        // }
         aClient->playerList[i].pos = packets[i].pos;
         aClient->playerList[i].state = packets[i].state;
         aClient->playerList[i].direction = packets[i].direction;
         aClient->playerList[i].colorIndex = packets[i].colorIndex;
         strcpy(aClient->playerList[i].username, packets[i].username);
+        aClient->playerList[i].color = NET_clientGetColor(aClient->playerList[i].colorIndex);
 
-             aClient->playerList[i].color = NET_clientGetColor(aClient, aClient->playerList[i].colorIndex);
-
-        // if (existingIndex >= 0){
-        //     aClient->playerList[i].color = aClient->playerList[existingIndex].color;
-        // }
-        // else{
-        //     aClient->playerList[i].color = NET_clientGetColor(aClient);
-        // }
-        
     }
 }
 
@@ -249,7 +233,7 @@ SDL_Point NET_clientGetSelfPos(Client aClient){
     return (SDL_Point){-1,-1};
 }
 
-SDL_Color NET_clientGetColor(Client aClient, int index){
+SDL_Color NET_clientGetColor(int index){
     SDL_Color colors[] = {
         {255, 0, 0, 255},     // Red
         {0, 255, 0, 255},     // Green
@@ -260,33 +244,9 @@ SDL_Color NET_clientGetColor(Client aClient, int index){
         {255, 165, 0, 255},   // Orange
         {128, 0, 128, 255},   // Purple
     };
-    // int numColors = sizeof(colors) / sizeof(colors[0]);
-
-    // bool isColors[numColors];
-    // memset(isColors, 0, sizeof(isColors));
-
-    // for (int i = 0; i < aClient->PlayerCount; i++){
-    //     for (int j = 0; j < numColors; j++){
-    //         if (colorEquals(aClient->playerList[i].color, colors[j])){
-    //             isColors[j] = true;
-    //             break;
-    //         }
-    //     }
-    // }
-    // for (int i = 0; i < numColors; i++){
-    //     if (!isColors[i]){
-    //         index = i;
-    //         break;
-    //     }
-    // }
-    
     return colors[index];
 }
 
 SDL_Color NET_GetPlayerColor(Client aClient,int index){
     return aClient->playerList[index].color;
-}
-
-bool colorEquals(SDL_Color a, SDL_Color b) {
-    return a.r == b.r && a.g == b.g && a.b == b.b && a.a == b.a;
 }
