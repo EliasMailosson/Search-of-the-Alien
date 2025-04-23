@@ -1,5 +1,6 @@
 #include "../../include/NET/server.h"
-#include "math.h"
+#include "../../include/NET/serverLogic.h"
+#include <math.h>
 
 struct Player{
     SDL_Rect hitBox;
