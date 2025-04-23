@@ -44,6 +44,11 @@ void runLobby(Client aClient, Map aMap, ClientControl *pControl, ClientView *pVi
     static int toggleDelay = 0;
     int selfIndex = NET_clientGetSelfIndex(aClient);
 
+    SDL_Point lastPosition[MAX_CLIENTS];
+    for(int i = 0; i < NET_clientGetPlayerCount(aClient); i++) {
+        lastPosition[i] = NET_clientGetPlayerPos(aClient, i);
+    }
+
     SDL_Point playerPos = NET_clientGetPlayerPos(aClient, selfIndex);
 
     SDL_Rect playerCamera = {
@@ -70,12 +75,25 @@ void runLobby(Client aClient, Map aMap, ClientControl *pControl, ClientView *pVi
     pView->playerRenderSize = tileRect.h;
 
     PlayerInputPacket pip;
-    pip = prepareInputArray(pControl);
+    pip = prepareInputArray(pControl, pView->windowWidth, pView->windowHeight);
     if(NET_playerInputPacketCheck(pip)){
         NET_clientSendArray(aClient, LOBBY, PLAYER_INPUT, &pip, sizeof(PlayerInputPacket));
     }
 
     NET_clientReceiver(aClient);
+    
+    
+    for(int i = 0; i < NET_clientGetPlayerCount(aClient); i++) {
+        SDL_Point newPosition = NET_clientGetPlayerPos(aClient, i);
+        int dx = abs(newPosition.x - lastPosition[i].x);
+        int dy = abs(newPosition.y - lastPosition[i].y);
+        if(dx > 0 || dy > 0) {
+            NET_clientSetPlayerAnimation(aClient, i, ANIMATION_RUNNING);
+        }
+        else {
+            NET_clientSetPlayerAnimation(aClient, i, ANIMATION_IDLE);
+        }
+    }
     
     MAP_MapMoveMap(aMap, playerPos);
 
