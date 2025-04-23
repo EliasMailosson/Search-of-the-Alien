@@ -259,3 +259,7 @@ SDL_Color NET_clientGetColor(int index){
 SDL_Color NET_GetPlayerColor(Client aClient,int index){
     return aClient->playerList[index].color;
 }
+
+int NET_clientGetPlayerColorIndex(Client aClient,int index){
+    return aClient->playerList[index].colorIndex;
+}
