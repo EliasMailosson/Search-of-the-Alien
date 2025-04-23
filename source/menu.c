@@ -4,6 +4,7 @@
 #include "../include/UI/checklist.h"
 #include "../include/UI/inputfield.h"
 #include "../include/UI/friend.h"
+#include "../include/UI/animation.h"
 #include "../include/players.h"
 #include "../include/NET/client.h"
 
@@ -219,6 +220,10 @@ void refreshMenu(SDL_Renderer *pRend, Menu *pMenu, ClientView *pView) {
         pView->windowWidth*0.08, pView->windowHeight*0.85, SMALLBUTTONWIDTH, SMALLBUTTONHEIGHT, pRend, (SDL_Color) { .r = 0, .g = 0, .b = 0, .a = 255 }, 
         pMenu->fonts[0], (SDL_Color) { .r = 255, .g = 255, .b = 255, .a = 255 }
     );
+
+    // PLANET SELECT MENU //////////////////
+    Animation a1 = (Animation)UI_panelGetComponent(pMenu->panels[PANEL_PLANET_SELECT], "planet-animation");
+    UI_animationSetDestination(a1, (SDL_Rect) {.x = 0, .y = 0, .w = 960, .h = 512});
 }
 //CreateFriendList() och panelAddComponent
 Menu initMenu(SDL_Renderer *pRend, ClientView *pView, Client aClient) {
@@ -263,7 +268,7 @@ Menu initMenu(SDL_Renderer *pRend, ClientView *pView, Client aClient) {
 
     Button b3 = UI_buttonCreate();
     UI_panelAddComponent(menu.panels[PANEL_START], b3, UI_BUTTON, "Options");
-    UI_panelSetComponentLink(menu.panels[PANEL_START], "Options", PANEL_OPTIONS);
+    UI_panelSetComponentLink(menu.panels[PANEL_START], "Options", PANEL_PLANET_SELECT);
 
     Button b4 = UI_buttonCreate();
     UI_panelAddComponent(menu.panels[PANEL_START], b4, UI_BUTTON, "Quit");
@@ -337,6 +342,13 @@ Menu initMenu(SDL_Renderer *pRend, ClientView *pView, Client aClient) {
     Button b7 = UI_buttonCreate();
     UI_panelAddComponent(menu.panels[PANEL_OPTIONS], b7, UI_BUTTON, "Options-back");
     UI_panelSetComponentLink(menu.panels[PANEL_OPTIONS], "Options-back", PANEL_START);
+
+    // PLANET SELECT MENU //////////////////
+    UI_panelSetImage(pRend, menu.panels[PANEL_PLANET_SELECT], "assets/images/menu/background2.png");
+
+    Animation a1 = UI_animationCreate();
+    UI_panelAddComponent(menu.panels[PANEL_PLANET_SELECT], a1, UI_ANIMATION, "planet-animation");
+    UI_animationLoad(a1, pView->pRend, "assets/images/menu/character_selection.png", 960, 512, 72);
 
     refreshMenu(pRend, &menu, pView);
     return menu;

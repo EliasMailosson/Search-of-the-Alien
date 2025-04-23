@@ -7,6 +7,7 @@
 #include "../../include/UI/checklist.h"
 #include "../../include/UI/inputfield.h"
 #include "../../include/UI/friend.h"
+#include "../../include/UI/animation.h"
 
 typedef struct component {
     void* pComp;
@@ -155,6 +156,15 @@ void UI_panelUpdate(Panel aPanel, MenuEvent *pEvent, bool isMouseUp, bool *keys)
                 
             break;
 
+        case UI_ANIMATION:
+                int mode = UI_animationGetMode((Animation)aPanel->compList[i].pComp);
+                if(mode == PLAYBACK_FORWARD) {
+                    UI_animationNextFrame((Animation)aPanel->compList[i].pComp);
+                } else if(mode == PLAYBACK_BACKWARD) {
+                    UI_animationPrevFrame((Animation)aPanel->compList[i].pComp);
+                }
+                break;
+
         }
     }
 }
@@ -192,6 +202,10 @@ void UI_panelRender(SDL_Renderer* pRend, Panel aPanel) {
             UI_DrawFriendList(pRend,(FriendList)aPanel->compList[i].pComp); 
             break;
 
+        case UI_ANIMATION:
+            UI_animationRender(pRend,(Animation)aPanel->compList[i].pComp);
+            break;
+
         }
     }
 }
@@ -217,6 +231,10 @@ void UI_panelDestroy(Panel aPanel) {
 
         case UI_FRIENDLIST:
             UI_friendListDestroy((FriendList)aPanel->compList[i].pComp);
+            break;
+        
+        case UI_ANIMATION:
+            UI_animationDestroy((Animation)aPanel->compList[i].pComp);
             break;
 
         }
