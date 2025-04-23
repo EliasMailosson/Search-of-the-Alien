@@ -1,52 +1,23 @@
 #include "../include/hud.h"
 
 struct Arrow{
-    SDL_Texture *pImg;
     double angel;
     SDL_FRect pos;
     bool isPlayerOnScreen;
 };
 
 struct Hud{
+    SDL_Texture *imgArrow[MAX_CLIENTS]; 
     Arrow indicators[MAX_CLIENTS-1];
     //
 };
 
-Arrow arrowCreate(int index, SDL_Renderer *pRend){
+Arrow arrowCreate(){
     Arrow aArrow = malloc(sizeof(struct Arrow));
     if(aArrow == NULL){
         fprintf(stderr,"Error allocating memory for Arrow\n");
         return NULL;
     }
-    SDL_Surface *tmpSurface = IMG_Load(FILE_PHAT_ARROW);
-    if(!tmpSurface){
-        fprintf(stderr,"Error creating Surface for arrow, %s\n",IMG_GetError());
-        free(aArrow);
-        return NULL;
-    }
-    aArrow->pImg = SDL_CreateTextureFromSurface(pRend,tmpSurface);
-    if(!aArrow->pImg){
-        fprintf(stderr,"Error creating textur for arrow %d: %s",index,IMG_GetError());
-        SDL_FreeSurface(tmpSurface);
-        free(aArrow);
-        return NULL;
-    }
-    SDL_FreeSurface(tmpSurface);
-    SDL_Color tmpColor = {0};
-    switch (index){
-    case 0:tmpColor = SDL_RED;break;
-    case 1:tmpColor = SDL_GREEN;break;
-    case 2:tmpColor = SDL_CYAN;break;// kommer behöva änras så att bägerna funkar
-    case 3:tmpColor = SDL_YELLOW;break;
-    case 4:tmpColor = SDL_BLACK;break;
-    case 5:tmpColor = SDL_BLUE;break;
-    case 6:tmpColor = SDL_RED;break;
-    case 7:tmpColor = SDL_RED;break;
-    default:
-        tmpColor = SDL_TRANSPARENT;
-        break;
-    }
-    SDL_SetTextureColorMod(aArrow->pImg,tmpColor.r,tmpColor.g,tmpColor.b);
     aArrow->pos = (SDL_FRect){.h = ARROW_SIZE,.w = ARROW_SIZE, .x = 40, .y = 40};
     aArrow->angel = 0;
     aArrow->isPlayerOnScreen = true;
@@ -59,15 +30,47 @@ Hud hudCreate(SDL_Renderer *pRend){
         fprintf(stderr,"Error allocating memory for the Hud\n");
         return NULL;
     }
+    for (int i = 0; i < MAX_CLIENTS; i++){
+        char *file;
+        switch (i){
+        case 0: file = FILE_PHAT_ARROW_RED; break;
+        case 1: file = FILE_PHAT_ARROW_GREEN; break;
+        case 2: file = FILE_PHAT_ARROW_BLUE; break;
+        case 3: file = FILE_PHAT_ARROW_ORANGE; break;
+        case 4: file = FILE_PHAT_ARROW_PURPLE; break;
+        case 5: file = FILE_PHAT_ARROW_CYAN; break;
+        case 6: file = FILE_PHAT_ARROW_MAGENTA; break;
+        case 7: file = FILE_PHAT_ARROW_YELLO; break;
+        default:
+            file = FILE_PHAT_ARROW_BLACK;
+            break;
+        }
+        SDL_Surface *tmpSurface = IMG_Load(file);
+        if(!tmpSurface){
+            fprintf(stderr,"Error creating Surface for arrow, %s\n",IMG_GetError());
+            free(aHud);
+            return NULL;
+        }
+        aHud->imgArrow[i] = SDL_CreateTextureFromSurface(pRend,tmpSurface);
+        if(!aHud->imgArrow[i]){
+            fprintf(stderr,"Error creating textur for arrow %d: %s",i,IMG_GetError());
+            SDL_FreeSurface(tmpSurface);
+            free(aHud);
+            return NULL;
+        }
+        SDL_FreeSurface(tmpSurface);
+    }
     for (int i = 0; i < MAX_CLIENTS-1; i++){
-        aHud->indicators[i] = arrowCreate(i,pRend);
+        aHud->indicators[i] = arrowCreate();
     }
     return aHud;
 }
 
 void hudDestroy(Hud aHud){
+    for (int i = 0; i < MAX_CLIENTS; i++){
+        if(aHud->imgArrow[i]) SDL_DestroyTexture(aHud->imgArrow[i]);
+    }
     for (int i = 0; i < MAX_CLIENTS-1; i++){
-        if(aHud->indicators[i]->pImg) SDL_DestroyTexture(aHud->indicators[i]->pImg);
         if(aHud->indicators[i] != NULL) free(aHud->indicators[i]);
         aHud->indicators[i] = NULL;
     }
@@ -75,19 +78,16 @@ void hudDestroy(Hud aHud){
     aHud = NULL;
 }
 
-static void arrowRender(Arrow aArrow,SDL_Renderer *pRend){
+static void arrowRender(Arrow aArrow,SDL_Renderer *pRend,SDL_Texture *pImg){
     if(!aArrow->isPlayerOnScreen){
-        if(SDL_RenderCopyExF(pRend,aArrow->pImg,NULL,&aArrow->pos,aArrow->angel,NULL,SDL_FLIP_NONE) == -1){
+        if(SDL_RenderCopyExF(pRend,pImg,NULL,&aArrow->pos,aArrow->angel,NULL,SDL_FLIP_NONE) == -1){
             printf("filde to render\n");
         }
     }
 }
 
-void hudRender(Hud aHud,SDL_Renderer *pRend, int playerCount){
-    for (int i = 0; i < playerCount; i++){
-        arrowRender(aHud->indicators[i],pRend);
-    }
-    //
+void hudRender(Hud aHud,SDL_Renderer *pRend,int colerIndex,int i){
+    arrowRender(aHud->indicators[i],pRend,aHud->imgArrow[colerIndex]);
 }
 
 SDL_Point hudGettArrowPos(Hud aHud, int index){
