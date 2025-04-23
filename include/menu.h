@@ -6,7 +6,7 @@
 #include "UI/friend.h"
 
 #define PANEL_COUNT 7
-#define FONT_COUNT 3
+#define FONT_COUNT 4
 
 #define OFFSET 80
 #define BIGBUTTONWIDTH 300

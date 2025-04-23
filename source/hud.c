@@ -18,7 +18,21 @@ Arrow arrowCreate(int index, SDL_Renderer *pRend){
         fprintf(stderr,"Error allocating memory for Arrow\n");
         return NULL;
     }
-    SDL_Surface *tmpSurface = IMG_Load(FILE_PHAT_ARROW);
+    char *file;
+    switch (index){
+    case 0: file = FILE_PHAT_ARROW_RED; break;
+    case 1: file = FILE_PHAT_ARROW_GREEN; break;
+    case 2: file = FILE_PHAT_ARROW_BLUE; break;
+    case 3: file = FILE_PHAT_ARROW_ORANGE; break;
+    case 4: file = FILE_PHAT_ARROW_PURPLE; break;
+    case 5: file = FILE_PHAT_ARROW_CYAN; break;
+    case 6: file = FILE_PHAT_ARROW_MAGENTA; break;
+    case 7: file = FILE_PHAT_ARROW_YELLO; break;
+    default:
+        file = FILE_PHAT_ARROW_BLACK;
+        break;
+    }
+    SDL_Surface *tmpSurface = IMG_Load(file);
     if(!tmpSurface){
         fprintf(stderr,"Error creating Surface for arrow, %s\n",IMG_GetError());
         free(aArrow);
@@ -32,21 +46,7 @@ Arrow arrowCreate(int index, SDL_Renderer *pRend){
         return NULL;
     }
     SDL_FreeSurface(tmpSurface);
-    SDL_Color tmpColor = {0};
-    switch (index){
-    case 0:tmpColor = SDL_RED;break;
-    case 1:tmpColor = SDL_GREEN;break;
-    case 2:tmpColor = SDL_CYAN;break;// kommer behöva änras så att bägerna funkar
-    case 3:tmpColor = SDL_YELLOW;break;
-    case 4:tmpColor = SDL_BLACK;break;
-    case 5:tmpColor = SDL_BLUE;break;
-    case 6:tmpColor = SDL_RED;break;
-    case 7:tmpColor = SDL_RED;break;
-    default:
-        tmpColor = SDL_TRANSPARENT;
-        break;
-    }
-    SDL_SetTextureColorMod(aArrow->pImg,tmpColor.r,tmpColor.g,tmpColor.b);
+
     aArrow->pos = (SDL_FRect){.h = ARROW_SIZE,.w = ARROW_SIZE, .x = 40, .y = 40};
     aArrow->angel = 0;
     aArrow->isPlayerOnScreen = true;
