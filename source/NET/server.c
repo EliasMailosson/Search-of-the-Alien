@@ -112,6 +112,7 @@ void NET_serverSendPlayerPacket(Server aServer,GameState GS){
         };
         packet[i].pos = pos;
         packet[i].direction = aServer->clients[i].player.direction;
+        packet[i].colorIndex = 1;
     }
     Uint32 payloadSize = aServer->clientCount * sizeof(PlayerPacket);
     for (int i = 0; i < aServer->clientCount; i++){

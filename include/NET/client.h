@@ -41,8 +41,8 @@ void NET_clientUpdatePlayerList(Client aClient,Packet aPacket);
 //----------
 SDL_Point NET_clientGetSelfPos(Client aClient);
 
-SDL_Color NET_clientGetColor(Client aClient);
+SDL_Color NET_clientGetColor(Client aClient, int index);
 SDL_Color NET_GetPlayerColor(Client aClient, int index);
-bool colorEquals(SDL_Color a, SDL_Color b)
+bool colorEquals(SDL_Color a, SDL_Color b);
 
 #endif
