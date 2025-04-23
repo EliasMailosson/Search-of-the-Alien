@@ -4,8 +4,6 @@
 #include "../include/MAP/map.h"
 #include "SDL_image.h"
 
-#define PI 3.14159
-
 #define SDL_WHITE (SDL_Color){255, 255, 255, SDL_ALPHA_OPAQUE}
 #define SDL_RED (SDL_Color){255, 0, 0, SDL_ALPHA_OPAQUE}
 #define SDL_GREEN (SDL_Color){0, 255, 0, SDL_ALPHA_OPAQUE}
@@ -16,7 +14,7 @@
 #define SDL_TRANSPARENT (SDL_Color){0, 0, 0, SDL_ALPHA_TRANSPARENT}
 
 #define FILE_PHAT_ARROW "assets/images/player/testArrow.png"
-
+#define ARROW_SIZE (TILE_SIZE / 2.0f)
 typedef struct Hud *Hud;
 typedef struct Arrow *Arrow;
 
@@ -27,6 +25,7 @@ void hudRender(Hud aHud,SDL_Renderer *pRend, int playerCount);
 
 Arrow arrowCreate(int index, SDL_Renderer *pRend);
 void updateArrows(Hud aHud,SDL_Window *pWin,Client aClient, SDL_Point playerPos[MAX_CLIENTS]);
+SDL_Point hudGettArrowPos(Hud aHud, int index);
 
 
 bool pointInRect(SDL_Rect rect, SDL_Point point);

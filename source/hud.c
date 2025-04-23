@@ -47,7 +47,7 @@ Arrow arrowCreate(int index, SDL_Renderer *pRend){
         break;
     }
     SDL_SetTextureColorMod(aArrow->pImg,tmpColor.r,tmpColor.g,tmpColor.b);
-    aArrow->pos = (SDL_FRect){.h = TILE_SIZE,.w = TILE_SIZE, .x = 40, .y = 40};
+    aArrow->pos = (SDL_FRect){.h = ARROW_SIZE,.w = ARROW_SIZE, .x = 40, .y = 40};
     aArrow->angel = 0;
     aArrow->isPlayerOnScreen = true;
     return aArrow;
@@ -67,6 +67,7 @@ Hud hudCreate(SDL_Renderer *pRend){
 
 void hudDestroy(Hud aHud){
     for (int i = 0; i < MAX_CLIENTS-1; i++){
+        if(aHud->indicators[i]->pImg) SDL_DestroyTexture(aHud->indicators[i]->pImg);
         if(aHud->indicators[i] != NULL) free(aHud->indicators[i]);
         aHud->indicators[i] = NULL;
     }
@@ -76,7 +77,9 @@ void hudDestroy(Hud aHud){
 
 static void arrowRender(Arrow aArrow,SDL_Renderer *pRend){
     if(!aArrow->isPlayerOnScreen){
-        SDL_RenderCopyExF(pRend,aArrow->pImg,NULL,&aArrow->pos,aArrow->angel,NULL,SDL_FLIP_NONE);
+        if(SDL_RenderCopyExF(pRend,aArrow->pImg,NULL,&aArrow->pos,aArrow->angel,NULL,SDL_FLIP_NONE) == -1){
+            printf("filde to render\n");
+        }
     }
 }
 
@@ -87,6 +90,13 @@ void hudRender(Hud aHud,SDL_Renderer *pRend, int playerCount){
     //
 }
 
+SDL_Point hudGettArrowPos(Hud aHud, int index){
+    return (SDL_Point){
+        .x = aHud->indicators[index]->pos.x,
+        .y = aHud->indicators[index]->pos.y
+    };
+}
+
 void updateArrows(Hud aHud,SDL_Window *pWin,Client aClient, SDL_Point playerPos[MAX_CLIENTS]){
     int screenHeight = 0, screenWidth = 0;
     SDL_GetWindowSize(pWin,&screenWidth,&screenHeight);
@@ -94,25 +104,40 @@ void updateArrows(Hud aHud,SDL_Window *pWin,Client aClient, SDL_Point playerPos[
     SDL_Rect screen = {.h = screenHeight, .w = screenWidth, .x = 0,.y = 0};
     int selfIndex = NET_clientGetSelfIndex(aClient);
     double radians ={0};
-
+    float dx = {0}, dy = {0};
+    float tx = {0}, ty = {0}, t = {0}, x = 0, y = 0;
     for (int i = 0; i < NET_clientGetPlayerCount(aClient); i++){
         if(selfIndex == i) continue;
-
         if(pointInRect(screen,playerPos[i])){
             aHud->indicators[i]->isPlayerOnScreen = true;
             continue;
         }else{
             aHud->indicators[i]->isPlayerOnScreen = false;
         }
-
-        SDL_Point posWithoutOffset = (SDL_Point){
-            .x = -(playerPos[i].x - center.x),
-            .y = -(playerPos[i].y - center.y)
-        };
-        radians = atan2((double)posWithoutOffset.x,(double)posWithoutOffset.y);
+        dx = (playerPos[i].x - center.x);
+        dy = (playerPos[i].y - center.y);
+        radians = atan2(-(double)dx,-(double)dy);
         aHud->indicators[i]->angel = -((double)radians* 180.0 / M_PI);
+        radians = atan2((double)dy,(double)dx);
         //position
+        float len = hypotf(dx, dy);
+        dx = (dx/len);
+        dy = (dy/len);
+
+        tx = (dx != 0.0f) ? center.x / fabsf(dx) : INFINITY;
+        ty = (dy != 0.0f) ? center.y / fabsf(dy) : INFINITY;
+        t = (tx < ty) ? tx : ty;
+
+        x = (center.x + dx * t) - ARROW_SIZE;
+        y = (center.y + dy * t) - ARROW_SIZE;
         
+        x = fmaxf(0.0f, fminf(x, screenWidth  - ARROW_SIZE));
+        y = fmaxf(0.0f, fminf(y, screenHeight - ARROW_SIZE));
+
+        aHud->indicators[i]->pos.x = x;
+        aHud->indicators[i]->pos.y = y;
+        
+        //printf("x: %f, y: %f\n",aHud->indicators[i]->pos.x,aHud->indicators[i]->pos.y);
     }
 }
 
