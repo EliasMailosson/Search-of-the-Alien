@@ -94,7 +94,7 @@ void runLobby(Client aClient, Map aMap, ClientControl *pControl, ClientView *pVi
             NET_clientSetPlayerAnimation(aClient, i, ANIMATION_IDLE);
         }
     }
-    
+    updateArrows(pView->aHud,pView->pWin,aClient,pView->PlayerPos);
     MAP_MapMoveMap(aMap, playerPos);
 
     SDL_SetRenderDrawColor(pView->pRend, 0,0,0,0);
@@ -102,7 +102,7 @@ void runLobby(Client aClient, Map aMap, ClientControl *pControl, ClientView *pVi
 
     MAP_MapRender(pView->pRend, aMap);
     renderPlayers(aClient, pView, playerCamera);
-    
+    hudRender(pView->aHud,pView->pRend,NET_clientGetPlayerCount(aClient));
     SDL_RenderPresent(pView->pRend);
 }
 

@@ -45,6 +45,7 @@ void renderPlayers(Client aClient, ClientView *pView, SDL_Rect playerCamera) {
                 .h = pView->playerRenderSize
             };
         }
+        pView->PlayerPos[i] = (SDL_Point){.x = playerRect.x, .y = playerRect.y};
         
         SDL_Rect src;
         switch(NET_clientGetPlayerAnimation(aClient, i)) {
