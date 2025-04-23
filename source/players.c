@@ -74,3 +74,44 @@ PlayerInputPacket prepareInputArray(ClientControl *pControl) {
 void updatepos(){
 
 }
+void RenderPlayerName(Client aClient, ClientView *pView, int i, SDL_Rect playerRect){
+    char username[MAX_USERNAME_LEN] = {0};
+    username[MAX_USERNAME_LEN - 1] = '\0';
+    NET_clientGetPlayerName(aClient, i, username);
+
+    if (strlen(username) == 0 || !pView->fonts){
+        printf("%s",username);
+        printf("Font: %p", (void*)pView->fonts);
+        return;
+    }
+
+    SDL_Color nameColor = {255,255,255,255}; // Server ska välja färgerna på namnen
+    SDL_Surface* nameSurface = TTF_RenderText_Blended(pView->fonts, username, nameColor);
+
+    if (!nameSurface){
+        printf("Andra gangen: %s", username);
+        return;
+    } 
+
+    SDL_Texture* nameTexture = SDL_CreateTextureFromSurface(pView->pRend, nameSurface);
+    if (!nameTexture) {
+        printf("Tredje gangen: %s", username);
+        SDL_FreeSurface(nameSurface);
+        return;
+    }
+
+    int nameWidth = nameSurface->w;
+    int nameHeight = nameSurface->h;
+
+    SDL_Rect nameRect = {
+        .x = playerRect.x + (playerRect.w - nameWidth)/2,
+        .y = playerRect.y - nameHeight - 5,
+        .w = nameWidth,
+        .h = nameHeight
+    };
+
+    SDL_RenderCopy(pView->pRend, nameTexture, NULL, &nameRect);
+
+    SDL_FreeSurface(nameSurface);
+    SDL_DestroyTexture(nameTexture);
+}
