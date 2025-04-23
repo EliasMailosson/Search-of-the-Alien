@@ -1,6 +1,7 @@
 #ifndef CLIENT_H
 #define CLIENT_H
 #include <stdbool.h>
+#include <stdlib.h>
 #include "../../include/NET/shared.h"
 
 enum PlayerAnimationTypes{ANIMATION_IDLE, ANIMATION_RUNNING, EMOTE_TPOSE};
@@ -45,5 +46,6 @@ void NET_clientUpdatePlayerList(Client aClient,Packet aPacket);
 //----------
 SDL_Point NET_clientGetSelfPos(Client aClient);
 
-
+SDL_Color NET_clientGetColor(int index);
+SDL_Color NET_GetPlayerColor(Client aClient, int index);
 #endif

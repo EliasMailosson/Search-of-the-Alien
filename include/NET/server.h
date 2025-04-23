@@ -2,7 +2,7 @@
 #define SERVER_H
 #include "../../include/NET/shared.h"
 #include "../../include/NET/protocol.h"
-
+#define MAX_COLORS 8
 
 typedef struct Player Player;
 
@@ -38,5 +38,7 @@ void NET_serverAddUser(Server aServer, User newUser);
 
 /** Freeing memory after use, for server */
 void NET_serverDestroy(Server aServer);
+
+int NET_serverAssignColorIndex(Server aServer);
 
 #endif

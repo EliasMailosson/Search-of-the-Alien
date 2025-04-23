@@ -11,6 +11,7 @@ typedef struct PlayerPacket{
     GameState state;
     SDL_Point mousePos;
     int direction;
+    int colorIndex;
 }PlayerPacket;  
 
 void NET_protocolSendInt(UDPpacket *pUDPpkg,UDPsocket Socket,IPaddress IP,

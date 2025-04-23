@@ -13,6 +13,7 @@ struct User{
     int LobbyID;
     GameState State;
     Player player;
+    int colorIndex;
 };
 struct server {
     UDPsocket serverSocket;
@@ -22,6 +23,7 @@ struct server {
     UDPpacket *pSendPacket;
     User *clients;
     bool isOff;
+    bool usedColors[MAX_COLORS];
 };
 
 int main(int argc, char **argv ){
@@ -29,6 +31,7 @@ int main(int argc, char **argv ){
     NET_serverInitSDL();
     Server aServer = {0};
     aServer = NET_serverCreate();
+    memset(aServer->usedColors, 0, sizeof(aServer->usedColors));
     bool isRunning;
     // if Server has allocated memory then the server is running on "PORT"
     if(aServer == NULL){
@@ -112,6 +115,7 @@ void NET_serverSendPlayerPacket(Server aServer,GameState GS){
         };
         packet[i].pos = pos;
         packet[i].direction = aServer->clients[i].player.direction;
+        packet[i].colorIndex = aServer->clients[i].colorIndex;
     }
     Uint32 payloadSize = aServer->clientCount * sizeof(PlayerPacket);
     for (int i = 0; i < aServer->clientCount; i++){
@@ -183,6 +187,12 @@ void NET_serverChangeGameStateOnClient(Server aServer,Packet aPacket){
 
 void NET_serverClientDisconnect(Server aServer){
     int indexIP = NET_serverCompIP(aServer);
+    int color = aServer->clients[indexIP].colorIndex;
+    if (color >= 0 && color < MAX_COLORS)
+    {
+        aServer->usedColors[color] = false;
+    }
+    
     if(indexIP == -1) {
         printf("Error NET_serverCompIP return -1\n");
         return;
@@ -321,7 +331,7 @@ void NET_serverClientConnected(Packet aPacket, Server aServer){
     newUser.LobbyID = -1;
     // newUser.State = NET_packetGetMessageType(aPacket);
     newUser.State = MENU;
-    
+    newUser.colorIndex = NET_serverAssignColorIndex(aServer);
     NET_serverAddUser(aServer, newUser);
     NET_serverSendInt(aServer, GLOBAL, CONNECT_RESPONSE, 0, aServer->clientCount - 1);
     printf("username: %s connected to server\n", aServer->clients[aServer->clientCount - 1].username);
@@ -331,6 +341,18 @@ int NET_serverFindPlayerID(Server aServer, const char* str){
     for (int i = 0; i < aServer->clientCount; i++){
         if(strcmp(str, aServer->clients[i].username) == 0){
             return (i);
+        }
+    }
+    return -1;
+}
+
+int NET_serverAssignColorIndex(Server aServer){
+    for (int i = 0; i < MAX_COLORS; i++)
+    {
+        if (!aServer->usedColors[i])
+        {
+            aServer->usedColors[i] = true;
+            return i;
         }
     }
     return -1;

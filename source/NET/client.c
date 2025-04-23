@@ -6,6 +6,7 @@ struct Player{
     SDL_Point pos;
     int direction;
     int currentPlayerAnimation;
+    int colorIndex;
 };
 struct client{
     SDLNet_SocketSet socketSet;
@@ -206,10 +207,14 @@ void NET_clientUpdatePlayerList(Client aClient, Packet aPacket){
     PlayerPacket packets[MAX_CLIENTS] = {0};
     NET_playerPacketReceive(aPacket, packets, &aClient->PlayerCount);
     for (int i = 0; i < aClient->PlayerCount; i++){
+
         aClient->playerList[i].pos = packets[i].pos;
         aClient->playerList[i].state = packets[i].state;
         aClient->playerList[i].direction = packets[i].direction;
+        aClient->playerList[i].colorIndex = packets[i].colorIndex;
         strcpy(aClient->playerList[i].username, packets[i].username);
+        aClient->playerList[i].color = NET_clientGetColor(aClient->playerList[i].colorIndex);
+
     }
 }
 
@@ -234,4 +239,22 @@ SDL_Point NET_clientGetSelfPos(Client aClient){
         }
     }
     return (SDL_Point){-1,-1};
+}
+
+SDL_Color NET_clientGetColor(int index){
+    SDL_Color colors[] = {
+        {255, 0, 0, 255},     // Red
+        {0, 255, 0, 255},     // Green
+        {0, 0, 255, 255},     // Blue
+        {255, 255, 0, 255},   // Yellow
+        {255, 0, 255, 255},   // Magenta
+        {0, 255, 255, 255},   // Cyan
+        {255, 165, 0, 255},   // Orange
+        {128, 0, 128, 255},   // Purple
+    };
+    return colors[index];
+}
+
+SDL_Color NET_GetPlayerColor(Client aClient,int index){
+    return aClient->playerList[index].color;
 }
