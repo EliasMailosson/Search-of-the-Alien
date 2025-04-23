@@ -51,6 +51,12 @@ void renderPlayers(Client aClient, ClientView *pView, SDL_Rect playerCamera) {
         SDL_Point pos = NET_clientGetPlayerPos(aClient, i);
         int direction = NET_clientGetPlayerDirection(aClient, i);
 
+        int worldOffsetX = pos.x - selfPos.x;
+        int worldOffsetY = pos.y - selfPos.y;
+        float scale = (float)pView->playerRenderSize / RENDER_SIZE;
+        float screenOffsetX = worldOffsetX * scale;
+        float screenOffsetY = worldOffsetY * scale;
+
         SDL_Rect playerRect;
         if(selfIndex == i) {
             playerRect = (SDL_Rect){
@@ -62,8 +68,8 @@ void renderPlayers(Client aClient, ClientView *pView, SDL_Rect playerCamera) {
         }
         else {
             playerRect = (SDL_Rect){
-                .x = centerX - (selfPos.x - pos.x) - renderSizeHalf,
-                .y = centerY - (selfPos.y - pos.y) - renderSizeHalf,
+                .x = (int)(centerX + screenOffsetX - renderSizeHalf),
+                .y = (int)(centerY + screenOffsetY - renderSizeHalf),
                 .w = pView->playerRenderSize,
                 .h = pView->playerRenderSize
             };
