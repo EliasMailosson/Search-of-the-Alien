@@ -44,7 +44,7 @@ void runLobby(Client aClient, Map aMap, ClientControl *pControl, ClientView *pVi
     static int toggleDelay = 0;
     int selfIndex = NET_clientGetSelfIndex(aClient);
 
-    static SDL_Point lastPosition[MAX_CLIENTS];
+    SDL_Point lastPosition[MAX_CLIENTS];
     for(int i = 0; i < NET_clientGetPlayerCount(aClient); i++) {
         lastPosition[i] = NET_clientGetPlayerPos(aClient, i);
     }
@@ -85,11 +85,13 @@ void runLobby(Client aClient, Map aMap, ClientControl *pControl, ClientView *pVi
     
     for(int i = 0; i < NET_clientGetPlayerCount(aClient); i++) {
         SDL_Point newPosition = NET_clientGetPlayerPos(aClient, i);
-        if(lastPosition[i].x == newPosition.x && lastPosition[i].y == newPosition.y) {
-            NET_clientSetPlayerAnimation(aClient, i, ANIMATION_IDLE);
+        int dx = abs(newPosition.x - lastPosition[i].x);
+        int dy = abs(newPosition.y - lastPosition[i].y);
+        if(dx > 0 || dy > 0) {
+            NET_clientSetPlayerAnimation(aClient, i, ANIMATION_RUNNING);
         }
         else {
-            NET_clientSetPlayerAnimation(aClient, i, ANIMATION_RUNNING);
+            NET_clientSetPlayerAnimation(aClient, i, ANIMATION_IDLE);
         }
     }
     

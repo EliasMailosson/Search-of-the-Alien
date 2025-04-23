@@ -72,11 +72,11 @@ void NET_clientGetPlayerName(Client aClient, int playerIndex, char* username) {
 }
 
 void NET_clientSetPlayerAnimation(Client aClient, int playerIdx, int newAnimation) {
-    aClient->playerList->currentPlayerAnimation = newAnimation;
+    aClient->playerList[playerIdx].currentPlayerAnimation = newAnimation;
 }
 
 int NET_clientGetPlayerAnimation(Client aClient, int playerIdx) {
-    return aClient->playerList->currentPlayerAnimation;
+    return aClient->playerList[playerIdx].currentPlayerAnimation;
 }
 
 void NET_clientSetSelfName(Client aClient, char* newName) {
