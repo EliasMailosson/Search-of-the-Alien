@@ -21,9 +21,9 @@ typedef struct Arrow *Arrow;
 
 Hud hudCreate(SDL_Renderer *pRend);
 void hudDestroy(Hud aHud);
-void hudRender(Hud aHud,SDL_Renderer *pRend, int playerCount);
+void hudRender(Hud aHud,SDL_Renderer *pRend,int colerIndex,int i);
 
-Arrow arrowCreate(int index, SDL_Renderer *pRend);
+Arrow arrowCreate();
 void updateArrows(Hud aHud,SDL_Window *pWin,Client aClient, SDL_Point playerPos[MAX_CLIENTS]);
 SDL_Point hudGettArrowPos(Hud aHud, int index);
 
