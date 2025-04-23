@@ -163,6 +163,9 @@ void UI_panelUpdate(Panel aPanel, MenuEvent *pEvent, bool isMouseUp, bool *keys)
                 } else if(mode == PLAYBACK_BACKWARD) {
                     UI_animationPrevFrame((Animation)aPanel->compList[i].pComp);
                 }
+                if(UI_animationGetColumn((Animation)aPanel->compList[i].pComp) == 0) {
+                    UI_animationSetMode((Animation)aPanel->compList[i].pComp, PLAYBACK_STOP);
+                }
                 break;
 
         }

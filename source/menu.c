@@ -73,6 +73,15 @@ void updateMenu(Menu *pMenu, ClientControl *pControl, Client aClient) {
                     UI_clientAddFriend(aFriendList, friend);
                     UI_updateFriendList(aFriendList);
                 }
+                if (strcmp("planet-r", menuEvent.key) == 0) {
+                    Animation a1 = (Animation)UI_panelGetComponent(pMenu->panels[PANEL_PLAYER_SELECT], "planet-animation");
+                    UI_animationSetMode(a1, PLAYBACK_FORWARD);
+                    
+                }
+                else if (strcmp("planet-l", menuEvent.key) == 0) {
+                    Animation a1 = (Animation)UI_panelGetComponent(pMenu->panels[PANEL_PLAYER_SELECT], "planet-animation");
+                    UI_animationSetMode(a1, PLAYBACK_BACKWARD);
+                }
                 break;
         }
 }
@@ -221,9 +230,21 @@ void refreshMenu(SDL_Renderer *pRend, Menu *pMenu, ClientView *pView) {
         pMenu->fonts[0], (SDL_Color) { .r = 255, .g = 255, .b = 255, .a = 255 }
     );
 
-    // PLANET SELECT MENU //////////////////
-    Animation a1 = (Animation)UI_panelGetComponent(pMenu->panels[PANEL_PLANET_SELECT], "planet-animation");
+    // PANEL_PLAYER_SELECT //////////////////
+    Animation a1 = (Animation)UI_panelGetComponent(pMenu->panels[PANEL_PLAYER_SELECT], "planet-animation");
     UI_animationSetDestination(a1, (SDL_Rect) {.x = 0, .y = 0, .w = 960, .h = 512});
+
+    Button bLeft = (Button)UI_panelGetComponent(pMenu->panels[PANEL_PLAYER_SELECT], "planet-l");
+    UI_buttonConfigure(bLeft, "<-", 
+        40, pView->windowHeight*0.85, 40, SMALLBUTTONHEIGHT, pRend, (SDL_Color) { .r = 0, .g = 0, .b = 0, .a = 255 }, 
+        pMenu->fonts[0], (SDL_Color) { .r = 255, .g = 255, .b = 255, .a = 255 }
+    );
+
+    Button bRight = (Button)UI_panelGetComponent(pMenu->panels[PANEL_PLAYER_SELECT], "planet-r");
+    UI_buttonConfigure(bRight, "->", 
+        pView->windowWidth - 80, pView->windowHeight*0.85, 40, SMALLBUTTONHEIGHT, pRend, (SDL_Color) { .r = 0, .g = 0, .b = 0, .a = 255 }, 
+        pMenu->fonts[0], (SDL_Color) { .r = 255, .g = 255, .b = 255, .a = 255 }
+    );
 }
 //CreateFriendList() och panelAddComponent
 Menu initMenu(SDL_Renderer *pRend, ClientView *pView, Client aClient) {
@@ -268,7 +289,7 @@ Menu initMenu(SDL_Renderer *pRend, ClientView *pView, Client aClient) {
 
     Button b3 = UI_buttonCreate();
     UI_panelAddComponent(menu.panels[PANEL_START], b3, UI_BUTTON, "Options");
-    UI_panelSetComponentLink(menu.panels[PANEL_START], "Options", PANEL_PLANET_SELECT);
+    UI_panelSetComponentLink(menu.panels[PANEL_START], "Options", PANEL_PLAYER_SELECT);
 
     Button b4 = UI_buttonCreate();
     UI_panelAddComponent(menu.panels[PANEL_START], b4, UI_BUTTON, "Quit");
@@ -343,12 +364,18 @@ Menu initMenu(SDL_Renderer *pRend, ClientView *pView, Client aClient) {
     UI_panelAddComponent(menu.panels[PANEL_OPTIONS], b7, UI_BUTTON, "Options-back");
     UI_panelSetComponentLink(menu.panels[PANEL_OPTIONS], "Options-back", PANEL_START);
 
-    // PLANET SELECT MENU //////////////////
-    UI_panelSetImage(pRend, menu.panels[PANEL_PLANET_SELECT], "assets/images/menu/background2.png");
+    // PANEL_PLAYER_SELECT //////////////////
+    UI_panelSetImage(pRend, menu.panels[PANEL_PLAYER_SELECT], "assets/images/menu/background2.png");
 
     Animation a1 = UI_animationCreate();
-    UI_panelAddComponent(menu.panels[PANEL_PLANET_SELECT], a1, UI_ANIMATION, "planet-animation");
+    UI_panelAddComponent(menu.panels[PANEL_PLAYER_SELECT], a1, UI_ANIMATION, "planet-animation");
     UI_animationLoad(a1, pView->pRend, "assets/images/menu/character_selection.png", 960, 512, 72);
+
+    Button bLeft = UI_buttonCreate();
+    UI_panelAddComponent(menu.panels[PANEL_PLAYER_SELECT], bLeft, UI_BUTTON, "planet-l");
+
+    Button bRight = UI_buttonCreate();
+    UI_panelAddComponent(menu.panels[PANEL_PLAYER_SELECT], bRight, UI_BUTTON, "planet-r");
 
     refreshMenu(pRend, &menu, pView);
     return menu;

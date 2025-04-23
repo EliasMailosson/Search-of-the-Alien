@@ -35,17 +35,26 @@ int UI_animationGetMode(Animation aAnimation) {
 }
 
 void UI_animationNextFrame(Animation aAnimation) {
-    (aAnimation->currentFrame)++;
-    aAnimation->currentFrame %= (aAnimation->frameCount);
+    aAnimation->currentFrame++;
+    if (aAnimation->currentFrame >= aAnimation->frameCount) {
+        aAnimation->currentFrame = 0;
+    }
 }
 
 void UI_animationPrevFrame(Animation aAnimation) {
-    (aAnimation->currentFrame)--;
-    aAnimation->currentFrame %= (aAnimation->frameCount);
+    if (aAnimation->currentFrame <= 0) {
+        aAnimation->currentFrame = aAnimation->frameCount - 1;
+    } else {
+        aAnimation->currentFrame--;
+    }
 }
 
 void UI_animationSetMode(Animation aAnimation, int newMode) {
     aAnimation->playbackMode = newMode;
+}
+
+int UI_animationGetColumn(Animation aAnimation) {
+    return (aAnimation->currentFrame % aAnimation->frameCols);
 }
 
 void UI_animationLoad(Animation aAnimation, SDL_Renderer *pRend, char *imgPath, int frameW, int frameH, int frameCount) {
