@@ -99,22 +99,13 @@ void RenderPlayerName(Client aClient, ClientView *pView, int i, SDL_Rect playerR
     }
 
     SDL_Color nameColor = {255,255,255,255}; // Server ska välja färgerna på namnen
-    SDL_Surface* nameSurface = TTF_RenderText_Blended(pView->fonts, username, nameColor);
+    SDL_Color shadowColor = {0,0,0,255}; //skuggan 
 
-    if (!nameSurface){
-        printf("Andra gangen: %s", username);
-        return;
-    } 
+    SDL_Surface* shadowSurface = TTF_RenderText_Blended(pView->fonts, username, shadowColor);
+    SDL_Texture* shadowTexture = SDL_CreateTextureFromSurface(pView->pRend, shadowSurface);
 
-    SDL_Texture* nameTexture = SDL_CreateTextureFromSurface(pView->pRend, nameSurface);
-    if (!nameTexture) {
-        printf("Tredje gangen: %s", username);
-        SDL_FreeSurface(nameSurface);
-        return;
-    }
-
-    int nameWidth = nameSurface->w;
-    int nameHeight = nameSurface->h;
+    int nameWidth = shadowSurface->w;
+    int nameHeight = shadowSurface->h;
 
     SDL_Rect nameRect = {
         .x = playerRect.x + (playerRect.w - nameWidth)/2,
@@ -122,6 +113,20 @@ void RenderPlayerName(Client aClient, ClientView *pView, int i, SDL_Rect playerR
         .w = nameWidth,
         .h = nameHeight
     };
+
+    SDL_Rect shadowRect = {
+        .x = nameRect.x + 1,
+        .y = nameRect.y + 1,
+        .w = nameWidth,
+        .h = nameHeight
+    };
+
+    SDL_RenderCopy(pView->pRend,shadowTexture,NULL,&shadowRect);
+    SDL_FreeSurface(shadowSurface);
+    SDL_DestroyTexture(shadowTexture);
+
+    SDL_Surface* nameSurface = TTF_RenderText_Blended(pView->fonts, username, nameColor);
+    SDL_Texture* nameTexture = SDL_CreateTextureFromSurface(pView->pRend, nameSurface);
 
     SDL_RenderCopy(pView->pRend, nameTexture, NULL, &nameRect);
 
