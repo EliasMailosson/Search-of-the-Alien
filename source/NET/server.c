@@ -281,6 +281,7 @@ void NET_serverRemoveUser(Server aServer,int index){
         printf("Invalid index\n");
         return;
     }
+    free(aServer->clients[index].username);
     for (int i = index; i < aServer->clientCount - 1; i++){
         aServer->clients[i] = aServer->clients[i + 1];
     }
