@@ -7,6 +7,7 @@ struct Player{
     int direction;
     int currentPlayerAnimation;
     int colorIndex;
+    SDL_Color color;
 };
 struct client{
     SDLNet_SocketSet socketSet;
