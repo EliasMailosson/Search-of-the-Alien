@@ -8,6 +8,24 @@
 #define SPRITE_SIZE 256
 #define RENDER_SIZE 128
 
+void sortByYaxis(Client aClient, int playerCount, int indices[]){
+    for (int i = 0; i < playerCount - 1; i++) {
+        for (int j = 0; j < playerCount - i - 1; j++) {
+            int ia = indices[j];
+            int ib = indices[j + 1];
+
+            SDL_Point pa = NET_clientGetPlayerPos(aClient, ia);
+            SDL_Point pb = NET_clientGetPlayerPos(aClient, ib);
+
+            if (pa.y > pb.y) {  // ascending sort → lowest y LAST
+                int temp = indices[j];
+                indices[j] = indices[j + 1];
+                indices[j + 1] = temp;
+            }
+        }
+    }
+}
+
 void renderPlayers(Client aClient, ClientView *pView, SDL_Rect playerCamera) {
     static int frame = 0;
     frame++;
@@ -19,12 +37,17 @@ void renderPlayers(Client aClient, ClientView *pView, SDL_Rect playerCamera) {
     int centerY = pView->windowHeight/2;
     int renderSizeHalf = pView->playerRenderSize/2;
 
-    // TODO: sort players in "y" value, so the players in front get rendered last.
-    // for(int i = 0; i < playerCount; i++) {
-    //     SDL_Point pos = NET_clientGetPlayerPos(aClient, i);
-    // }
+    int sortedIndex[playerCount];
 
-    for(int i = 0; i < playerCount; i++) {
+    for (int i = 0; i < playerCount; i++) {
+        sortedIndex[i] = i;
+    }
+
+    sortByYaxis(aClient, playerCount, sortedIndex);
+
+    for(int n = 0; n < playerCount; n++) {
+        int i = sortedIndex[n];
+
         SDL_Point pos = NET_clientGetPlayerPos(aClient, i);
         int direction = NET_clientGetPlayerDirection(aClient, i);
 
