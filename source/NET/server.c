@@ -5,6 +5,7 @@ struct Player{
     SDL_Rect hitBox;
     SDL_Point mousePos;
     int direction;
+    int character;
 };
 
 struct User{
@@ -116,6 +117,7 @@ void NET_serverSendPlayerPacket(Server aServer,GameState GS){
         packet[i].pos = pos;
         packet[i].direction = aServer->clients[i].player.direction;
         packet[i].colorIndex = aServer->clients[i].colorIndex;
+        packet[i].playerCharacter = aServer->clients[i].player.character;
     }
     Uint32 payloadSize = aServer->clientCount * sizeof(PlayerPacket);
     for (int i = 0; i < aServer->clientCount; i++){
@@ -169,6 +171,7 @@ void NET_serverUpdatePlayer(Server aServer, Packet aPacket){
 
     float angle = atan2(dy, dx);
     aServer->clients[playerIdx].player.direction = ((int)roundf(angle / (float)M_PI_4) + 7 ) % 8;
+    aServer->clients[playerIdx].player.character = pip.selecterPlayerCharacter;
 
     NET_serverSendPlayerPacket(aServer,LOBBY); 
 }

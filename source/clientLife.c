@@ -43,8 +43,11 @@ void startClient(Client *aClient, ClientView *pView,ClientControl *pControl){
     *aClient = NET_clientCreate();
 
     SDL_Surface *surface = IMG_Load("assets/images/player/bluethan.png");
-    pView->playerTexture = SDL_CreateTextureFromSurface(pView->pRend, surface);
+    pView->playerTexture[CHARACTER_BLUEFACE] = SDL_CreateTextureFromSurface(pView->pRend, surface);
     SDL_FreeSurface(surface);
+    SDL_Surface *surface2 = IMG_Load("assets/images/player/biggie.png");
+    pView->playerTexture[CHARACTER_BIGGIE] = SDL_CreateTextureFromSurface(pView->pRend, surface2);
+    SDL_FreeSurface(surface2);
 
     pView->crosshair = createScaledCursor("assets/images/cursor/crosshair.png", 50, 50, 25, 25);
 
@@ -59,6 +62,8 @@ void startClient(Client *aClient, ClientView *pView,ClientControl *pControl){
         SDL_Quit();
     }
     pView->aHud = hudCreate(pView->pRend);
+
+    pControl->selectedCharacter = CHARACTER_BLUEFACE;
 }
 
 SDL_Cursor* createScaledCursor(const char *filePath, int newWidth, int newHeight, int hotX, int hotY) {
@@ -105,7 +110,10 @@ SDL_Cursor* createScaledCursor(const char *filePath, int newWidth, int newHeight
 
 void killClient(Client *aClient, ClientView *pView){
     SDL_FreeCursor(pView->crosshair);
-    SDL_DestroyTexture(pView->playerTexture);
+    for(int i = 0; i < MAX_PLAYER_CHARACTERS; i++) {
+        SDL_DestroyTexture(pView->playerTexture[i]);
+        pView->playerTexture[i] = NULL;
+    }
 
     hudDestroy(pView->aHud);
     NET_clientDestroy(*aClient);

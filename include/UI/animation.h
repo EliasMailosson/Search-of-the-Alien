@@ -24,5 +24,6 @@ void UI_animationSetDestination(Animation aAnimation, SDL_Rect rect);
 int UI_animationGetMode(Animation aAnimation);
 void UI_animationSetMode(Animation aAnimation, int newMode);
 int UI_animationGetColumn(Animation aAnimation);
+int UI_animationGetRow(Animation aAnimation);
 
 #endif

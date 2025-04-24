@@ -88,7 +88,8 @@ void renderPlayers(Client aClient, ClientView *pView, SDL_Rect playerCamera) {
                 src = (SDL_Rect){((frame/2)%24)*SPRITE_SIZE, direction*SPRITE_SIZE, SPRITE_SIZE, SPRITE_SIZE};
         }
         
-        SDL_RenderCopy(pView->pRend, pView->playerTexture, &src, &playerRect);
+        int playerCharacter = NET_clientGetPlayerCharacter(aClient, i);
+        SDL_RenderCopy(pView->pRend, pView->playerTexture[playerCharacter], &src, &playerRect);
         RenderPlayerName(aClient, pView, i, playerRect);
     }
 }
@@ -108,7 +109,8 @@ PlayerInputPacket prepareInputArray(ClientControl *pControl, int windowWidth, in
             pControl->keys[SDL_SCANCODE_SPACE],
             pControl->isMouseDown,
             // pControl->isMouseUp, en för mycket
-        }
+        },
+        .selecterPlayerCharacter = pControl->selectedCharacter
     };
     return pip;
 }

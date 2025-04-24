@@ -39,6 +39,8 @@ void NET_clientGetSelfname(Client aClient, char* outputName);
 int NET_clientGetSelfIndex(Client aClient);
 int NET_clientGetPlayerColorIndex(Client aClient,int index);
 
+int NET_clientGetPlayerCharacter(Client aClient, int playerIdx);
+
 
 void NET_clientReceiver(Client aClient);
 int NET_clientFindPlayer(Client aClient, char* str);

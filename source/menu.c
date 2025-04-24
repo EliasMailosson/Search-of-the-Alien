@@ -52,6 +52,10 @@ void updateMenu(Menu *pMenu, ClientControl *pControl, Client aClient) {
                 
                     updateFriendList(pMenu, aClient);
                 }
+                if (strcmp("player-sel", menuEvent.key) == 0) {
+                    Animation a1 = (Animation)UI_panelGetComponent(pMenu->panels[PANEL_PLAYER_SELECT], "player-animation");
+                    pControl->selectedCharacter = UI_animationGetRow(a1) % MAX_PLAYER_CHARACTERS;
+                }
                 break;
                 
                 case BUTTON_CLICKED:
@@ -73,13 +77,13 @@ void updateMenu(Menu *pMenu, ClientControl *pControl, Client aClient) {
                     UI_clientAddFriend(aFriendList, friend);
                     UI_updateFriendList(aFriendList);
                 }
-                if (strcmp("planet-r", menuEvent.key) == 0) {
-                    Animation a1 = (Animation)UI_panelGetComponent(pMenu->panels[PANEL_PLAYER_SELECT], "planet-animation");
+                if (strcmp("player-r", menuEvent.key) == 0) {
+                    Animation a1 = (Animation)UI_panelGetComponent(pMenu->panels[PANEL_PLAYER_SELECT], "player-animation");
                     UI_animationSetMode(a1, PLAYBACK_FORWARD);
                     
                 }
-                else if (strcmp("planet-l", menuEvent.key) == 0) {
-                    Animation a1 = (Animation)UI_panelGetComponent(pMenu->panels[PANEL_PLAYER_SELECT], "planet-animation");
+                else if (strcmp("player-l", menuEvent.key) == 0) {
+                    Animation a1 = (Animation)UI_panelGetComponent(pMenu->panels[PANEL_PLAYER_SELECT], "player-animation");
                     UI_animationSetMode(a1, PLAYBACK_BACKWARD);
                 }
                 break;
@@ -230,19 +234,31 @@ void refreshMenu(SDL_Renderer *pRend, Menu *pMenu, ClientView *pView) {
         pMenu->fonts[0], (SDL_Color) { .r = 255, .g = 255, .b = 255, .a = 255 }
     );
 
-    // PANEL_PLAYER_SELECT //////////////////
-    Animation a1 = (Animation)UI_panelGetComponent(pMenu->panels[PANEL_PLAYER_SELECT], "planet-animation");
-    UI_animationSetDestination(a1, (SDL_Rect) {.x = 0, .y = 0, .w = 960, .h = 512});
+    Button b71 = (Button)UI_panelGetComponent(pMenu->panels[PANEL_OPTIONS], "Options-player-sel");
+    UI_buttonConfigure(b71, "Choose Your Character", 
+        100, 100, BIGBUTTONWIDTH, SMALLBUTTONHEIGHT, pRend, (SDL_Color) { .r = 0, .g = 0, .b = 0, .a = 255 }, 
+        pMenu->fonts[0], (SDL_Color) { .r = 255, .g = 255, .b = 255, .a = 255 }
+    );
 
-    Button bLeft = (Button)UI_panelGetComponent(pMenu->panels[PANEL_PLAYER_SELECT], "planet-l");
+    // PANEL_PLAYER_SELECT //////////////////
+    Animation a1 = (Animation)UI_panelGetComponent(pMenu->panels[PANEL_PLAYER_SELECT], "player-animation");
+    UI_animationSetDestination(a1, (SDL_Rect) {.x = pView->windowWidth/4, .y = pView->windowHeight/4, .w = pView->windowWidth/2, .h = pView->windowHeight/2});
+
+    Button bLeft = (Button)UI_panelGetComponent(pMenu->panels[PANEL_PLAYER_SELECT], "player-l");
     UI_buttonConfigure(bLeft, "<-", 
         40, pView->windowHeight*0.85, 40, SMALLBUTTONHEIGHT, pRend, (SDL_Color) { .r = 0, .g = 0, .b = 0, .a = 255 }, 
         pMenu->fonts[0], (SDL_Color) { .r = 255, .g = 255, .b = 255, .a = 255 }
     );
 
-    Button bRight = (Button)UI_panelGetComponent(pMenu->panels[PANEL_PLAYER_SELECT], "planet-r");
+    Button bRight = (Button)UI_panelGetComponent(pMenu->panels[PANEL_PLAYER_SELECT], "player-r");
     UI_buttonConfigure(bRight, "->", 
         pView->windowWidth - 80, pView->windowHeight*0.85, 40, SMALLBUTTONHEIGHT, pRend, (SDL_Color) { .r = 0, .g = 0, .b = 0, .a = 255 }, 
+        pMenu->fonts[0], (SDL_Color) { .r = 255, .g = 255, .b = 255, .a = 255 }
+    );
+
+    Button bSel = (Button)UI_panelGetComponent(pMenu->panels[PANEL_PLAYER_SELECT], "player-sel");
+    UI_buttonConfigure(bSel, "Confirm", 
+        pView->windowWidth/2 - 80, pView->windowHeight*0.85, 160, SMALLBUTTONHEIGHT, pRend, (SDL_Color) { .r = 0, .g = 0, .b = 0, .a = 255 }, 
         pMenu->fonts[0], (SDL_Color) { .r = 255, .g = 255, .b = 255, .a = 255 }
     );
 }
@@ -289,7 +305,7 @@ Menu initMenu(SDL_Renderer *pRend, ClientView *pView, Client aClient) {
 
     Button b3 = UI_buttonCreate();
     UI_panelAddComponent(menu.panels[PANEL_START], b3, UI_BUTTON, "Options");
-    UI_panelSetComponentLink(menu.panels[PANEL_START], "Options", PANEL_PLAYER_SELECT);
+    UI_panelSetComponentLink(menu.panels[PANEL_START], "Options", PANEL_OPTIONS);
 
     Button b4 = UI_buttonCreate();
     UI_panelAddComponent(menu.panels[PANEL_START], b4, UI_BUTTON, "Quit");
@@ -364,18 +380,26 @@ Menu initMenu(SDL_Renderer *pRend, ClientView *pView, Client aClient) {
     UI_panelAddComponent(menu.panels[PANEL_OPTIONS], b7, UI_BUTTON, "Options-back");
     UI_panelSetComponentLink(menu.panels[PANEL_OPTIONS], "Options-back", PANEL_START);
 
+    Button b71 = UI_buttonCreate();
+    UI_panelAddComponent(menu.panels[PANEL_OPTIONS], b71, UI_BUTTON, "Options-player-sel");
+    UI_panelSetComponentLink(menu.panels[PANEL_OPTIONS], "Options-player-sel", PANEL_PLAYER_SELECT);
+
     // PANEL_PLAYER_SELECT //////////////////
     UI_panelSetImage(pRend, menu.panels[PANEL_PLAYER_SELECT], "assets/images/menu/background2.png");
 
     Animation a1 = UI_animationCreate();
-    UI_panelAddComponent(menu.panels[PANEL_PLAYER_SELECT], a1, UI_ANIMATION, "planet-animation");
+    UI_panelAddComponent(menu.panels[PANEL_PLAYER_SELECT], a1, UI_ANIMATION, "player-animation");
     UI_animationLoad(a1, pView->pRend, "assets/images/menu/character_selection.png", 960, 512, 72);
 
     Button bLeft = UI_buttonCreate();
-    UI_panelAddComponent(menu.panels[PANEL_PLAYER_SELECT], bLeft, UI_BUTTON, "planet-l");
+    UI_panelAddComponent(menu.panels[PANEL_PLAYER_SELECT], bLeft, UI_BUTTON, "player-l");
 
     Button bRight = UI_buttonCreate();
-    UI_panelAddComponent(menu.panels[PANEL_PLAYER_SELECT], bRight, UI_BUTTON, "planet-r");
+    UI_panelAddComponent(menu.panels[PANEL_PLAYER_SELECT], bRight, UI_BUTTON, "player-r");
+
+    Button bSel = UI_buttonCreate();
+    UI_panelAddComponent(menu.panels[PANEL_PLAYER_SELECT], bSel, UI_BUTTON, "player-sel");
+    UI_panelSetComponentLink(menu.panels[PANEL_PLAYER_SELECT], "player-sel", PANEL_START);
 
     refreshMenu(pRend, &menu, pView);
     return menu;

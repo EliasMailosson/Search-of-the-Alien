@@ -13,6 +13,8 @@
 #include "UI/friend.h"
 #include "../include/hud.h"
 
+#define MAX_PLAYER_CHARACTERS 2
+
 typedef struct menu Menu;
 typedef struct {
     SDL_Window *pWin;
@@ -22,7 +24,7 @@ typedef struct {
     char myUsername[MAX_USERNAME_LEN];
 
         SDL_Cursor *crosshair;
-        SDL_Texture *playerTexture;
+        SDL_Texture *playerTexture[MAX_PLAYER_CHARACTERS];
         int playerRenderSize;
     TTF_Font *fonts;
     Hud aHud;
@@ -38,6 +40,8 @@ typedef struct {
 
     bool isTextInput;
     char textInput[32];
+
+    int selectedCharacter;
 }ClientControl;
 
 void eventHandler(ClientControl *pControl);

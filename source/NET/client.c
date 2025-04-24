@@ -8,6 +8,7 @@ struct Player{
     int currentPlayerAnimation;
     int colorIndex;
     SDL_Color color;
+    int playerCharacter;
 };
 struct client{
     SDLNet_SocketSet socketSet;
@@ -204,6 +205,10 @@ int NET_clientGetPlayerDirection(Client aClient, int playerIdx) {
     return aClient->playerList[playerIdx].direction;
 }
 
+int NET_clientGetPlayerCharacter(Client aClient, int playerIdx) {
+    return aClient->playerList[playerIdx].playerCharacter;
+}
+
 void NET_clientUpdatePlayerList(Client aClient, Packet aPacket){
     PlayerPacket packets[MAX_CLIENTS] = {0};
     NET_playerPacketReceive(aPacket, packets, &aClient->PlayerCount);
@@ -215,6 +220,7 @@ void NET_clientUpdatePlayerList(Client aClient, Packet aPacket){
         aClient->playerList[i].colorIndex = packets[i].colorIndex;
         strcpy(aClient->playerList[i].username, packets[i].username);
         aClient->playerList[i].color = NET_clientGetColor(aClient->playerList[i].colorIndex);
+        aClient->playerList[i].playerCharacter = packets[i].playerCharacter;
 
     }
 }

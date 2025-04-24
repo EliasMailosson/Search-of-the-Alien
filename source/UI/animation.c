@@ -57,6 +57,10 @@ int UI_animationGetColumn(Animation aAnimation) {
     return (aAnimation->currentFrame % aAnimation->frameCols);
 }
 
+int UI_animationGetRow(Animation aAnimation) {
+    return (aAnimation->currentFrame / aAnimation->frameCols);
+}
+
 void UI_animationLoad(Animation aAnimation, SDL_Renderer *pRend, char *imgPath, int frameW, int frameH, int frameCount) {
     aAnimation->frameCount = frameCount;
     aAnimation->frameW = frameW;

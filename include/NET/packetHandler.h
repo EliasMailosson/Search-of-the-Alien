@@ -34,10 +34,12 @@ typedef enum{
 
 #define NUM_PLAYER_INPUTS 6
 enum PlayerInput{PLAYER_INPUT_UP, PLAYER_INPUT_DOWN, PLAYER_INPUT_RIGHT, PLAYER_INPUT_LEFT, PLAYER_INPUT_SPACE, PLAYER_INPUT_MOUSEDOWN, PLAYER_INPUT_MOUSEUP};
+enum PlayerCharacters{CHARACTER_BLUEFACE, CHARACTER_BIGGIE};
 
 typedef struct playerInputPacket {
     bool keys[NUM_PLAYER_INPUTS];
     SDL_Point mousePos;
+    int selecterPlayerCharacter;
 } PlayerInputPacket;
 
 struct packet;
