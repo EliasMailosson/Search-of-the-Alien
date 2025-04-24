@@ -1,6 +1,4 @@
 #include "../../include/NET/server.h"
-#include "../../include/NET/serverLogic.h"
-#include <math.h>
 
 struct Player{
     SDL_Rect hitBox;
@@ -15,6 +13,7 @@ struct User{
     GameState State;
     Player player;
 };
+
 struct server {
     UDPsocket serverSocket;
     SDLNet_SocketSet socketSet;
@@ -145,6 +144,7 @@ static void calcMovement(Server aServer, PlayerInputPacket *pip, int playerIdx){
         dy = dy / 2;
     }
 
+    if (isTileWalkable())
 
     aServer->clients[playerIdx].player.hitBox.x += (int)dx * speed;
     aServer->clients[playerIdx].player.hitBox.y += (int)dy * speed;

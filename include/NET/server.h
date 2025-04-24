@@ -2,11 +2,14 @@
 #define SERVER_H
 #include "../../include/NET/shared.h"
 #include "../../include/NET/protocol.h"
+#include "../../include/NET/serverLogic.h"
+#include <math.h>
 
 
 typedef struct Player Player;
 
 typedef struct User User;
+
 
 struct server;
 typedef struct server *Server;

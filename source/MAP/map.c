@@ -53,7 +53,7 @@ Map MAP_MapCreate(SDL_Renderer *pRend, int winW, int winH){
         }
     }
     MAP_TilesFillWithBlank(aMap->tileID);
-    MAP_MapGetTilseFromLobby(aMap->tileID);
+    MAP_MapGetTilesFromLobby(aMap->tileID);
     SDL_Rect startRect = {
         .h = TILE_SIZE,
         .w = TILE_SIZE,
@@ -99,7 +99,7 @@ void MAP_MapDestroy(Map aMap){
     aMap = NULL;
 }
 
-void MAP_MapGetTilseFromLobby(int tileID[MAP_HEIGHT][MAP_WIDTH]){
+void MAP_MapGetTilesFromLobby(int tileID[MAP_HEIGHT][MAP_WIDTH]){
     char buffer[256];
     FILE *fp = fopen(FILE_PHAT_LOBBY_DATA, "r");
     if (fp == NULL) {
