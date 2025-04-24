@@ -13,7 +13,7 @@
 #include "UI/friend.h"
 #include "../include/hud.h"
 
-#define MAX_PLAYER_CHARACTERS 2
+#define MAX_PLAYER_CHARACTERS 3
 
 typedef struct menu Menu;
 typedef struct {

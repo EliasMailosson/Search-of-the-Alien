@@ -48,6 +48,9 @@ void startClient(Client *aClient, ClientView *pView,ClientControl *pControl){
     SDL_Surface *surface2 = IMG_Load("assets/images/player/biggie.png");
     pView->playerTexture[CHARACTER_BIGGIE] = SDL_CreateTextureFromSurface(pView->pRend, surface2);
     SDL_FreeSurface(surface2);
+    SDL_Surface *surface3 = IMG_Load("assets/images/player/cleopatra.png");
+    pView->playerTexture[CHARACTER_CLEOPATRA] = SDL_CreateTextureFromSurface(pView->pRend, surface3);
+    SDL_FreeSurface(surface3);
 
     pView->crosshair = createScaledCursor("assets/images/cursor/crosshair.png", 50, 50, 25, 25);
 
