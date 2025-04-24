@@ -156,7 +156,7 @@ void UI_panelUpdate(Panel aPanel, MenuEvent *pEvent, bool isMouseUp, bool *keys)
                 
             break;
 
-        case UI_ANIMATION:
+        case UI_ANIMATION: {
                 int mode = UI_animationGetMode((Animation)aPanel->compList[i].pComp);
                 if(mode == PLAYBACK_FORWARD) {
                     UI_animationNextFrame((Animation)aPanel->compList[i].pComp);
@@ -167,7 +167,7 @@ void UI_panelUpdate(Panel aPanel, MenuEvent *pEvent, bool isMouseUp, bool *keys)
                     UI_animationSetMode((Animation)aPanel->compList[i].pComp, PLAYBACK_STOP);
                 }
                 break;
-
+            }
         }
     }
 }
