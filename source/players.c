@@ -106,6 +106,7 @@ PlayerInputPacket prepareInputArray(ClientControl *pControl, int windowWidth, in
             pControl->keys[SDL_SCANCODE_S],
             pControl->keys[SDL_SCANCODE_D],
             pControl->keys[SDL_SCANCODE_A],
+            pControl->keys[SDL_SCANCODE_E],
             pControl->keys[SDL_SCANCODE_SPACE],
             pControl->isMouseDown,
             // pControl->isMouseUp, en för mycket

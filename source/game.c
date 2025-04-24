@@ -42,6 +42,7 @@ void gameLoop(Client aClient, ClientControl *pControl, ClientView *pView){
 
 void runLobby(Client aClient, Map aMap, ClientControl *pControl, ClientView *pView) {
     static int toggleDelay = 0;
+    static bool showHub = false;
     int selfIndex = NET_clientGetSelfIndex(aClient);
 
     SDL_Point lastPosition[MAX_CLIENTS];
@@ -68,20 +69,26 @@ void runLobby(Client aClient, Map aMap, ClientControl *pControl, ClientView *pVi
         MAP_MapRefresh(aMap, pView->windowWidth, pView->windowHeight);
         toggleDelay = 0;
     }
+    if (pControl->keys[SDL_SCANCODE_E] && toggleDelay > 12)
+    {
+        showHub = !showHub;
+        toggleDelay = 0;
+    }
 
     MAP_MapRefresh(aMap, pView->windowWidth, pView->windowHeight);
 
     SDL_Rect tileRect = MAP_getTileRect(aMap);
     pView->playerRenderSize = tileRect.h;
 
-    PlayerInputPacket pip;
-    pip = prepareInputArray(pControl, pView->windowWidth, pView->windowHeight);
-    if(NET_playerInputPacketCheck(pip)){
-        NET_clientSendArray(aClient, LOBBY, PLAYER_INPUT, &pip, sizeof(PlayerInputPacket));
+    if (!showHub){
+        PlayerInputPacket pip;
+        pip = prepareInputArray(pControl, pView->windowWidth, pView->windowHeight);
+        if(NET_playerInputPacketCheck(pip)){
+            NET_clientSendArray(aClient, LOBBY, PLAYER_INPUT, &pip, sizeof(PlayerInputPacket));
+        }
     }
 
     NET_clientReceiver(aClient);
-    
     
     for(int i = 0; i < NET_clientGetPlayerCount(aClient); i++) {
         SDL_Point newPosition = NET_clientGetPlayerPos(aClient, i);
@@ -107,6 +114,24 @@ void runLobby(Client aClient, Map aMap, ClientControl *pControl, ClientView *pVi
     for (int i = 0; i < NET_clientGetPlayerCount(aClient); i++){
         hudRender(pView->aHud,pView->pRend,NET_clientGetPlayerColorIndex(aClient,i),i);
     }
+
+    if (showHub) {
+        int centerX = pView->windowWidth / 2;
+        int centerY = pView->windowHeight / 2;
+        int renderSizeHalf = 300 / 2;
+    
+        SDL_Rect hubRect = {
+            .x = centerX - renderSizeHalf,
+            .y = centerY - renderSizeHalf,
+            .w = 400,
+            .h = 200 
+        };
+    
+        SDL_SetRenderDrawBlendMode(pView->pRend, SDL_BLENDMODE_BLEND);
+        SDL_SetRenderDrawColor(pView->pRend, 255, 0, 0, 200); // semi-transparent red
+        SDL_RenderFillRect(pView->pRend, &hubRect);
+    }
+
     SDL_RenderPresent(pView->pRend);
 }
 
