@@ -4,9 +4,9 @@
 #include "../include/UI/friend.h"
 
 static void enableMouseTexture(SDL_Cursor *CurrentCursor);
+static void updatePositioning(Client aClient, SDL_Point lastPosition[MAX_CLIENTS], SDL_Point *playerPos, int selfIndex);
 static void lobbyFullscreenToggle(ClientControl *pControl, ClientView *pView, Map aMap, int *pDelay);
 static void handlePlayerInput(Client aClient, ClientControl *pControl, ClientView *pView);
-static void updatePositioning(Client aClient, SDL_Point lastPosition[MAX_CLIENTS], SDL_Point *playerPos, int selfIndex);
 static void updatePlayerAnimation(Client aClient, SDL_Point lastPosition[]);
 static void renderLobby(ClientView *pView, Map aMap, Client aClient);
 
