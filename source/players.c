@@ -26,7 +26,7 @@ void sortByYaxis(Client aClient, int playerCount, int indices[]){
     }
 }
 
-void renderPlayers(Client aClient, ClientView *pView, SDL_Rect playerCamera) {
+void renderPlayers(Client aClient, ClientView *pView) {
     static int frame = 0;
     frame++;
     int playerCount = NET_clientGetPlayerCount(aClient);

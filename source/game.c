@@ -3,6 +3,14 @@
 #include "../include/players.h"
 #include "../include/UI/friend.h"
 
+static void enableMouseTexture(SDL_Cursor *CurrentCursor);
+static void updatePositioning(Client aClient, SDL_Point lastPosition[MAX_CLIENTS], SDL_Point *playerPos, int selfIndex);
+static void lobbyFullscreenToggle(ClientControl *pControl, ClientView *pView, Map aMap, int *pDelay);
+static void handlePlayerInput(Client aClient, ClientControl *pControl, ClientView *pView);
+static void updatePlayerAnimation(Client aClient, SDL_Point lastPosition[]);
+static void renderLobby(ClientView *pView, Map aMap, Client aClient);
+
+
 void gameLoop(Client aClient, ClientControl *pControl, ClientView *pView){
     NET_clientConnect(aClient);
 
@@ -43,71 +51,32 @@ void gameLoop(Client aClient, ClientControl *pControl, ClientView *pView){
 void runLobby(Client aClient, Map aMap, ClientControl *pControl, ClientView *pView) {
     static int toggleDelay = 0;
     int selfIndex = NET_clientGetSelfIndex(aClient);
-
     SDL_Point lastPosition[MAX_CLIENTS];
-    for(int i = 0; i < NET_clientGetPlayerCount(aClient); i++) {
-        lastPosition[i] = NET_clientGetPlayerPos(aClient, i);
-    }
+    SDL_Point playerPos;
 
-    SDL_Point playerPos = NET_clientGetPlayerPos(aClient, selfIndex);
+    enableMouseTexture(pView->crosshair);
 
-    SDL_Rect playerCamera = {
-        .x = playerPos.x - pView->windowWidth/2,
-        .y = playerPos.y - pView->windowHeight/2,
-        .w = pView->windowWidth,
-        .h = pView->windowHeight
-    };
-
-    SDL_ShowCursor(SDL_DISABLE);
-    SDL_SetCursor(pView->crosshair);
-    SDL_ShowCursor(SDL_ENABLE);
+    updatePositioning(aClient, lastPosition, &playerPos, selfIndex);
 
     toggleDelay++;
-    if(pControl->keys[SDL_SCANCODE_F] && toggleDelay > 12) {
-        toggleFullscreen(pView);
-        MAP_MapRefresh(aMap, pView->windowWidth, pView->windowHeight);
-        toggleDelay = 0;
-    }
+    lobbyFullscreenToggle(pControl, pView, aMap, &toggleDelay);
 
-    MAP_MapRefresh(aMap, pView->windowWidth, pView->windowHeight);
+    handlePlayerInput(aClient, pControl, pView);
+
+    NET_clientReceiver(aClient);
+    
+    updatePlayerAnimation(aClient, lastPosition);
+
+    // update HUD?
+    updateArrows(pView->aHud,pView->pWin,aClient,pView->PlayerPos);
 
     SDL_Rect tileRect = MAP_getTileRect(aMap);
     pView->playerRenderSize = tileRect.h;
 
-    PlayerInputPacket pip;
-    pip = prepareInputArray(pControl, pView->windowWidth, pView->windowHeight);
-    if(NET_playerInputPacketCheck(pip)){
-        NET_clientSendArray(aClient, LOBBY, PLAYER_INPUT, &pip, sizeof(PlayerInputPacket));
-    }
-
-    NET_clientReceiver(aClient);
-    
-    
-    for(int i = 0; i < NET_clientGetPlayerCount(aClient); i++) {
-        SDL_Point newPosition = NET_clientGetPlayerPos(aClient, i);
-        int dx = abs(newPosition.x - lastPosition[i].x);
-        int dy = abs(newPosition.y - lastPosition[i].y);
-        if(dx > 0 || dy > 0) {
-            NET_clientSetPlayerAnimation(aClient, i, ANIMATION_RUNNING);
-        }
-        else {
-            NET_clientSetPlayerAnimation(aClient, i, ANIMATION_IDLE);
-        }
-    }
-    updateArrows(pView->aHud,pView->pWin,aClient,pView->PlayerPos);
-
     SDL_Point mapMovePos = {(playerPos.x/(float)TILE_SIZE)*tileRect.w, (playerPos.y/(float)TILE_SIZE)*tileRect.h};
     MAP_MapMoveMap(aMap, mapMovePos);
 
-    SDL_SetRenderDrawColor(pView->pRend, 0,0,0,0);
-    SDL_RenderClear(pView->pRend);
-
-    MAP_MapRender(pView->pRend, aMap);
-    renderPlayers(aClient, pView, playerCamera);
-    for (int i = 0; i < NET_clientGetPlayerCount(aClient); i++){
-        hudRender(pView->aHud,pView->pRend,NET_clientGetPlayerColorIndex(aClient,i),i);
-    }
-    SDL_RenderPresent(pView->pRend);
+    renderLobby(pView, aMap, aClient);
 }
 
 void runMenu(Client aClient, ClientControl *pControl, ClientView *pView, Menu *pMenu) {
@@ -173,5 +142,63 @@ void eventHandler(ClientControl *pControl){
         default:
             break;
         }
+    }
+}
+
+static void renderLobby(ClientView *pView, Map aMap, Client aClient){
+    SDL_SetRenderDrawColor(pView->pRend, 0,0,0,0);
+    SDL_RenderClear(pView->pRend);
+
+    MAP_MapRender(pView->pRend, aMap);
+    renderPlayers(aClient, pView);
+    for (int i = 0; i < NET_clientGetPlayerCount(aClient); i++){
+        hudRender(pView->aHud,pView->pRend,NET_clientGetPlayerColorIndex(aClient,i),i);
+    }
+    SDL_RenderPresent(pView->pRend);
+
+}
+
+static void updatePlayerAnimation(Client aClient, SDL_Point lastPosition[]){
+    for(int i = 0; i < NET_clientGetPlayerCount(aClient); i++) {
+        SDL_Point newPosition = NET_clientGetPlayerPos(aClient, i);
+        int dx = abs(newPosition.x - lastPosition[i].x);
+        int dy = abs(newPosition.y - lastPosition[i].y);
+        if(dx > 0 || dy > 0) {
+            NET_clientSetPlayerAnimation(aClient, i, ANIMATION_RUNNING);
+        }
+        else {
+            NET_clientSetPlayerAnimation(aClient, i, ANIMATION_IDLE);
+        }
+    }
+}
+
+/* Disables the previous cursor and sets new one 
+ * depending on the SDL_Cursor Texture in argument
+ */
+static void enableMouseTexture(SDL_Cursor *CurrentCursor){
+    SDL_ShowCursor(SDL_DISABLE);
+    SDL_SetCursor(CurrentCursor);
+    SDL_ShowCursor(SDL_ENABLE);
+}
+
+static void updatePositioning(Client aClient, SDL_Point lastPosition[MAX_CLIENTS], SDL_Point *playerPos, int selfIndex){
+        for(int i = 0; i < NET_clientGetPlayerCount(aClient); i++) {
+            lastPosition[i] = NET_clientGetPlayerPos(aClient, i);
+        }
+        *playerPos = NET_clientGetPlayerPos(aClient, selfIndex);
+}
+
+static void lobbyFullscreenToggle(ClientControl *pControl, ClientView *pView, Map aMap, int *pDelay) {
+    if (pControl->keys[SDL_SCANCODE_F] && *pDelay > 12) {
+        toggleFullscreen(pView);
+        MAP_MapRefresh(aMap, pView->windowWidth, pView->windowHeight);
+        *pDelay = 0;
+    }
+}
+
+static void handlePlayerInput(Client aClient, ClientControl *pControl, ClientView *pView) {
+    PlayerInputPacket pip = prepareInputArray(pControl, pView->windowWidth, pView->windowHeight);
+    if (NET_playerInputPacketCheck(pip)) {
+        NET_clientSendArray(aClient, LOBBY, PLAYER_INPUT, &pip, sizeof(PlayerInputPacket));
     }
 }
