@@ -3,3 +3,8 @@ build/**
 .vscode/**
 assets/images/tiles/tileDesigns/**
 data/*.txt
+
+# macOS junk
+.DS_Store
+.AppleDouble
+._*
