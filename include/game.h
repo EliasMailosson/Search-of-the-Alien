@@ -15,12 +15,14 @@
 #include "../include/hud.h"
 
 #define MAX_PLAYER_CHARACTERS 2
+#define MAX_BUTTONS 3
 
 typedef struct menu Menu;
 typedef struct {
+    int hubWidth;
+    int hubHeight;
     bool isVisible;
-    int buttonCount;
-    Button button[];
+    Button button[MAX_BUTTONS];
 }PlanetChooser;
 
 typedef struct {
@@ -56,8 +58,8 @@ void gameLoop(Client aClient, ClientControl *pControl, ClientView *pView);
 void runLobby(Client aClient, Map aMap, ClientControl *pControl, ClientView *pView, PlanetChooser *pPlanetChooser);
 void runMenu(Client aClient, ClientControl *pControl, ClientView *pView, Menu *pMenu);
 void toggleFullscreen(ClientView *pView);
-void renderPlanetChooser(ClientView *pView);
-PlanetChooser initPlanetChooser();
+void renderPlanetChooser(ClientView *pView, PlanetChooser planetchooser);
+PlanetChooser initPlanetChooser(ClientView *pView);
 void destroyPlanetChooser(PlanetChooser *pPlanetChooser);
 
 #endif
