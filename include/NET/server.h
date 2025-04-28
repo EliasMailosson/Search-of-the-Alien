@@ -33,6 +33,9 @@ void NET_serverClientDisconnect(Server aServer);
 void NET_serverChangeGameStateOnClient(Server aServer,Packet aPacket);
 
 void NET_serverUpdatePlayer(Server aServer, Packet aPacket);
+SDL_Rect NET_serverGetPlayerHitbox(Server aServer, int playerIndex);
+int NET_serverGetClientCount(Server aServer);
+void NET_serverSetPlayerHitbox(Server aServer, int playerIndex, SDL_Rect r);
 
 //server util
 int NET_serverFindPlayerID(Server aServer, const char* str);

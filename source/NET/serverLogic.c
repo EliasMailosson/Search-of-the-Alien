@@ -48,6 +48,61 @@ bool MAP_TileNotWalkable(ServerMap aServerMap, int screenX, int screenY) {
     }
 }
 
+void NET_serverCheckPlayerCollision(Server aServer, int selfIdx, int *collide) {
+    int playerCount = NET_serverGetClientCount(aServer);
+    float resistance = 1.0f;
+
+    *collide = 0;
+    for (int i = 0; i < playerCount; i++) {
+        for (int j = i + 1; j < playerCount; j++) {
+            SDL_Rect p1 = NET_serverGetPlayerHitbox(aServer, i);
+            SDL_Rect p2 = NET_serverGetPlayerHitbox(aServer, j);
+            p1.x;
+            p2.x;
+
+            float p1CenterX = p1.x + p1.w / 2.0f;
+            float p1CenterY = p1.y + p1.h / 2.0f;
+            float p2CenterX = p2.x + p2.w / 2.0f;
+            float p2CenterY = p2.y + p2.h / 2.0f;
+
+            bool isIntersect = (
+                p1.x < p2.x + p2.w &&
+                p1.x + p1.w > p2.x &&
+                p1.y < p2.y + p2.h &&
+                p1.y + p1.h > p2.y
+            );
+            if(isIntersect) {
+                float intersectX = (p1.w / 2.0f + p2.w / 2.0f) - fabs(p1CenterX - p2CenterX);
+                float intersectY = (p1.h / 2.0f + p2.h / 2.0f) - fabs(p1CenterY - p2CenterY);
+
+                if (intersectX < intersectY) {
+                    if((selfIdx == i || selfIdx == j) && *collide == 0) *collide = 1;
+                    // float moveX = intersectX / 8.0f;
+                    if (p1CenterX < p2CenterX) {
+                         p1.x -= (int)ceil(resistance);
+                         p2.x += (int)ceil(resistance);
+                    } else {
+                         p1.x += (int)ceil(resistance);
+                         p2.x -= (int)ceil(resistance);
+                    }
+                } else {
+                    if((selfIdx == i || selfIdx == j) && *collide == 0) *collide = 1;
+                    // float moveY = intersectY / 8.0f;
+                     if (p1CenterY < p2CenterY) {
+                         p1.y -= (int)ceil(resistance);
+                         p2.y += (int)ceil(resistance);
+                     } else {
+                         p1.y += (int)ceil(resistance);
+                         p2.y -= (int)ceil(resistance);
+                     }
+                }
+
+                NET_serverSetPlayerHitbox(aServer, i, p1);
+                NET_serverSetPlayerHitbox(aServer, j, p2);
+            }
+        }
+    }
+}
 
 void NET_serverMapDestroy(ServerMap aMap) {
     free(aMap);

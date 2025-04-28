@@ -112,8 +112,8 @@ void NET_serverSendPlayerPacket(Server aServer,GameState GS){
 
         packet[i].state = aServer->clients[i].State;
         SDL_Point pos = {
-            .x = aServer->clients[i].player.hitBox.x,
-            .y = aServer->clients[i].player.hitBox.y
+            .x = aServer->clients[i].player.hitBox.x - 32,
+            .y = aServer->clients[i].player.hitBox.y - 32
         };
         packet[i].pos = pos;
         packet[i].direction = aServer->clients[i].player.direction;
@@ -151,6 +151,12 @@ static void calcMovement(Server aServer, PlayerInputPacket *pip, int playerIdx){
     }
 
     if(MAP_TileNotWalkable(aServer->aServerMap, aServer->clients[playerIdx].player.hitBox.x, aServer->clients[playerIdx].player.hitBox.y)) return;
+
+    int collisionType;
+    NET_serverCheckPlayerCollision(aServer, playerIdx, &collisionType);
+    if(collisionType != 0) {
+        speed = 1.0f;
+    }
 
     aServer->clients[playerIdx].player.hitBox.x += (int)dx * speed;
     aServer->clients[playerIdx].player.hitBox.y += (int)dy * speed;
@@ -219,6 +225,18 @@ int NET_serverCompIP(Server aServer){
         }
     }
     return -1;
+}
+
+SDL_Rect NET_serverGetPlayerHitbox(Server aServer, int playerIndex) {
+    return aServer->clients[playerIndex].player.hitBox;
+}
+
+void NET_serverSetPlayerHitbox(Server aServer, int playerIndex, SDL_Rect r) {
+    aServer->clients[playerIndex].player.hitBox = r;
+}
+
+int NET_serverGetClientCount(Server aServer) {
+    return aServer->clientCount;
 }
 
 void NET_serverDestroy(Server aServer){
@@ -337,8 +355,8 @@ void NET_serverClientConnected(Packet aPacket, Server aServer){
     newUser.State = MENU;
     newUser.player.hitBox.x = 200;
     newUser.player.hitBox.y = 800;
-    newUser.player.hitBox.w = 0;
-    newUser.player.hitBox.h = 0;
+    newUser.player.hitBox.w = 128 - 64;
+    newUser.player.hitBox.h = 32;
     newUser.State = MENU;
     newUser.colorIndex = NET_serverAssignColorIndex(aServer);
     NET_serverAddUser(aServer, newUser);
