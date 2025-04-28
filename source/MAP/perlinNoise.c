@@ -19,7 +19,7 @@ void MAP_generatePerlinNoise(int output[][MAP_WIDTH], int height, int width, int
 void MAP_generate2DNoise(float *output,int outputHeight, int outputWidth){
     float *fNoiseSeed2D = malloc((outputHeight * outputWidth) * sizeof *fNoiseSeed2D);
     for (int i = 0; i < outputHeight * outputWidth; i++) fNoiseSeed2D[i] = (float)rand() / (float)RAND_MAX;
-    MAP_perlinNoise2D(outputWidth, outputHeight, fNoiseSeed2D, 3, 2.0f, output);
+    MAP_perlinNoise2D(outputWidth, outputHeight, fNoiseSeed2D, 6, 2.0f, output);
     free(fNoiseSeed2D);
 }
 
@@ -88,7 +88,7 @@ static void MAP_perlinNoise2D(int width, int height, float *fSeed, int octaves,f
 // int main(){
 //     srand(time(NULL));
 //     int output[MAP_HEIGHT][MAP_WIDTH] = {0};
-//     MAP_generatePerlinNoise(output,MAP_HEIGHT,MAP_WIDTH,3,0);
+//     MAP_generatePerlinNoise(output,MAP_HEIGHT,MAP_WIDTH,13,0);
 //     for (int y = 0; y < MAP_HEIGHT; y++){
 //         for(int x = 0;x < MAP_WIDTH; x++){
 //             printf("%d,",output[y][x]);

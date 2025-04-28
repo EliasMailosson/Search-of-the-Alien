@@ -24,7 +24,14 @@
 #define LOGICAL_WIN_W 600
 #define LOGICAL_WIN_H (600 * 16 / 9)
 
+#define MAX_LUT_LEN 16
+
+typedef enum {LOBBY_LUT,NEMUR_LUT,AURANTIC_LUT,CINDORA_LUT}PlanetLUT;
+
 typedef struct Map *Map;
+
+void MAP_convertTiles(int tileID[MAP_HEIGHT][MAP_WIDTH],PlanetLUT plantet);
+PlanetLUT MAP_mapGetPlanetLUT(Map aMap);
 
 void MAP_MapRender(SDL_Renderer *pRend, Map aMap);
 
