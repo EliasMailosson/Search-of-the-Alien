@@ -5,8 +5,9 @@
 #include "game.h"
 
 void renderTerminalHub(ClientView *pView, TerminalHub planetchooser);
-TerminalHub initTerminalHub(ClientView *pView);
+void initTerminalHub(ClientView *pView, TerminalHub *pTerminalHub);
 void destroyTerminalHub(TerminalHub *pTerminalHub);
 void updateTerminalHub(TerminalHub *pTerminalHub, Client aClient, bool isMouseUp);
+void refreshTerminalHub(ClientView *pView, TerminalHub *pTerminalHub);
 
 #endif

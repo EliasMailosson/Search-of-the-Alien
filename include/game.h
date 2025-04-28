@@ -22,6 +22,7 @@ typedef struct {
     int hubWidth;
     int hubHeight;
     bool isVisible;
+    SDL_Rect hubRect;
     Button button[MAX_BUTTONS_TERMINAL_HUB];
 }TerminalHub;
 typedef struct {

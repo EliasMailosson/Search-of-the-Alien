@@ -6,7 +6,7 @@
 
 static void enableMouseTexture(SDL_Cursor *CurrentCursor);
 static void updatePositioning(Client aClient, SDL_Point lastPosition[MAX_CLIENTS], SDL_Point *playerPos, int selfIndex);
-static void lobbyFullscreenToggle(ClientControl *pControl, ClientView *pView, Map aMap, int *pDelay);
+static void lobbyFullscreenToggle(ClientControl *pControl, ClientView *pView, Map aMap, int *pDelay, TerminalHub *pTerminalHub);
 static void lobbyTerminalHubToggle(ClientControl *pControl, bool *pShowHub, int *pDelay);
 static void handlePlayerInput(Client aClient, ClientControl *pControl, ClientView *pView);
 static void updatePlayerAnimation(Client aClient, SDL_Point lastPosition[]);
@@ -18,7 +18,8 @@ void gameLoop(Client aClient, ClientControl *pControl, ClientView *pView){
 
     Menu menu = initMenu(pView->pRend, pView, aClient);
 
-    TerminalHub terminalHub = initTerminalHub(pView);
+    TerminalHub terminalHub;
+    initTerminalHub(pView, &terminalHub);
     
     char username[MAX_USERNAME_LEN];
     NET_clientGetSelfname(aClient, username);
@@ -67,7 +68,7 @@ void runLobby(Client aClient, Map aMap, ClientControl *pControl, ClientView *pVi
 
     toggleDelay++;
     
-    lobbyFullscreenToggle(pControl, pView, aMap, &toggleDelay);
+    lobbyFullscreenToggle(pControl, pView, aMap, &toggleDelay, pTerminalHub);
     lobbyTerminalHubToggle(pControl, &pTerminalHub->isVisible, &toggleDelay);
 
     if (!pTerminalHub->isVisible){
@@ -203,10 +204,11 @@ static void updatePositioning(Client aClient, SDL_Point lastPosition[MAX_CLIENTS
         *playerPos = NET_clientGetPlayerPos(aClient, selfIndex);
 }
 
-static void lobbyFullscreenToggle(ClientControl *pControl, ClientView *pView, Map aMap, int *pDelay) {
+static void lobbyFullscreenToggle(ClientControl *pControl, ClientView *pView, Map aMap, int *pDelay, TerminalHub *pTerminalHub) {
     if (pControl->keys[SDL_SCANCODE_F] && *pDelay > 12) {
         toggleFullscreen(pView);
         MAP_MapRefresh(aMap, pView->windowWidth, pView->windowHeight);
+        refreshTerminalHub(pView, pTerminalHub);
         *pDelay = 0;
     }
 }
@@ -227,5 +229,5 @@ static void handlePlayerInput(Client aClient, ClientControl *pControl, ClientVie
 }
 
 void runNemur(){
-    
+
 }
