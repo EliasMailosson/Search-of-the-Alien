@@ -1,5 +1,4 @@
 #include "../../include/NET/server.h"
-#include "math.h"
 
 struct Player{
     SDL_Rect hitBox;
@@ -16,6 +15,7 @@ struct User{
     Player player;
     int colorIndex;
 };
+
 struct server {
     UDPsocket serverSocket;
     SDLNet_SocketSet socketSet;
@@ -24,6 +24,7 @@ struct server {
     UDPpacket *pSendPacket;
     User *clients;
     bool isOff;
+    ServerMap aServerMap;
     bool usedColors[MAX_COLORS];
 };
 
@@ -34,6 +35,7 @@ int main(int argc, char **argv ){
     aServer = NET_serverCreate();
     memset(aServer->usedColors, 0, sizeof(aServer->usedColors));
     bool isRunning;
+    aServer->aServerMap = NET_serverMapCreate();
     // if Server has allocated memory then the server is running on "PORT"
     if(aServer == NULL){
         isRunning = false;
@@ -111,8 +113,8 @@ void NET_serverSendPlayerPacket(Server aServer,GameState GS){
 
         packet[i].state = aServer->clients[i].State;
         SDL_Point pos = {
-            .x = aServer->clients[i].player.hitBox.x,
-            .y = aServer->clients[i].player.hitBox.y
+            .x = aServer->clients[i].player.hitBox.x + aServer->clients[i].player.hitBox.w/2,
+            .y = aServer->clients[i].player.hitBox.y + aServer->clients[i].player.hitBox.h
         };
         packet[i].pos = pos;
         packet[i].direction = aServer->clients[i].player.direction;
@@ -150,6 +152,13 @@ static void calcMovement(Server aServer, PlayerInputPacket *pip, int playerIdx){
         dy = dy / 2;
     }
 
+    if(MAP_TileNotWalkable(aServer->aServerMap, aServer->clients[playerIdx].player.hitBox.x + (int)dx * speed, aServer->clients[playerIdx].player.hitBox.y + (int)dy * speed)) return;
+
+    int collisionType;
+    NET_serverCheckPlayerCollision(aServer, playerIdx, &collisionType);
+    if(collisionType != 0) {
+        speed = 1.0f;
+    }
 
     aServer->clients[playerIdx].player.hitBox.x += (int)dx * speed;
     aServer->clients[playerIdx].player.hitBox.y += (int)dy * speed;
@@ -221,6 +230,18 @@ int NET_serverCompIP(Server aServer){
     return -1;
 }
 
+SDL_Rect NET_serverGetPlayerHitbox(Server aServer, int playerIndex) {
+    return aServer->clients[playerIndex].player.hitBox;
+}
+
+void NET_serverSetPlayerHitbox(Server aServer, int playerIndex, SDL_Rect r) {
+    aServer->clients[playerIndex].player.hitBox = r;
+}
+
+int NET_serverGetClientCount(Server aServer) {
+    return aServer->clientCount;
+}
+
 void NET_serverDestroy(Server aServer){
     if(aServer->pReceivePacket != NULL){
         SDLNet_FreePacket(aServer->pReceivePacket);
@@ -239,6 +260,7 @@ void NET_serverDestroy(Server aServer){
         aServer->serverSocket = NULL;
     }
     free(aServer->clients);
+    NET_serverMapDestroy(aServer->aServerMap);
     free(aServer);
 }
 
@@ -333,6 +355,11 @@ void NET_serverClientConnected(Packet aPacket, Server aServer){
     newUser.IP = aServer->pReceivePacket->address;
     newUser.LobbyID = -1;
     // newUser.State = NET_packetGetMessageType(aPacket);
+    newUser.State = MENU;
+    newUser.player.hitBox.x = 200;
+    newUser.player.hitBox.y = 800;
+    newUser.player.hitBox.w = 64;
+    newUser.player.hitBox.h = 32;
     newUser.State = MENU;
     newUser.colorIndex = NET_serverAssignColorIndex(aServer);
     NET_serverAddUser(aServer, newUser);

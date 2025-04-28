@@ -49,6 +49,8 @@ void renderPlayers(Client aClient, ClientView *pView) {
         int i = sortedIndex[n];
 
         SDL_Point pos = NET_clientGetPlayerPos(aClient, i);
+        pos.x -= renderSizeHalf;
+        pos.y -= pView->playerRenderSize;
         int direction = NET_clientGetPlayerDirection(aClient, i);
 
         int worldOffsetX = pos.x - selfPos.x;
@@ -68,8 +70,8 @@ void renderPlayers(Client aClient, ClientView *pView) {
         }
         else {
             playerRect = (SDL_Rect){
-                .x = (int)(centerX + screenOffsetX - renderSizeHalf),
-                .y = (int)(centerY + screenOffsetY - renderSizeHalf),
+                .x = (int)(centerX + screenOffsetX - pView->playerRenderSize/6),
+                .y = (int)(centerY + screenOffsetY + pView->playerRenderSize/5),
                 .w = pView->playerRenderSize,
                 .h = pView->playerRenderSize
             };
@@ -91,6 +93,9 @@ void renderPlayers(Client aClient, ClientView *pView) {
         int playerCharacter = NET_clientGetPlayerCharacter(aClient, i);
         SDL_RenderCopy(pView->pRend, pView->playerTexture[playerCharacter], &src, &playerRect);
         RenderPlayerName(aClient, pView, i, playerRect);
+        // SDL_SetRenderDrawColor(pView->pRend, 255, 255, 255, 255);
+        // SDL_Rect rpoint = {centerX-5,centerY-5 + renderSizeHalf, 10, 10};
+        // SDL_RenderFillRect(pView->pRend, &rpoint);
     }
 }
 

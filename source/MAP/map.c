@@ -21,7 +21,7 @@ void MAP_MapRender(SDL_Renderer *pRend, Map aMap){
     currentRect.w = tileW;
     currentRect.h = tileH;
 
-    for(int y = 0; y < MAP_HEIGHT; y++){
+    for(int y = 0; y < MAP_HEIGHT; y++){ 
         for(int x = 0; x < MAP_WIDTH; x++){
             currentRect.x = (int)roundf((x - y) * (tileW * 0.5f)
                                         + aMap->tileRect.x);
@@ -53,7 +53,7 @@ Map MAP_MapCreate(SDL_Renderer *pRend, int winW, int winH){
         }
     }
     MAP_TilesFillWithBlank(aMap->tileID);
-    MAP_MapGetTilseFromLobby(aMap->tileID);
+    MAP_MapGetTilesFromLobby(aMap->tileID);
     SDL_Rect startRect = {
         .h = TILE_SIZE,
         .w = TILE_SIZE,
@@ -63,7 +63,7 @@ Map MAP_MapCreate(SDL_Renderer *pRend, int winW, int winH){
     aMap->baseRect = startRect;
     aMap->tileRect = startRect;
     MAP_MapRefresh(aMap,winW,winH);
-    aMap->tileID[15][15] = MAX_COUNT_SPRITE_TILES + 1;
+    // aMap->tileID[0][0] = 1;
     return aMap;
 }
 
@@ -99,7 +99,7 @@ void MAP_MapDestroy(Map aMap){
     aMap = NULL;
 }
 
-void MAP_MapGetTilseFromLobby(int tileID[MAP_HEIGHT][MAP_WIDTH]){
+void MAP_MapGetTilesFromLobby(int tileID[MAP_HEIGHT][MAP_WIDTH]){
     char buffer[256];
     FILE *fp = fopen(FILE_PHAT_LOBBY_DATA, "r");
     if (fp == NULL) {

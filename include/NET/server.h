@@ -2,11 +2,15 @@
 #define SERVER_H
 #include "../../include/NET/shared.h"
 #include "../../include/NET/protocol.h"
+#include "../../include/NET/serverLogic.h"
+#include <math.h>
+
 #define MAX_COLORS 8
 
 typedef struct Player Player;
 
 typedef struct User User;
+
 
 struct server;
 typedef struct server *Server;
@@ -29,6 +33,9 @@ void NET_serverClientDisconnect(Server aServer);
 void NET_serverChangeGameStateOnClient(Server aServer,Packet aPacket);
 
 void NET_serverUpdatePlayer(Server aServer, Packet aPacket);
+SDL_Rect NET_serverGetPlayerHitbox(Server aServer, int playerIndex);
+int NET_serverGetClientCount(Server aServer);
+void NET_serverSetPlayerHitbox(Server aServer, int playerIndex, SDL_Rect r);
 
 //server util
 int NET_serverFindPlayerID(Server aServer, const char* str);
