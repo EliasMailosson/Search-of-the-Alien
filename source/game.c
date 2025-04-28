@@ -1,7 +1,8 @@
 #include "../include/game.h"
-#include "../include/menu.h"
 #include "../include/players.h"
 #include "../include/UI/friend.h"
+#include "../include/terminalHub.h"
+#include "../include/menu.h"
 
 static void enableMouseTexture(SDL_Cursor *CurrentCursor);
 static void updatePositioning(Client aClient, SDL_Point lastPosition[MAX_CLIENTS], SDL_Point *playerPos, int selfIndex);
@@ -9,7 +10,7 @@ static void lobbyFullscreenToggle(ClientControl *pControl, ClientView *pView, Ma
 static void lobbyTerminalHubToggle(ClientControl *pControl, bool *pShowHub, int *pDelay);
 static void handlePlayerInput(Client aClient, ClientControl *pControl, ClientView *pView);
 static void updatePlayerAnimation(Client aClient, SDL_Point lastPosition[]);
-static void renderLobby(ClientView *pView, Map aMap, Client aClient, PlanetChooser planetChooser);
+static void renderLobby(ClientView *pView, Map aMap, Client aClient, TerminalHub terminalHub);
 
 
 void gameLoop(Client aClient, ClientControl *pControl, ClientView *pView){
@@ -17,7 +18,7 @@ void gameLoop(Client aClient, ClientControl *pControl, ClientView *pView){
 
     Menu menu = initMenu(pView->pRend, pView, aClient);
 
-    PlanetChooser planetChooser = initPlanetChooser(pView);
+    TerminalHub terminalHub = initTerminalHub(pView);
     
     char username[MAX_USERNAME_LEN];
     NET_clientGetSelfname(aClient, username);
@@ -36,14 +37,17 @@ void gameLoop(Client aClient, ClientControl *pControl, ClientView *pView){
             runMenu(aClient, pControl, pView, &menu);
             break;
         case LOBBY:
-            runLobby(aClient, aMap, pControl, pView, &planetChooser);
+            runLobby(aClient, aMap, pControl, pView, &terminalHub);
+            break;
+        case NEMUR:
+            runNemur();
             break;
         default:
             break;
         }
     }
 
-    destroyPlanetChooser(&planetChooser);
+    destroyTerminalHub(&terminalHub);
     destroyMenu(&menu);
     MAP_MapDestroy(aMap);
     NET_clientGetSelfname(aClient, username);
@@ -52,7 +56,7 @@ void gameLoop(Client aClient, ClientControl *pControl, ClientView *pView){
     }
 }
 
-void runLobby(Client aClient, Map aMap, ClientControl *pControl, ClientView *pView, PlanetChooser *pPlanetChooser) {
+void runLobby(Client aClient, Map aMap, ClientControl *pControl, ClientView *pView, TerminalHub *pTerminalHub) {
     static int toggleDelay = 0;
     int selfIndex = NET_clientGetSelfIndex(aClient);
     SDL_Point lastPosition[MAX_CLIENTS];
@@ -64,10 +68,13 @@ void runLobby(Client aClient, Map aMap, ClientControl *pControl, ClientView *pVi
     toggleDelay++;
     
     lobbyFullscreenToggle(pControl, pView, aMap, &toggleDelay);
-    lobbyTerminalHubToggle(pControl, &pPlanetChooser->isVisible, &toggleDelay);
+    lobbyTerminalHubToggle(pControl, &pTerminalHub->isVisible, &toggleDelay);
 
-    if (!pPlanetChooser->isVisible){
+    if (!pTerminalHub->isVisible){
         handlePlayerInput(aClient, pControl, pView);
+    }
+    else {
+        updateTerminalHub(pTerminalHub, aClient, pControl->isMouseUp);
     }
 
     NET_clientReceiver(aClient);
@@ -81,7 +88,7 @@ void runLobby(Client aClient, Map aMap, ClientControl *pControl, ClientView *pVi
     SDL_Point mapMovePos = {(playerPos.x/(float)TILE_SIZE)*tileRect.w, (playerPos.y/(float)TILE_SIZE)*tileRect.h};
     MAP_MapMoveMap(aMap, mapMovePos);
 
-    renderLobby(pView, aMap, aClient, *pPlanetChooser);
+    renderLobby(pView, aMap, aClient, *pTerminalHub);
 }
 
 void runMenu(Client aClient, ClientControl *pControl, ClientView *pView, Menu *pMenu) {
@@ -150,7 +157,7 @@ void eventHandler(ClientControl *pControl){
     }
 }
 
-static void renderLobby(ClientView *pView, Map aMap, Client aClient, PlanetChooser planetChooser){
+static void renderLobby(ClientView *pView, Map aMap, Client aClient, TerminalHub terminalHub){
     SDL_SetRenderDrawColor(pView->pRend, 0,0,0,0);
     SDL_RenderClear(pView->pRend);
 
@@ -159,8 +166,8 @@ static void renderLobby(ClientView *pView, Map aMap, Client aClient, PlanetChoos
     for (int i = 0; i < NET_clientGetPlayerCount(aClient); i++){
         hudRender(pView->aHud,pView->pRend,NET_clientGetPlayerColorIndex(aClient,i),i);
     }
-    if (planetChooser.isVisible) {
-        renderPlanetChooser(pView, planetChooser);
+    if (terminalHub.isVisible) {
+        renderTerminalHub(pView, terminalHub);
     }
     SDL_RenderPresent(pView->pRend);
 
@@ -219,74 +226,6 @@ static void handlePlayerInput(Client aClient, ClientControl *pControl, ClientVie
     }
 }
 
-
-// struct planetChooser --> is visible , Button buttons[]
-
-// void createPlanetChooser() // skapar knappar och sätter start värden -- returnarer struct 
-
-// void destroyPlanetChooser() destroy all buttons
-
-// void updatePlanetChooser() {
+void runNemur(){
     
-
-// }// kollar input på knappar och uppdaterar pControl
-// // kolla om knapp är klivkad oh byt state
-
-void renderPlanetChooser(ClientView *pView, PlanetChooser planetChooser){ // ritar knappar och rektanglar... (pView)
-    int centerX = pView->windowWidth / 2;
-    int centerY = pView->windowHeight / 2;
-    
-    SDL_Rect hubRect = {
-        .x = centerX - planetChooser.hubWidth / 2,
-        .y = centerY - planetChooser.hubHeight / 2,
-        .w = planetChooser.hubWidth,
-        .h = planetChooser.hubHeight 
-    };
-
-    SDL_SetRenderDrawBlendMode(pView->pRend, SDL_BLENDMODE_BLEND);
-    SDL_SetRenderDrawColor(pView->pRend, 255, 0, 0, 200); // semi-transparent red
-    SDL_RenderFillRect(pView->pRend, &hubRect);
-
-    for (int i = 0; i < MAX_BUTTONS; i++) {
-        UI_buttonRenderer(pView->pRend, planetChooser.button[i]);
-    }
-
-
-}
-
-PlanetChooser initPlanetChooser(ClientView *pView){
-    PlanetChooser planetChooser;
-
-    planetChooser.isVisible = false;
-
-    for (int i = 0; i < MAX_BUTTONS; i++){
-        planetChooser.button[i] = UI_buttonCreate();
-    }
-
-    planetChooser.hubWidth  = (pView->windowWidth / 3) * 2 ;
-    planetChooser.hubHeight = (pView->windowHeight / 3) * 2;
-
-    UI_buttonConfigure(planetChooser.button[0], "Mordor", 
-        pView->windowWidth / 2 - 150, pView->windowHeight * 0.65, BIGBUTTONWIDTH, BIGBUTTONHEIGHT, pView->pRend, (SDL_Color) { .r = 0, .g = 0, .b = 0, .a = 255 }, 
-        pView->fonts, (SDL_Color) { .r = 255, .g = 255, .b = 255, .a = 255 }
-    );
-    UI_buttonConfigure(planetChooser.button[1], "Andor", 
-        pView->windowWidth / 2 - 150, pView->windowHeight * 0.45, BIGBUTTONWIDTH, BIGBUTTONHEIGHT, pView->pRend, (SDL_Color) { .r = 0, .g = 0, .b = 0, .a = 255 }, 
-        pView->fonts, (SDL_Color) { .r = 255, .g = 255, .b = 255, .a = 255 }
-    );
-    UI_buttonConfigure(planetChooser.button[2], "Sardor", 
-        pView->windowWidth / 2 - 150, pView->windowHeight * 0.25, BIGBUTTONWIDTH, BIGBUTTONHEIGHT, pView->pRend, (SDL_Color) { .r = 0, .g = 0, .b = 0, .a = 255 }, 
-        pView->fonts, (SDL_Color) { .r = 255, .g = 255, .b = 255, .a = 255 }
-    ); 
-
-    ///  jag anväder fonts behöver jag freea de?
-
-    
-    return planetChooser;
-}
-void destroyPlanetChooser(PlanetChooser *pPlanetChooser){
-    for (int i = 0; i < MAX_BUTTONS; i++)
-    {
-        UI_buttonDestroy(pPlanetChooser->button[i]);
-    }   
 }

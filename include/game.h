@@ -15,16 +15,15 @@
 #include "../include/hud.h"
 
 #define MAX_PLAYER_CHARACTERS 2
-#define MAX_BUTTONS 3
+#define MAX_BUTTONS_TERMINAL_HUB 4
 
 typedef struct menu Menu;
 typedef struct {
     int hubWidth;
     int hubHeight;
     bool isVisible;
-    Button button[MAX_BUTTONS];
-}PlanetChooser;
-
+    Button button[MAX_BUTTONS_TERMINAL_HUB];
+}TerminalHub;
 typedef struct {
     SDL_Window *pWin;
     SDL_Renderer *pRend;
@@ -55,11 +54,9 @@ typedef struct {
 
 void eventHandler(ClientControl *pControl);
 void gameLoop(Client aClient, ClientControl *pControl, ClientView *pView);
-void runLobby(Client aClient, Map aMap, ClientControl *pControl, ClientView *pView, PlanetChooser *pPlanetChooser);
+void runLobby(Client aClient, Map aMap, ClientControl *pControl, ClientView *pView, TerminalHub *pTerminalHub);
 void runMenu(Client aClient, ClientControl *pControl, ClientView *pView, Menu *pMenu);
+void runNemur();
 void toggleFullscreen(ClientView *pView);
-void renderPlanetChooser(ClientView *pView, PlanetChooser planetchooser);
-PlanetChooser initPlanetChooser(ClientView *pView);
-void destroyPlanetChooser(PlanetChooser *pPlanetChooser);
 
 #endif

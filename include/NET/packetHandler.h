@@ -29,7 +29,10 @@ typedef enum{
 typedef enum{
     GLOBAL,
     MENU,
-    LOBBY
+    LOBBY,
+    NEMUR,
+    AURANTIC,
+    CINDORA
 }GameState;
 
 #define NUM_PLAYER_INPUTS 7
