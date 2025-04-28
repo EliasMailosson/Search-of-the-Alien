@@ -1,5 +1,9 @@
 #include "../../include/NET/client.h"
 #include "../../include/UI/friend.h"
+struct Enemies{
+    SDL_Point pos;
+};
+
 struct Player{
     GameState state;
     char username[MAX_USERNAME_LEN]; //myusername
@@ -21,7 +25,7 @@ struct client{
 
     int PlayerCount;
     Player playerList[MAX_CLIENTS];
-    SDL_Rect enemies[MAX_ENEMIES];
+    Enemies enemies[MAX_ENEMIES];
 }; 
 
 bool NET_clientConnect(Client aClient){
@@ -125,8 +129,11 @@ SDL_Point NET_clientGetPlayerPos(Client aClient, int playerIdx) {
     else return (SDL_Point) {.x=-1, .y=-1};
 }
 
-SDL_Rect NET_clientGetEnemyRect(Client aClient, int index){
-    return aClient->enemies[index];
+SDL_Point NET_clientGetEnemyPos(Client aClient, int index){
+    if(index < MAX_CLIENTS) {
+        return aClient->enemies->pos;
+    }
+    else return (SDL_Point) {.x=-1, .y=-1};
 }
 
 void NET_clientDestroy(Client aClient){
@@ -237,9 +244,9 @@ void NET_clientUpdatePlayerList(Client aClient, Packet aPacket){
 
 void NET_clientUpdateEnemy(Client aClient, Packet aPacket){
     EnemyPacket packets[MAX_ENEMIES] = {0};
-    NET_enemyPacketReceive(aPacket, &packets);
+    NET_enemyPacketReceive(aPacket, packets);
     for (int i = 0; i < MAX_ENEMIES; i++){
-        aClient->enemies[i] = packets[i].pos;
+        aClient->enemies[i].pos = packets[i].pos;
     }
 }
 

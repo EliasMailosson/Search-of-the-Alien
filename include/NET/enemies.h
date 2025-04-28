@@ -3,6 +3,8 @@
 
 #include "../../include/NET/shared.h"
 
+typedef struct healthPoints HealthPoints;
+
 typedef struct enemy Enemy;
 
 typedef struct enemies *Enemies;
@@ -12,7 +14,7 @@ enum enemyID {LIGHT_ENEMY, HEAVY_ENEMY, BOSS_ENEMY};
 
 Enemies enemyCreate();
 
-SDL_Rect enemyGetRect(Enemies aEnemies, int index);
+SDL_Point enemyGetPoint(Enemies aEnemies, int index);
 
 void enemySpawn(Enemies aEnemies);
 

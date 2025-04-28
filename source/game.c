@@ -145,6 +145,20 @@ void eventHandler(ClientControl *pControl){
     }
 }
 
+static void enemiesRender(SDL_Renderer *renderer, Client aClient){
+    SDL_Rect enemyRects[MAX_ENEMIES];
+    for (int i = 0; i < MAX_ENEMIES; i++)
+    {
+        SDL_Point pos = NET_clientGetEnemyPos(aClient, i);
+        enemyRects[i].x = pos.x;
+        enemyRects[i].y = pos.y;
+        enemyRects[i].w = 32;
+        enemyRects[i].h = 32;
+        SDL_SetRenderDrawColor(renderer, 255,0,0,0);
+        SDL_RenderDrawRect(renderer, &enemyRects[i]);
+    }
+}
+
 static void renderLobby(ClientView *pView, Map aMap, Client aClient){
     SDL_SetRenderDrawColor(pView->pRend, 0,0,0,0);
     SDL_RenderClear(pView->pRend);
@@ -154,13 +168,8 @@ static void renderLobby(ClientView *pView, Map aMap, Client aClient){
     for (int i = 0; i < NET_clientGetPlayerCount(aClient); i++){
         hudRender(pView->aHud,pView->pRend,NET_clientGetPlayerColorIndex(aClient,i),i);
     }
-    for (int i = 0; i < MAX_ENEMIES; i++)
-    {
-        SDL_Rect enemyRekt = NET_clientGetEnemyRect(aClient);
-        SDL_SetRenderDrawColor(pView->pRend, 255,0,0,0);
-        SDL_RenderDrawRect(pView->pRend, &enemyRekt);
-    }
-    
+    //enemiesRender(pView->pRend, aClient);
+    renderEnemy(aClient, pView);
 
     SDL_RenderPresent(pView->pRend);
 

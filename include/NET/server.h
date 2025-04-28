@@ -32,7 +32,7 @@ void NET_serverChangeGameStateOnClient(Server aServer,Packet aPacket);
 
 void NET_serverUpdatePlayer(Server aServer, Packet aPacket);
 
-void NET_serverUpdateEnemy(Server aServer, Enemy aEnemy);
+void NET_serverUpdateEnemies(Server aServer, Enemies aEnemies);
 
 //server util
 int NET_serverFindPlayerID(Server aServer, const char* str);

@@ -7,6 +7,7 @@
 enum PlayerAnimationTypes{ANIMATION_IDLE, ANIMATION_RUNNING, EMOTE_TPOSE};
 
 typedef struct Player Player;
+typedef struct Enemies Enemies;
 
 struct client;
 typedef struct client *Client;
@@ -54,6 +55,6 @@ SDL_Color NET_clientGetColor(int index);
 SDL_Color NET_GetPlayerColor(Client aClient, int index);
 
 void NET_clientUpdateEnemy(Client aClient, Packet aPacket);
-SDL_Rect NET_clientGetEnemyRect(Client aClient);
+SDL_Point NET_clientGetEnemyPos(Client aClient, int index);
 
 #endif

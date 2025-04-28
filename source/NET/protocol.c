@@ -28,7 +28,9 @@ void NET_enemyPacketReceive(Packet aPacket, EnemyPacket *enemyData){
         return;
     }
     //maybe?
-    memcpy(enemyData, raw, size);
+    //memcpy(enemyData, raw, size);
+    int enemyCount = size / sizeof(EnemyPacket);
+    memcpy(enemyData, raw, enemyCount * sizeof(EnemyPacket));
 }
 
 void NET_protocolSendInt(UDPpacket *pUDPpkg,UDPsocket Socket,IPaddress IP,
