@@ -70,8 +70,8 @@ void renderPlayers(Client aClient, ClientView *pView, SDL_Rect playerCamera) {
         }
         else {
             playerRect = (SDL_Rect){
-                .x = (int)(centerX + screenOffsetX - renderSizeHalf),
-                .y = (int)(centerY + screenOffsetY - renderSizeHalf),
+                .x = (int)(centerX + screenOffsetX - pView->playerRenderSize/6),
+                .y = (int)(centerY + screenOffsetY + pView->playerRenderSize/5),
                 .w = pView->playerRenderSize,
                 .h = pView->playerRenderSize
             };
