@@ -21,7 +21,7 @@ void MAP_MapRender(SDL_Renderer *pRend, Map aMap){
     currentRect.w = tileW;
     currentRect.h = tileH;
 
-    for(int y = 0; y < MAP_HEIGHT; y++){
+    for(int y = 0; y < MAP_HEIGHT; y++){ 
         for(int x = 0; x < MAP_WIDTH; x++){
             currentRect.x = (int)roundf((x - y) * (tileW * 0.5f)
                                         + aMap->tileRect.x);

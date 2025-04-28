@@ -7,5 +7,6 @@
 typedef struct ServerMap *ServerMap;
 
 ServerMap NET_serverMapCreate();
-bool isTileWalkable(ServerMap aMap, int x, int y);
+void MAP_ScreenToTile(ServerMap aServerMap, int screenX, int screenY, int *outTileX, int *outTileY);
+bool MAP_TileNotWalkable(ServerMap aServerMap, int screenX, int screenY);
 void NET_serverMapDestroy(ServerMap aMap);

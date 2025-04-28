@@ -22,6 +22,7 @@ struct server {
     UDPpacket *pSendPacket;
     User *clients;
     bool isOff;
+    ServerMap aServerMap;
 };
 
 int main(int argc, char **argv ){
@@ -30,6 +31,7 @@ int main(int argc, char **argv ){
     Server aServer = {0};
     aServer = NET_serverCreate();
     bool isRunning;
+    aServer->aServerMap = NET_serverMapCreate();
     // if Server has allocated memory then the server is running on "PORT"
     if(aServer == NULL){
         isRunning = false;
@@ -144,7 +146,7 @@ static void calcMovement(Server aServer, PlayerInputPacket *pip, int playerIdx){
         dy = dy / 2;
     }
 
-    if (isTileWalkable())
+    if(MAP_TileNotWalkable(aServer->aServerMap, aServer->clients[playerIdx].player.hitBox.x, aServer->clients[playerIdx].player.hitBox.y)) return;
 
     aServer->clients[playerIdx].player.hitBox.x += (int)dx * speed;
     aServer->clients[playerIdx].player.hitBox.y += (int)dy * speed;
@@ -227,6 +229,7 @@ void NET_serverDestroy(Server aServer){
         aServer->serverSocket = NULL;
     }
     free(aServer->clients);
+    NET_serverMapDestroy(aServer->aServerMap);
     free(aServer);
 }
 
