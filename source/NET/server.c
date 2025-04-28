@@ -335,6 +335,11 @@ void NET_serverClientConnected(Packet aPacket, Server aServer){
     newUser.LobbyID = -1;
     // newUser.State = NET_packetGetMessageType(aPacket);
     newUser.State = MENU;
+    newUser.player.hitBox.x = 200;
+    newUser.player.hitBox.y = 800;
+    newUser.player.hitBox.w = 0;
+    newUser.player.hitBox.h = 0;
+    newUser.State = MENU;
     newUser.colorIndex = NET_serverAssignColorIndex(aServer);
     NET_serverAddUser(aServer, newUser);
     NET_serverSendInt(aServer, GLOBAL, CONNECT_RESPONSE, 0, aServer->clientCount - 1);
