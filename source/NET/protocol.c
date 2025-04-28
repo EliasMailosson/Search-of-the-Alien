@@ -19,6 +19,18 @@ void NET_playerPacketReceive(Packet aPacket, PlayerPacket *list, int *count){
     *count = playerCount;
 }
 
+void NET_enemyPacketReceive(Packet aPacket, EnemyPacket *enemyData){
+    Uint8* raw = NET_packetGetPayload(aPacket);
+    Uint32 size = NET_packetGetPayloadSize(aPacket);
+
+    if (!raw) {
+        printf("Raw error!\n");
+        return;
+    }
+    //maybe?
+    memcpy(enemyData, raw, size);
+}
+
 void NET_protocolSendInt(UDPpacket *pUDPpkg,UDPsocket Socket,IPaddress IP,
                             GameState GS,MessageType msgType,int placeHolder){
     Uint32 payloadSize = (Uint32)sizeof(placeHolder);

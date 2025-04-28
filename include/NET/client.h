@@ -52,4 +52,8 @@ SDL_Point NET_clientGetSelfPos(Client aClient);
 
 SDL_Color NET_clientGetColor(int index);
 SDL_Color NET_GetPlayerColor(Client aClient, int index);
+
+void NET_clientUpdateEnemy(Client aClient, Packet aPacket);
+SDL_Rect NET_clientGetEnemyRect(Client aClient);
+
 #endif

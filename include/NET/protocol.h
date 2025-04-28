@@ -15,6 +15,10 @@ typedef struct PlayerPacket{
     int playerCharacter;
 }PlayerPacket;  
 
+typedef struct enemyPacket{
+    SDL_Rect pos;
+}EnemyPacket;  
+
 void NET_protocolSendInt(UDPpacket *pUDPpkg,UDPsocket Socket,IPaddress IP,
                             GameState GS,MessageType msgType,int placeHolder);
 
@@ -25,6 +29,8 @@ void NET_protocolSendArray(UDPpacket *pUDPpkg,UDPsocket Socket,IPaddress IP,
                             GameState GS,MessageType msgType,const void* array, Uint32 arraySize);
 
 void NET_playerPacketReceive(Packet aPacket, PlayerPacket *list, int *count);
+
+void NET_enemyPacketReceive(Packet aPacket, EnemyPacket *enemyData);
 
 bool NET_playerInputPacketCheck(PlayerInputPacket pip);
 

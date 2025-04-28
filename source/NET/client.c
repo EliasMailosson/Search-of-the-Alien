@@ -10,6 +10,7 @@ struct Player{
     SDL_Color color;
     int playerCharacter;
 };
+
 struct client{
     SDLNet_SocketSet socketSet;
     UDPsocket clientSocket;
@@ -20,6 +21,7 @@ struct client{
 
     int PlayerCount;
     Player playerList[MAX_CLIENTS];
+    SDL_Rect enemies[MAX_ENEMIES];
 }; 
 
 bool NET_clientConnect(Client aClient){
@@ -123,6 +125,10 @@ SDL_Point NET_clientGetPlayerPos(Client aClient, int playerIdx) {
     else return (SDL_Point) {.x=-1, .y=-1};
 }
 
+SDL_Rect NET_clientGetEnemyRect(Client aClient, int index){
+    return aClient->enemies[index];
+}
+
 void NET_clientDestroy(Client aClient){
     if(aClient->pReceivePacket != NULL){
         SDLNet_FreePacket(aClient->pReceivePacket);
@@ -192,6 +198,10 @@ void NET_clientReceiver(Client aClient){
             case CHANGE_GAME_STATE_RESPONSE:
                 NET_clientUpdateGameState(aClient,aPacket);
                 break;
+            case ENEMY_POS:
+                //
+                NET_clientUpdateEnemy(aClient, aPacket);
+                break;
             default:
                 printf("client recieved invalid msgType: %d!!\n", NET_packetGetMessageType(aPacket));
                 break;
@@ -222,6 +232,14 @@ void NET_clientUpdatePlayerList(Client aClient, Packet aPacket){
         aClient->playerList[i].color = NET_clientGetColor(aClient->playerList[i].colorIndex);
         aClient->playerList[i].playerCharacter = packets[i].playerCharacter;
 
+    }
+}
+
+void NET_clientUpdateEnemy(Client aClient, Packet aPacket){
+    EnemyPacket packets[MAX_ENEMIES] = {0};
+    NET_enemyPacketReceive(aPacket, &packets);
+    for (int i = 0; i < MAX_ENEMIES; i++){
+        aClient->enemies[i] = packets[i].pos;
     }
 }
 

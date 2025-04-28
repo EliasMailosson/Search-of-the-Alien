@@ -2,6 +2,8 @@
 #define SERVER_H
 #include "../../include/NET/shared.h"
 #include "../../include/NET/protocol.h"
+#include "../../include/NET/enemies.h"
+
 #define MAX_COLORS 8
 
 typedef struct Player Player;
@@ -29,6 +31,8 @@ void NET_serverClientDisconnect(Server aServer);
 void NET_serverChangeGameStateOnClient(Server aServer,Packet aPacket);
 
 void NET_serverUpdatePlayer(Server aServer, Packet aPacket);
+
+void NET_serverUpdateEnemy(Server aServer, Enemy aEnemy);
 
 //server util
 int NET_serverFindPlayerID(Server aServer, const char* str);

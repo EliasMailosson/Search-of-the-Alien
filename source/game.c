@@ -154,6 +154,14 @@ static void renderLobby(ClientView *pView, Map aMap, Client aClient){
     for (int i = 0; i < NET_clientGetPlayerCount(aClient); i++){
         hudRender(pView->aHud,pView->pRend,NET_clientGetPlayerColorIndex(aClient,i),i);
     }
+    for (int i = 0; i < MAX_ENEMIES; i++)
+    {
+        SDL_Rect enemyRekt = NET_clientGetEnemyRect(aClient);
+        SDL_SetRenderDrawColor(pView->pRend, 255,0,0,0);
+        SDL_RenderDrawRect(pView->pRend, &enemyRekt);
+    }
+    
+
     SDL_RenderPresent(pView->pRend);
 
 }

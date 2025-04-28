@@ -31,6 +31,10 @@ int main(int argc, char **argv ){
     (void)argc; (void)argv;
     NET_serverInitSDL();
     Server aServer = {0};
+    Uint32 lastSendTime = SDL_GetTicks();
+    Enemies aEnemies = {0};
+    aEnemies = enemiesCreate();
+    enemySpawn(aEnemies);
     aServer = NET_serverCreate();
     memset(aServer->usedColors, 0, sizeof(aServer->usedColors));
     bool isRunning;
@@ -42,6 +46,14 @@ int main(int argc, char **argv ){
         printf("UDP server started on port %d\n", PORT);
     } 
     while (isRunning){
+        Uint32 nowTime = SDL_GetTicks();
+        
+        if (nowTime - lastSendTime > 30) {
+            NET_serverUpdateEnemies(aServer, aEnemies, aServer->clients->player);
+            printf("Jag kom in\n");
+            lastSendTime = nowTime;
+        }
+
         int numReady = SDLNet_CheckSockets(aServer->socketSet, 10); 
         if (numReady == -1) {
             fprintf(stderr, "SDLNet_CheckSockets error: %s\n", SDLNet_GetError());
@@ -95,12 +107,29 @@ int main(int argc, char **argv ){
                 }
                 if(aPacket) NET_packetDestroy(aPacket);
             }
+
             if(aServer->isOff)break;
         }
+
     }
+    enemiesDestroy(aEnemies);
     NET_serverDestroy(aServer);
     NET_serverDestroySDL();
     return 0;
+}
+
+void NET_serverSendEnemiesPacket(Server aServer, GameState GS, Enemies aEnemies){
+    SDL_Rect packet[MAX_ENEMIES] = {0};
+    for (int i = 0; i < MAX_ENEMIES; i++){
+        packet[i] = enemyGetRect(aEnemies, i); 
+    }
+    Uint32 payloadSize = sizeof(SDL_Rect);
+    for (int i = 0; i < aServer->clientCount; i++){
+        if(aServer->clients[i].State == GS || GS == -1){
+            // msgtype lobby_list
+            NET_serverSendArray(aServer, LOBBY, ENEMY_POS, &packet, payloadSize, i);
+        }
+    }
 }
 
 void NET_serverSendPlayerPacket(Server aServer,GameState GS){
@@ -174,6 +203,14 @@ void NET_serverUpdatePlayer(Server aServer, Packet aPacket){
     aServer->clients[playerIdx].player.character = pip.selecterPlayerCharacter;
 
     NET_serverSendPlayerPacket(aServer,LOBBY); 
+}
+
+void NET_serverUpdateEnemies(Server aServer, Enemies aEnemies, Player player){
+    
+    SDL_Point playerPos = {.x = player.hitBox.x, .y = player.hitBox.y};
+    enemyUpdatePos(aEnemies, playerPos);
+
+    NET_serverSendEnemiesPacket(aServer, LOBBY, aEnemies); 
 }
 
 void NET_serverChangeGameStateOnClient(Server aServer,Packet aPacket){

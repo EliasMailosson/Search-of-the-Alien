@@ -24,6 +24,7 @@ typedef enum{
     CHANGE_GAME_STATE,
     CHANGE_GAME_STATE_RESPONSE,
     PLAYER_INPUT,
+    ENEMY_POS
 } MessageType;
 
 typedef enum{
