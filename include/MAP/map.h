@@ -10,6 +10,8 @@
 
 #define MAP_WIDTH 60
 #define MAP_HEIGHT 60
+#define MAP_TOTAL_SIZE (MAP_WIDTH * MAP_HEIGHT)
+
 #define LOBBY_HEIGHT 30
 #define LOBBY_WIDTH 30
 #define TILE_INDEX_COUNT (MAP_HEIGHT * MAP_WIDTH)+1
@@ -22,7 +24,15 @@
 #define LOGICAL_WIN_W 600
 #define LOGICAL_WIN_H (600 * 16 / 9)
 
+#define MAX_LUT_LEN 16
+
+typedef enum {LOBBY_LUT,NEMUR_LUT,AURANTIC_LUT,CINDORA_LUT}PlanetLUT;
+
 typedef struct Map *Map;
+
+void MAP_convertTiles(int tileID[MAP_HEIGHT][MAP_WIDTH],PlanetLUT plantet);
+void MAP_mapSetEdgesToZero(int tileID[][MAP_WIDTH]);
+PlanetLUT MAP_mapGetPlanetLUT(Map aMap);
 
 void MAP_MapRender(SDL_Renderer *pRend, Map aMap);
 
