@@ -150,7 +150,7 @@ static void calcMovement(Server aServer, PlayerInputPacket *pip, int playerIdx){
         dy = dy / 2;
     }
 
-    if(MAP_TileNotWalkable(aServer->aServerMap, aServer->clients[playerIdx].player.hitBox.x, aServer->clients[playerIdx].player.hitBox.y)) return;
+    if(MAP_TileNotWalkable(aServer->aServerMap, aServer->clients[playerIdx].player.hitBox.x + (int)dx * speed, aServer->clients[playerIdx].player.hitBox.y + (int)dy * speed)) return;
 
     aServer->clients[playerIdx].player.hitBox.x += (int)dx * speed;
     aServer->clients[playerIdx].player.hitBox.y += (int)dy * speed;
