@@ -2,28 +2,28 @@
 #define HUD_H
 #include "../include/NET/client.h"
 #include "../include/MAP/map.h"
-#include "SDL_image.h"
+#include <SDL_image.h>
 
-#define SDL_WHITE (SDL_Color){255, 255, 255, SDL_ALPHA_OPAQUE}
-#define SDL_RED (SDL_Color){255, 0, 0, SDL_ALPHA_OPAQUE}
-#define SDL_GREEN (SDL_Color){0, 255, 0, SDL_ALPHA_OPAQUE}
-#define SDL_CYAN (SDL_Color){0, 255, 255, SDL_ALPHA_OPAQUE}
-#define SDL_YELLOW (SDL_Color){255, 255, 0, SDL_ALPHA_OPAQUE}
-#define SDL_BLUE (SDL_Color){0, 0, 255, SDL_ALPHA_OPAQUE}
-#define SDL_BLACK (SDL_Color){0, 0, 0, SDL_ALPHA_OPAQUE}
-#define SDL_TRANSPARENT (SDL_Color){0, 0, 0, SDL_ALPHA_TRANSPARENT}
+#define FILE_PHAT_ARROW_RED "assets/images/player/arrow_red.png"
+#define FILE_PHAT_ARROW_BLUE "assets/images/player/arrow_blue.png"
+#define FILE_PHAT_ARROW_GREEN "assets/images/player/arrow_green.png"
+#define FILE_PHAT_ARROW_YELLO "assets/images/player/arrow_yellow.png"
+#define FILE_PHAT_ARROW_CYAN "assets/images/player/arrow_cyan.png"
+#define FILE_PHAT_ARROW_MAGENTA "assets/images/player/arrow_magenta.png"
+#define FILE_PHAT_ARROW_ORANGE "assets/images/player/arrow_orange.png"
+#define FILE_PHAT_ARROW_PURPLE "assets/images/player/arrow_purple.png"
+#define FILE_PHAT_ARROW_BLACK "assets/images/player/arrow.png"
 
-#define FILE_PHAT_ARROW "assets/images/player/testArrow.png"
 #define ARROW_SIZE (TILE_SIZE / 2.0f)
+
 typedef struct Hud *Hud;
 typedef struct Arrow *Arrow;
 
 Hud hudCreate(SDL_Renderer *pRend);
 void hudDestroy(Hud aHud);
-void hudRender(Hud aHud,SDL_Renderer *pRend, int playerCount);
+void hudRender(Hud aHud,SDL_Renderer *pRend,int colerIndex,int i);
 
-
-Arrow arrowCreate(int index, SDL_Renderer *pRend);
+Arrow arrowCreate();
 void updateArrows(Hud aHud,SDL_Window *pWin,Client aClient, SDL_Point playerPos[MAX_CLIENTS]);
 SDL_Point hudGettArrowPos(Hud aHud, int index);
 

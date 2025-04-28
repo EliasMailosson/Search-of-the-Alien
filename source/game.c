@@ -95,14 +95,18 @@ void runLobby(Client aClient, Map aMap, ClientControl *pControl, ClientView *pVi
         }
     }
     updateArrows(pView->aHud,pView->pWin,aClient,pView->PlayerPos);
-    MAP_MapMoveMap(aMap, playerPos);
+
+    SDL_Point mapMovePos = {(playerPos.x/(float)TILE_SIZE)*tileRect.w, (playerPos.y/(float)TILE_SIZE)*tileRect.h};
+    MAP_MapMoveMap(aMap, mapMovePos);
 
     SDL_SetRenderDrawColor(pView->pRend, 0,0,0,0);
     SDL_RenderClear(pView->pRend);
 
     MAP_MapRender(pView->pRend, aMap);
     renderPlayers(aClient, pView, playerCamera);
-    hudRender(pView->aHud,pView->pRend,NET_clientGetPlayerCount(aClient));
+    for (int i = 0; i < NET_clientGetPlayerCount(aClient); i++){
+        hudRender(pView->aHud,pView->pRend,NET_clientGetPlayerColorIndex(aClient,i),i);
+    }
     SDL_RenderPresent(pView->pRend);
 }
 

@@ -8,6 +8,24 @@
 #define SPRITE_SIZE 256
 #define RENDER_SIZE 128
 
+void sortByYaxis(Client aClient, int playerCount, int indices[]){
+    for (int i = 0; i < playerCount - 1; i++) {
+        for (int j = 0; j < playerCount - i - 1; j++) {
+            int ia = indices[j];
+            int ib = indices[j + 1];
+
+            SDL_Point pa = NET_clientGetPlayerPos(aClient, ia);
+            SDL_Point pb = NET_clientGetPlayerPos(aClient, ib);
+
+            if (pa.y > pb.y) {  // ascending sort → lowest y LAST
+                int temp = indices[j];
+                indices[j] = indices[j + 1];
+                indices[j + 1] = temp;
+            }
+        }
+    }
+}
+
 void renderPlayers(Client aClient, ClientView *pView, SDL_Rect playerCamera) {
     static int frame = 0;
     frame++;
@@ -19,14 +37,25 @@ void renderPlayers(Client aClient, ClientView *pView, SDL_Rect playerCamera) {
     int centerY = pView->windowHeight/2;
     int renderSizeHalf = pView->playerRenderSize/2;
 
-    // TODO: sort players in "y" value, so the players in front get rendered last.
-    // for(int i = 0; i < playerCount; i++) {
-    //     SDL_Point pos = NET_clientGetPlayerPos(aClient, i);
-    // }
+    int sortedIndex[playerCount];
 
-    for(int i = 0; i < playerCount; i++) {
+    for (int i = 0; i < playerCount; i++) {
+        sortedIndex[i] = i;
+    }
+
+    sortByYaxis(aClient, playerCount, sortedIndex);
+
+    for(int n = 0; n < playerCount; n++) {
+        int i = sortedIndex[n];
+
         SDL_Point pos = NET_clientGetPlayerPos(aClient, i);
         int direction = NET_clientGetPlayerDirection(aClient, i);
+
+        int worldOffsetX = pos.x - selfPos.x;
+        int worldOffsetY = pos.y - selfPos.y;
+        float scale = (float)pView->playerRenderSize / RENDER_SIZE;
+        float screenOffsetX = worldOffsetX * scale;
+        float screenOffsetY = worldOffsetY * scale;
 
         SDL_Rect playerRect;
         if(selfIndex == i) {
@@ -39,8 +68,8 @@ void renderPlayers(Client aClient, ClientView *pView, SDL_Rect playerCamera) {
         }
         else {
             playerRect = (SDL_Rect){
-                .x = centerX - (selfPos.x - pos.x) - renderSizeHalf,
-                .y = centerY - (selfPos.y - pos.y) - renderSizeHalf,
+                .x = (int)(centerX + screenOffsetX - renderSizeHalf),
+                .y = (int)(centerY + screenOffsetY - renderSizeHalf),
                 .w = pView->playerRenderSize,
                 .h = pView->playerRenderSize
             };
@@ -98,23 +127,14 @@ void RenderPlayerName(Client aClient, ClientView *pView, int i, SDL_Rect playerR
         return;
     }
 
-    SDL_Color nameColor = {255,255,255,255}; // Server ska välja färgerna på namnen
-    SDL_Surface* nameSurface = TTF_RenderText_Blended(pView->fonts, username, nameColor);
+    SDL_Color nameColor = NET_GetPlayerColor(aClient, i); // Server ska välja färgerna på namnen
+    SDL_Color shadowColor = {0,0,0,255}; //skuggan 
 
-    if (!nameSurface){
-        printf("Andra gangen: %s", username);
-        return;
-    } 
+    SDL_Surface* shadowSurface = TTF_RenderText_Blended(pView->fonts, username, shadowColor);
+    SDL_Texture* shadowTexture = SDL_CreateTextureFromSurface(pView->pRend, shadowSurface);
 
-    SDL_Texture* nameTexture = SDL_CreateTextureFromSurface(pView->pRend, nameSurface);
-    if (!nameTexture) {
-        printf("Tredje gangen: %s", username);
-        SDL_FreeSurface(nameSurface);
-        return;
-    }
-
-    int nameWidth = nameSurface->w;
-    int nameHeight = nameSurface->h;
+    int nameWidth = shadowSurface->w;
+    int nameHeight = shadowSurface->h;
 
     SDL_Rect nameRect = {
         .x = playerRect.x + (playerRect.w - nameWidth)/2,
@@ -122,6 +142,20 @@ void RenderPlayerName(Client aClient, ClientView *pView, int i, SDL_Rect playerR
         .w = nameWidth,
         .h = nameHeight
     };
+
+    SDL_Rect shadowRect = {
+        .x = nameRect.x + 1,
+        .y = nameRect.y + 1,
+        .w = nameWidth,
+        .h = nameHeight
+    };
+
+    SDL_RenderCopy(pView->pRend,shadowTexture,NULL,&shadowRect);
+    SDL_FreeSurface(shadowSurface);
+    SDL_DestroyTexture(shadowTexture);
+
+    SDL_Surface* nameSurface = TTF_RenderText_Blended(pView->fonts, username, nameColor);
+    SDL_Texture* nameTexture = SDL_CreateTextureFromSurface(pView->pRend, nameSurface);
 
     SDL_RenderCopy(pView->pRend, nameTexture, NULL, &nameRect);
 

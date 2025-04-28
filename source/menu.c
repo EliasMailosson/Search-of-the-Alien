@@ -226,8 +226,9 @@ Menu initMenu(SDL_Renderer *pRend, ClientView *pView, Client aClient) {
     menu.fonts[0] = TTF_OpenFont("assets/fonts/PricedownBl-Regular 900.ttf", 20);
     menu.fonts[1] = TTF_OpenFont("assets/fonts/PricedownBl-Regular 900.ttf", 40);
     menu.fonts[2] = TTF_OpenFont("assets/fonts/PricedownBl-Regular 900.ttf", 60);
+    menu.fonts[3] = TTF_OpenFont("assets/fonts/jura.ttf", 20);
 
-    pView->fonts = menu.fonts[0];
+    pView->fonts = menu.fonts[3];
 
     menu.currentPanel = PANEL_START;
 
