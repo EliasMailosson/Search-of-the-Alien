@@ -48,6 +48,16 @@ void MAP_convertTiles(int tileID[MAP_HEIGHT][MAP_WIDTH], PlanetLUT plantet){
     }
 }
 
+void MAP_mapSetEdgesToZero(int tileID[][MAP_WIDTH]){
+    for (int i = 0; i < MAP_WIDTH; i++){
+        tileID[0][i] = 0;
+        tileID[MAP_HEIGHT-1][i] = 0;
+    }
+    for (int i = 0; i < MAP_HEIGHT; i++){
+        tileID[i][0] = 0;
+        tileID[i][MAP_WIDTH - 1] = 0;
+    }
+}
 
 void MAP_MapRender(SDL_Renderer *pRend, Map aMap){
     int tileW = aMap->tileRect.w;
@@ -90,7 +100,9 @@ Map MAP_MapCreate(SDL_Renderer *pRend, int winW, int winH){
     }
     MAP_TilesFillWithBlank(aMap->tileID);
     MAP_MapGetTilseFromLobby(aMap->tileID);
-    MAP_convertTiles(aMap->tileID,NEMUR_LUT);
+    //MAP_convertTiles(aMap->tileID,NEMUR_LUT);
+    MAP_mapSetEdgesToZero(aMap->tileID);
+
     SDL_Rect startRect = {
         .h = TILE_SIZE,
         .w = TILE_SIZE,

@@ -31,6 +31,7 @@ typedef enum {LOBBY_LUT,NEMUR_LUT,AURANTIC_LUT,CINDORA_LUT}PlanetLUT;
 typedef struct Map *Map;
 
 void MAP_convertTiles(int tileID[MAP_HEIGHT][MAP_WIDTH],PlanetLUT plantet);
+void MAP_mapSetEdgesToZero(int tileID[][MAP_WIDTH]);
 PlanetLUT MAP_mapGetPlanetLUT(Map aMap);
 
 void MAP_MapRender(SDL_Renderer *pRend, Map aMap);
