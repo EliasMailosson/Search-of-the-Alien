@@ -63,7 +63,7 @@ Map MAP_MapCreate(SDL_Renderer *pRend, int winW, int winH){
     aMap->baseRect = startRect;
     aMap->tileRect = startRect;
     MAP_MapRefresh(aMap,winW,winH);
-    aMap->tileID[0][0] = 1;
+    // aMap->tileID[0][0] = 1;
     return aMap;
 }
 

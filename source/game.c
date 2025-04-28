@@ -96,7 +96,7 @@ void runLobby(Client aClient, Map aMap, ClientControl *pControl, ClientView *pVi
     }
     updateArrows(pView->aHud,pView->pWin,aClient,pView->PlayerPos);
 
-    SDL_Point mapMovePos = {(playerPos.x/(float)TILE_SIZE)*tileRect.w - pView->windowWidth/2, (playerPos.y/(float)TILE_SIZE)*tileRect.h - pView->windowHeight/2};
+    SDL_Point mapMovePos = {(playerPos.x/(float)TILE_SIZE)*tileRect.w - pView->windowWidth/2 - pView->playerRenderSize/2 + tileRect.w/2, (playerPos.y/(float)TILE_SIZE)*tileRect.h - pView->windowHeight/2 - pView->playerRenderSize + tileRect.h/2};
     MAP_MapMoveMap(aMap, mapMovePos);
 
     SDL_SetRenderDrawColor(pView->pRend, 0,0,0,0);

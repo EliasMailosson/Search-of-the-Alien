@@ -112,8 +112,8 @@ void NET_serverSendPlayerPacket(Server aServer,GameState GS){
 
         packet[i].state = aServer->clients[i].State;
         SDL_Point pos = {
-            .x = aServer->clients[i].player.hitBox.x - 32,
-            .y = aServer->clients[i].player.hitBox.y - 32
+            .x = aServer->clients[i].player.hitBox.x + aServer->clients[i].player.hitBox.w/2,
+            .y = aServer->clients[i].player.hitBox.y + aServer->clients[i].player.hitBox.h
         };
         packet[i].pos = pos;
         packet[i].direction = aServer->clients[i].player.direction;
@@ -355,7 +355,7 @@ void NET_serverClientConnected(Packet aPacket, Server aServer){
     newUser.State = MENU;
     newUser.player.hitBox.x = 200;
     newUser.player.hitBox.y = 800;
-    newUser.player.hitBox.w = 128 - 64;
+    newUser.player.hitBox.w = 64;
     newUser.player.hitBox.h = 32;
     newUser.State = MENU;
     newUser.colorIndex = NET_serverAssignColorIndex(aServer);

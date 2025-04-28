@@ -38,7 +38,7 @@ void MAP_ScreenToTile(ServerMap aServerMap, int screenX, int screenY, int *outTi
 bool MAP_TileNotWalkable(ServerMap aServerMap, int screenX, int screenY) {
     int tileX, tileY;
     MAP_ScreenToTile(aServerMap, screenX, screenY, &tileX, &tileY);
-    printf("tileY: %d, tileX: %d ,tileID:%d\n", tileY, tileX, aServerMap->MapTileId[tileX][tileY]);
+    // printf("tileY: %d, tileX: %d ,tileID:%d\n", tileY, tileX, aServerMap->MapTileId[tileX][tileY]);
     if (aServerMap->MapTileId[tileY][tileX] == 0){
         return true;
     }
