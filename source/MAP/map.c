@@ -99,7 +99,7 @@ Map MAP_MapCreate(SDL_Renderer *pRend, int winW, int winH){
         }
     }
     MAP_TilesFillWithBlank(aMap->tileID);
-    MAP_MapGetTilseFromLobby(aMap->tileID);
+    MAP_MapGetTilesFromLobby(aMap->tileID);
     //MAP_convertTiles(aMap->tileID,NEMUR_LUT);
     MAP_mapSetEdgesToZero(aMap->tileID);
 
