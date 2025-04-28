@@ -57,7 +57,7 @@ UIDIR = source/UI
 MAPDIR = source/MAP
 BUILDDIR = build
 OBJ_CLIENT = $(BUILDDIR)/main.o $(BUILDDIR)/game.o $(BUILDDIR)/clientLife.o $(BUILDDIR)/menu.o $(BUILDDIR)/panel.o $(BUILDDIR)/client.o $(BUILDDIR)/label.o $(BUILDDIR)/button.o $(BUILDDIR)/checklist.o $(BUILDDIR)/protocol.o $(BUILDDIR)/packetHandler.o $(BUILDDIR)/inputfield.o $(BUILDDIR)/shared.o $(BUILDDIR)/friend.o $(BUILDDIR)/players.o $(BUILDDIR)/map.o $(BUILDDIR)/hud.o $(BUILDDIR)/animation.o
-OBJ_SERVER = $(BUILDDIR)/server.o $(BUILDDIR)/shared.o $(BUILDDIR)/protocol.o $(BUILDDIR)/packetHandler.o
+OBJ_SERVER = $(BUILDDIR)/server.o $(BUILDDIR)/shared.o $(BUILDDIR)/protocol.o $(BUILDDIR)/packetHandler.o $(BUILDDIR)/enemies.o
 
 # Default Goal
 all: $(BUILDDIR) $(CLIENT_TARGET) $(SERVER_TARGET)
@@ -135,6 +135,9 @@ $(BUILDDIR)/map.o: $(MAPDIR)/map.c
 	$(CC) $(CFLAGS) -c $< -o $@
 
 $(BUILDDIR)/hud.o: $(SRCDIR)/hud.c
+	$(CC) $(CFLAGS) -c $< -o $@
+
+$(BUILDDIR)/enemies.o: $(NETDIR)/enemies.c
 	$(CC) $(CFLAGS) -c $< -o $@
     
 clean:
