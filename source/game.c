@@ -1,20 +1,25 @@
 #include "../include/game.h"
-#include "../include/menu.h"
 #include "../include/players.h"
 #include "../include/UI/friend.h"
+#include "../include/terminalHub.h"
+#include "../include/menu.h"
 
 static void enableMouseTexture(SDL_Cursor *CurrentCursor);
 static void updatePositioning(Client aClient, SDL_Point lastPosition[MAX_CLIENTS], SDL_Point *playerPos, int selfIndex);
-static void lobbyFullscreenToggle(ClientControl *pControl, ClientView *pView, Map aMap, int *pDelay);
+static void lobbyFullscreenToggle(ClientControl *pControl, ClientView *pView, Map aMap, int *pDelay, TerminalHub *pTerminalHub);
+static void lobbyTerminalHubToggle(ClientControl *pControl, bool *pShowHub, int *pDelay);
 static void handlePlayerInput(Client aClient, ClientControl *pControl, ClientView *pView);
 static void updatePlayerAnimation(Client aClient, SDL_Point lastPosition[]);
-static void renderLobby(ClientView *pView, Map aMap, Client aClient);
+static void renderLobby(ClientView *pView, Map aMap, Client aClient, TerminalHub terminalHub);
 
 
 void gameLoop(Client aClient, ClientControl *pControl, ClientView *pView){
     NET_clientConnect(aClient);
 
     Menu menu = initMenu(pView->pRend, pView, aClient);
+
+    TerminalHub terminalHub;
+    initTerminalHub(pView, &terminalHub);
     
     char username[MAX_USERNAME_LEN];
     NET_clientGetSelfname(aClient, username);
@@ -33,13 +38,17 @@ void gameLoop(Client aClient, ClientControl *pControl, ClientView *pView){
             runMenu(aClient, pControl, pView, &menu);
             break;
         case LOBBY:
-            runLobby(aClient, aMap, pControl, pView);
+            runLobby(aClient, aMap, pControl, pView, &terminalHub);
+            break;
+        case NEMUR:
+            runNemur();
             break;
         default:
             break;
         }
     }
 
+    destroyTerminalHub(&terminalHub);
     destroyMenu(&menu);
     MAP_MapDestroy(aMap);
     NET_clientGetSelfname(aClient, username);
@@ -48,35 +57,39 @@ void gameLoop(Client aClient, ClientControl *pControl, ClientView *pView){
     }
 }
 
-void runLobby(Client aClient, Map aMap, ClientControl *pControl, ClientView *pView) {
+void runLobby(Client aClient, Map aMap, ClientControl *pControl, ClientView *pView, TerminalHub *pTerminalHub) {
     static int toggleDelay = 0;
     int selfIndex = NET_clientGetSelfIndex(aClient);
     SDL_Point lastPosition[MAX_CLIENTS];
     SDL_Point playerPos;
 
     enableMouseTexture(pView->crosshair);
-
     updatePositioning(aClient, lastPosition, &playerPos, selfIndex);
 
     toggleDelay++;
-    lobbyFullscreenToggle(pControl, pView, aMap, &toggleDelay);
+    
+    lobbyFullscreenToggle(pControl, pView, aMap, &toggleDelay, pTerminalHub);
+    lobbyTerminalHubToggle(pControl, &pTerminalHub->isVisible, &toggleDelay);
 
-    handlePlayerInput(aClient, pControl, pView);
+    if (!pTerminalHub->isVisible){
+        handlePlayerInput(aClient, pControl, pView);
+    }
+    else {
+        updateTerminalHub(pTerminalHub, aClient, pControl->isMouseUp);
+    }
 
     NET_clientReceiver(aClient);
-    
     updatePlayerAnimation(aClient, lastPosition);
 
     // update HUD?
     updateArrows(pView->aHud,pView->pWin,aClient,pView->PlayerPos);
-
     SDL_Rect tileRect = MAP_getTileRect(aMap);
     pView->playerRenderSize = tileRect.h;
 
     SDL_Point mapMovePos = {(playerPos.x/(float)TILE_SIZE)*tileRect.w, (playerPos.y/(float)TILE_SIZE)*tileRect.h};
     MAP_MapMoveMap(aMap, mapMovePos);
 
-    renderLobby(pView, aMap, aClient);
+    renderLobby(pView, aMap, aClient, *pTerminalHub);
 }
 
 void runMenu(Client aClient, ClientControl *pControl, ClientView *pView, Menu *pMenu) {
@@ -145,7 +158,7 @@ void eventHandler(ClientControl *pControl){
     }
 }
 
-static void renderLobby(ClientView *pView, Map aMap, Client aClient){
+static void renderLobby(ClientView *pView, Map aMap, Client aClient, TerminalHub terminalHub){
     SDL_SetRenderDrawColor(pView->pRend, 0,0,0,0);
     SDL_RenderClear(pView->pRend);
 
@@ -153,6 +166,9 @@ static void renderLobby(ClientView *pView, Map aMap, Client aClient){
     renderPlayers(aClient, pView);
     for (int i = 0; i < NET_clientGetPlayerCount(aClient); i++){
         hudRender(pView->aHud,pView->pRend,NET_clientGetPlayerColorIndex(aClient,i),i);
+    }
+    if (terminalHub.isVisible) {
+        renderTerminalHub(pView, terminalHub);
     }
     SDL_RenderPresent(pView->pRend);
 
@@ -188,17 +204,30 @@ static void updatePositioning(Client aClient, SDL_Point lastPosition[MAX_CLIENTS
         *playerPos = NET_clientGetPlayerPos(aClient, selfIndex);
 }
 
-static void lobbyFullscreenToggle(ClientControl *pControl, ClientView *pView, Map aMap, int *pDelay) {
+static void lobbyFullscreenToggle(ClientControl *pControl, ClientView *pView, Map aMap, int *pDelay, TerminalHub *pTerminalHub) {
     if (pControl->keys[SDL_SCANCODE_F] && *pDelay > 12) {
         toggleFullscreen(pView);
         MAP_MapRefresh(aMap, pView->windowWidth, pView->windowHeight);
+        refreshTerminalHub(pView, pTerminalHub);
         *pDelay = 0;
     }
 }
+
+static void lobbyTerminalHubToggle(ClientControl *pControl, bool *pShowHub, int *pDelay){
+    if (pControl->keys[SDL_SCANCODE_E] && *pDelay > 12){
+        *pShowHub = !*pShowHub;
+        *pDelay = 0;
+    }
+}
+
 
 static void handlePlayerInput(Client aClient, ClientControl *pControl, ClientView *pView) {
     PlayerInputPacket pip = prepareInputArray(pControl, pView->windowWidth, pView->windowHeight);
     if (NET_playerInputPacketCheck(pip)) {
         NET_clientSendArray(aClient, LOBBY, PLAYER_INPUT, &pip, sizeof(PlayerInputPacket));
     }
+}
+
+void runNemur(){
+
 }

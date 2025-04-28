@@ -69,9 +69,12 @@ bool UI_buttonIsHovered(Button aButton, int mouseX, int mouseY);
 */
 void UI_buttonConfigure(Button aButton, char* text, int newX, int newY, int newWidth, int newHeight, SDL_Renderer* pRend, SDL_Color textColor, TTF_Font* pFont, SDL_Color buttonColor);
 
+void UI_buttonGetText(Button aButton, char *text);
+
 /**
  * Destroys the button and label inside it.
 */
 void UI_buttonDestroy(Button aButton);
+
 
 #endif

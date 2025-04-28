@@ -17,6 +17,7 @@ void UI_labelRefreshTexture(SDL_Renderer* pRend, Label aLabel);
 // Setters
 void UI_labelSetAppearance(SDL_Renderer* pRend, Label aLabel, int x, int y, SDL_Color color, TTF_Font* pFont);
 void UI_labelSetText(Label aLabel, char* text);
+void UI_labelGetText(Label aLabel, char* text);
 void UI_labelSetPosition(Label aLabel, int x, int y);
 
 // Getters

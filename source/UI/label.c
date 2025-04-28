@@ -29,6 +29,10 @@ void UI_labelSetText(Label aLabel, char* text) {
     strcpy(aLabel->text, text);
 }
 
+void UI_labelGetText(Label aLabel, char* text) {
+    strcpy(text, aLabel->text);
+}
+
 void UI_labelSetPosition(Label aLabel, int x, int y) {
     aLabel->x = x;
     aLabel->y = y;

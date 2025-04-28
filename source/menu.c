@@ -7,6 +7,7 @@
 #include "../include/UI/animation.h"
 #include "../include/players.h"
 #include "../include/NET/client.h"
+#include "../include/game.h"
 
 void renderMenu(SDL_Renderer *pRend, Menu *pMenu) {
     SDL_SetRenderDrawColor(pRend, 0,0,0,0);
