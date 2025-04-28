@@ -91,8 +91,11 @@ void UI_buttonConfigure(Button aButton, char* text, int newX, int newY, int newW
     UI_buttonSetLabelappearence(pRend, aButton, textColor, pFont, buttonColor);
 }
 
+void UI_buttonGetText(Button aButton, char *text){
+    UI_labelGetText(aButton->buttonText, text);
+}
+
 void UI_buttonDestroy(Button aButton) {
     UI_labelDestroy(aButton->buttonText);
     free(aButton);
 }
-
