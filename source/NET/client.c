@@ -1,6 +1,7 @@
 #include "../../include/NET/client.h"
 #include "../../include/UI/friend.h"
-struct Enemy{
+
+struct enemy{
     SDL_Point pos;
 };
 

@@ -3,12 +3,12 @@
 #include <stdbool.h>
 #include <stdlib.h>
 #include "../../include/NET/shared.h"
+#include "../../include/NET/enemies.h"
 
 enum PlayerAnimationTypes{ANIMATION_IDLE, ANIMATION_RUNNING, EMOTE_TPOSE};
 
-typedef struct Enemy Enemy;
 typedef struct Player Player;
-
+typedef struct enemy Enemy;
 struct client;
 typedef struct client *Client;
 

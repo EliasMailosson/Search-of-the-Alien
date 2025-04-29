@@ -3,13 +3,11 @@
 #include "../../include/NET/shared.h"
 #include "../../include/NET/protocol.h"
 #include "../../include/NET/enemies.h"
-
 #define MAX_COLORS 8
 
 typedef struct Player Player;
-
 typedef struct User User;
-
+typedef struct enemies* Enemies;
 struct server;
 typedef struct server *Server;
 

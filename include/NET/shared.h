@@ -7,12 +7,11 @@
 #include <stdbool.h>
 
 #include "../../include/NET/protocol.h"
+#include "server.h"
 
 #define MAX_CLIENTS 8
 #define PORT 1234
-#define JON_IP "130.229.161.153"
-
-#define MAX_ENEMIES 3
+#define JON_IP "127.0.0.1"
 
 /** Initializes SDL network 
  * ex use: While true then the network is running

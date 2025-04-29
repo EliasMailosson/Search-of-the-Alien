@@ -1,19 +1,20 @@
 #include "../../include/NET/enemies.h"
 
-
-struct healthPoints{
+typedef struct healthPoints {
     float maxHP;
     float currentHP;
-};
-struct enemy{
+} HealthPoints;
+
+typedef struct enemy {
     SDL_Rect enemyRect;
     int enemyID;
     HealthPoints HP;
     Uint32 ThinkTime;
-};
-struct enemies{
+} Enemy;
+
+typedef struct enemies {
     Enemy enemyList[MAX_ENEMIES];
-};
+}enemies;
 
 Enemies enemyCreate(){
     Enemies aEnemies =  malloc(sizeof(struct enemies));
@@ -37,8 +38,6 @@ void enemySpawn(Enemies aEnemies){
 
     for (int i = 0; i < MAX_ENEMIES; i++)
     {
-        aEnemies->enemyList[i].enemyRect.x = 0;
-        aEnemies->enemyList[i].enemyRect.y = 0;
         aEnemies->enemyList[i].ThinkTime = 0;
     }
 }
@@ -50,31 +49,28 @@ void enemyAI(Enemies aEnemies, SDL_Point playerpos){
     {
         if (CurrentThinkTime >= aEnemies->enemyList[i].ThinkTime)
         {
-            enemyUpdatePos(aEnemies, playerpos);
+            PlayerTracker(aEnemies, playerpos, i);
             aEnemies->enemyList[i].ThinkTime = CurrentThinkTime + 3000;
         }
     }
 }
 
-void enemyUpdatePos(Enemies aEnemies, SDL_Point playerPos, int enemyindex){
+void PlayerTracker(Enemies aEnemies, SDL_Point playerPos, int enemyindex){
 
     const int speed = 1;
     //printf("Enemy-pos: %d %d, Player-pos: %d %d\n", aEnemies->enemyList[0].enemyRect.x, aEnemies->enemyList[0].enemyRect.y, playerPos.x, playerPos.y);
 
     Enemy* enemy = &aEnemies->enemyList[enemyindex];
     
-    for (int i = 0; i < MAX_ENEMIES; ++i)
-    {
-        if (aEnemies->enemyList[i].enemyRect.x < playerPos.x)
-            aEnemies->enemyList[i].enemyRect.x += speed;
-        else if (aEnemies->enemyList[i].enemyRect.x > playerPos.x)
-            aEnemies->enemyList[i].enemyRect.x -= speed;
+        if (enemy->enemyRect.x < playerPos.x)
+            enemy->enemyRect.x += speed;
+        else if (enemy->enemyRect.x > playerPos.x)
+            enemy->enemyRect.x -= speed;
 
-        if (aEnemies->enemyList[i].enemyRect.y < playerPos.y)
-            aEnemies->enemyList[i].enemyRect.y += speed;
-        else if (aEnemies->enemyList[i].enemyRect.y > playerPos.y)
-            aEnemies->enemyList[i].enemyRect.y -= speed;
-    }
+        if (enemy->enemyRect.y < playerPos.y)
+            enemy->enemyRect.y += speed;
+        else if (enemy->enemyRect.y > playerPos.y)
+            enemy->enemyRect.y -= speed;
 }
 
 SDL_Point enemyGetPoint(Enemies aEnemies, int index){
