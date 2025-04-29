@@ -12,6 +12,7 @@ struct Map{
     SDL_Rect tileRect; 
     SDL_Rect baseRect;
     PlanetLUT planet;
+    uint32_t seed;
 };
 
 static void substring(char *buffer, int start, int end, char* result);
@@ -46,6 +47,10 @@ void MAP_convertTiles(int tileID[MAP_HEIGHT][MAP_WIDTH], PlanetLUT plantet){
             }
         }
     }
+}
+void MAP_mapNewMap(Map aMap,uint32_t seed){
+    MAP_generatePerlinNoise(aMap->tileID,MAP_HEIGHT,MAP_WIDTH,13,0,seed);
+    MAP_convertTiles(aMap->tileID,aMap->planet);
 }
 
 void MAP_mapSetEdgesToZero(int tileID[][MAP_WIDTH]){
@@ -224,4 +229,17 @@ static void printMap(Map aMap){
 void MAP_MapMoveMap(Map aMap, SDL_Point playerOffset){
     aMap->tileRect.y = - playerOffset.y;
     aMap->tileRect.x = - playerOffset.x;
+}
+
+void MAP_mapSetPlanet(GameState state,Map aMap){
+    switch (state){
+    case NEMUR: aMap->planet = NEMUR_LUT;
+        break;
+    case AURANTIC: aMap->planet = AURANTIC_LUT;
+        break;
+    case CINDORA: aMap->planet = CINDORA_LUT;
+        break;
+    default:
+        break;
+    }
 }

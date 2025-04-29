@@ -105,6 +105,28 @@ int main(int argc, char **argv ){
     return 0;
 }
 
+void NET_serverSetNewMap(Server aServer){
+    for (int i = 0; i < aServer->clientCount; i++){
+        switch (aServer->clients[i].State){
+        case NEMUR:case AURANTIC:case CINDORA:
+            printf("VI HAR REDAN EN KARTA !!!\n");
+            return;
+            break;
+        default:
+            break;
+        }
+    }
+    int indexIP = NET_serverCompIP(aServer);
+    if(indexIP == -1) {
+        printf("Error NET_serverCompIP return -1\n");
+        return;
+        }
+    NET_serverMapSetSeed(aServer->aServerMap,MAP_generate_seed());
+    NET_serverMapGenerateNewMap(aServer->aServerMap);
+    NET_serverSendInt(aServer,GLOBAL,NEW_SEED,(int)NET_serverMapGetSeed(aServer->aServerMap),indexIP);
+    printf("%u\n",NET_serverMapGetSeed(aServer->aServerMap));
+}
+
 void NET_serverSendPlayerPacket(Server aServer,GameState GS){
     PlayerPacket packet[MAX_CLIENTS] = {0};
     for (int i = 0; i < aServer->clientCount; i++){
@@ -192,6 +214,7 @@ void NET_serverChangeGameStateOnClient(Server aServer,Packet aPacket){
         return;
         }
     GameState newState = SDLNet_Read32(NET_packetGetPayload(aPacket));
+    if(newState == LOBBY || newState == MENU){}else NET_serverSetNewMap(aServer);
     NET_serverSendInt(aServer,GLOBAL,CHANGE_GAME_STATE_RESPONSE,newState,indexIP);
     printf("username: %s gameState is now %d\n",aServer->clients[indexIP].username,newState);
     aServer->clients[indexIP].State = newState;

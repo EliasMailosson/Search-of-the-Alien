@@ -4,9 +4,9 @@ static void MAP_perlinNoise1D(int count, float *fSeed, int octaves,float bias, f
 static void MAP_perlinNoise2D(int width, int height, float *fSeed, int octaves,float bias, float *output);
 
 
-void MAP_generatePerlinNoise(int output[][MAP_WIDTH], int height, int width, int range, int offset){
+void MAP_generatePerlinNoise(int output[][MAP_WIDTH], int height, int width, int range, int offset, uint32_t seed){
     float fOutput[height * width];
-    MAP_generate2DNoise(fOutput,height,width);
+    MAP_generate2DNoise(fOutput,height,width,seed);
     range--;
     for (int y = 0; y < height; y++){
         for(int x = 0;x < width; x++){
@@ -14,15 +14,24 @@ void MAP_generatePerlinNoise(int output[][MAP_WIDTH], int height, int width, int
             output[y][x] = (int)(roundf(fOutput[idx]*range) + offset);
         }
     }
+    for (int y = 0; y < height; y++){
+        for(int x = 0;x < width; x++){
+            printf("%d,",output[y][x]);
+        }printf("\n");
+    }
 }
 
-void MAP_generate2DNoise(float *output,int outputHeight, int outputWidth){
+void MAP_generate2DNoise(float *output,int outputHeight, int outputWidth,uint32_t seed){
     float *fNoiseSeed2D = malloc((outputHeight * outputWidth) * sizeof *fNoiseSeed2D);
-    for (int i = 0; i < outputHeight * outputWidth; i++) fNoiseSeed2D[i] = (float)rand() / (float)RAND_MAX;
+    for (int y = 0; y < outputHeight; y++){
+        for(int x = 0; x< outputWidth; x++){
+            int idx = y * outputWidth + x;
+            fNoiseSeed2D[idx] = MAP_converRandToFloat(x,y,seed);
+        }
+    }
     MAP_perlinNoise2D(outputWidth, outputHeight, fNoiseSeed2D, 6, 2.0f, output);
     free(fNoiseSeed2D);
 }
-
 
 void MAP_generat1DNoise(float *output, int size){
     float *fNoiseSeed1D = malloc(size * sizeof *fNoiseSeed1D);;
@@ -85,14 +94,17 @@ static void MAP_perlinNoise2D(int width, int height, float *fSeed, int octaves,f
     
 }
 
-// int main(){
-//     srand(time(NULL));
-//     int output[MAP_HEIGHT][MAP_WIDTH] = {0};
-//     MAP_generatePerlinNoise(output,MAP_HEIGHT,MAP_WIDTH,13,0);
-//     for (int y = 0; y < MAP_HEIGHT; y++){
-//         for(int x = 0;x < MAP_WIDTH; x++){
-//             printf("%d,",output[y][x]);
-//         }printf("\n");
-//     }
-//     return 0;
-// }
+uint32_t MAP_randOnSeed2D(int x, int y, uint32_t seed){
+    uint32_t h = seed ^ (x * 374761393u) ^ (y * 668265263u);
+    h = (h ^ (h >> 13)) * 1274126177u;
+    return h ^ (h >> 16);
+}
+
+float MAP_converRandToFloat(int x, int y, uint32_t seed){
+    return (MAP_randOnSeed2D(x, y, seed) & 0xFFFFFF) / (float)0xFFFFFF;
+}
+
+uint32_t MAP_generate_seed(){
+    uintptr_t ptr_entropy = (uintptr_t)&ptr_entropy;
+    return (uint32_t)(time(NULL) ^ ptr_entropy);
+}

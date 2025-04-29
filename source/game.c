@@ -35,7 +35,7 @@ void gameLoop(Client aClient, ClientControl *pControl, ClientView *pView){
         switch (NET_clientGetState(aClient))
         {
         case MENU:
-            runMenu(aClient, pControl, pView, &menu);
+            runMenu(aClient, pControl, pView, &menu, aMap);
             break;
         case LOBBY:
             runLobby(aClient, aMap, pControl, pView, &terminalHub);
@@ -78,7 +78,7 @@ void runLobby(Client aClient, Map aMap, ClientControl *pControl, ClientView *pVi
         updateTerminalHub(pTerminalHub, aClient, pControl->isMouseUp);
     }
 
-    NET_clientReceiver(aClient);
+    NET_clientReceiver(aClient,aMap,pView->pWin);
     updatePlayerAnimation(aClient, lastPosition);
 
     // update HUD?
@@ -92,7 +92,7 @@ void runLobby(Client aClient, Map aMap, ClientControl *pControl, ClientView *pVi
     renderLobby(pView, aMap, aClient, *pTerminalHub);
 }
 
-void runMenu(Client aClient, ClientControl *pControl, ClientView *pView, Menu *pMenu) {
+void runMenu(Client aClient, ClientControl *pControl, ClientView *pView, Menu *pMenu,Map aMap) {
     static int toggleDelay = 0;
     toggleDelay++;
     if(pControl->keys[SDL_SCANCODE_F] && toggleDelay > 12) {
@@ -109,7 +109,7 @@ void runMenu(Client aClient, ClientControl *pControl, ClientView *pView, Menu *p
     if (pMenu->isGameStarted) {
         NET_clientSendInt(aClient, MENU, CHANGE_GAME_STATE, LOBBY);
     }
-    NET_clientReceiver(aClient);
+    NET_clientReceiver(aClient,aMap,pView->pWin);
     renderMenu(pView->pRend, pMenu);
 }
 
