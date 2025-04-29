@@ -116,12 +116,14 @@ void NET_serverSetNewMap(Server aServer){
             break;
         }
     }
+    int indexIP = NET_serverCompIP(aServer);
+    if(indexIP == -1) {
+        printf("Error NET_serverCompIP return -1\n");
+        return;
+        }
+    NET_serverMapSetSeed(aServer->aServerMap,MAP_generate_seed());
     NET_serverMapGenerateNewMap(aServer->aServerMap);
-}
-
-void NET_serverUpdateClientMap(Server aServer){
-
-    
+    NET_serverSendInt(aServer,GLOBAL,NEW_SEED,(int)NET_serverMapGetSeed(aServer->aServerMap),indexIP);
 }
 
 void NET_serverSendPlayerPacket(Server aServer,GameState GS){

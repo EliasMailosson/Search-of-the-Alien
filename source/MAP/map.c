@@ -12,6 +12,7 @@ struct Map{
     SDL_Rect tileRect; 
     SDL_Rect baseRect;
     PlanetLUT planet;
+    uint32_t seed;
 };
 
 static void substring(char *buffer, int start, int end, char* result);

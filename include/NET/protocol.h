@@ -15,6 +15,12 @@ typedef struct PlayerPacket{
     int playerCharacter;
 }PlayerPacket;  
 
+
+typedef struct MapPacket{
+    uint32_t seed;
+};
+
+
 void NET_protocolSendInt(UDPpacket *pUDPpkg,UDPsocket Socket,IPaddress IP,
                             GameState GS,MessageType msgType,int placeHolder);
 

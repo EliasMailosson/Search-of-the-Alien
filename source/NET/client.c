@@ -192,6 +192,9 @@ void NET_clientReceiver(Client aClient){
             case CHANGE_GAME_STATE_RESPONSE:
                 NET_clientUpdateGameState(aClient,aPacket);
                 break;
+            case NEW_SEED:
+                
+                break;
             default:
                 printf("client recieved invalid msgType: %d!!\n", NET_packetGetMessageType(aPacket));
                 break;

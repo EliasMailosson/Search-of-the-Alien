@@ -1,9 +1,8 @@
 #include "../../include/NET/serverLogic.h"
-
-struct ServerMap
-{
+struct ServerMap{
     int MapTileId[MAP_HEIGHT][MAP_WIDTH];
     SDL_Rect tileRect;
+    uint32_t seed;
 };
 
 ServerMap NET_serverMapCreate() {
@@ -17,8 +16,16 @@ ServerMap NET_serverMapCreate() {
     return aServerMap;
 }
 
+void NET_serverMapSetSeed(ServerMap aServerMap,uint32_t newSeed){
+    aServerMap->seed = newSeed;
+}
+
+uint32_t NET_serverMapGetSeed(ServerMap aServerMap){
+    return aServerMap->seed;
+}
+
 void NET_serverMapGenerateNewMap(ServerMap aServerMap){
-    MAP_generatePerlinNoise(aServerMap->MapTileId,MAP_HEIGHT,MAP_WIDTH,13,0);
+    MAP_generatePerlinNoise(aServerMap->MapTileId,MAP_HEIGHT,MAP_WIDTH,13,0,aServerMap->seed);
     for (int y = 0; y < MAP_HEIGHT; y++){
         for(int x = 0; x < MAP_WIDTH; x++){
             printf("%d,",aServerMap->MapTileId[y][x]);
@@ -87,22 +94,22 @@ void NET_serverCheckPlayerCollision(Server aServer, int selfIdx, int *collide) {
                     if((selfIdx == i || selfIdx == j) && *collide == 0) *collide = 1;
                     // float moveX = intersectX / 8.0f;
                     if (p1CenterX < p2CenterX) {
-                         p1.x -= (int)ceil(resistance);
-                         p2.x += (int)ceil(resistance);
+                        p1.x -= (int)ceil(resistance);
+                        p2.x += (int)ceil(resistance);
                     } else {
-                         p1.x += (int)ceil(resistance);
-                         p2.x -= (int)ceil(resistance);
+                        p1.x += (int)ceil(resistance);
+                        p2.x -= (int)ceil(resistance);
                     }
                 } else {
                     if((selfIdx == i || selfIdx == j) && *collide == 0) *collide = 1;
                     // float moveY = intersectY / 8.0f;
-                     if (p1CenterY < p2CenterY) {
-                         p1.y -= (int)ceil(resistance);
-                         p2.y += (int)ceil(resistance);
-                     } else {
-                         p1.y += (int)ceil(resistance);
-                         p2.y -= (int)ceil(resistance);
-                     }
+                    if (p1CenterY < p2CenterY) {
+                        p1.y -= (int)ceil(resistance);
+                        p2.y += (int)ceil(resistance);
+                    } else {
+                        p1.y += (int)ceil(resistance);
+                        p2.y -= (int)ceil(resistance);
+                    }
                 }
 
                 NET_serverSetPlayerHitbox(aServer, i, p1);
