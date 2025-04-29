@@ -4,6 +4,7 @@
 #include <stdlib.h>
 #include <stdio.h>  
 #include <time.h>
+#include <inttypes.h>
 
 #define MAP_WIDTH 60
 #define MAP_HEIGHT 60
