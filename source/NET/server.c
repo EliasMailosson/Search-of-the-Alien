@@ -3,6 +3,7 @@
 struct Player{
     SDL_Rect hitBox;
     SDL_Point mousePos;
+    int8_t angle;
     int direction;
     int character;
 };
@@ -23,6 +24,8 @@ struct server {
     UDPpacket *pReceivePacket;
     UDPpacket *pSendPacket;
     User *clients;
+    Projectile projList[1024];
+    int projCount;
     bool isOff;
     ServerMap aServerMap;
     bool usedColors[MAX_COLORS];
@@ -179,6 +182,7 @@ void NET_serverUpdatePlayer(Server aServer, Packet aPacket){
     int dy = 0 - my;
 
     float angle = atan2(dy, dx);
+    aServer->clients[playerIdx].player.angle = (int8_t)(angle * (180.0 / M_PI));
     aServer->clients[playerIdx].player.direction = ((int)roundf(angle / (float)M_PI_4) + 7 ) % 8;
     aServer->clients[playerIdx].player.character = pip.selecterPlayerCharacter;
 
@@ -264,6 +268,18 @@ void NET_serverDestroy(Server aServer){
     free(aServer);
 }
 
+int NET_serverGetProjCount(Server aServer) {
+    return aServer->projCount;
+}
+
+void NET_serverSetProjCount(Server aServer, int count) {
+    aServer->projCount = count;
+}
+
+float NET_serverGetPlayerAngle(Server aServer, int playerIdx) {
+    return aServer->clients[playerIdx].player.angle;
+}
+
 Server NET_serverCreate(){
     Server aServer = malloc(sizeof(struct server));
     if(aServer == NULL){
@@ -273,6 +289,7 @@ Server NET_serverCreate(){
     aServer->clients = NULL;
     aServer->clientCount = 0;
     aServer->isOff = false;
+    aServer->projCount = 0;
      // Open server UDP socket
     aServer->serverSocket = SDLNet_UDP_Open(PORT);
     if(!aServer->serverSocket){

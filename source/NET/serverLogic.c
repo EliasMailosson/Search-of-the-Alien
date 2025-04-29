@@ -107,3 +107,34 @@ void NET_serverCheckPlayerCollision(Server aServer, int selfIdx, int *collide) {
 void NET_serverMapDestroy(ServerMap aMap) {
     free(aMap);
 }
+
+void NET_projectileSpawn(Server aServer, Projectile *list, int16_t x, int16_t y, uint8_t srcPlayerIdx) {
+    int projCount = NET_serverGetProjCount(aServer);
+    list[projCount].x = x;
+    list[projCount].y = y;
+    list[projCount].angle = NET_serverGetPlayerAngle(aServer, srcPlayerIdx);
+    list[projCount].srcPlayerIdx = srcPlayerIdx;
+    NET_serverSetProjCount(aServer, ++projCount);
+}
+
+void NET_projectileKill(Server aServer, Projectile *list, int projIdx) {
+    int projCount = NET_serverGetProjCount(aServer);
+    for(int i = projIdx; i < projCount-1; i++) {
+        list[i] = list[i+1];
+    }
+    NET_serverSetProjCount(aServer, --projCount);
+}
+
+void NET_projectilesUpdate(Server aServer, Projectile *list) {
+    int projCount = NET_serverGetProjCount(aServer);
+    for(int i = 0; i < projCount; i++) {
+        float speed = 5.0f; // TO DO: get speed from player- weapon attributes
+
+        float r = list[i].angle * (M_PI / 180.0f);
+        float dx = cosf(r);
+        float dy = sinf(r);
+        
+        list[i].x += (int)dx * speed;
+        list[i].y += (int)dy * speed;
+    }
+}
