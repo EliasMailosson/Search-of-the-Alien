@@ -54,6 +54,12 @@ void runLobby(Client aClient, Map aMap, ClientControl *pControl, ClientView *pVi
     SDL_Point lastPosition[MAX_CLIENTS];
     SDL_Point playerPos;
 
+    for (int i = 0; i < MAX_ENEMIES; i++)
+    {
+        SDL_Point point = NET_clientGetEnemyPos(aClient, i);
+        //printf("enemy #%d: pos: %d\n", i, point.x);
+    }
+
     enableMouseTexture(pView->crosshair);
 
     updatePositioning(aClient, lastPosition, &playerPos, selfIndex);

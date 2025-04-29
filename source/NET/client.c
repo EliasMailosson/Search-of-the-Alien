@@ -1,6 +1,6 @@
 #include "../../include/NET/client.h"
 #include "../../include/UI/friend.h"
-struct Enemies{
+struct Enemy{
     SDL_Point pos;
 };
 
@@ -25,7 +25,7 @@ struct client{
 
     int PlayerCount;
     Player playerList[MAX_CLIENTS];
-    Enemies enemies[MAX_ENEMIES];
+    Enemy enemies[MAX_ENEMIES];
 }; 
 
 bool NET_clientConnect(Client aClient){
@@ -131,7 +131,7 @@ SDL_Point NET_clientGetPlayerPos(Client aClient, int playerIdx) {
 
 SDL_Point NET_clientGetEnemyPos(Client aClient, int index){
     if(index < MAX_CLIENTS) {
-        return aClient->enemies->pos;
+        return aClient->enemies[index].pos;
     }
     else return (SDL_Point) {.x=-1, .y=-1};
 }
@@ -245,6 +245,7 @@ void NET_clientUpdateEnemy(Client aClient, Packet aPacket){
     EnemyPacket packets[MAX_ENEMIES] = {0};
     NET_enemyPacketReceive(aPacket, packets);
     for (int i = 0; i < MAX_ENEMIES; i++){
+        printf("fiende #%d: x: %d\n", i, packets[i].pos.x);
         aClient->enemies[i].pos = packets[i].pos;
     }
 }

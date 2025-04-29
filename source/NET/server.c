@@ -120,14 +120,16 @@ int main(int argc, char **argv ){
 
 void NET_serverSendEnemiesPacket(Server aServer, GameState GS, Enemies aEnemies){
     EnemyPacket packet[MAX_ENEMIES] = {0};
+    SDL_Point pos;
     for (int i = 0; i < MAX_ENEMIES; i++){
-        SDL_Point pos = enemyGetPoint(aEnemies, i); 
+        pos = enemyGetPoint(aEnemies, i); 
+        // printf("Fiende #%d: x: %d\n", i, pos.x);
         packet[i].pos = pos;
     }
     Uint32 payloadSize = MAX_ENEMIES * sizeof(EnemyPacket);
     for (int i = 0; i < aServer->clientCount; i++){
         if(aServer->clients[i].State == GS || GS == -1){
-            NET_serverSendArray(aServer, LOBBY, ENEMY_POS, packet, payloadSize, i);
+            NET_serverSendArray(aServer, GLOBAL, ENEMY_POS, packet, payloadSize, i);
         }
     }
 }
@@ -214,8 +216,7 @@ void NET_serverUpdateEnemies(Server aServer, Enemies aEnemies){
         playerPos.y = aServer->clients[i].player.hitBox.y;
     }
     enemyUpdatePos(aEnemies, playerPos);
-
-    NET_serverSendEnemiesPacket(aServer, LOBBY, aEnemies); 
+    NET_serverSendEnemiesPacket(aServer, LOBBY, aEnemies);
 }
 
 void NET_serverChangeGameStateOnClient(Server aServer,Packet aPacket){

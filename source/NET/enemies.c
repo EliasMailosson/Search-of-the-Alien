@@ -28,10 +28,10 @@ void enemySpawn(Enemies aEnemies){
     aEnemies->enemyList[0].enemyRect.x = 128;
     aEnemies->enemyList[0].enemyRect.y = 128;
 
-    aEnemies->enemyList[1].enemyRect.y = 256;
+    aEnemies->enemyList[1].enemyRect.x = 256;
     aEnemies->enemyList[1].enemyRect.y = 256;
 
-    aEnemies->enemyList[2].enemyRect.y = 512;
+    aEnemies->enemyList[2].enemyRect.x = 512;
     aEnemies->enemyList[2].enemyRect.y = 512;
 
 }
