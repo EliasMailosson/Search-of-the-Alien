@@ -14,6 +14,11 @@ void MAP_generatePerlinNoise(int output[][MAP_WIDTH], int height, int width, int
             output[y][x] = (int)(roundf(fOutput[idx]*range) + offset);
         }
     }
+    for (int y = 0; y < height; y++){
+        for(int x = 0;x < width; x++){
+            printf("%d,",output[y][x]);
+        }printf("\n");
+    }
 }
 
 void MAP_generate2DNoise(float *output,int outputHeight, int outputWidth,uint32_t seed){
@@ -99,7 +104,7 @@ float MAP_converRandToFloat(int x, int y, uint32_t seed){
     return (MAP_randOnSeed2D(x, y, seed) & 0xFFFFFF) / (float)0xFFFFFF;
 }
 
-uint32_t MAP_generate_seed() {
+uint32_t MAP_generate_seed(){
     uintptr_t ptr_entropy = (uintptr_t)&ptr_entropy;
     return (uint32_t)(time(NULL) ^ ptr_entropy);
 }

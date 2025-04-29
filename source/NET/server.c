@@ -124,6 +124,7 @@ void NET_serverSetNewMap(Server aServer){
     NET_serverMapSetSeed(aServer->aServerMap,MAP_generate_seed());
     NET_serverMapGenerateNewMap(aServer->aServerMap);
     NET_serverSendInt(aServer,GLOBAL,NEW_SEED,(int)NET_serverMapGetSeed(aServer->aServerMap),indexIP);
+    printf("%u\n",NET_serverMapGetSeed(aServer->aServerMap));
 }
 
 void NET_serverSendPlayerPacket(Server aServer,GameState GS){

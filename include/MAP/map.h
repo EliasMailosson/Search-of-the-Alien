@@ -1,6 +1,9 @@
 #ifndef MAP_H
 #define MAP_H
 
+#include "../NET/packetHandler.h"
+#include "../../include/MAP/perlinNoise.h"
+
 #include <string.h>
 #include <stdbool.h>
 #include <stdlib.h>
@@ -8,8 +11,7 @@
 #include <SDL_image.h>
 #include <math.h>
 
-#define MAP_WIDTH 60
-#define MAP_HEIGHT 60
+
 #define MAP_TOTAL_SIZE (MAP_WIDTH * MAP_HEIGHT)
 
 #define LOBBY_HEIGHT 30
@@ -33,6 +35,8 @@ typedef struct Map *Map;
 void MAP_convertTiles(int tileID[MAP_HEIGHT][MAP_WIDTH],PlanetLUT plantet);
 void MAP_mapSetEdgesToZero(int tileID[][MAP_WIDTH]);
 PlanetLUT MAP_mapGetPlanetLUT(Map aMap);
+void MAP_mapNewMap(Map aMap,uint32_t seed);
+void MAP_mapSetPlanet(GameState state,Map aMap);
 
 void MAP_MapRender(SDL_Renderer *pRend, Map aMap);
 

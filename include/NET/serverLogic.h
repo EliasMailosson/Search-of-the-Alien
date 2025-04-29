@@ -1,5 +1,5 @@
 #include "server.h"
-#include "../../include/MAP/perlinNoise.h"
+#include "../../include/MAP/map.h"
 
 #include <math.h>
 

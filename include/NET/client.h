@@ -3,7 +3,7 @@
 #include <stdbool.h>
 #include <stdlib.h>
 #include "../../include/NET/shared.h"
-
+#include "../../include/MAP/map.h"
 enum PlayerAnimationTypes{ANIMATION_IDLE, ANIMATION_RUNNING, EMOTE_TPOSE};
 
 typedef struct Player Player;
@@ -41,8 +41,8 @@ int NET_clientGetPlayerColorIndex(Client aClient,int index);
 
 int NET_clientGetPlayerCharacter(Client aClient, int playerIdx);
 
+void NET_clientReceiver(Client aClient, Map aMap,SDL_Window *pScreen);
 
-void NET_clientReceiver(Client aClient);
 int NET_clientFindPlayer(Client aClient, char* str);
 
 void NET_clientUpdateGameState(Client aClient,Packet aPacket);
