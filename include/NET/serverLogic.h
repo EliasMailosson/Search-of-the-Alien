@@ -19,7 +19,7 @@ ServerMap NET_serverMapCreate();
 void MAP_ScreenToTile(ServerMap aServerMap, int screenX, int screenY, int *outTileX, int *outTileY);
 bool MAP_TileNotWalkable(ServerMap aServerMap, int screenX, int screenY);
 void NET_serverCheckPlayerCollision(Server aServer, int selfIdx, int *collide);
-void NET_projectileSpawn(Server aServer, Projectile *list, int16_t x, int16_t y, uint8_t srcPlayerIdx);
+void NET_projectileSpawn(Server aServer, Projectile *list, uint8_t srcPlayerIdx);
 void NET_projectileKill(Server aServer, Projectile *list, int projIdx);
 void NET_projectilesUpdate(Server aServer, Projectile *list);
 void NET_serverMapDestroy(ServerMap aMap);

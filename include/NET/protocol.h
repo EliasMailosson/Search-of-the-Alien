@@ -7,6 +7,8 @@
 #define MAX_USERNAME_LEN 40
 #define MAX_CLIENT_PROJ 32
 
+enum ProjectileTextures{PROJ_TEX_NONE, PROJ_TEX_BULLET, PROJ_TEX_LASER, PROJ_TEX_FIRE};
+
 typedef struct __attribute__((packed)) projPacket {
     int16_t x, y;
     int8_t angle;

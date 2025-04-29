@@ -52,7 +52,6 @@ int main(int argc, char **argv ){
         NET_projectilesUpdate(aServer, aServer->projList);
         if(sendProjectileCounter++%5 == 0) {
             NET_serverSendProjPacket(aServer);
-            // printf("%d, %d\n", aServer->projList[2].x, aServer->projList[2].y);
         } 
         
         int numReady = SDLNet_CheckSockets(aServer->socketSet, 10); 
@@ -140,64 +139,33 @@ void NET_serverSendPlayerPacket(Server aServer,GameState GS){
     }
 }
 
-// void NET_serverSendProjPacket(Server aServer){
-//     ProjPacket packet[MAX_CLIENT_PROJ] = {0};
-//     for(int player = 0; player < aServer->clientCount; player++) {
-//         User p = aServer->clients[player];
-//         for (int i = 0; i < MAX_CLIENT_PROJ; i++){
-//             if(i >= aServer->projCount) {
-//                 packet[i].angle = 0;
-//                 packet[i].x = 0;
-//                 packet[i].y = 0;
-//                 packet[i].textureIdx = 1;
-//             }
-//             else if(abs(p.player.hitBox.x - aServer->projList[i].x) < CLIENT_PROJ_RANGE &&
-//                 abs(p.player.hitBox.y - aServer->projList[i].y) < CLIENT_PROJ_RANGE) 
-//             {
-//                 packet[i].angle = aServer->projList[i].angle;
-//                 packet[i].textureIdx = 0;
-//                 packet[i].x = aServer->projList[i].x;
-//                 packet[i].y = aServer->projList[i].y;
-//                 // printf("%d, %d\n", aServer->projList[i].x, aServer->projList[i].y);
-//             }
-
-//             Uint32 payloadSize = MAX_CLIENT_PROJ * sizeof(ProjPacket);
-//             if(p.State == LOBBY || p.State == NEMUR){
-//                 NET_serverSendArray(aServer, GLOBAL, PROJ_LIST, packet, payloadSize, i);
-//             }
-//         }
-//     }
-// }
-
 void NET_serverSendProjPacket(Server aServer) {
     for (int player = 0; player < aServer->clientCount; player++) {
         User p = aServer->clients[player];
 
         if (p.State == LOBBY || p.State == NEMUR) {
             ProjPacket packet[MAX_SERVER_PROJECTILES] = {0};
-            int projectilesInPacket = 0;
+            int projSendCount = 0;
 
             for (int i = 0; i < aServer->projCount; i++) {
                 if (abs(p.player.hitBox.x - aServer->projList[i].x) < CLIENT_PROJ_RANGE &&
                     abs(p.player.hitBox.y - aServer->projList[i].y) < CLIENT_PROJ_RANGE)
                 {
-                    if (projectilesInPacket < MAX_CLIENT_PROJ) {
-                        packet[projectilesInPacket].angle = aServer->projList[i].angle;
-                        packet[projectilesInPacket].textureIdx = 0;
-                        packet[projectilesInPacket].x = p.player.hitBox.x - aServer->projList[i].x;
-                        packet[projectilesInPacket].y = p.player.hitBox.y - aServer->projList[i].y;
-                        projectilesInPacket++;
-                    } else {
-                        break;
-                    }
+                    if (projSendCount < MAX_CLIENT_PROJ) {
+                        packet[projSendCount].angle = aServer->projList[i].angle;
+                        packet[projSendCount].textureIdx = PROJ_TEX_BULLET;
+                        packet[projSendCount].x = p.player.hitBox.x - aServer->projList[i].x;
+                        packet[projSendCount].y = p.player.hitBox.y - aServer->projList[i].y;
+                        projSendCount++;
+                    } else break;
                 }
             } 
 
-            for (int j = projectilesInPacket; j < MAX_CLIENT_PROJ; j++) {
-                 packet[j].angle = 0;
-                 packet[j].x = 0;
-                 packet[j].y = 0;
-                 packet[j].textureIdx = 1;
+            for (int j = projSendCount; j < MAX_CLIENT_PROJ; j++) {
+                packet[j].angle = 0;
+                packet[j].x = 0;
+                packet[j].y = 0;
+                packet[j].textureIdx = PROJ_TEX_NONE;
             }
 
             Uint32 payloadSize = MAX_CLIENT_PROJ * sizeof(ProjPacket);
@@ -263,10 +231,11 @@ void NET_serverUpdatePlayer(Server aServer, Packet aPacket){
     }
     aServer->clients[playerIdx].player.angle = (uint8_t)roundf(angle / (2.0f * M_PI) * 255.0f);
 
-    if(pip.keys[PLAYER_INPUT_MOUSEDOWN] && (aServer->clients[playerIdx].player.projCounter)++%4 == 0) {
-        NET_projectileSpawn(aServer, aServer->projList, aServer->clients[playerIdx].player.hitBox.x, aServer->clients[playerIdx].player.hitBox.y, playerIdx);
+    if(pip.keys[PLAYER_INPUT_MOUSEDOWN] && !pip.keys[PLAYER_INPUT_SPACE] && 
+        (aServer->clients[playerIdx].player.projCounter)++%4 == 0) // TODO: change frequency depending on weapon/character
+    {
+        NET_projectileSpawn(aServer, aServer->projList, playerIdx);
     }
-    // printf("%d\n", aServer->projCount);
 
     NET_serverSendPlayerPacket(aServer,LOBBY);
 }

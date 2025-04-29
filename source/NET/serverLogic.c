@@ -1,6 +1,8 @@
 #include "../../include/NET/serverLogic.h"
 #include "../../include/NET/server.h"
 
+#define PROJ_DESPAWN_DISTANCE 10000
+
 struct ServerMap
 {
     int MapTileId[MAP_HEIGHT][MAP_WIDTH];
@@ -109,10 +111,11 @@ void NET_serverMapDestroy(ServerMap aMap) {
     free(aMap);
 }
 
-void NET_projectileSpawn(Server aServer, Projectile *list, int16_t x, int16_t y, uint8_t srcPlayerIdx) {
+void NET_projectileSpawn(Server aServer, Projectile *list, uint8_t srcPlayerIdx) {
     int projCount = NET_serverGetProjCount(aServer);
-    list[projCount].x = x;
-    list[projCount].y = y;
+    SDL_Rect hb = NET_serverGetPlayerHitbox(aServer, srcPlayerIdx);
+    list[projCount].x = hb.x;
+    list[projCount].y = hb.y;
     list[projCount].angle = NET_serverGetPlayerAngle(aServer, srcPlayerIdx);
     list[projCount].srcPlayerIdx = srcPlayerIdx;
 
@@ -136,13 +139,13 @@ void NET_projectilesUpdate(Server aServer, Projectile *list) {
         float dx = cosf(r);
         float dy = sinf(r);
 
-        float moveX = dx * speed;
-        float moveY = dy * speed;
+        float moveX = dx * speed * -1;
+        float moveY = dy * speed * -1;
 
         list[i].x += moveX;
         list[i].y += moveY;
 
-        if(abs(list[i].x) > 10000 || abs(list[i].y) > 10000) {
+        if(abs(list[i].x) > PROJ_DESPAWN_DISTANCE || abs(list[i].y) > PROJ_DESPAWN_DISTANCE) {
             NET_projectileKill(aServer, list, i);
         }
     }

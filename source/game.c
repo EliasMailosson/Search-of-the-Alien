@@ -163,6 +163,8 @@ static void renderLobby(ClientView *pView, Map aMap, Client aClient, TerminalHub
     SDL_RenderClear(pView->pRend);
 
     MAP_MapRender(pView->pRend, aMap);
+
+    renderProjectiles(aClient, pView);
     
     renderPlayers(aClient, pView);
     for (int i = 0; i < NET_clientGetPlayerCount(aClient); i++){
@@ -171,10 +173,6 @@ static void renderLobby(ClientView *pView, Map aMap, Client aClient, TerminalHub
     if (terminalHub.isVisible) {
         renderTerminalHub(pView, terminalHub);
     }
-
-    Proj projList[MAX_CLIENT_PROJ];
-    NET_clientGetProjList(aClient, projList);
-    renderProjectiles(aClient, projList, pView);
     
     SDL_RenderPresent(pView->pRend);
 

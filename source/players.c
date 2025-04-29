@@ -27,14 +27,17 @@ void sortByYaxis(Client aClient, int playerCount, int indices[]){
     }
 }
 
-void renderProjectiles(Client aClient, Proj *projList, ClientView *pView) {
+void renderProjectiles(Client aClient, ClientView *pView) {
+    Proj projList[MAX_CLIENT_PROJ];
+    NET_clientGetProjList(aClient, projList);
+
     int centerX = pView->windowWidth/2;
     int centerY = pView->windowHeight/2;
 
     float scale = (float)pView->playerRenderSize / RENDER_SIZE;
 
     for(int i = 0; i < MAX_CLIENT_PROJ; i++) {
-        if(projList[i].textureIdx == 0) {
+        if(projList[i].textureIdx == PROJ_TEX_BULLET) {
             int screenX = (int)roundf(centerX - (float)projList[i].x * scale);
             int screenY = (int)roundf(centerY - (float)projList[i].y * scale);
 
