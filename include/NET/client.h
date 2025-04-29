@@ -6,8 +6,8 @@
 
 enum PlayerAnimationTypes{ANIMATION_IDLE, ANIMATION_RUNNING, EMOTE_TPOSE};
 
+typedef struct Enemy Enemy;
 typedef struct Player Player;
-typedef struct Enemies Enemies;
 
 struct client;
 typedef struct client *Client;

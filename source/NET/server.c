@@ -120,14 +120,16 @@ int main(int argc, char **argv ){
 
 void NET_serverSendEnemiesPacket(Server aServer, GameState GS, Enemies aEnemies){
     EnemyPacket packet[MAX_ENEMIES] = {0};
+    SDL_Point pos;
     for (int i = 0; i < MAX_ENEMIES; i++){
-        SDL_Point pos = enemyGetPoint(aEnemies, i); 
+        pos = enemyGetPoint(aEnemies, i); 
+        // printf("Fiende #%d: x: %d\n", i, pos.x);
         packet[i].pos = pos;
     }
     Uint32 payloadSize = MAX_ENEMIES * sizeof(EnemyPacket);
     for (int i = 0; i < aServer->clientCount; i++){
         if(aServer->clients[i].State == GS || GS == -1){
-            NET_serverSendArray(aServer, LOBBY, ENEMY_POS, packet, payloadSize, i);
+            NET_serverSendArray(aServer, GLOBAL, ENEMY_POS, packet, payloadSize, i);
         }
     }
 }
@@ -207,24 +209,38 @@ void NET_serverUpdatePlayer(Server aServer, Packet aPacket){
 
 void NET_serverUpdateEnemies(Server aServer, Enemies aEnemies){
     
-    static SDL_Point playerPos;
-    for (int j = 0; j < MAX_CLIENTS; j++)
-    {
-        playerPos.x = aServer->clients[j].player.hitBox.x;
-        playerPos.y = aServer->clients[j].player.hitBox.y;   
-    }
-
     for (int i = 0; i < MAX_ENEMIES; i++)
     {
-        SDL_Point EnemyPos = enemyGetPoint(aEnemies, i);
-        
-        if (playerPos.x < EnemyPos.x && playerPos.y < EnemyPos.y)
-        {
-            enemyUpdatePos(aEnemies, playerPos);
-        }
+        int closestDist = INT_MAX;
 
-        NET_serverSendEnemiesPacket(aServer, LOBBY, aEnemies); 
+        SDL_Point ClosestPlayerPos = {0,0};
+        SDL_Point EnemyPos = enemyGetPoint(aEnemies, i);
+        SDL_Point playerPos;
+
+        for (int j = 0; j <aServer->clientCount; j++)
+        {
+            playerPos.x = aServer->clients[j].player.hitBox.x;
+            playerPos.y = aServer->clients[j].player.hitBox.y;
+
+            int dx = playerPos.x - EnemyPos.x;
+            int dy = playerPos.y - EnemyPos.y;
+            int diff = dx * dx + dy * dy;
+
+            if (diff < closestDist)
+            {
+                closestDist = diff;
+                ClosestPlayerPos = playerPos;
+                
+            }
+        } 
+
+        if (aServer->clientCount > 0) 
+        {
+            PlayerTracker(aEnemies, ClosestPlayerPos, i);
+        }
     }
+    
+    NET_serverSendEnemiesPacket(aServer, LOBBY, aEnemies);
 }
 
 void NET_serverChangeGameStateOnClient(Server aServer,Packet aPacket){

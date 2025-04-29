@@ -30,25 +30,14 @@ void renderEnemy(Client aClient, ClientView *pView) {
     static int frame = 0;
     frame++;
     int playerCount = NET_clientGetPlayerCount(aClient);
-
     int selfIndex = NET_clientGetSelfIndex(aClient);
     SDL_Point selfPos = NET_clientGetPlayerPos(aClient, selfIndex);
     int centerX = pView->windowWidth/2;
     int centerY = pView->windowHeight/2;
     int renderSizeHalf = pView->playerRenderSize/2;
 
-    // int sortedIndex[playerCount];
-
-
-    // sortByYaxis(aClient, playerCount, sortedIndex);
-
     for(int i = 0; i < MAX_ENEMIES; i++) {
-        //int i = sortedIndex[n];
-
         SDL_Point pos = NET_clientGetEnemyPos(aClient, i);
-        //printf("x: %d\n", pos.x);
-
-        int direction = NET_clientGetPlayerDirection(aClient, i);
 
         int worldOffsetX = pos.x - selfPos.x;
         int worldOffsetY = pos.y - selfPos.y;
@@ -66,7 +55,7 @@ void renderEnemy(Client aClient, ClientView *pView) {
 
         //pView->PlayerPos[i] = (SDL_Point){.x = playerRect.x, .y = playerRect.y};
         SDL_SetRenderDrawColor(pView->pRend, 255, 0, 0, 0);
-        SDL_RenderDrawRect(pView->pRend, &enemyRect);
+        SDL_RenderFillRect(pView->pRend, &enemyRect);
 
     }
 }
