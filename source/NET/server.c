@@ -6,6 +6,7 @@ struct Player{
     int8_t angle;
     int direction;
     int character;
+    int projCounter;
 };
 
 struct User{
@@ -38,6 +39,7 @@ int main(int argc, char **argv ){
     aServer = NET_serverCreate();
     memset(aServer->usedColors, 0, sizeof(aServer->usedColors));
     bool isRunning;
+    int sendProjectileCounter = 0;
     aServer->aServerMap = NET_serverMapCreate();
     // if Server has allocated memory then the server is running on "PORT"
     if(aServer == NULL){
@@ -47,6 +49,12 @@ int main(int argc, char **argv ){
         printf("UDP server started on port %d\n", PORT);
     } 
     while (isRunning){
+        NET_projectilesUpdate(aServer, aServer->projList);
+        if(sendProjectileCounter++%5 == 0) {
+            NET_serverSendProjPacket(aServer);
+            // printf("%d, %d\n", aServer->projList[2].x, aServer->projList[2].y);
+        } 
+        
         int numReady = SDLNet_CheckSockets(aServer->socketSet, 10); 
         if (numReady == -1) {
             fprintf(stderr, "SDLNet_CheckSockets error: %s\n", SDLNet_GetError());
@@ -132,6 +140,72 @@ void NET_serverSendPlayerPacket(Server aServer,GameState GS){
     }
 }
 
+// void NET_serverSendProjPacket(Server aServer){
+//     ProjPacket packet[MAX_CLIENT_PROJ] = {0};
+//     for(int player = 0; player < aServer->clientCount; player++) {
+//         User p = aServer->clients[player];
+//         for (int i = 0; i < MAX_CLIENT_PROJ; i++){
+//             if(i >= aServer->projCount) {
+//                 packet[i].angle = 0;
+//                 packet[i].x = 0;
+//                 packet[i].y = 0;
+//                 packet[i].textureIdx = 1;
+//             }
+//             else if(abs(p.player.hitBox.x - aServer->projList[i].x) < CLIENT_PROJ_RANGE &&
+//                 abs(p.player.hitBox.y - aServer->projList[i].y) < CLIENT_PROJ_RANGE) 
+//             {
+//                 packet[i].angle = aServer->projList[i].angle;
+//                 packet[i].textureIdx = 0;
+//                 packet[i].x = aServer->projList[i].x;
+//                 packet[i].y = aServer->projList[i].y;
+//                 // printf("%d, %d\n", aServer->projList[i].x, aServer->projList[i].y);
+//             }
+
+//             Uint32 payloadSize = MAX_CLIENT_PROJ * sizeof(ProjPacket);
+//             if(p.State == LOBBY || p.State == NEMUR){
+//                 NET_serverSendArray(aServer, GLOBAL, PROJ_LIST, packet, payloadSize, i);
+//             }
+//         }
+//     }
+// }
+
+void NET_serverSendProjPacket(Server aServer) {
+    for (int player = 0; player < aServer->clientCount; player++) {
+        User p = aServer->clients[player];
+
+        if (p.State == LOBBY || p.State == NEMUR) {
+            ProjPacket packet[MAX_SERVER_PROJECTILES] = {0};
+            int projectilesInPacket = 0;
+
+            for (int i = 0; i < aServer->projCount; i++) {
+                if (abs(p.player.hitBox.x - aServer->projList[i].x) < CLIENT_PROJ_RANGE &&
+                    abs(p.player.hitBox.y - aServer->projList[i].y) < CLIENT_PROJ_RANGE)
+                {
+                    if (projectilesInPacket < MAX_CLIENT_PROJ) {
+                        packet[projectilesInPacket].angle = aServer->projList[i].angle;
+                        packet[projectilesInPacket].textureIdx = 0;
+                        packet[projectilesInPacket].x = p.player.hitBox.x - aServer->projList[i].x;
+                        packet[projectilesInPacket].y = p.player.hitBox.y - aServer->projList[i].y;
+                        projectilesInPacket++;
+                    } else {
+                        break;
+                    }
+                }
+            } 
+
+            for (int j = projectilesInPacket; j < MAX_CLIENT_PROJ; j++) {
+                 packet[j].angle = 0;
+                 packet[j].x = 0;
+                 packet[j].y = 0;
+                 packet[j].textureIdx = 1;
+            }
+
+            Uint32 payloadSize = MAX_CLIENT_PROJ * sizeof(ProjPacket);
+            NET_serverSendArray(aServer, GLOBAL, PROJ_LIST, packet, payloadSize, player);
+        }
+    }
+}
+
 static void calcMovement(Server aServer, PlayerInputPacket *pip, int playerIdx){
 
     float speed = 3.0f;
@@ -182,11 +256,19 @@ void NET_serverUpdatePlayer(Server aServer, Packet aPacket){
     int dy = 0 - my;
 
     float angle = atan2(dy, dx);
-    aServer->clients[playerIdx].player.angle = (int8_t)(angle * (180.0 / M_PI));
     aServer->clients[playerIdx].player.direction = ((int)roundf(angle / (float)M_PI_4) + 7 ) % 8;
     aServer->clients[playerIdx].player.character = pip.selecterPlayerCharacter;
+    if (angle < 0.0f) {
+        angle += 2.0f * M_PI;
+    }
+    aServer->clients[playerIdx].player.angle = (uint8_t)roundf(angle / (2.0f * M_PI) * 255.0f);
 
-    NET_serverSendPlayerPacket(aServer,LOBBY); 
+    if(pip.keys[PLAYER_INPUT_MOUSEDOWN] && (aServer->clients[playerIdx].player.projCounter)++%4 == 0) {
+        NET_projectileSpawn(aServer, aServer->projList, aServer->clients[playerIdx].player.hitBox.x, aServer->clients[playerIdx].player.hitBox.y, playerIdx);
+    }
+    // printf("%d\n", aServer->projCount);
+
+    NET_serverSendPlayerPacket(aServer,LOBBY);
 }
 
 void NET_serverChangeGameStateOnClient(Server aServer,Packet aPacket){
@@ -377,6 +459,7 @@ void NET_serverClientConnected(Packet aPacket, Server aServer){
     newUser.player.hitBox.y = 800;
     newUser.player.hitBox.w = 64;
     newUser.player.hitBox.h = 32;
+    newUser.player.projCounter = 0;
     newUser.State = MENU;
     newUser.colorIndex = NET_serverAssignColorIndex(aServer);
     NET_serverAddUser(aServer, newUser);

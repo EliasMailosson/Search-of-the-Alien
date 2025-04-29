@@ -5,6 +5,13 @@
 #include <stdbool.h>
 
 #define MAX_USERNAME_LEN 40
+#define MAX_CLIENT_PROJ 32
+
+typedef struct __attribute__((packed)) projPacket {
+    int16_t x, y;
+    int8_t angle;
+    uint8_t textureIdx;
+}ProjPacket;
 typedef struct PlayerPacket{
     char username[MAX_USERNAME_LEN];
     SDL_Point pos;
@@ -25,6 +32,7 @@ void NET_protocolSendArray(UDPpacket *pUDPpkg,UDPsocket Socket,IPaddress IP,
                             GameState GS,MessageType msgType,const void* array, Uint32 arraySize);
 
 void NET_playerPacketReceive(Packet aPacket, PlayerPacket *list, int *count);
+void NET_projPacketReceive(Packet aPacket, ProjPacket *list, int *count);
 
 bool NET_playerInputPacketCheck(PlayerInputPacket pip);
 

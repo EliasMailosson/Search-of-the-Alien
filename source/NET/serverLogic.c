@@ -1,4 +1,5 @@
 #include "../../include/NET/serverLogic.h"
+#include "../../include/NET/server.h"
 
 struct ServerMap
 {
@@ -114,7 +115,8 @@ void NET_projectileSpawn(Server aServer, Projectile *list, int16_t x, int16_t y,
     list[projCount].y = y;
     list[projCount].angle = NET_serverGetPlayerAngle(aServer, srcPlayerIdx);
     list[projCount].srcPlayerIdx = srcPlayerIdx;
-    NET_serverSetProjCount(aServer, ++projCount);
+
+    if(projCount < MAX_SERVER_PROJECTILES) NET_serverSetProjCount(aServer, ++projCount);
 }
 
 void NET_projectileKill(Server aServer, Projectile *list, int projIdx) {
@@ -128,13 +130,20 @@ void NET_projectileKill(Server aServer, Projectile *list, int projIdx) {
 void NET_projectilesUpdate(Server aServer, Projectile *list) {
     int projCount = NET_serverGetProjCount(aServer);
     for(int i = 0; i < projCount; i++) {
-        float speed = 5.0f; // TO DO: get speed from player- weapon attributes
+        float speed = 10.0f; // TO DO: get projectile speed from player- weapon attributes
 
-        float r = list[i].angle * (M_PI / 180.0f);
+        float r = ((float)list[i].angle / 255.0f) * (2.0f * M_PI);
         float dx = cosf(r);
         float dy = sinf(r);
-        
-        list[i].x += (int)dx * speed;
-        list[i].y += (int)dy * speed;
+
+        float moveX = dx * speed;
+        float moveY = dy * speed;
+
+        list[i].x += moveX;
+        list[i].y += moveY;
+
+        if(abs(list[i].x) > 10000 || abs(list[i].y) > 10000) {
+            NET_projectileKill(aServer, list, i);
+        }
     }
 }

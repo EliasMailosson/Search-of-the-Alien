@@ -7,17 +7,11 @@
 
 #define MAX_COLORS 8
 #define MAX_SERVER_PROJECTILES 512
+#define CLIENT_PROJ_RANGE 1200
 
 typedef struct Player Player;
 
-typedef struct __attribute__((packed)) Projectile {
-    int16_t x, y;
-    int8_t angle;
-    uint8_t srcPlayerIdx;
-}Projectile;
-
 typedef struct User User;
-
 
 struct server;
 typedef struct server *Server;
@@ -33,6 +27,7 @@ void NET_serverSendString(Server aServer,GameState GS, MessageType msgType, cons
 void NET_serverSendArray(Server aServer,GameState GS, MessageType msgType, const void* array, Uint32 arraySize, int index);
 
 void NET_serverSendPlayerPacket(Server aServer,GameState GS);
+void NET_serverSendProjPacket(Server aServer);
 
 //server respons
 void NET_serverClientConnected(Packet aPacket, Server aServer);
