@@ -14,11 +14,6 @@ void MAP_generatePerlinNoise(int output[][MAP_WIDTH], int height, int width, int
             output[y][x] = (int)(roundf(fOutput[idx]*range) + offset);
         }
     }
-    for (int y = 0; y < height; y++){
-        for(int x = 0;x < width; x++){
-            printf("%d,",output[y][x]);
-        }printf("\n");
-    }
 }
 
 void MAP_generate2DNoise(float *output,int outputHeight, int outputWidth,uint32_t seed){
