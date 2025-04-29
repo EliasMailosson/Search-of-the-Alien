@@ -69,8 +69,19 @@ void runLobby(Client aClient, Map aMap, ClientControl *pControl, ClientView *pVi
     toggleDelay++;
     
     lobbyFullscreenToggle(pControl, pView, aMap, &toggleDelay, pTerminalHub);
-    lobbyTerminalHubToggle(pControl, &pTerminalHub->isVisible, &toggleDelay);
 
+    int tileX, tileY;
+    MAP_PixelsToTile(aMap, playerPos.x, playerPos.y, &tileX, &tileY);
+
+
+    if (tileX >= 10 && tileX <= 25 && tileY >= -1 && tileY <= 6 && pView->windowFullscreen){
+        lobbyTerminalHubToggle(pControl, &pTerminalHub->isVisible, &toggleDelay);
+    }
+    else if (tileX >= 19 && tileX <= 40 && tileY >= 0 && tileY <= 11 && !pView->windowFullscreen){
+        lobbyTerminalHubToggle(pControl, &pTerminalHub->isVisible, &toggleDelay);
+    }
+    
+    
     if (!pTerminalHub->isVisible){
         handlePlayerInput(aClient, pControl, pView);
     }
