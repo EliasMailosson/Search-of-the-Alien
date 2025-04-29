@@ -21,7 +21,7 @@
 #define TILE_SPRITE_SIZE 256
 #define MAX_COUNT_SPRITE_TILES 40
 #define FILE_PHAT_LOBBY_DATA "data/lobby.csv"
-#define FILE_PHAT_LOBBY_SPRITE "assets/images/tiles/newTileSet04:29.png"
+#define FILE_PHAT_LOBBY_SPRITE "assets/images/tiles/newTileSet0429.png"
 
 #define LOGICAL_WIN_W 600
 #define LOGICAL_WIN_H (600 * 16 / 9)
