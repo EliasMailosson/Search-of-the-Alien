@@ -3,6 +3,7 @@ build/**
 .vscode/**
 assets/images/tiles/tileDesigns/**
 data/*.txt
+runClients.bat
 
 # macOS junk
 .DS_Store
