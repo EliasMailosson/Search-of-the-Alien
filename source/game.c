@@ -163,6 +163,9 @@ static void renderLobby(ClientView *pView, Map aMap, Client aClient, TerminalHub
     SDL_RenderClear(pView->pRend);
 
     MAP_MapRender(pView->pRend, aMap);
+
+    renderProjectiles(aClient, pView);
+    
     renderPlayers(aClient, pView);
     for (int i = 0; i < NET_clientGetPlayerCount(aClient); i++){
         hudRender(pView->aHud,pView->pRend,NET_clientGetPlayerColorIndex(aClient,i),i);
@@ -170,6 +173,7 @@ static void renderLobby(ClientView *pView, Map aMap, Client aClient, TerminalHub
     if (terminalHub.isVisible) {
         renderTerminalHub(pView, terminalHub);
     }
+    
     SDL_RenderPresent(pView->pRend);
 
 }

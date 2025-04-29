@@ -25,6 +25,7 @@ typedef enum{
     CHANGE_GAME_STATE_RESPONSE,
     PLAYER_INPUT,
     NEW_SEED,
+    PROJ_LIST,
 } MessageType;
 
 typedef enum{

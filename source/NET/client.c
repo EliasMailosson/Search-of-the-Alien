@@ -21,6 +21,7 @@ struct client{
     int PlayerCount;
     Player playerList[MAX_CLIENTS];
     uint32_t seed;
+    Proj projList[MAX_CLIENT_PROJ];
 }; 
 
 bool NET_clientConnect(Client aClient){
@@ -29,6 +30,15 @@ bool NET_clientConnect(Client aClient){
         return false;
     }
     return true;
+}
+
+void NET_clientGetProjList(Client aClient, Proj *outputProjList) {
+    for(int i = 0; i < MAX_CLIENT_PROJ; i++) {
+        outputProjList[i].angle = aClient->projList[i].angle;
+        outputProjList[i].textureIdx = aClient->projList[i].textureIdx;
+        outputProjList[i].x = aClient->projList[i].x;
+        outputProjList[i].y = aClient->projList[i].y;
+    }
 }
 
 Client NET_clientCreate(){
@@ -203,6 +213,9 @@ void NET_clientReceiver(Client aClient, Map aMap,SDL_Window *pScreen){
                 MAP_mapSetPlanet(NET_clientGetState(aClient),aMap);
                 MAP_mapNewMap(aMap,aClient->seed);
                 break;
+            case PROJ_LIST:
+                NET_clientUpdateProjList(aClient, aPacket);
+                break;
             default:
                 printf("client recieved invalid msgType: %d!!\n", NET_packetGetMessageType(aPacket));
                 break;
@@ -233,6 +246,21 @@ void NET_clientUpdatePlayerList(Client aClient, Packet aPacket){
         aClient->playerList[i].color = NET_clientGetColor(aClient->playerList[i].colorIndex);
         aClient->playerList[i].playerCharacter = packets[i].playerCharacter;
 
+    }
+}
+
+void NET_clientUpdateProjList(Client aClient, Packet aPacket) {
+    ProjPacket packets[MAX_CLIENT_PROJ] = {0};
+    int count;
+    NET_projPacketReceive(aPacket, packets, &count);
+
+    if(count <= MAX_CLIENT_PROJ) {
+        for(int i = 0; i < MAX_CLIENT_PROJ; i++) {
+            aClient->projList[i].angle = packets[i].angle;
+            aClient->projList[i].textureIdx = packets[i].textureIdx;
+            aClient->projList[i].x = packets[i].x;
+            aClient->projList[i].y = packets[i].y;
+        }
     }
 }
 

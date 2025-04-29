@@ -1,5 +1,6 @@
 #include <stdio.h>
-#include<string.h>
+#include <string.h>
+#include <math.h>
 #include "../include/players.h"
 #include "../include/NET/client.h"
 #include "../include/game.h"
@@ -22,6 +23,32 @@ void sortByYaxis(Client aClient, int playerCount, int indices[]){
                 indices[j] = indices[j + 1];
                 indices[j + 1] = temp;
             }
+        }
+    }
+}
+
+void renderProjectiles(Client aClient, ClientView *pView) {
+    Proj projList[MAX_CLIENT_PROJ];
+    NET_clientGetProjList(aClient, projList);
+
+    int centerX = pView->windowWidth/2;
+    int centerY = pView->windowHeight/2;
+
+    float scale = (float)pView->playerRenderSize / RENDER_SIZE;
+
+    for(int i = 0; i < MAX_CLIENT_PROJ; i++) {
+        if(projList[i].textureIdx == PROJ_TEX_BULLET) {
+            int screenX = (int)roundf(centerX - (float)projList[i].x * scale);
+            int screenY = (int)roundf(centerY - (float)projList[i].y * scale);
+
+            SDL_Rect projRect = (SDL_Rect){
+                .x = screenX,
+                .y = screenY,
+                .w = 10,
+                .h = 10
+            };
+            SDL_SetRenderDrawColor(pView->pRend, 255, 255, 0, 255);
+            SDL_RenderFillRect(pView->pRend, &projRect);
         }
     }
 }
@@ -100,6 +127,12 @@ void renderPlayers(Client aClient, ClientView *pView) {
 }
 
 PlayerInputPacket prepareInputArray(ClientControl *pControl, int windowWidth, int windowHeight) {
+    static bool mouseDown = false;
+    if(pControl->isMouseDown) {
+        mouseDown = true;
+    } else if(pControl->isMouseUp) {
+        mouseDown = false;
+    }
     PlayerInputPacket pip = {
         // Later: let mousePos x and y be float between 0.0 and 1.0, normalized to the screen size. 
         .mousePos = {
@@ -113,7 +146,7 @@ PlayerInputPacket prepareInputArray(ClientControl *pControl, int windowWidth, in
             pControl->keys[SDL_SCANCODE_A],
             pControl->keys[SDL_SCANCODE_E],
             pControl->keys[SDL_SCANCODE_SPACE],
-            pControl->isMouseDown,
+            mouseDown,
             // pControl->isMouseUp, en för mycket
         },
         .selecterPlayerCharacter = pControl->selectedCharacter

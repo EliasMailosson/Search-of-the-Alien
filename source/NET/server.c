@@ -3,8 +3,10 @@
 struct Player{
     SDL_Rect hitBox;
     SDL_Point mousePos;
+    int8_t angle;
     int direction;
     int character;
+    int projCounter;
 };
 
 struct User{
@@ -23,6 +25,8 @@ struct server {
     UDPpacket *pReceivePacket;
     UDPpacket *pSendPacket;
     User *clients;
+    Projectile projList[1024];
+    int projCount;
     bool isOff;
     ServerMap aServerMap;
     bool usedColors[MAX_COLORS];
@@ -35,6 +39,7 @@ int main(int argc, char **argv ){
     aServer = NET_serverCreate();
     memset(aServer->usedColors, 0, sizeof(aServer->usedColors));
     bool isRunning;
+    int sendProjectileCounter = 0;
     aServer->aServerMap = NET_serverMapCreate();
     // if Server has allocated memory then the server is running on "PORT"
     if(aServer == NULL){
@@ -44,6 +49,11 @@ int main(int argc, char **argv ){
         printf("UDP server started on port %d\n", PORT);
     } 
     while (isRunning){
+        NET_projectilesUpdate(aServer, aServer->projList);
+        if(sendProjectileCounter++%5 == 0) {
+            NET_serverSendProjPacket(aServer);
+        } 
+        
         int numReady = SDLNet_CheckSockets(aServer->socketSet, 10); 
         if (numReady == -1) {
             fprintf(stderr, "SDLNet_CheckSockets error: %s\n", SDLNet_GetError());
@@ -151,6 +161,41 @@ void NET_serverSendPlayerPacket(Server aServer,GameState GS){
     }
 }
 
+void NET_serverSendProjPacket(Server aServer) {
+    for (int player = 0; player < aServer->clientCount; player++) {
+        User p = aServer->clients[player];
+
+        if (p.State == LOBBY || p.State == NEMUR) {
+            ProjPacket packet[MAX_SERVER_PROJECTILES] = {0};
+            int projSendCount = 0;
+
+            for (int i = 0; i < aServer->projCount; i++) {
+                if (abs(p.player.hitBox.x - aServer->projList[i].x) < CLIENT_PROJ_RANGE &&
+                    abs(p.player.hitBox.y - aServer->projList[i].y) < CLIENT_PROJ_RANGE)
+                {
+                    if (projSendCount < MAX_CLIENT_PROJ) {
+                        packet[projSendCount].angle = aServer->projList[i].angle;
+                        packet[projSendCount].textureIdx = PROJ_TEX_BULLET;
+                        packet[projSendCount].x = p.player.hitBox.x - aServer->projList[i].x;
+                        packet[projSendCount].y = p.player.hitBox.y - aServer->projList[i].y;
+                        projSendCount++;
+                    } else break;
+                }
+            } 
+
+            for (int j = projSendCount; j < MAX_CLIENT_PROJ; j++) {
+                packet[j].angle = 0;
+                packet[j].x = 0;
+                packet[j].y = 0;
+                packet[j].textureIdx = PROJ_TEX_NONE;
+            }
+
+            Uint32 payloadSize = MAX_CLIENT_PROJ * sizeof(ProjPacket);
+            NET_serverSendArray(aServer, GLOBAL, PROJ_LIST, packet, payloadSize, player);
+        }
+    }
+}
+
 static void calcMovement(Server aServer, PlayerInputPacket *pip, int playerIdx){
 
     float speed = 3.0f;
@@ -203,8 +248,18 @@ void NET_serverUpdatePlayer(Server aServer, Packet aPacket){
     float angle = atan2(dy, dx);
     aServer->clients[playerIdx].player.direction = ((int)roundf(angle / (float)M_PI_4) + 7 ) % 8;
     aServer->clients[playerIdx].player.character = pip.selecterPlayerCharacter;
+    if (angle < 0.0f) {
+        angle += 2.0f * M_PI;
+    }
+    aServer->clients[playerIdx].player.angle = (uint8_t)roundf(angle / (2.0f * M_PI) * 255.0f);
 
-    NET_serverSendPlayerPacket(aServer,LOBBY); 
+    if(pip.keys[PLAYER_INPUT_MOUSEDOWN] && !pip.keys[PLAYER_INPUT_SPACE] && 
+        (aServer->clients[playerIdx].player.projCounter)++%4 == 0) // TODO: change frequency depending on weapon/character
+    {
+        NET_projectileSpawn(aServer, aServer->projList, playerIdx);
+    }
+
+    NET_serverSendPlayerPacket(aServer,LOBBY);
 }
 
 void NET_serverChangeGameStateOnClient(Server aServer,Packet aPacket){
@@ -287,6 +342,18 @@ void NET_serverDestroy(Server aServer){
     free(aServer);
 }
 
+int NET_serverGetProjCount(Server aServer) {
+    return aServer->projCount;
+}
+
+void NET_serverSetProjCount(Server aServer, int count) {
+    aServer->projCount = count;
+}
+
+float NET_serverGetPlayerAngle(Server aServer, int playerIdx) {
+    return aServer->clients[playerIdx].player.angle;
+}
+
 Server NET_serverCreate(){
     Server aServer = malloc(sizeof(struct server));
     if(aServer == NULL){
@@ -296,6 +363,7 @@ Server NET_serverCreate(){
     aServer->clients = NULL;
     aServer->clientCount = 0;
     aServer->isOff = false;
+    aServer->projCount = 0;
      // Open server UDP socket
     aServer->serverSocket = SDLNet_UDP_Open(PORT);
     if(!aServer->serverSocket){
@@ -383,6 +451,7 @@ void NET_serverClientConnected(Packet aPacket, Server aServer){
     newUser.player.hitBox.y = 800;
     newUser.player.hitBox.w = 64;
     newUser.player.hitBox.h = 32;
+    newUser.player.projCounter = 0;
     newUser.State = MENU;
     newUser.colorIndex = NET_serverAssignColorIndex(aServer);
     NET_serverAddUser(aServer, newUser);

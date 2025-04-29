@@ -1,5 +1,10 @@
 #include "../../include/NET/serverLogic.h"
-struct ServerMap{
+#include "../../include/NET/server.h"
+
+#define PROJ_DESPAWN_DISTANCE 10000
+
+struct ServerMap
+{
     int MapTileId[MAP_HEIGHT][MAP_WIDTH];
     SDL_Rect tileRect;
     uint32_t seed;
@@ -121,4 +126,44 @@ void NET_serverCheckPlayerCollision(Server aServer, int selfIdx, int *collide) {
 
 void NET_serverMapDestroy(ServerMap aMap) {
     free(aMap);
+}
+
+void NET_projectileSpawn(Server aServer, Projectile *list, uint8_t srcPlayerIdx) {
+    int projCount = NET_serverGetProjCount(aServer);
+    SDL_Rect hb = NET_serverGetPlayerHitbox(aServer, srcPlayerIdx);
+    list[projCount].x = hb.x;
+    list[projCount].y = hb.y;
+    list[projCount].angle = NET_serverGetPlayerAngle(aServer, srcPlayerIdx);
+    list[projCount].srcPlayerIdx = srcPlayerIdx;
+
+    if(projCount < MAX_SERVER_PROJECTILES) NET_serverSetProjCount(aServer, ++projCount);
+}
+
+void NET_projectileKill(Server aServer, Projectile *list, int projIdx) {
+    int projCount = NET_serverGetProjCount(aServer);
+    for(int i = projIdx; i < projCount-1; i++) {
+        list[i] = list[i+1];
+    }
+    NET_serverSetProjCount(aServer, --projCount);
+}
+
+void NET_projectilesUpdate(Server aServer, Projectile *list) {
+    int projCount = NET_serverGetProjCount(aServer);
+    for(int i = 0; i < projCount; i++) {
+        float speed = 10.0f; // TO DO: get projectile speed from player- weapon attributes
+
+        float r = ((float)list[i].angle / 255.0f) * (2.0f * M_PI);
+        float dx = cosf(r);
+        float dy = sinf(r);
+
+        float moveX = dx * speed * -1;
+        float moveY = dy * speed * -1;
+
+        list[i].x += moveX;
+        list[i].y += moveY;
+
+        if(abs(list[i].x) > PROJ_DESPAWN_DISTANCE || abs(list[i].y) > PROJ_DESPAWN_DISTANCE) {
+            NET_projectileKill(aServer, list, i);
+        }
+    }
 }

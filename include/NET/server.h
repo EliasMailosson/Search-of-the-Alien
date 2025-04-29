@@ -6,11 +6,12 @@
 #include <math.h>
 
 #define MAX_COLORS 8
+#define MAX_SERVER_PROJECTILES 512
+#define CLIENT_PROJ_RANGE 1200
 
 typedef struct Player Player;
 
 typedef struct User User;
-
 
 struct server;
 typedef struct server *Server;
@@ -26,6 +27,7 @@ void NET_serverSendString(Server aServer,GameState GS, MessageType msgType, cons
 void NET_serverSendArray(Server aServer,GameState GS, MessageType msgType, const void* array, Uint32 arraySize, int index);
 
 void NET_serverSendPlayerPacket(Server aServer,GameState GS);
+void NET_serverSendProjPacket(Server aServer);
 
 //server respons
 void NET_serverClientConnected(Packet aPacket, Server aServer);
@@ -45,6 +47,9 @@ int NET_serverFindPlayerID(Server aServer, const char* str);
 int NET_serverCompIP(Server aServer);
 void NET_serverRemoveUser(Server aServer,int index);
 void NET_serverAddUser(Server aServer, User newUser);
+int NET_serverGetProjCount(Server aServer);
+float NET_serverGetPlayerAngle(Server aServer, int playerIdx);
+void NET_serverSetProjCount(Server aServer, int count);
 
 /** Freeing memory after use, for server */
 void NET_serverDestroy(Server aServer);
