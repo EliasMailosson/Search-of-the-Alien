@@ -17,6 +17,14 @@ ServerMap NET_serverMapCreate() {
     return aServerMap;
 }
 
+void NET_serverMapGenerateNewMap(ServerMap aServerMap){
+    MAP_generatePerlinNoise(aServerMap->MapTileId,MAP_HEIGHT,MAP_WIDTH,13,0);
+    for (int y = 0; y < MAP_HEIGHT; y++){
+        for(int x = 0; x < MAP_WIDTH; x++){
+            printf("%d,",aServerMap->MapTileId[y][x]);
+        }printf("\n");
+    }
+}
 
 void MAP_ScreenToTile(ServerMap aServerMap, int screenX, int screenY, int *outTileX, int *outTileY) {
     float dx = screenX - aServerMap->tileRect.x;
