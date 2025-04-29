@@ -17,7 +17,7 @@ Enemies enemyCreate();
 SDL_Point enemyGetPoint(Enemies aEnemies, int index);
 
 void enemySpawn(Enemies aEnemies);
-
+enemyClosestPlayer(Uint32 TimeLeft);
 void enemyUpdatePos(Enemies aEnemies, SDL_Point playerPos);
 
 void enemyDestroy(Enemies aEnemies);

@@ -208,14 +208,23 @@ void NET_serverUpdatePlayer(Server aServer, Packet aPacket){
 void NET_serverUpdateEnemies(Server aServer, Enemies aEnemies){
     
     static SDL_Point playerPos;
-
-    for (int i = 0; i < aServer->clientCount; i++){
-        playerPos.x = aServer->clients[i].player.hitBox.x;
-        playerPos.y = aServer->clients[i].player.hitBox.y;
+    for (int j = 0; j < MAX_CLIENTS; j++)
+    {
+        playerPos.x = aServer->clients[j].player.hitBox.x;
+        playerPos.y = aServer->clients[j].player.hitBox.y;   
     }
-    enemyUpdatePos(aEnemies, playerPos);
 
-    NET_serverSendEnemiesPacket(aServer, LOBBY, aEnemies); 
+    for (int i = 0; i < MAX_ENEMIES; i++)
+    {
+        SDL_Point EnemyPos = enemyGetPoint(aEnemies, i);
+        
+        if (playerPos.x < EnemyPos.x && playerPos.y < EnemyPos.y)
+        {
+            enemyUpdatePos(aEnemies, playerPos);
+        }
+
+        NET_serverSendEnemiesPacket(aServer, LOBBY, aEnemies); 
+    }
 }
 
 void NET_serverChangeGameStateOnClient(Server aServer,Packet aPacket){

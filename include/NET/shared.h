@@ -10,7 +10,7 @@
 
 #define MAX_CLIENTS 8
 #define PORT 1234
-#define JON_IP "127.0.0.1"
+#define JON_IP "130.229.161.153"
 
 #define MAX_ENEMIES 3
 
