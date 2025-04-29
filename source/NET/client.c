@@ -206,7 +206,6 @@ void NET_clientReceiver(Client aClient){
                 NET_clientUpdateGameState(aClient,aPacket);
                 break;
             case ENEMY_POS:
-                //
                 NET_clientUpdateEnemy(aClient, aPacket);
                 break;
             default:

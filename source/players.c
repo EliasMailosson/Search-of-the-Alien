@@ -37,15 +37,15 @@ void renderEnemy(Client aClient, ClientView *pView) {
     int centerY = pView->windowHeight/2;
     int renderSizeHalf = pView->playerRenderSize/2;
 
-    int sortedIndex[playerCount];
+    // int sortedIndex[playerCount];
 
 
-    sortByYaxis(aClient, playerCount, sortedIndex);
+    // sortByYaxis(aClient, playerCount, sortedIndex);
 
     for(int i = 0; i < MAX_ENEMIES; i++) {
         //int i = sortedIndex[n];
 
-        SDL_Point pos = NET_clientGetEnemyPos(aClient, 0);
+        SDL_Point pos = NET_clientGetEnemyPos(aClient, i);
         //printf("x: %d\n", pos.x);
 
         int direction = NET_clientGetPlayerDirection(aClient, i);

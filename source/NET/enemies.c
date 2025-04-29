@@ -25,16 +25,20 @@ Enemies enemyCreate(){
 }
 
 void enemySpawn(Enemies aEnemies){
-    for (int i = 0; i < MAX_ENEMIES; i++)
-    {   
-        aEnemies->enemyList[i].enemyRect.x = i*128;
-        aEnemies->enemyList[i].enemyRect.y = i*128;
-    }
+    aEnemies->enemyList[0].enemyRect.x = 128;
+    aEnemies->enemyList[0].enemyRect.y = 128;
+
+    aEnemies->enemyList[1].enemyRect.y = 256;
+    aEnemies->enemyList[1].enemyRect.y = 256;
+
+    aEnemies->enemyList[2].enemyRect.y = 512;
+    aEnemies->enemyList[2].enemyRect.y = 512;
+
 }
 
 void enemyUpdatePos(Enemies aEnemies, SDL_Point playerPos){
 
-    const int speed = 3; // pixels per frame
+    const int speed = 1;
     //printf("Enemy-pos: %d %d, Player-pos: %d %d\n", aEnemies->enemyList[0].enemyRect.x, aEnemies->enemyList[0].enemyRect.y, playerPos.x, playerPos.y);
 
     for (int i = 0; i < MAX_ENEMIES; ++i)
@@ -52,7 +56,7 @@ void enemyUpdatePos(Enemies aEnemies, SDL_Point playerPos){
 }
 
 SDL_Point enemyGetPoint(Enemies aEnemies, int index){
-    SDL_Point point= {
+    SDL_Point point = {
         .x = aEnemies->enemyList[index].enemyRect.x,
         .y = aEnemies->enemyList[index].enemyRect.y
     };

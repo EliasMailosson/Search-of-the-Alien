@@ -47,14 +47,10 @@ int main(int argc, char **argv ){
     } 
     while (isRunning){
         Uint32 nowTime = SDL_GetTicks();
-        
-        if (nowTime - lastSendTime > 50) {
-            
-            //printf("This x: %d and this is y: %d", x, y);
-            //SDL_Point playerPos = {.x = x, .y = y};
+        // 10ms is a good start
+        if (nowTime - lastSendTime > 10) {
             
             NET_serverUpdateEnemies(aServer, aEnemies);
-            // printf("Jag kom in\n");
             lastSendTime = nowTime;
         }
 
@@ -128,7 +124,7 @@ void NET_serverSendEnemiesPacket(Server aServer, GameState GS, Enemies aEnemies)
         SDL_Point pos = enemyGetPoint(aEnemies, i); 
         packet[i].pos = pos;
     }
-    Uint32 payloadSize = MAX_ENEMIES * sizeof(EnemyPacket);;
+    Uint32 payloadSize = MAX_ENEMIES * sizeof(EnemyPacket);
     for (int i = 0; i < aServer->clientCount; i++){
         if(aServer->clients[i].State == GS || GS == -1){
             NET_serverSendArray(aServer, LOBBY, ENEMY_POS, packet, payloadSize, i);
@@ -218,7 +214,6 @@ void NET_serverUpdateEnemies(Server aServer, Enemies aEnemies){
         playerPos.y = aServer->clients[i].player.hitBox.y;
     }
     enemyUpdatePos(aEnemies, playerPos);
-
 
     NET_serverSendEnemiesPacket(aServer, LOBBY, aEnemies); 
 }
