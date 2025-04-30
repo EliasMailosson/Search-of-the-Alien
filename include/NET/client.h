@@ -41,6 +41,8 @@ int NET_clientGetPlayerColorIndex(Client aClient,int index);
 
 int NET_clientGetPlayerCharacter(Client aClient, int playerIdx);
 
+bool NET_clientGetTerminalHub(Client aClient);
+void NET_clientSetTerminalHub(Client aClient, int selfIndex, bool isVisible);
 
 void NET_clientReceiver(Client aClient);
 int NET_clientFindPlayer(Client aClient, char* str);

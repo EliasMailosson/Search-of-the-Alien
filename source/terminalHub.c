@@ -90,4 +90,6 @@ void updateTerminalHub(TerminalHub *pTerminalHub, Client aClient, bool isMouseUp
             }    
         }
     }
+
+    // NET_serverSendInt(aClient, LOBBY, PLAYER_INPUT, aServer->clients[playerIdx].isHubVisible, playerIdx);
 }

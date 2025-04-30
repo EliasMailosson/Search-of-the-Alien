@@ -7,8 +7,8 @@
 static void enableMouseTexture(SDL_Cursor *CurrentCursor);
 static void updatePositioning(Client aClient, SDL_Point lastPosition[MAX_CLIENTS], SDL_Point *playerPos, int selfIndex);
 static void lobbyFullscreenToggle(ClientControl *pControl, ClientView *pView, Map aMap, int *pDelay, TerminalHub *pTerminalHub);
-static void lobbyTerminalHubToggle(ClientControl *pControl, bool *pShowHub, int *pDelay);
-static void handlePlayerInput(Client aClient, ClientControl *pControl, ClientView *pView);
+static void lobbyTerminalHubToggle(ClientControl *pControl, int *pDelay, Client aClient);
+static void handlePlayerInput(Client aClient, ClientControl *pControl, ClientView *pView, int *pDelay);
 static void updatePlayerAnimation(Client aClient, SDL_Point lastPosition[]);
 static void renderLobby(ClientView *pView, Map aMap, Client aClient, TerminalHub terminalHub);
 
@@ -70,23 +70,16 @@ void runLobby(Client aClient, Map aMap, ClientControl *pControl, ClientView *pVi
     
     lobbyFullscreenToggle(pControl, pView, aMap, &toggleDelay, pTerminalHub);
 
-    int tileX, tileY;
-    MAP_PixelsToTile(aMap, playerPos.x, playerPos.y, &tileX, &tileY);
 
+    pTerminalHub->isVisible = NET_clientGetTerminalHub(aClient);
+    // printf("%d\n", pTerminalHub->isVisible);
 
-    if (tileX >= 10 && tileX <= 25 && tileY >= -1 && tileY <= 6 && pView->windowFullscreen){
-        lobbyTerminalHubToggle(pControl, &pTerminalHub->isVisible, &toggleDelay);
-    }
-    else if (tileX >= 19 && tileX <= 40 && tileY >= 0 && tileY <= 11 && !pView->windowFullscreen){
-        lobbyTerminalHubToggle(pControl, &pTerminalHub->isVisible, &toggleDelay);
-    }
-    
-    
     if (!pTerminalHub->isVisible){
-        handlePlayerInput(aClient, pControl, pView);
+        handlePlayerInput(aClient, pControl, pView, &toggleDelay);
     }
     else {
         updateTerminalHub(pTerminalHub, aClient, pControl->isMouseUp);
+        lobbyTerminalHubToggle(pControl, &toggleDelay, aClient);
     }
 
     NET_clientReceiver(aClient);
@@ -224,18 +217,25 @@ static void lobbyFullscreenToggle(ClientControl *pControl, ClientView *pView, Ma
     }
 }
 
-static void lobbyTerminalHubToggle(ClientControl *pControl, bool *pShowHub, int *pDelay){
+static void lobbyTerminalHubToggle(ClientControl *pControl, int *pDelay, Client aClient){
     if (pControl->keys[SDL_SCANCODE_E] && *pDelay > 12){
-        *pShowHub = !*pShowHub;
+        NET_clientSendInt(aClient, LOBBY, TRY_OPEN_TERMINAL_HUB_RESPONSE, 1);
+        printf("snet E\n");
         *pDelay = 0;
     }
 }
 
 
-static void handlePlayerInput(Client aClient, ClientControl *pControl, ClientView *pView) {
+static void handlePlayerInput(Client aClient, ClientControl *pControl, ClientView *pView, int *pDelay) {
     PlayerInputPacket pip = prepareInputArray(pControl, pView->windowWidth, pView->windowHeight);
+
     if (NET_playerInputPacketCheck(pip)) {
         NET_clientSendArray(aClient, LOBBY, PLAYER_INPUT, &pip, sizeof(PlayerInputPacket));
+    }
+    if (pControl->keys[SDL_SCANCODE_E] && *pDelay > 12){
+        NET_clientSendInt(aClient, LOBBY, TRY_OPEN_TERMINAL_HUB_RESPONSE, 1);
+        printf("snet E handleoplayer\n");
+        *pDelay = 0;
     }
 }
 

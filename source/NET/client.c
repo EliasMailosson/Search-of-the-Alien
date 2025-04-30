@@ -20,6 +20,7 @@ struct client{
 
     int PlayerCount;
     Player playerList[MAX_CLIENTS];
+    bool isHubVisible;
 }; 
 
 bool NET_clientConnect(Client aClient){
@@ -63,6 +64,7 @@ Client NET_clientCreate(){
     aClient->playerList[0].state = MENU;
     strcpy(aClient->playerList[0].username,"None");
     strcpy(aClient->selfUsername,"None");
+    aClient->isHubVisible = false;
     return aClient;
 }
 void NET_clientGetPlayerName(Client aClient, int playerIndex, char* username) {
@@ -192,6 +194,9 @@ void NET_clientReceiver(Client aClient){
             case CHANGE_GAME_STATE_RESPONSE:
                 NET_clientUpdateGameState(aClient,aPacket);
                 break;
+            case TRY_OPEN_TERMINAL_HUB:
+                aClient->isHubVisible = !aClient->isHubVisible;
+                break;
             default:
                 printf("client recieved invalid msgType: %d!!\n", NET_packetGetMessageType(aPacket));
                 break;
@@ -221,7 +226,6 @@ void NET_clientUpdatePlayerList(Client aClient, Packet aPacket){
         strcpy(aClient->playerList[i].username, packets[i].username);
         aClient->playerList[i].color = NET_clientGetColor(aClient->playerList[i].colorIndex);
         aClient->playerList[i].playerCharacter = packets[i].playerCharacter;
-
     }
 }
 
@@ -268,4 +272,8 @@ SDL_Color NET_GetPlayerColor(Client aClient,int index){
 
 int NET_clientGetPlayerColorIndex(Client aClient,int index){
     return aClient->playerList[index].colorIndex;
+}
+
+bool NET_clientGetTerminalHub(Client aClient){
+    return aClient->isHubVisible;
 }

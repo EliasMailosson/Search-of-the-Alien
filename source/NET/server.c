@@ -14,6 +14,7 @@ struct User{
     GameState State;
     Player player;
     int colorIndex;
+    bool isHubVisible;
 };
 
 struct server {
@@ -27,6 +28,8 @@ struct server {
     ServerMap aServerMap;
     bool usedColors[MAX_COLORS];
 };
+
+static void keyPressedListener(Server aServer, int playerIdx, ServerMap aServerMap);
 
 int main(int argc, char **argv ){
     (void)argc; (void)argv;
@@ -91,6 +94,11 @@ int main(int argc, char **argv ){
                 case PLAYER_INPUT:
                     NET_serverUpdatePlayer(aServer, aPacket);
                     break;
+                case TRY_OPEN_TERMINAL_HUB_RESPONSE:{
+                    int playerIdx = NET_serverCompIP(aServer); 
+                    keyPressedListener(aServer, playerIdx, aServer->aServerMap);
+                    break;
+                }
                 default:
                     printf("Failed!\n");
                     break;
@@ -164,13 +172,36 @@ static void calcMovement(Server aServer, PlayerInputPacket *pip, int playerIdx){
     aServer->clients[playerIdx].player.hitBox.y += (int)dy * speed;
 }
 
+
+static void keyPressedListener(Server aServer, int playerIdx, ServerMap aServerMap){
+
+    int tileX, tileY;
+    MAP_ScreenToTile(aServerMap, aServer->clients[playerIdx].player.hitBox.x, aServer->clients[playerIdx].player.hitBox.y, &tileX, &tileY);
+    
+
+    bool inTerminalArea = 
+        tileX >= 12 &&
+        tileX <= 19 &&
+        tileY >= 0 &&
+        tileY <= 4;
+            
+    if (inTerminalArea) {
+
+        int indexIP = NET_serverCompIP(aServer);
+        if(indexIP == -1) {
+            printf("Error NET_serverCompIP return -1\n");
+            return;
+        }
+        aServer->clients[playerIdx].isHubVisible = !aServer->clients[playerIdx].isHubVisible;
+        NET_serverSendInt(aServer, GLOBAL, TRY_OPEN_TERMINAL_HUB, aServer->clients[playerIdx].isHubVisible, indexIP);
+    }
+}
+
 void NET_serverUpdatePlayer(Server aServer, Packet aPacket){
     PlayerInputPacket pip;
     Uint8* payload = NET_packetGetPayload(aPacket);
     memcpy(&pip, payload, sizeof(PlayerInputPacket));
-
     int playerIdx = NET_serverCompIP(aServer); 
-
     calcMovement(aServer, &pip, playerIdx);
 
     int mx = aServer->clients[playerIdx].player.mousePos.x = pip.mousePos.x;
@@ -362,6 +393,7 @@ void NET_serverClientConnected(Packet aPacket, Server aServer){
     newUser.player.hitBox.h = 32;
     newUser.State = MENU;
     newUser.colorIndex = NET_serverAssignColorIndex(aServer);
+    newUser.isHubVisible = false;
     NET_serverAddUser(aServer, newUser);
     NET_serverSendInt(aServer, GLOBAL, CONNECT_RESPONSE, 0, aServer->clientCount - 1);
     printf("username: %s connected to server\n", aServer->clients[aServer->clientCount - 1].username);

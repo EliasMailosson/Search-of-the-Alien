@@ -225,24 +225,3 @@ void MAP_MapMoveMap(Map aMap, SDL_Point playerOffset){
     aMap->tileRect.y = - playerOffset.y;
     aMap->tileRect.x = - playerOffset.x;
 }
-
-void MAP_PixelsToTile(Map aMap, int screenX, int screenY, int *outTileX, int *outTileY) {
-    float dx = screenX - aMap->tileRect.x;
-    float dy = screenY - aMap->tileRect.y;
-
-
-    float a = dx / (aMap->tileRect.w * 0.5f);
-    float b = dy / (aMap->tileRect.h * 0.25f);
-
-
-    float fx = (a + b) * 0.5f;
-    float fy = (b - a) * 0.5f;
-
-
-    int tx = (int)floor(fx);
-    int ty = (int)floor(fy);
-
-
-    *outTileX = tx;
-    *outTileY = ty;
-}
