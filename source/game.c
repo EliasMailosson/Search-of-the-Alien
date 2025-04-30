@@ -41,7 +41,7 @@ void gameLoop(Client aClient, ClientControl *pControl, ClientView *pView){
             runLobby(aClient, aMap, pControl, pView, &terminalHub);
             break;
         case NEMUR:
-            runNemur();
+            runPlanet(aClient,pControl,pView,aMap);
             break;
         default:
             break;
@@ -171,7 +171,6 @@ static void renderLobby(ClientView *pView, Map aMap, Client aClient, TerminalHub
         renderTerminalHub(pView, terminalHub);
     }
     SDL_RenderPresent(pView->pRend);
-
 }
 
 static void updatePlayerAnimation(Client aClient, SDL_Point lastPosition[]){
@@ -228,6 +227,41 @@ static void handlePlayerInput(Client aClient, ClientControl *pControl, ClientVie
     }
 }
 
-void runNemur(){
+void renderPlanet(ClientView *pView, Map aMap, Client aClient){
+    SDL_SetRenderDrawColor(pView->pRend, 0,0,0,0);
+    SDL_RenderClear(pView->pRend);
 
+    MAP_MapRender(pView->pRend, aMap);
+    renderPlayers(aClient, pView);
+    for (int i = 0; i < NET_clientGetPlayerCount(aClient); i++){
+        hudRender(pView->aHud,pView->pRend,NET_clientGetPlayerColorIndex(aClient,i),i);
+    }
+    SDL_RenderPresent(pView->pRend);
+}
+
+void runPlanet(Client aClient, ClientControl *pControl, ClientView *pView, Map aMap){
+    static int toggleDelay = 0;
+    int selfIndex = NET_clientGetSelfIndex(aClient);
+    SDL_Point lastPosition[MAX_CLIENTS];
+    SDL_Point playerPos;
+
+    enableMouseTexture(pView->crosshair);
+    updatePositioning(aClient, lastPosition, &playerPos, selfIndex);
+    handlePlayerInput(aClient, pControl, pView);
+    
+    toggleDelay++;
+
+    NET_clientReceiver(aClient,aMap,pView->pWin);
+    updatePlayerAnimation(aClient, lastPosition);
+
+    updateArrows(pView->aHud,pView->pWin,aClient,pView->PlayerPos);
+    SDL_Rect tileRect = MAP_getTileRect(aMap);
+    pView->playerRenderSize = tileRect.h;
+
+    SDL_Point mapMovePos = {
+        (playerPos.x/(float)TILE_SIZE)*tileRect.w - pView->windowWidth/2 - pView->playerRenderSize/2 + tileRect.w/2,
+        (playerPos.y/(float)TILE_SIZE)*tileRect.h - pView->windowHeight/2 - pView->playerRenderSize + tileRect.h/2};
+    MAP_MapMoveMap(aMap, mapMovePos);
+    
+    renderPlanet(pView,aMap,aClient);
 }
