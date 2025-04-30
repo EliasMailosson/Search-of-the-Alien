@@ -20,6 +20,7 @@ struct client{
 
     int PlayerCount;
     Player playerList[MAX_CLIENTS];
+    bool isHubVisible;
     uint32_t seed;
     Proj projList[MAX_CLIENT_PROJ];
 }; 
@@ -74,6 +75,7 @@ Client NET_clientCreate(){
     aClient->playerList[0].state = MENU;
     strcpy(aClient->playerList[0].username,"None");
     strcpy(aClient->selfUsername,"None");
+    aClient->isHubVisible = false;
     aClient->seed = 0;
     return aClient;
 }
@@ -217,6 +219,9 @@ void NET_clientReceiver(Client aClient, Map aMap,SDL_Window *pScreen){
             case PROJ_LIST:
                 NET_clientUpdateProjList(aClient, aPacket);
                 break;
+            case TRY_OPEN_TERMINAL_HUB:
+                aClient->isHubVisible = !aClient->isHubVisible;
+                break;
             default:
                 printf("client recieved invalid msgType: %d!!\n", NET_packetGetMessageType(aPacket));
                 break;
@@ -246,7 +251,6 @@ void NET_clientUpdatePlayerList(Client aClient, Packet aPacket){
         strcpy(aClient->playerList[i].username, packets[i].username);
         aClient->playerList[i].color = NET_clientGetColor(aClient->playerList[i].colorIndex);
         aClient->playerList[i].playerCharacter = packets[i].playerCharacter;
-
     }
 }
 
@@ -308,4 +312,8 @@ SDL_Color NET_GetPlayerColor(Client aClient,int index){
 
 int NET_clientGetPlayerColorIndex(Client aClient,int index){
     return aClient->playerList[index].colorIndex;
+}
+
+bool NET_clientGetTerminalHub(Client aClient){
+    return aClient->isHubVisible;
 }

@@ -24,8 +24,10 @@ typedef enum{
     CHANGE_GAME_STATE,
     CHANGE_GAME_STATE_RESPONSE,
     PLAYER_INPUT,
+    TRY_OPEN_TERMINAL_HUB,
+    TRY_OPEN_TERMINAL_HUB_RESPONSE,
     NEW_SEED,
-    PROJ_LIST,
+    PROJ_LIST
 } MessageType;
 
 typedef enum{
