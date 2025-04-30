@@ -169,7 +169,7 @@ static void renderLobby(ClientView *pView, Map aMap, Client aClient, TerminalHub
 
     MAP_MapRender(pView->pRend, aMap);
 
-    renderProjectiles(aClient, pView);
+    
     
     renderPlayers(aClient, pView);
     for (int i = 0; i < NET_clientGetPlayerCount(aClient); i++){
@@ -255,6 +255,9 @@ void renderPlanet(ClientView *pView, Map aMap, Client aClient){
 
     MAP_MapRender(pView->pRend, aMap);
     renderPlayers(aClient, pView);
+    
+    renderProjectiles(aClient, pView);
+
     for (int i = 0; i < NET_clientGetPlayerCount(aClient); i++){
         hudRender(pView->aHud,pView->pRend,NET_clientGetPlayerColorIndex(aClient,i),i);
     }
