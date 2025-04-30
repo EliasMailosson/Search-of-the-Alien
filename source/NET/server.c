@@ -99,7 +99,9 @@ int main(int argc, char **argv ){
                     NET_serverChangeGameStateOnClient(aServer, aPacket);
                     break;
                 case PLAYER_INPUT:
-                    NET_serverUpdatePlayer(aServer, aPacket);
+                    int index = NET_serverCompIP(aServer);
+                    if(index == -1)break;;
+                    NET_serverUpdatePlayer(aServer, aPacket,aServer->clients[index].State);
                     break;
                 default:
                     printf("Failed!\n");
@@ -116,23 +118,26 @@ int main(int argc, char **argv ){
 }
 
 void NET_serverSetNewMap(Server aServer){
+    int indexIP = NET_serverCompIP(aServer);
+    if(indexIP == -1){
+        printf("NET_serverCompIP == -1\n");
+        return;
+    }
     for (int i = 0; i < aServer->clientCount; i++){
+        if(i == indexIP) continue;
         switch (aServer->clients[i].State){
         case NEMUR:case AURANTIC:case CINDORA:
             printf("VI HAR REDAN EN KARTA !!!\n");
+            NET_serverSendInt(aServer,GLOBAL,NEW_SEED,(int)NET_serverMapGetSeed(aServer->aServerMap),indexIP);
             return;
             break;
         default:
             break;
         }
     }
-    int indexIP = NET_serverCompIP(aServer);
-    if(indexIP == -1) {
-        printf("Error NET_serverCompIP return -1\n");
-        return;
-        }
     NET_serverMapSetSeed(aServer->aServerMap,MAP_generate_seed());
     NET_serverMapGenerateNewMap(aServer->aServerMap);
+    NET_serverMapSetEdgesToZero(aServer->aServerMap);
     NET_serverSendInt(aServer,GLOBAL,NEW_SEED,(int)NET_serverMapGetSeed(aServer->aServerMap),indexIP);
     printf("%u\n",NET_serverMapGetSeed(aServer->aServerMap));
 }
@@ -231,7 +236,7 @@ static void calcMovement(Server aServer, PlayerInputPacket *pip, int playerIdx){
     aServer->clients[playerIdx].player.hitBox.y += (int)dy * speed;
 }
 
-void NET_serverUpdatePlayer(Server aServer, Packet aPacket){
+void NET_serverUpdatePlayer(Server aServer, Packet aPacket, GameState state){
     PlayerInputPacket pip;
     Uint8* payload = NET_packetGetPayload(aPacket);
     memcpy(&pip, payload, sizeof(PlayerInputPacket));
@@ -259,7 +264,7 @@ void NET_serverUpdatePlayer(Server aServer, Packet aPacket){
         NET_projectileSpawn(aServer, aServer->projList, playerIdx);
     }
 
-    NET_serverSendPlayerPacket(aServer,LOBBY);
+    NET_serverSendPlayerPacket(aServer,state); 
 }
 
 void NET_serverChangeGameStateOnClient(Server aServer,Packet aPacket){
@@ -269,10 +274,10 @@ void NET_serverChangeGameStateOnClient(Server aServer,Packet aPacket){
         return;
         }
     GameState newState = SDLNet_Read32(NET_packetGetPayload(aPacket));
-    if(newState == LOBBY || newState == MENU){}else NET_serverSetNewMap(aServer);
     NET_serverSendInt(aServer,GLOBAL,CHANGE_GAME_STATE_RESPONSE,newState,indexIP);
     printf("username: %s gameState is now %d\n",aServer->clients[indexIP].username,newState);
     aServer->clients[indexIP].State = newState;
+    if(newState == LOBBY || newState == MENU){}else NET_serverSetNewMap(aServer);
 }
 
 void NET_serverClientDisconnect(Server aServer){

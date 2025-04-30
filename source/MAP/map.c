@@ -17,7 +17,7 @@ struct Map{
 
 static void substring(char *buffer, int start, int end, char* result);
 static void MAP_StrTrimWhitespace(char *str);
-static void printMap(Map aMap);
+void printMap(Map aMap);
 static void MAP_TileSheetload(SDL_Renderer* pRend, char *imagePath, Map aMap);
 
 PlanetLUT MAP_mapGetPlanetLUT(Map aMap){
@@ -51,6 +51,7 @@ void MAP_convertTiles(int tileID[MAP_HEIGHT][MAP_WIDTH], PlanetLUT plantet){
 void MAP_mapNewMap(Map aMap,uint32_t seed){
     MAP_generatePerlinNoise(aMap->tileID,MAP_HEIGHT,MAP_WIDTH,13,0,seed);
     MAP_convertTiles(aMap->tileID,aMap->planet);
+    MAP_mapSetEdgesToZero(aMap->tileID);
 }
 
 void MAP_mapSetEdgesToZero(int tileID[][MAP_WIDTH]){
@@ -217,7 +218,7 @@ static void MAP_StrTrimWhitespace(char *str){
     *(end + 1) = 0;
 }
 
-static void printMap(Map aMap){
+void printMap(Map aMap){
     for (int y = 0; y < MAP_HEIGHT; ++y){
         for (int x = 0; x < MAP_WIDTH; ++x){
             printf("%d,",aMap->tileID[y][x]);
@@ -229,6 +230,7 @@ static void printMap(Map aMap){
 void MAP_MapMoveMap(Map aMap, SDL_Point playerOffset){
     aMap->tileRect.y = - playerOffset.y;
     aMap->tileRect.x = - playerOffset.x;
+    //printf("Y: %d, X: %d\n",aMap->tileRect.y,aMap->tileRect.x);
 }
 
 void MAP_mapSetPlanet(GameState state,Map aMap){

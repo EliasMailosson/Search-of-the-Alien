@@ -57,7 +57,8 @@ void eventHandler(ClientControl *pControl);
 void gameLoop(Client aClient, ClientControl *pControl, ClientView *pView);
 void runLobby(Client aClient, Map aMap, ClientControl *pControl, ClientView *pView, TerminalHub *pTerminalHub);
 void runMenu(Client aClient, ClientControl *pControl, ClientView *pView, Menu *pMenu, Map aMap);
-void runNemur();
+void runPlanet(Client aClient, ClientControl *pControl, ClientView *pView, Map aMap);
+
 void toggleFullscreen(ClientView *pView);
 
 #endif

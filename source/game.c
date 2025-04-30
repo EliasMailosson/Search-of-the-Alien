@@ -11,6 +11,7 @@ static void lobbyTerminalHubToggle(ClientControl *pControl, bool *pShowHub, int 
 static void handlePlayerInput(Client aClient, ClientControl *pControl, ClientView *pView);
 static void updatePlayerAnimation(Client aClient, SDL_Point lastPosition[]);
 static void renderLobby(ClientView *pView, Map aMap, Client aClient, TerminalHub terminalHub);
+static void planetFullscreenToggle(ClientControl *pControl, ClientView *pView, Map aMap, int *pDelay);
 
 
 void gameLoop(Client aClient, ClientControl *pControl, ClientView *pView){
@@ -41,7 +42,7 @@ void gameLoop(Client aClient, ClientControl *pControl, ClientView *pView){
             runLobby(aClient, aMap, pControl, pView, &terminalHub);
             break;
         case NEMUR:
-            runNemur();
+            runPlanet(aClient,pControl,pView,aMap);
             break;
         default:
             break;
@@ -175,7 +176,6 @@ static void renderLobby(ClientView *pView, Map aMap, Client aClient, TerminalHub
     }
     
     SDL_RenderPresent(pView->pRend);
-
 }
 
 static void updatePlayerAnimation(Client aClient, SDL_Point lastPosition[]){
@@ -217,6 +217,14 @@ static void lobbyFullscreenToggle(ClientControl *pControl, ClientView *pView, Ma
     }
 }
 
+static void planetFullscreenToggle(ClientControl *pControl, ClientView *pView, Map aMap, int *pDelay){
+    if (pControl->keys[SDL_SCANCODE_F] && *pDelay > 12) {
+        toggleFullscreen(pView);
+        MAP_MapRefresh(aMap, pView->windowWidth, pView->windowHeight);
+        *pDelay = 0;
+    }
+}
+
 static void lobbyTerminalHubToggle(ClientControl *pControl, bool *pShowHub, int *pDelay){
     if (pControl->keys[SDL_SCANCODE_E] && *pDelay > 12){
         *pShowHub = !*pShowHub;
@@ -232,6 +240,43 @@ static void handlePlayerInput(Client aClient, ClientControl *pControl, ClientVie
     }
 }
 
-void runNemur(){
+void renderPlanet(ClientView *pView, Map aMap, Client aClient){
+    SDL_SetRenderDrawColor(pView->pRend, 0,0,0,0);
+    SDL_RenderClear(pView->pRend);
 
+    MAP_MapRender(pView->pRend, aMap);
+    renderPlayers(aClient, pView);
+    for (int i = 0; i < NET_clientGetPlayerCount(aClient); i++){
+        hudRender(pView->aHud,pView->pRend,NET_clientGetPlayerColorIndex(aClient,i),i);
+    }
+    SDL_RenderPresent(pView->pRend);
+}
+
+void runPlanet(Client aClient, ClientControl *pControl, ClientView *pView, Map aMap){
+    static int toggleDelay = 0;
+    int selfIndex = NET_clientGetSelfIndex(aClient);
+    SDL_Point lastPosition[MAX_CLIENTS];
+    SDL_Point playerPos;
+
+    enableMouseTexture(pView->crosshair);
+    updatePositioning(aClient, lastPosition, &playerPos, selfIndex);
+    handlePlayerInput(aClient, pControl, pView);
+
+    planetFullscreenToggle(pControl,pView,aMap,&toggleDelay);
+    
+    toggleDelay++;
+
+    NET_clientReceiver(aClient,aMap,pView->pWin);
+    updatePlayerAnimation(aClient, lastPosition);
+
+    updateArrows(pView->aHud,pView->pWin,aClient,pView->PlayerPos);
+    SDL_Rect tileRect = MAP_getTileRect(aMap);
+    pView->playerRenderSize = tileRect.h;
+
+    SDL_Point mapMovePos = {
+        (playerPos.x/(float)TILE_SIZE)*tileRect.w - pView->windowWidth/2 - pView->playerRenderSize/2 + tileRect.w/2,
+        (playerPos.y/(float)TILE_SIZE)*tileRect.h - pView->windowHeight/2 - pView->playerRenderSize + tileRect.h/2};
+    MAP_MapMoveMap(aMap, mapMovePos);
+    
+    renderPlanet(pView,aMap,aClient);
 }

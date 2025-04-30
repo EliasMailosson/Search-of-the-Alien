@@ -50,11 +50,11 @@ void MAP_MapRefresh(Map aMap, int winW, int winH);
 
 void MAP_MapDestroy(Map aMap);
 
-//void MAP_MapGettOffset(int winH, int winW, SDL_Point *index);
 void MAP_TilesFillWithBlank(int tileID[MAP_HEIGHT][MAP_WIDTH]);
 void MAP_MapGetTilesFromLobby(int tileID[MAP_HEIGHT][MAP_WIDTH]);
 
 void MAP_MapMoveMap(Map aMap, SDL_Point playerOffset);
+void printMap(Map aMap);
 
 
 #endif

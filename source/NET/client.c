@@ -197,6 +197,7 @@ void NET_clientReceiver(Client aClient, Map aMap,SDL_Window *pScreen){
                 break;
             case LOBBY_LIST:
                 NET_clientUpdatePlayerList(aClient,aPacket);
+                //printf("%d\n",(int)SDL_GetTicks());
                 break;
             case PRINT:
                 printf("%s\n",NET_packetGetPayload(aPacket));
