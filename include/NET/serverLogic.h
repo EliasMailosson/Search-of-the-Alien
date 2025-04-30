@@ -29,3 +29,4 @@ void NET_serverMapSetSeed(ServerMap aServerMap,uint32_t newSeed);
 uint32_t NET_serverMapGetSeed(ServerMap aServerMap);
 void NET_serverMapSetEdgesToZero(ServerMap aServerMap);
 
+#endif
