@@ -5,6 +5,7 @@
 #include "../../include/NET/enemies.h"
 #include "../../include/NET/serverLogic.h"
 #include <math.h>
+#include <limits.h>
 
 #define MAX_COLORS 8
 #define MAX_SERVER_PROJECTILES 512
