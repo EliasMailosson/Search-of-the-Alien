@@ -3,7 +3,12 @@
 #include "../../include/NET/shared.h"
 #include "../../include/NET/protocol.h"
 #include "../../include/NET/enemies.h"
+#include "../../include/NET/serverLogic.h"
+#include <math.h>
+
 #define MAX_COLORS 8
+#define MAX_SERVER_PROJECTILES 512
+#define CLIENT_PROJ_RANGE 1200
 
 typedef struct Player Player;
 typedef struct User User;
@@ -22,6 +27,7 @@ void NET_serverSendString(Server aServer,GameState GS, MessageType msgType, cons
 void NET_serverSendArray(Server aServer,GameState GS, MessageType msgType, const void* array, Uint32 arraySize, int index);
 
 void NET_serverSendPlayerPacket(Server aServer,GameState GS);
+void NET_serverSendProjPacket(Server aServer);
 
 //server respons
 void NET_serverClientConnected(Packet aPacket, Server aServer);
@@ -29,6 +35,12 @@ void NET_serverClientDisconnect(Server aServer);
 void NET_serverChangeGameStateOnClient(Server aServer,Packet aPacket);
 
 void NET_serverUpdatePlayer(Server aServer, Packet aPacket);
+SDL_Rect NET_serverGetPlayerHitbox(Server aServer, int playerIndex);
+int NET_serverGetClientCount(Server aServer);
+void NET_serverSetPlayerHitbox(Server aServer, int playerIndex, SDL_Rect r);
+void NET_serverSetNewMap(Server aServer);
+void NET_serverUpdateClientMap(Server aServer);
+
 
 void NET_serverUpdateEnemies(Server aServer, Enemies aEnemies);
 
@@ -37,6 +49,9 @@ int NET_serverFindPlayerID(Server aServer, const char* str);
 int NET_serverCompIP(Server aServer);
 void NET_serverRemoveUser(Server aServer,int index);
 void NET_serverAddUser(Server aServer, User newUser);
+int NET_serverGetProjCount(Server aServer);
+float NET_serverGetPlayerAngle(Server aServer, int playerIdx);
+void NET_serverSetProjCount(Server aServer, int count);
 
 /** Freeing memory after use, for server */
 void NET_serverDestroy(Server aServer);

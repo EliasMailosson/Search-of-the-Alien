@@ -33,6 +33,20 @@ void NET_enemyPacketReceive(Packet aPacket, EnemyPacket *enemyData){
     memcpy(enemyData, raw, enemyCount * sizeof(EnemyPacket));
 }
 
+void NET_projPacketReceive(Packet aPacket, ProjPacket *list, int *count){
+    Uint8* raw = NET_packetGetPayload(aPacket);
+    Uint32 size = NET_packetGetPayloadSize(aPacket);
+
+    if (!raw) {
+        printf("Raw error!\n");
+        return;
+    }
+
+    int listCount = size / sizeof(ProjPacket);
+    memcpy(list, raw, listCount * sizeof(ProjPacket));
+    *count = listCount;
+}
+
 void NET_protocolSendInt(UDPpacket *pUDPpkg,UDPsocket Socket,IPaddress IP,
                             GameState GS,MessageType msgType,int placeHolder){
     Uint32 payloadSize = (Uint32)sizeof(placeHolder);

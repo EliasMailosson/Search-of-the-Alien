@@ -1,10 +1,18 @@
 #include "../../include/MAP/map.h"
+
+static const int lobbyLUT[MAX_LUT_LEN] ={/* lägg till lobby tiles*/};
+static const int nemurLUT[MAX_LUT_LEN] ={1,10,11,12,13,38,37,2,3,4,5,35,34};
+static const int auranticLUT[MAX_LUT_LEN] ={/* lägg till tiles*/};
+static const int cindoraLUT[MAX_LUT_LEN] ={/* lägg till tiles*/};
+
 struct Map{
     SDL_Texture *texture;
     SDL_Rect tileIndex[MAX_COUNT_SPRITE_TILES];
     int tileID[MAP_HEIGHT][MAP_WIDTH];
     SDL_Rect tileRect; 
     SDL_Rect baseRect;
+    PlanetLUT planet;
+    uint32_t seed;
 };
 
 static void substring(char *buffer, int start, int end, char* result);
@@ -12,6 +20,49 @@ static void MAP_StrTrimWhitespace(char *str);
 static void printMap(Map aMap);
 static void MAP_TileSheetload(SDL_Renderer* pRend, char *imagePath, Map aMap);
 
+PlanetLUT MAP_mapGetPlanetLUT(Map aMap){
+    return aMap->planet;
+}
+
+void MAP_convertTiles(int tileID[MAP_HEIGHT][MAP_WIDTH], PlanetLUT plantet){
+    for(int y = 0; y < MAP_HEIGHT; y++){
+        for(int x = 0; x < MAP_WIDTH; x++){
+            int index = tileID[y][x];
+            switch (plantet){
+            case LOBBY_LUT:
+                tileID[y][x] = lobbyLUT[index];
+                break;
+            case NEMUR_LUT:
+                tileID[y][x] = nemurLUT[index];
+                break;
+            case AURANTIC_LUT:
+                tileID[y][x] = auranticLUT[index];
+                break;
+            case CINDORA_LUT:
+                tileID[y][x] = cindoraLUT[index];
+                break;
+            default:
+                tileID[y][x] = 0;
+                break;
+            }
+        }
+    }
+}
+void MAP_mapNewMap(Map aMap,uint32_t seed){
+    MAP_generatePerlinNoise(aMap->tileID,MAP_HEIGHT,MAP_WIDTH,13,0,seed);
+    MAP_convertTiles(aMap->tileID,aMap->planet);
+}
+
+void MAP_mapSetEdgesToZero(int tileID[][MAP_WIDTH]){
+    for (int i = 0; i < MAP_WIDTH; i++){
+        tileID[0][i] = 0;
+        tileID[MAP_HEIGHT-1][i] = 0;
+    }
+    for (int i = 0; i < MAP_HEIGHT; i++){
+        tileID[i][0] = 0;
+        tileID[i][MAP_WIDTH - 1] = 0;
+    }
+}
 
 void MAP_MapRender(SDL_Renderer *pRend, Map aMap){
     int tileW = aMap->tileRect.w;
@@ -21,7 +72,7 @@ void MAP_MapRender(SDL_Renderer *pRend, Map aMap){
     currentRect.w = tileW;
     currentRect.h = tileH;
 
-    for(int y = 0; y < MAP_HEIGHT; y++){
+    for(int y = 0; y < MAP_HEIGHT; y++){ 
         for(int x = 0; x < MAP_WIDTH; x++){
             currentRect.x = (int)roundf((x - y) * (tileW * 0.5f)
                                         + aMap->tileRect.x);
@@ -53,7 +104,10 @@ Map MAP_MapCreate(SDL_Renderer *pRend, int winW, int winH){
         }
     }
     MAP_TilesFillWithBlank(aMap->tileID);
-    MAP_MapGetTilseFromLobby(aMap->tileID);
+    MAP_MapGetTilesFromLobby(aMap->tileID);
+    //MAP_convertTiles(aMap->tileID,NEMUR_LUT);
+    MAP_mapSetEdgesToZero(aMap->tileID);
+
     SDL_Rect startRect = {
         .h = TILE_SIZE,
         .w = TILE_SIZE,
@@ -63,7 +117,7 @@ Map MAP_MapCreate(SDL_Renderer *pRend, int winW, int winH){
     aMap->baseRect = startRect;
     aMap->tileRect = startRect;
     MAP_MapRefresh(aMap,winW,winH);
-    aMap->tileID[15][15] = MAX_COUNT_SPRITE_TILES + 1;
+    // aMap->tileID[0][0] = 1;
     return aMap;
 }
 
@@ -99,7 +153,7 @@ void MAP_MapDestroy(Map aMap){
     aMap = NULL;
 }
 
-void MAP_MapGetTilseFromLobby(int tileID[MAP_HEIGHT][MAP_WIDTH]){
+void MAP_MapGetTilesFromLobby(int tileID[MAP_HEIGHT][MAP_WIDTH]){
     char buffer[256];
     FILE *fp = fopen(FILE_PHAT_LOBBY_DATA, "r");
     if (fp == NULL) {
@@ -175,4 +229,17 @@ static void printMap(Map aMap){
 void MAP_MapMoveMap(Map aMap, SDL_Point playerOffset){
     aMap->tileRect.y = - playerOffset.y;
     aMap->tileRect.x = - playerOffset.x;
+}
+
+void MAP_mapSetPlanet(GameState state,Map aMap){
+    switch (state){
+    case NEMUR: aMap->planet = NEMUR_LUT;
+        break;
+    case AURANTIC: aMap->planet = AURANTIC_LUT;
+        break;
+    case CINDORA: aMap->planet = CINDORA_LUT;
+        break;
+    default:
+        break;
+    }
 }

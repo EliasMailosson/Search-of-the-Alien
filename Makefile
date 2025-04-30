@@ -58,6 +58,8 @@ MAPDIR = source/MAP
 BUILDDIR = build
 OBJ_CLIENT = $(BUILDDIR)/main.o $(BUILDDIR)/game.o $(BUILDDIR)/clientLife.o $(BUILDDIR)/menu.o $(BUILDDIR)/panel.o $(BUILDDIR)/client.o $(BUILDDIR)/label.o $(BUILDDIR)/button.o $(BUILDDIR)/checklist.o $(BUILDDIR)/protocol.o $(BUILDDIR)/packetHandler.o $(BUILDDIR)/inputfield.o $(BUILDDIR)/shared.o $(BUILDDIR)/friend.o $(BUILDDIR)/players.o $(BUILDDIR)/map.o $(BUILDDIR)/hud.o $(BUILDDIR)/animation.o
 OBJ_SERVER = $(BUILDDIR)/server.o $(BUILDDIR)/shared.o $(BUILDDIR)/protocol.o $(BUILDDIR)/packetHandler.o $(BUILDDIR)/enemies.o
+OBJ_CLIENT = $(BUILDDIR)/main.o $(BUILDDIR)/game.o $(BUILDDIR)/clientLife.o $(BUILDDIR)/menu.o $(BUILDDIR)/panel.o $(BUILDDIR)/client.o $(BUILDDIR)/label.o $(BUILDDIR)/button.o $(BUILDDIR)/checklist.o $(BUILDDIR)/protocol.o $(BUILDDIR)/packetHandler.o $(BUILDDIR)/inputfield.o $(BUILDDIR)/shared.o $(BUILDDIR)/friend.o $(BUILDDIR)/players.o $(BUILDDIR)/map.o $(BUILDDIR)/hud.o $(BUILDDIR)/animation.o $(BUILDDIR)/terminalHub.o $(BUILDDIR)/perlinNoise.o
+OBJ_SERVER = $(BUILDDIR)/server.o $(BUILDDIR)/shared.o $(BUILDDIR)/protocol.o $(BUILDDIR)/packetHandler.o $(BUILDDIR)/serverLogic.o $(BUILDDIR)/map.o $(BUILDDIR)/perlinNoise.o
 
 # Default Goal
 all: $(BUILDDIR) $(CLIENT_TARGET) $(SERVER_TARGET)
@@ -138,8 +140,14 @@ $(BUILDDIR)/hud.o: $(SRCDIR)/hud.c
 	$(CC) $(CFLAGS) -c $< -o $@
 
 $(BUILDDIR)/enemies.o: $(NETDIR)/enemies.c
+$(BUILDDIR)/terminalHub.o: $(SRCDIR)/terminalHub.c
 	$(CC) $(CFLAGS) -c $< -o $@
     
+$(BUILDDIR)/serverLogic.o: $(NETDIR)/serverLogic.c
+	$(CC) $(CFLAGS) -c $< -o $@
+
+$(BUILDDIR)/perlinNoise.o: $(MAPDIR)/perlinNoise.c
+	$(CC) $(CFLAGS) -c $< -o $@
 clean:
 	$(REMOV)
 

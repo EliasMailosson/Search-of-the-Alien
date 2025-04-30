@@ -27,6 +27,8 @@ struct client{
     int PlayerCount;
     Player playerList[MAX_CLIENTS];
     Enemy enemies[MAX_ENEMIES];
+    uint32_t seed;
+    Proj projList[MAX_CLIENT_PROJ];
 }; 
 
 bool NET_clientConnect(Client aClient){
@@ -35,6 +37,15 @@ bool NET_clientConnect(Client aClient){
         return false;
     }
     return true;
+}
+
+void NET_clientGetProjList(Client aClient, Proj *outputProjList) {
+    for(int i = 0; i < MAX_CLIENT_PROJ; i++) {
+        outputProjList[i].angle = aClient->projList[i].angle;
+        outputProjList[i].textureIdx = aClient->projList[i].textureIdx;
+        outputProjList[i].x = aClient->projList[i].x;
+        outputProjList[i].y = aClient->projList[i].y;
+    }
 }
 
 Client NET_clientCreate(){
@@ -70,6 +81,7 @@ Client NET_clientCreate(){
     aClient->playerList[0].state = MENU;
     strcpy(aClient->playerList[0].username,"None");
     strcpy(aClient->selfUsername,"None");
+    aClient->seed = 0;
     return aClient;
 }
 void NET_clientGetPlayerName(Client aClient, int playerIndex, char* username) {
@@ -169,7 +181,7 @@ void NET_clientSendArray(Client aClient,GameState GS, MessageType msgType,const 
     NET_protocolSendArray(aClient->pSendPacket, aClient->clientSocket, aClient->serverAddr, GS, msgType, array, arraySize);
 }
 
-void NET_clientReceiver(Client aClient){
+void NET_clientReceiver(Client aClient, Map aMap,SDL_Window *pScreen){
     int numReady = SDLNet_CheckSockets(aClient->socketSet, 10); 
     if (numReady == -1) {
         fprintf(stderr, "SDLNet_CheckSockets error: %s\n", SDLNet_GetError());
@@ -205,6 +217,18 @@ void NET_clientReceiver(Client aClient){
                 break;
             case CHANGE_GAME_STATE_RESPONSE:
                 NET_clientUpdateGameState(aClient,aPacket);
+                int w = 0,h = 0;
+                SDL_GetWindowSize(pScreen,&w,&h);
+                MAP_MapRefresh(aMap,w,h);
+                break;
+            case NEW_SEED:
+                aClient->seed = SDLNet_Read32(NET_packetGetPayload(aPacket));
+                printf("new seed: %u\n",aClient->seed);
+                MAP_mapSetPlanet(NET_clientGetState(aClient),aMap);
+                MAP_mapNewMap(aMap,aClient->seed);
+                break;
+            case PROJ_LIST:
+                NET_clientUpdateProjList(aClient, aPacket);
                 break;
             case ENEMY_POS:
                 NET_clientUpdateEnemy(aClient, aPacket);
@@ -248,6 +272,21 @@ void NET_clientUpdateEnemy(Client aClient, Packet aPacket){
     for (int i = 0; i < MAX_ENEMIES; i++){
         printf("fiende #%d: x: %d\n", i, packets[i].pos.x);
         aClient->enemies[i].pos = packets[i].pos;
+    }
+}
+
+void NET_clientUpdateProjList(Client aClient, Packet aPacket) {
+    ProjPacket packets[MAX_CLIENT_PROJ] = {0};
+    int count;
+    NET_projPacketReceive(aPacket, packets, &count);
+
+    if(count <= MAX_CLIENT_PROJ) {
+        for(int i = 0; i < MAX_CLIENT_PROJ; i++) {
+            aClient->projList[i].angle = packets[i].angle;
+            aClient->projList[i].textureIdx = packets[i].textureIdx;
+            aClient->projList[i].x = packets[i].x;
+            aClient->projList[i].y = packets[i].y;
+        }
     }
 }
 

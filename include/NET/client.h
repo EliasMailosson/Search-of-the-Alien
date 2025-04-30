@@ -3,9 +3,15 @@
 #include <stdbool.h>
 #include <stdlib.h>
 #include "../../include/NET/shared.h"
+#include "../../include/MAP/map.h"
 #include "../../include/NET/enemies.h"
-
 enum PlayerAnimationTypes{ANIMATION_IDLE, ANIMATION_RUNNING, EMOTE_TPOSE};
+
+typedef struct __attribute__((packed)) Proj {
+    int16_t x, y;
+    int8_t angle;
+    uint8_t textureIdx;
+}Proj;
 
 typedef struct Player Player;
 typedef struct enemy Enemy;
@@ -41,9 +47,11 @@ int NET_clientGetSelfIndex(Client aClient);
 int NET_clientGetPlayerColorIndex(Client aClient,int index);
 
 int NET_clientGetPlayerCharacter(Client aClient, int playerIdx);
+void NET_clientGetProjList(Client aClient, Proj *outputProjList);
+void NET_clientUpdateProjList(Client aClient, Packet aPacket);
 
+void NET_clientReceiver(Client aClient, Map aMap,SDL_Window *pScreen);
 
-void NET_clientReceiver(Client aClient);
 int NET_clientFindPlayer(Client aClient, char* str);
 
 void NET_clientUpdateGameState(Client aClient,Packet aPacket);

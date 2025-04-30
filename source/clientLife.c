@@ -45,7 +45,7 @@ void startClient(Client *aClient, ClientView *pView,ClientControl *pControl){
     SDL_Surface *surface = IMG_Load("assets/images/player/bluethan.png");
     pView->playerTexture[CHARACTER_BLUEFACE] = SDL_CreateTextureFromSurface(pView->pRend, surface);
     SDL_FreeSurface(surface);
-    SDL_Surface *surface2 = IMG_Load("assets/images/player/biggie.png");
+    SDL_Surface *surface2 = IMG_Load("assets/images/player/biggie_gun.png");
     pView->playerTexture[CHARACTER_BIGGIE] = SDL_CreateTextureFromSurface(pView->pRend, surface2);
     SDL_FreeSurface(surface2);
     SDL_Surface *surface3 = IMG_Load("assets/images/player/cleopatra.png");
