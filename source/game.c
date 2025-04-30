@@ -11,6 +11,7 @@ static void lobbyTerminalHubToggle(ClientControl *pControl, bool *pShowHub, int 
 static void handlePlayerInput(Client aClient, ClientControl *pControl, ClientView *pView);
 static void updatePlayerAnimation(Client aClient, SDL_Point lastPosition[]);
 static void renderLobby(ClientView *pView, Map aMap, Client aClient, TerminalHub terminalHub);
+static void planetFullscreenToggle(ClientControl *pControl, ClientView *pView, Map aMap, int *pDelay);
 
 
 void gameLoop(Client aClient, ClientControl *pControl, ClientView *pView){
@@ -212,6 +213,14 @@ static void lobbyFullscreenToggle(ClientControl *pControl, ClientView *pView, Ma
     }
 }
 
+static void planetFullscreenToggle(ClientControl *pControl, ClientView *pView, Map aMap, int *pDelay){
+    if (pControl->keys[SDL_SCANCODE_F] && *pDelay > 12) {
+        toggleFullscreen(pView);
+        MAP_MapRefresh(aMap, pView->windowWidth, pView->windowHeight);
+        *pDelay = 0;
+    }
+}
+
 static void lobbyTerminalHubToggle(ClientControl *pControl, bool *pShowHub, int *pDelay){
     if (pControl->keys[SDL_SCANCODE_E] && *pDelay > 12){
         *pShowHub = !*pShowHub;
@@ -248,6 +257,8 @@ void runPlanet(Client aClient, ClientControl *pControl, ClientView *pView, Map a
     enableMouseTexture(pView->crosshair);
     updatePositioning(aClient, lastPosition, &playerPos, selfIndex);
     handlePlayerInput(aClient, pControl, pView);
+
+    planetFullscreenToggle(pControl,pView,aMap,&toggleDelay);
     
     toggleDelay++;
 
