@@ -1,11 +1,19 @@
 #include "../../include/NET/server.h"
 
+struct Weapon{
+    int damage;
+    int projFreq;
+    int projSpeed;
+    int projType;
+};
+
 struct Player{
     SDL_Rect hitBox;
     SDL_Point mousePos;
     int8_t angle;
     int direction;
     int character;
+    Weapon weapon;
     int projCounter;
 };
 
@@ -189,7 +197,7 @@ void NET_serverSendProjPacket(Server aServer) {
                 {
                     if (projSendCount < MAX_CLIENT_PROJ) {
                         packet[projSendCount].angle = aServer->projList[i].angle;
-                        packet[projSendCount].textureIdx = PROJ_TEX_BULLET;
+                        packet[projSendCount].textureIdx = aServer->clients[aServer->projList[i].srcPlayerIdx].player.weapon.projType;
                         packet[projSendCount].x = p.player.hitBox.x - aServer->projList[i].x;
                         packet[projSendCount].y = p.player.hitBox.y - aServer->projList[i].y;
                         projSendCount++;
@@ -270,6 +278,10 @@ static void keyPressedListener(Server aServer, int playerIdx, ServerMap aServerM
     }
 }
 
+int NET_serverGetProjectileSpeed(Server aServer, int playerIdx) {
+    return aServer->clients[playerIdx].player.weapon.projSpeed;
+}
+
 void NET_serverUpdatePlayer(Server aServer, Packet aPacket, GameState state){
     PlayerInputPacket pip;
     Uint8* payload = NET_packetGetPayload(aPacket);
@@ -284,14 +296,37 @@ void NET_serverUpdatePlayer(Server aServer, Packet aPacket, GameState state){
 
     float angle = atan2(dy, dx);
     aServer->clients[playerIdx].player.direction = ((int)roundf(angle / (float)M_PI_4) + 7 ) % 8;
-    aServer->clients[playerIdx].player.character = pip.selecterPlayerCharacter;
+    int character = aServer->clients[playerIdx].player.character = pip.selecterPlayerCharacter;
+    switch(character) {
+        case CHARACTER_BLUEFACE:
+        aServer->clients[playerIdx].player.weapon.damage = 4;
+        aServer->clients[playerIdx].player.weapon.projFreq = 30;
+        aServer->clients[playerIdx].player.weapon.projSpeed = 14;
+        aServer->clients[playerIdx].player.weapon.projType = PROJ_TEX_BULLET;
+        break;
+
+        case CHARACTER_BIGGIE:
+        aServer->clients[playerIdx].player.weapon.damage = 1;
+        aServer->clients[playerIdx].player.weapon.projFreq = 2;
+        aServer->clients[playerIdx].player.weapon.projSpeed = 20;
+        aServer->clients[playerIdx].player.weapon.projType = PROJ_TEX_BULLET;
+        break;
+
+        case CHARACTER_CLEOPATRA:
+        aServer->clients[playerIdx].player.weapon.damage = 10;
+        aServer->clients[playerIdx].player.weapon.projFreq = 40;
+        aServer->clients[playerIdx].player.weapon.projSpeed = 5;
+        aServer->clients[playerIdx].player.weapon.projType = PROJ_TEX_BULLET;
+        break;
+    }
+
     if (angle < 0.0f) {
         angle += 2.0f * M_PI;
     }
     aServer->clients[playerIdx].player.angle = (uint8_t)roundf(angle / (2.0f * M_PI) * 255.0f);
-
+    int freq = aServer->clients[playerIdx].player.weapon.projFreq;
     if(pip.keys[PLAYER_INPUT_MOUSEDOWN] && !pip.keys[PLAYER_INPUT_SPACE] && 
-        (aServer->clients[playerIdx].player.projCounter)++%4 == 0) // TODO: change frequency depending on weapon/character
+        (aServer->clients[playerIdx].player.projCounter)++%freq == 0) // TODO: change frequency depending on weapon/character
     {
         NET_projectileSpawn(aServer, aServer->projList, playerIdx);
     }
@@ -489,6 +524,10 @@ void NET_serverClientConnected(Packet aPacket, Server aServer){
     newUser.player.hitBox.w = 64;
     newUser.player.hitBox.h = 32;
     newUser.player.projCounter = 0;
+    newUser.player.weapon.damage = 1;
+    newUser.player.weapon.projFreq = 10;
+    newUser.player.weapon.projSpeed = 14;
+    newUser.player.weapon.projType = PROJ_TEX_BULLET;
     newUser.State = MENU;
     newUser.colorIndex = NET_serverAssignColorIndex(aServer);
     newUser.isHubVisible = false;
