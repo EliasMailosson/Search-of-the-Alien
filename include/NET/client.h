@@ -12,6 +12,7 @@ typedef struct __attribute__((packed)) Proj {
     uint8_t textureIdx;
 }Proj;
 
+typedef struct WeaponStats WeaponStats;
 typedef struct Player Player;
 
 struct client;
@@ -58,6 +59,9 @@ void NET_clientUpdateGameState(Client aClient,Packet aPacket);
 void NET_clientUpdatePlayerList(Client aClient,Packet aPacket);
 //----------
 SDL_Point NET_clientGetSelfPos(Client aClient);
+
+void NET_clientSaveWeaponStats(Client aClient);
+void NET_clientLoadWeaponStats(Client aClient);
 
 SDL_Color NET_clientGetColor(int index);
 SDL_Color NET_GetPlayerColor(Client aClient, int index);

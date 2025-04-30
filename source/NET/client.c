@@ -1,5 +1,10 @@
 #include "../../include/NET/client.h"
 #include "../../include/UI/friend.h"
+
+struct WeaponStats {
+    int type;
+    int level;
+};
 struct Player{
     GameState state;
     char username[MAX_USERNAME_LEN]; //myusername
@@ -23,6 +28,7 @@ struct client{
     bool isHubVisible;
     uint32_t seed;
     Proj projList[MAX_CLIENT_PROJ];
+    WeaponStats weaponStatList[3];
 }; 
 
 bool NET_clientConnect(Client aClient){
@@ -77,6 +83,8 @@ Client NET_clientCreate(){
     strcpy(aClient->selfUsername,"None");
     aClient->isHubVisible = false;
     aClient->seed = 0;
+
+    NET_clientLoadWeaponStats(aClient);
     return aClient;
 }
 void NET_clientGetPlayerName(Client aClient, int playerIndex, char* username) {
@@ -138,6 +146,8 @@ SDL_Point NET_clientGetPlayerPos(Client aClient, int playerIdx) {
 }
 
 void NET_clientDestroy(Client aClient){
+    NET_clientSaveWeaponStats(aClient);
+
     if(aClient->pReceivePacket != NULL){
         SDLNet_FreePacket(aClient->pReceivePacket);
         aClient->pReceivePacket = NULL;
@@ -316,4 +326,32 @@ int NET_clientGetPlayerColorIndex(Client aClient,int index){
 
 bool NET_clientGetTerminalHub(Client aClient){
     return aClient->isHubVisible;
+}
+
+void NET_clientLoadWeaponStats(Client aClient) {
+    FILE *fp ;
+    fp = fopen("data/weapon-stats.csv", "r");
+    if (fp != NULL)
+    {   
+        char buf[32];
+        for(int i = 0; i < 3; i++) {
+            fgets(buf, 32, fp);
+            sscanf_s(buf, "%d,%d", &aClient->weaponStatList[i].type, &aClient->weaponStatList[i].level);
+        }
+    }
+
+    fclose(fp);
+}
+
+void NET_clientSaveWeaponStats(Client aClient) {
+    FILE *fp ;
+    fp = fopen("data/weapon-stats.csv", "w");
+    if (fp != NULL)
+    {   
+        for(int i = 0; i < 3; i++) {
+            fprintf(fp, "%d,%d\n", aClient->weaponStatList[i].type, aClient->weaponStatList[i].level);
+        }
+    }
+
+    fclose(fp);
 }
