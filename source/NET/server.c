@@ -137,7 +137,12 @@ void NET_serverSendEnemiesPacket(Server aServer, GameState GS, Enemies aEnemies)
         pos = enemyGetPoint(aEnemies, i); 
         // printf("Fiende #%d: x: %d\n", i, pos.x);
         packet[i].pos = pos;
+        packet[i].direction = enemyGetDirection(aEnemies, i);
+        //printf("enemy #%d: dir: %d\n", i, packet[i].direction);
+
     }
+
+
     Uint32 payloadSize = MAX_ENEMIES * sizeof(EnemyPacket);
     for (int i = 0; i < aServer->clientCount; i++){
         if(aServer->clients[i].State == GS || GS == -1){
@@ -312,17 +317,17 @@ void NET_serverUpdateEnemies(Server aServer, Enemies aEnemies){
             int dy = playerPos.y - EnemyPos.y;
             int diff = dx * dx + dy * dy;
 
-            if (diff < closestDist)
-            {
+            if (diff < closestDist){
                 closestDist = diff;
                 ClosestPlayerPos = playerPos;
-                
             }
         } 
 
         if (aServer->clientCount > 0) 
         {
+            //enemyAI(aEnemies, ClosestPlayerPos);
             PlayerTracker(aEnemies, ClosestPlayerPos, i);
+            enemyAngleTracker(aEnemies, ClosestPlayerPos, i);
         }
     }
     
@@ -546,3 +551,4 @@ int NET_serverAssignColorIndex(Server aServer){
     }
     return -1;
 }
+

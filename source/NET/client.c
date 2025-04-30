@@ -3,6 +3,7 @@
 
 struct enemy{
     SDL_Point pos;
+    int direction;
 };
 
 struct Player{
@@ -246,6 +247,10 @@ int NET_clientGetPlayerDirection(Client aClient, int playerIdx) {
     return aClient->playerList[playerIdx].direction;
 }
 
+int NET_clientGetEnemyDirection(Client aClient, int index) {
+    return aClient->enemies[index].direction;
+}
+
 int NET_clientGetPlayerCharacter(Client aClient, int playerIdx) {
     return aClient->playerList[playerIdx].playerCharacter;
 }
@@ -270,8 +275,10 @@ void NET_clientUpdateEnemy(Client aClient, Packet aPacket){
     EnemyPacket packets[MAX_ENEMIES] = {0};
     NET_enemyPacketReceive(aPacket, packets);
     for (int i = 0; i < MAX_ENEMIES; i++){
-        printf("fiende #%d: x: %d\n", i, packets[i].pos.x);
+        //printf("fiende #%d: x: %d\n", i, packets[i].direction);
+        //printf("fiende #%d: x: %d\n", i, packets[i].pos.x);
         aClient->enemies[i].pos = packets[i].pos;
+        aClient->enemies[i].direction = packets[i].direction;
     }
 }
 

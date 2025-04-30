@@ -10,6 +10,8 @@ typedef struct enemy {
     int enemyID;
     HealthPoints HP;
     Uint32 ThinkTime;
+    int direction;
+    float angle;
 } Enemy;
 
 typedef struct enemies {
@@ -27,18 +29,12 @@ Enemies enemyCreate(){
 }
 
 void enemySpawn(Enemies aEnemies){
-    aEnemies->enemyList[0].enemyRect.x = 128;
-    aEnemies->enemyList[0].enemyRect.y = 128;
-
-    aEnemies->enemyList[1].enemyRect.x = 256;
-    aEnemies->enemyList[1].enemyRect.y = 256;
-
-    aEnemies->enemyList[2].enemyRect.x = 512;
-    aEnemies->enemyList[2].enemyRect.y = 512;
-
-    for (int i = 0; i < MAX_ENEMIES; i++)
-    {
+    for (int i = 0; i < MAX_ENEMIES; i++){
+        aEnemies->enemyList[i].enemyRect.x = i*64;
+        aEnemies->enemyList[i].enemyRect.y = i*64;
         aEnemies->enemyList[i].ThinkTime = 0;
+        aEnemies->enemyList[i].direction = 0;
+        aEnemies->enemyList[i].angle = 0.0f;
     }
 }
 
@@ -50,7 +46,8 @@ void enemyAI(Enemies aEnemies, SDL_Point playerpos){
         if (CurrentThinkTime >= aEnemies->enemyList[i].ThinkTime)
         {
             PlayerTracker(aEnemies, playerpos, i);
-            aEnemies->enemyList[i].ThinkTime = CurrentThinkTime + 3000;
+            enemyAngleTracker(aEnemies, playerpos, i);
+            aEnemies->enemyList[i].ThinkTime = CurrentThinkTime + 30;
         }
     }
 }
@@ -71,6 +68,45 @@ void PlayerTracker(Enemies aEnemies, SDL_Point playerPos, int enemyindex){
             enemy->enemyRect.y += speed;
         else if (enemy->enemyRect.y > playerPos.y)
             enemy->enemyRect.y -= speed;
+}
+
+void enemyAngleTracker(Enemies aEnemies, SDL_Point playerPos, int enemyIndex){
+
+    SDL_Rect r  = aEnemies->enemyList[enemyIndex].enemyRect;
+    float dx = (float)playerPos.x - (float)r.x;
+    float dy = (float)playerPos.y - (float)r.y;
+
+    // if you’re on top of the player, skip
+    float dist = sqrtf(dx*dx + dy*dy);
+    
+    // normalize
+    //dx /= dist;  
+    //dy /= dist;
+
+    // move
+    //r->x += (int)roundf(dx * speed);
+    //r->y += (int)roundf(dy * speed);
+
+    // compute angle & update your direction enum
+    float angle;
+    aEnemies->enemyList[enemyIndex].angle = angle = atan2f(dy, dx);
+    aEnemies->enemyList[enemyIndex].direction = ((int)roundf(angle / (float)M_PI_4) + 7 + 4 ) % 8;
+
+    printf("server #%d: %d\n", enemyIndex, aEnemies->enemyList[enemyIndex].direction);
+}
+
+int enemyGetDirection(Enemies aEnemies, int index){
+    /*int* direction = &aEnemies->enemyList[index].direction;
+    float* angle = &aEnemies->enemyList[index].angle;
+    *direction = ((int)roundf((*angle) / (float)M_PI_4) + 7 ) % 8;*/
+    //float angle = aEnemies->enemyList[index].angle;
+    //int dir = ((int)roundf(angle / (float)M_PI_4));
+    //aEnemies->enemyList[index].direction = (dir + 7) % 8;
+    return aEnemies->enemyList[index].direction;
+}
+
+float enemyGetAngle(Enemies aEnemies, int index){
+    return aEnemies->enemyList[index].angle;
 }
 
 SDL_Point enemyGetPoint(Enemies aEnemies, int index){

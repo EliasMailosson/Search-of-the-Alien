@@ -52,6 +52,10 @@ void startClient(Client *aClient, ClientView *pView,ClientControl *pControl){
     pView->playerTexture[CHARACTER_CLEOPATRA] = SDL_CreateTextureFromSurface(pView->pRend, surface3);
     SDL_FreeSurface(surface3);
 
+    SDL_Surface *surface4 = IMG_Load("assets/images/enemy/enemy_bear_running.png");
+    pView->enemyTexture = SDL_CreateTextureFromSurface(pView->pRend, surface4);
+    SDL_FreeSurface(surface4);
+
     pView->crosshair = createScaledCursor("assets/images/cursor/crosshair.png", 50, 50, 25, 25);
 
     pView->playerRenderSize = 128;
@@ -117,6 +121,7 @@ void killClient(Client *aClient, ClientView *pView){
         SDL_DestroyTexture(pView->playerTexture[i]);
         pView->playerTexture[i] = NULL;
     }
+    SDL_DestroyTexture(pView->enemyTexture);
 
     hudDestroy(pView->aHud);
     NET_clientDestroy(*aClient);

@@ -71,6 +71,11 @@ void renderEnemy(Client aClient, ClientView *pView) {
         float scale = (float)pView->playerRenderSize / RENDER_SIZE;
         float screenOffsetX = worldOffsetX * scale;
         float screenOffsetY = worldOffsetY * scale;
+        int direction = NET_clientGetEnemyDirection(aClient, i);
+        if (direction < 0 || direction > 7) {
+            fprintf(stderr, "ERROR: Invalid direction: %d\n", direction);
+            direction = 0;  // or clamp, or skip rendering
+        }
 
         SDL_Rect enemyRect;
         enemyRect = (SDL_Rect){
@@ -79,11 +84,14 @@ void renderEnemy(Client aClient, ClientView *pView) {
                 .w = pView->playerRenderSize / 2,
                 .h = pView->playerRenderSize / 2
             };
+        SDL_Rect src;
+        src = (SDL_Rect){((frame/2)%24)*SPRITE_SIZE, direction*SPRITE_SIZE, SPRITE_SIZE, SPRITE_SIZE};
 
         //pView->PlayerPos[i] = (SDL_Point){.x = playerRect.x, .y = playerRect.y};
-        SDL_SetRenderDrawColor(pView->pRend, 255, 0, 0, 0);
-        SDL_RenderFillRect(pView->pRend, &enemyRect);
+        //SDL_SetRenderDrawColor(pView->pRend, 0, 255, 0, 0);
+        //SDL_RenderFillRect(pView->pRend, &enemyRect);
 
+        SDL_RenderCopy(pView->pRend, pView->enemyTexture, &src, &enemyRect);
     }
 }
 

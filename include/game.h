@@ -35,6 +35,8 @@ typedef struct {
         SDL_Cursor *crosshair;
         SDL_Texture *playerTexture[MAX_PLAYER_CHARACTERS];
         int playerRenderSize;
+    
+    SDL_Texture *enemyTexture;
     TTF_Font *fonts;
     Hud aHud;
     SDL_Point PlayerPos[MAX_CLIENTS];

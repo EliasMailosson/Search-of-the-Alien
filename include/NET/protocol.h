@@ -26,6 +26,7 @@ typedef struct PlayerPacket{
 
 typedef struct enemyPacket{
     SDL_Point pos;
+    int direction;
 }EnemyPacket;  
 
 void NET_protocolSendInt(UDPpacket *pUDPpkg,UDPsocket Socket,IPaddress IP,
