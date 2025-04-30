@@ -221,10 +221,17 @@ static void lobbyFullscreenToggle(ClientControl *pControl, ClientView *pView, Ma
     }
 }
 
+static void planetFullscreenToggle(ClientControl *pControl, ClientView *pView, Map aMap, int *pDelay){
+    if (pControl->keys[SDL_SCANCODE_F] && *pDelay > 12) {
+        toggleFullscreen(pView);
+        MAP_MapRefresh(aMap, pView->windowWidth, pView->windowHeight);
+        *pDelay = 0;
+    }
+}
+
 static void lobbyTerminalHubToggle(ClientControl *pControl, int *pDelay, Client aClient){
     if (pControl->keys[SDL_SCANCODE_E] && *pDelay > 12){
         NET_clientSendInt(aClient, LOBBY, TRY_OPEN_TERMINAL_HUB_RESPONSE, 1);
-        printf("snet E\n");
         *pDelay = 0;
     }
 }
@@ -238,7 +245,6 @@ static void handlePlayerInput(Client aClient, ClientControl *pControl, ClientVie
     }
     if (pControl->keys[SDL_SCANCODE_E] && *pDelay > 12){
         NET_clientSendInt(aClient, LOBBY, TRY_OPEN_TERMINAL_HUB_RESPONSE, 1);
-        printf("snet E handleoplayer\n");
         *pDelay = 0;
     }
 }

@@ -101,11 +101,12 @@ int main(int argc, char **argv ){
                 case CHANGE_GAME_STATE:
                     NET_serverChangeGameStateOnClient(aServer, aPacket);
                     break;
-                case PLAYER_INPUT:
+                case PLAYER_INPUT:{
                     int index = NET_serverCompIP(aServer);
                     if(index == -1)break;;
                     NET_serverUpdatePlayer(aServer, aPacket,aServer->clients[index].State);
                     break;
+                }
                 case TRY_OPEN_TERMINAL_HUB_RESPONSE:{
                     int playerIdx = NET_serverCompIP(aServer); 
                     keyPressedListener(aServer, playerIdx, aServer->aServerMap);

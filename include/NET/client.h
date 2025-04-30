@@ -50,7 +50,6 @@ void NET_clientGetProjList(Client aClient, Proj *outputProjList);
 void NET_clientUpdateProjList(Client aClient, Packet aPacket);
 
 bool NET_clientGetTerminalHub(Client aClient);
-void NET_clientSetTerminalHub(Client aClient, int selfIndex, bool isVisible);
 void NET_clientReceiver(Client aClient, Map aMap,SDL_Window *pScreen);
 
 int NET_clientFindPlayer(Client aClient, char* str);
