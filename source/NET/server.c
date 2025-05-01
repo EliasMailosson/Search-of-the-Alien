@@ -73,11 +73,6 @@ int main(int argc, char **argv ){
             lastSendTime = nowTime;
         }
 
-        NET_projectilesUpdate(aServer, aServer->projList);
-        if(sendProjectileCounter++%5 == 0) {
-            NET_serverSendProjPacket(aServer);
-        } 
-
         int numReady = SDLNet_CheckSockets(aServer->socketSet, 10); 
         if (numReady == -1) {
             fprintf(stderr, "SDLNet_CheckSockets error: %s\n", SDLNet_GetError());
