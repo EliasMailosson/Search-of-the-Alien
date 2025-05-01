@@ -32,6 +32,7 @@ Enemies enemyCreate(int capacity){
         fprintf(stderr,"Error allocating memory for server\n");
         return NULL;
     }
+    aEnemies->count = capacity;
 
     return aEnemies;
 }
@@ -65,13 +66,13 @@ void enemyAI(Enemies aEnemies, SDL_Point playerpos){
 }
 
 void PlayerTracker(Enemies aEnemies, SDL_Point playerPos, int enemyindex){
-    const int speed = 2;
+    const int speed = 1;
     int dx = 0;
     int dy = 0;
 
     Enemy *enemy = &aEnemies->enemyList[enemyindex];
 
-    if (enemy->enemyRect.x < playerPos.x + 64)      dx =  speed;
+    if (enemy->enemyRect.x < playerPos.x + 64)      dx =  speed; // Hard coded + 64 to get middle of the Player
     else if (enemy->enemyRect.x > playerPos.x + 64) dx = -speed;
 
     if (enemy->enemyRect.y < playerPos.y + 64)      dy =  speed;
@@ -80,57 +81,6 @@ void PlayerTracker(Enemies aEnemies, SDL_Point playerPos, int enemyindex){
     enemy->enemyRect.x += dx;
     enemy->enemyRect.y += dy;
 }
-
-/*void PlayerTracker(Enemies aEnemies, SDL_Point playerPos, int enemyindex){
-    const int speed = 2;
-    int dx = 0;
-    int dy = 0;
-
-    Enemy *enemy = &aEnemies->enemyList[enemyindex];
-
-    if (enemy->enemyRect.x < playerPos.x + 64)      dx =  speed;
-    else if (enemy->enemyRect.x > playerPos.x + 64) dx = -speed;
-
-    if (enemy->enemyRect.y < playerPos.y + 64)      dy =  speed;
-    else if (enemy->enemyRect.y > playerPos.y + 64) dy = -speed;
-
-    if (dx && dy ) {
-        dy = dy / 2;   
-    }
-
-    enemy->enemyRect.x += dx;
-    enemy->enemyRect.y += dy;
-}*/
-
-/*void enemyAngleTracker(Enemies aEnemies, SDL_Point playerPos, int enemyIndex){
-
-    SDL_Rect r  = aEnemies->enemyList[enemyIndex].enemyRect;
-
-    playerPos.x+=64;
-    playerPos.y+=64;
-
-
-    float dx = (float)playerPos.x - (float)r.x;
-    float dy = (float)playerPos.y - (float)r.y;
-
-    // if you’re on top of the player, skip
-    float dist = sqrtf(dx*dx + dy*dy);
-    
-    // normalize
-    //dx /= dist;  
-    //dy /= dist;
-
-    // move
-    //r->x += (int)roundf(dx * speed);
-    //r->y += (int)roundf(dy * speed);
-
-    // compute angle & update your direction enum
-    float angle;
-    aEnemies->enemyList[enemyIndex].angle = angle = atan2f(dy, dx);
-    aEnemies->enemyList[enemyIndex].direction = ((int)roundf(angle / (float)M_PI_4) + 7 + 4 ) % 8; // + 7 + 4
-
-    //printf("server #%d: %d\n", enemyIndex, aEnemies->enemyList[enemyIndex].direction);
-}*/
 
 void enemyAngleTracker(Enemies aEnemies, SDL_Point playerPos, int enemyIndex) {
     Enemy *enemy = &aEnemies->enemyList[enemyIndex];

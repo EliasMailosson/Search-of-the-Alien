@@ -253,7 +253,9 @@ int NET_clientGetPlayerDirection(Client aClient, int playerIdx) {
 }
 
 int NET_clientGetEnemyDirection(Client aClient, int index) {
-    return aClient->enemies[index].direction;
+    if(0 <= aClient->enemies[index].direction && 7 >= aClient->enemies[index].direction)
+        return aClient->enemies[index].direction;
+    else return 0;
 }
 
 int NET_clientGetPlayerCharacter(Client aClient, int playerIdx) {

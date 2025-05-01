@@ -27,8 +27,6 @@ void NET_enemyPacketReceive(Packet aPacket, EnemyPacket *enemyData){
         printf("Raw error!\n");
         return;
     }
-    //maybe?
-    //memcpy(enemyData, raw, size);
     int enemyCount = size / sizeof(EnemyPacket);
     memcpy(enemyData, raw, enemyCount * sizeof(EnemyPacket));
 }

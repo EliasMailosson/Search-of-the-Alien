@@ -41,7 +41,7 @@ int main(int argc, char **argv ){
     Server aServer = {0};
     Uint32 lastSendTime = SDL_GetTicks();
     Enemies aEnemies = {0};
-    aEnemies = enemyCreate(5);
+    aEnemies = enemyCreate(MAX_ENEMIES);
     enemySpawn(aEnemies);
     aServer = NET_serverCreate();
     memset(aServer->usedColors, 0, sizeof(aServer->usedColors));
@@ -58,7 +58,7 @@ int main(int argc, char **argv ){
     while (isRunning){
         Uint32 nowTime = SDL_GetTicks();
         // 10ms is a good start
-        if (nowTime - lastSendTime > 100) {
+        if (nowTime - lastSendTime > 10) {
             NET_serverUpdateEnemies(aServer, aEnemies);
             lastSendTime = nowTime;
         }
@@ -334,8 +334,7 @@ void NET_serverUpdatePlayer(Server aServer, Packet aPacket, GameState state){
 
 void NET_serverUpdateEnemies(Server aServer, Enemies aEnemies){
     
-    for (int i = 0; i < MAX_ENEMIES; i++)
-    {
+    for (int i = 0; i < MAX_ENEMIES; i++){
         int closestDist = INT_MAX;
 
         SDL_Point ClosestPlayerPos = {0,0};
@@ -357,14 +356,11 @@ void NET_serverUpdateEnemies(Server aServer, Enemies aEnemies){
             }
         } 
 
-        if (aServer->clientCount > 0) 
-        {
-            //enemyAI(aEnemies, ClosestPlayerPos);
+        if (aServer->clientCount > 0){
             PlayerTracker(aEnemies, ClosestPlayerPos, i);
             enemyAngleTracker(aEnemies, ClosestPlayerPos, i);
         }
     }
-    
     NET_serverSendEnemiesPacket(aServer, NEMUR, aEnemies);
 }
 
