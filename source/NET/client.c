@@ -242,6 +242,10 @@ void NET_clientReceiver(Client aClient, Map aMap,SDL_Window *pScreen){
     }
 }
 
+int NET_clientGetClientState(Client aClient, int playerIdx) {
+    return aClient->playerList[playerIdx].state;
+}
+
 int NET_clientGetPlayerDirection(Client aClient, int playerIdx) {
     return aClient->playerList[playerIdx].direction;
 }

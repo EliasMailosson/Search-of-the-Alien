@@ -39,6 +39,7 @@ typedef struct {
     TTF_Font *fonts;
     Hud aHud;
     SDL_Point PlayerPos[MAX_CLIENTS];
+    SDL_Texture *shadowTexture;
 }ClientView; 
 
 typedef struct {

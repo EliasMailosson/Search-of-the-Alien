@@ -60,6 +60,9 @@ void startClient(Client *aClient, ClientView *pView,ClientControl *pControl){
     SDL_Surface *surface6 = IMG_Load("assets/images/player/cleopatricia_shooting.png");
     pView->playerTexture[5] = SDL_CreateTextureFromSurface(pView->pRend, surface6);
     SDL_FreeSurface(surface6);
+    SDL_Surface *surface7 = IMG_Load("assets/images/player/shadow.png");
+    pView->shadowTexture = SDL_CreateTextureFromSurface(pView->pRend, surface7);
+    SDL_FreeSurface(surface7);
 
     pView->crosshair = createScaledCursor("assets/images/cursor/crosshair.png", 50, 50, 25, 25);
 
@@ -126,6 +129,7 @@ void killClient(Client *aClient, ClientView *pView){
         SDL_DestroyTexture(pView->playerTexture[i]);
         pView->playerTexture[i] = NULL;
     }
+    SDL_DestroyTexture(pView->shadowTexture);
 
     hudDestroy(pView->aHud);
     NET_clientDestroy(*aClient);
