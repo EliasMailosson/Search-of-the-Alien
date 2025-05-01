@@ -34,21 +34,25 @@ void renderProjectiles(Client aClient, ClientView *pView) {
     int centerX = pView->windowWidth/2;
     int centerY = pView->windowHeight/2;
 
+    
     float scale = (float)pView->playerRenderSize / RENDER_SIZE;
-
+    
     for(int i = 0; i < MAX_CLIENT_PROJ; i++) {
         if(projList[i].textureIdx == PROJ_TEX_BULLET) {
             int screenX = (int)roundf(centerX - (float)projList[i].x * scale);
             int screenY = (int)roundf(centerY - (float)projList[i].y * scale);
+            double angleDegrees = (projList[i].angle / 255.0) * 360;
 
             SDL_Rect projRect = (SDL_Rect){
                 .x = screenX,
                 .y = screenY,
-                .w = 10,
-                .h = 10
+                .w = 50,
+                .h = 50
             };
-            SDL_SetRenderDrawColor(pView->pRend, 255, 255, 0, 255);
-            SDL_RenderFillRect(pView->pRend, &projRect);
+            SDL_RenderCopyEx(pView->pRend, pView->projectileTexture[PROJ_TEX_FIRE], NULL, &projRect, angleDegrees, NULL, SDL_FLIP_NONE);
+            SDL_RenderCopy(pView->pRend, pView->projectileTexture[PROJ_TEX_FIRE], NULL, &projRect);
+            // SDL_SetRenderDrawColor(pView->pRend, 255, 255, 0, 255);
+            // SDL_RenderFillRect(pView->pRend, &projRect);
         }
     }
 }
