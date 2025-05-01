@@ -32,7 +32,6 @@ typedef enum {LOBBY_LUT,NEMUR_LUT,AURANTIC_LUT,CINDORA_LUT}PlanetLUT;
 
 typedef struct Map *Map;
 
-void MAP_PixelsToTile(Map aMap, int screenX, int screenY, int *outTileX, int *outTileY);
 
 void MAP_convertTiles(int tileID[MAP_HEIGHT][MAP_WIDTH],PlanetLUT plantet);
 void MAP_mapSetEdgesToZero(int tileID[][MAP_WIDTH]);
@@ -41,6 +40,8 @@ void MAP_mapNewMap(Map aMap,uint32_t seed);
 void MAP_mapSetPlanet(GameState state,Map aMap);
 
 void MAP_MapRender(SDL_Renderer *pRend, Map aMap);
+void MAP_MapNewRender(SDL_Renderer* rend, Map map, SDL_Window* win);
+
 
 void MAP_TileRender(SDL_Renderer *pRend, Map aMap, int y, int x, SDL_Rect *currentRect);
 

@@ -167,7 +167,7 @@ static void renderLobby(ClientView *pView, Map aMap, Client aClient, TerminalHub
     SDL_SetRenderDrawColor(pView->pRend, 0,0,0,0);
     SDL_RenderClear(pView->pRend);
 
-    MAP_MapRender(pView->pRend, aMap);
+    MAP_MapNewRender(pView->pRend, aMap, pView->pWin);
 
     
     
@@ -253,7 +253,7 @@ void renderPlanet(ClientView *pView, Map aMap, Client aClient){
     SDL_SetRenderDrawColor(pView->pRend, 0,0,0,0);
     SDL_RenderClear(pView->pRend);
 
-    MAP_MapRender(pView->pRend, aMap);
+    MAP_MapNewRender(pView->pRend, aMap, pView->pWin);
     renderPlayers(aClient, pView);
     
     renderProjectiles(aClient, pView);
