@@ -262,6 +262,7 @@ void renderPlanet(ClientView *pView, Map aMap, Client aClient){
 
     MAP_MapRender(pView->pRend, aMap);
     renderPlayers(aClient, pView);
+    
     renderEnemy(aClient, pView);
     
     renderProjectiles(aClient, pView);
