@@ -6,10 +6,10 @@
 #include <time.h>
 #include <inttypes.h>
 
-#define MAP_WIDTH 100
-#define MAP_HEIGHT 100
+#define MAP_WIDTH 600
+#define MAP_HEIGHT 500
 #define RANGE 13
-#define OFFSET 0
+#define MAP_OFFSET 0
 
 #define OCTAVES 7
 #define BIAS 0.2f

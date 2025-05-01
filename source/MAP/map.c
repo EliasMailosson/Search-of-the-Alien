@@ -49,7 +49,7 @@ void MAP_convertTiles(int tileID[MAP_HEIGHT][MAP_WIDTH], PlanetLUT plantet){
     }
 }
 void MAP_mapNewMap(Map aMap,uint32_t seed){
-    MAP_generatePerlinNoise(aMap->tileID,MAP_HEIGHT,MAP_WIDTH,RANGE,OFFSET,seed);
+    MAP_generatePerlinNoise(aMap->tileID,MAP_HEIGHT,MAP_WIDTH,RANGE,MAP_OFFSET,seed);
     MAP_convertTiles(aMap->tileID,aMap->planet);
     MAP_mapSetEdgesToZero(aMap->tileID);
 }

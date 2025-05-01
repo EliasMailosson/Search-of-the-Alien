@@ -18,7 +18,8 @@ ifeq ($(OS), Darwin)
              -I/opt/homebrew/include/SDL2_net
     LDFLAGS = -fsanitize=address \
               -L/opt/homebrew/lib \
-              -lSDL2main -lSDL2 -lSDL2_image -lSDL2_ttf -lSDL2_mixer -lSDL2_net
+              -lSDL2main -lSDL2 -lSDL2_image -lSDL2_ttf -lSDL2_mixer -lSDL2_net \
+              -lpthread
     REMOV = rm -rf build/*.o $(CLIENT_EXEC) $(SERVER_EXEC)
     SERVER_EXEC = build/server
     CLIENT_EXEC = build/main
