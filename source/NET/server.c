@@ -38,7 +38,7 @@ int main(int argc, char **argv ){
     Server aServer = {0};
     Uint32 lastSendTime = SDL_GetTicks();
     Enemies aEnemies = {0};
-    aEnemies = enemyCreate();
+    aEnemies = enemyCreate(5);
     enemySpawn(aEnemies);
     aServer = NET_serverCreate();
     memset(aServer->usedColors, 0, sizeof(aServer->usedColors));

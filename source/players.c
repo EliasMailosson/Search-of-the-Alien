@@ -163,9 +163,10 @@ void renderPlayers(Client aClient, ClientView *pView) {
         int playerCharacter = NET_clientGetPlayerCharacter(aClient, i);
         SDL_RenderCopy(pView->pRend, pView->playerTexture[playerCharacter], &src, &playerRect);
         RenderPlayerName(aClient, pView, i, playerRect);
-        // SDL_SetRenderDrawColor(pView->pRend, 255, 255, 255, 255);
+
+        //SDL_SetRenderDrawColor(pView->pRend, 255, 0, 0, 0);
         // SDL_Rect rpoint = {centerX-5,centerY-5 + renderSizeHalf, 10, 10};
-        // SDL_RenderFillRect(pView->pRend, &rpoint);
+        //SDL_RenderFillRect(pView->pRend, &playerRect);
     }
 }
 

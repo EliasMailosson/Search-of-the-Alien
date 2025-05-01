@@ -9,7 +9,7 @@ typedef struct enemy Enemy;
 // enum id?
 enum enemyID {LIGHT_ENEMY, HEAVY_ENEMY, BOSS_ENEMY};
 
-Enemies enemyCreate();
+Enemies enemyCreate(int capacity);
 
 SDL_Point enemyGetPoint(Enemies aEnemies, int index);
 
