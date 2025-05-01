@@ -56,9 +56,10 @@ SRCDIR = source
 NETDIR = source/NET
 UIDIR = source/UI
 MAPDIR = source/MAP
+CONCURRENCYDIR = source/CONCURRENCY
 BUILDDIR = build
 OBJ_CLIENT = $(BUILDDIR)/main.o $(BUILDDIR)/game.o $(BUILDDIR)/clientLife.o $(BUILDDIR)/menu.o $(BUILDDIR)/panel.o $(BUILDDIR)/client.o $(BUILDDIR)/label.o $(BUILDDIR)/button.o $(BUILDDIR)/checklist.o $(BUILDDIR)/protocol.o $(BUILDDIR)/packetHandler.o $(BUILDDIR)/inputfield.o $(BUILDDIR)/shared.o $(BUILDDIR)/friend.o $(BUILDDIR)/players.o $(BUILDDIR)/map.o $(BUILDDIR)/hud.o $(BUILDDIR)/animation.o $(BUILDDIR)/terminalHub.o $(BUILDDIR)/perlinNoise.o
-OBJ_SERVER = $(BUILDDIR)/server.o $(BUILDDIR)/shared.o $(BUILDDIR)/protocol.o $(BUILDDIR)/packetHandler.o $(BUILDDIR)/serverLogic.o $(BUILDDIR)/map.o $(BUILDDIR)/perlinNoise.o
+OBJ_SERVER = $(BUILDDIR)/server.o $(BUILDDIR)/shared.o $(BUILDDIR)/protocol.o $(BUILDDIR)/packetHandler.o $(BUILDDIR)/serverLogic.o $(BUILDDIR)/map.o $(BUILDDIR)/perlinNoise.o $(BUILDDIR)/threads.o
 
 # Default Goal
 all: $(BUILDDIR) $(CLIENT_TARGET) $(SERVER_TARGET)
@@ -146,6 +147,13 @@ $(BUILDDIR)/serverLogic.o: $(NETDIR)/serverLogic.c
 
 $(BUILDDIR)/perlinNoise.o: $(MAPDIR)/perlinNoise.c
 	$(CC) $(CFLAGS) -c $< -o $@
+
+$(BUILDDIR)/threads.o: $(CONCURRENCYDIR)/threads.c
+	$(CC) $(CFLAGS) -c $< -o $@
+
+$(BUILDDIR)/semaphore.o: $(CONCURRENCYDIR)/semaphore.c
+	$(CC) $(CFLAGS) -c $< -o $@
+
 clean:
 	$(REMOV)
 

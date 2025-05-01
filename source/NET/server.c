@@ -35,6 +35,13 @@ struct server {
 
 static void keyPressedListener(Server aServer, int playerIdx, ServerMap aServerMap);
 
+void* projektil_threads(void *arg);
+
+int stop = 0;
+mutex_t stop_mutex;
+thread_t projThread; 
+
+
 int main(int argc, char **argv ){
     (void)argc; (void)argv;
     NET_serverInitSDL();
@@ -42,7 +49,6 @@ int main(int argc, char **argv ){
     aServer = NET_serverCreate();
     memset(aServer->usedColors, 0, sizeof(aServer->usedColors));
     bool isRunning;
-    int sendProjectileCounter = 0;
     aServer->aServerMap = NET_serverMapCreate();
     // if Server has allocated memory then the server is running on "PORT"
     if(aServer == NULL){
@@ -50,13 +56,12 @@ int main(int argc, char **argv ){
     }else{
         isRunning = true;
         printf("UDP server started on port %d\n", PORT);
-    } 
+    }
+    
+    mutex_init(&stop_mutex);
+    thread_create(&projThread, projektil_threads,aServer);
+
     while (isRunning){
-        NET_projectilesUpdate(aServer, aServer->projList);
-        if(sendProjectileCounter++%5 == 0) {
-            NET_serverSendProjPacket(aServer);
-        } 
-        
         int numReady = SDLNet_CheckSockets(aServer->socketSet, 10); 
         if (numReady == -1) {
             fprintf(stderr, "SDLNet_CheckSockets error: %s\n", SDLNet_GetError());
@@ -121,9 +126,32 @@ int main(int argc, char **argv ){
             if(aServer->isOff)break;
         }
     }
+    mutex_lock(&stop_mutex);
+    stop = 1;
+    mutex_unlock(&stop_mutex);
+
+    thread_join(projThread);
+    mutex_destroy(&stop_mutex);
+
     NET_serverDestroy(aServer);
     NET_serverDestroySDL();
     return 0;
+}
+
+void* projektil_threads(void *arg){
+    Server aServer = (Server)arg;
+    while (1){
+        mutex_lock(&stop_mutex);
+        int should_stop = stop;
+        mutex_unlock(&stop_mutex);
+        if(should_stop) break;
+
+        NET_projectilesUpdate(aServer, aServer->projList);
+        NET_serverSendProjPacket(aServer);
+        sleep_ms(10);
+    }
+    printf("Projectile thread exiting.\n");
+    return NULL;
 }
 
 void NET_serverSetNewMap(Server aServer){
