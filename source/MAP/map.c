@@ -75,14 +75,45 @@ void MAP_MapRender(SDL_Renderer *pRend, Map aMap){
 
     for(int y = 0; y < MAP_HEIGHT; y++){ 
         for(int x = 0; x < MAP_WIDTH; x++){
+            
             currentRect.x = (int)roundf((x - y) * (tileW * 0.5f)
                                         + aMap->tileRect.x);
             currentRect.y = (int)roundf((x + y) * (tileH * 0.25f)
                                         + aMap->tileRect.y);
-
             MAP_TileRender(pRend, aMap, y, x, &currentRect);
         }
     }
+}
+
+void MAP_MapNewRender(SDL_Renderer* rend, Map map, SDL_Window* win){
+    int winW, winH;
+    SDL_GetWindowSize(win, &winW, &winH);
+
+    const int tileW     = map->tileRect.w;
+    const int tileH     = map->tileRect.h;
+    const int halfW     = tileW / 2;
+    const int quarterH  = tileH / 4;
+    const int offsetX   = map->tileRect.x;
+    const int offsetY   = map->tileRect.y;
+    int renderedCount   = 0;
+
+    for (int y = 0; y < MAP_HEIGHT; ++y) {
+        int edgeL = (int)ceil(( - tileW - offsetX + y*halfW) / (float)halfW);
+        int edgeR = (int)floor(( winW - offsetX + y*halfW) / (float)halfW);
+
+        if (edgeL < 0) edgeL = 0;
+        if (edgeR >= MAP_WIDTH) edgeR = MAP_WIDTH - 1;
+        if (edgeL > edgeR) continue;
+        for (int x = edgeL; x <= edgeR; ++x) {
+            int screenX = (x - y)*halfW + offsetX;
+            int screenY = (x + y)*quarterH + offsetY;
+            if (screenY + tileH  < 0 || screenY > winH) continue;
+            SDL_Rect dst = { screenX, screenY, tileW, tileH };
+            renderedCount++;
+            MAP_TileRender(rend, map, y, x, &dst);
+        }
+    }
+    //printf("tiles rendered this frame: %d\n", renderedCount);
 }
 
 void MAP_TileRender(SDL_Renderer *pRend, Map aMap, int y, int x, SDL_Rect *currentRect){
