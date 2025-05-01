@@ -16,6 +16,7 @@ struct User{
     GameState State;
     Player player;
     int colorIndex;
+    bool isHubVisible;
 };
 
 struct server {
@@ -31,6 +32,8 @@ struct server {
     ServerMap aServerMap;
     bool usedColors[MAX_COLORS];
 };
+
+static void keyPressedListener(Server aServer, int playerIdx, ServerMap aServerMap);
 
 int main(int argc, char **argv ){
     (void)argc; (void)argv;
@@ -110,9 +113,17 @@ int main(int argc, char **argv ){
                 case CHANGE_GAME_STATE:
                     NET_serverChangeGameStateOnClient(aServer, aPacket);
                     break;
-                case PLAYER_INPUT:
-                    NET_serverUpdatePlayer(aServer, aPacket);
+                case PLAYER_INPUT:{
+                    int index = NET_serverCompIP(aServer);
+                    if(index == -1)break;;
+                    NET_serverUpdatePlayer(aServer, aPacket,aServer->clients[index].State);
                     break;
+                }
+                case TRY_OPEN_TERMINAL_HUB_RESPONSE:{
+                    int playerIdx = NET_serverCompIP(aServer); 
+                    keyPressedListener(aServer, playerIdx, aServer->aServerMap);
+                    break;
+                }
                 default:
                     printf("Failed!\n");
                     break;
@@ -152,23 +163,26 @@ void NET_serverSendEnemiesPacket(Server aServer, GameState GS, Enemies aEnemies)
 }
 
 void NET_serverSetNewMap(Server aServer){
+    int indexIP = NET_serverCompIP(aServer);
+    if(indexIP == -1){
+        printf("NET_serverCompIP == -1\n");
+        return;
+    }
     for (int i = 0; i < aServer->clientCount; i++){
+        if(i == indexIP) continue;
         switch (aServer->clients[i].State){
         case NEMUR:case AURANTIC:case CINDORA:
             printf("VI HAR REDAN EN KARTA !!!\n");
+            NET_serverSendInt(aServer,GLOBAL,NEW_SEED,(int)NET_serverMapGetSeed(aServer->aServerMap),indexIP);
             return;
             break;
         default:
             break;
         }
     }
-    int indexIP = NET_serverCompIP(aServer);
-    if(indexIP == -1) {
-        printf("Error NET_serverCompIP return -1\n");
-        return;
-        }
     NET_serverMapSetSeed(aServer->aServerMap,MAP_generate_seed());
     NET_serverMapGenerateNewMap(aServer->aServerMap);
+    NET_serverMapSetEdgesToZero(aServer->aServerMap);
     NET_serverSendInt(aServer,GLOBAL,NEW_SEED,(int)NET_serverMapGetSeed(aServer->aServerMap),indexIP);
     printf("%u\n",NET_serverMapGetSeed(aServer->aServerMap));
 }
@@ -267,13 +281,36 @@ static void calcMovement(Server aServer, PlayerInputPacket *pip, int playerIdx){
     aServer->clients[playerIdx].player.hitBox.y += (int)dy * speed;
 }
 
-void NET_serverUpdatePlayer(Server aServer, Packet aPacket){
+
+static void keyPressedListener(Server aServer, int playerIdx, ServerMap aServerMap){
+
+    int tileX, tileY;
+    MAP_ScreenToTile(aServerMap, aServer->clients[playerIdx].player.hitBox.x, aServer->clients[playerIdx].player.hitBox.y, &tileX, &tileY);
+    
+
+    bool inTerminalArea = 
+        tileX >= 12 &&
+        tileX <= 19 &&
+        tileY >= 0 &&
+        tileY <= 4;
+            
+    if (inTerminalArea) {
+
+        int indexIP = NET_serverCompIP(aServer);
+        if(indexIP == -1) {
+            printf("Error NET_serverCompIP return -1\n");
+            return;
+        }
+        aServer->clients[playerIdx].isHubVisible = !aServer->clients[playerIdx].isHubVisible;
+        NET_serverSendInt(aServer, GLOBAL, TRY_OPEN_TERMINAL_HUB, aServer->clients[playerIdx].isHubVisible, indexIP);
+    }
+}
+
+void NET_serverUpdatePlayer(Server aServer, Packet aPacket, GameState state){
     PlayerInputPacket pip;
     Uint8* payload = NET_packetGetPayload(aPacket);
     memcpy(&pip, payload, sizeof(PlayerInputPacket));
-
     int playerIdx = NET_serverCompIP(aServer); 
-
     calcMovement(aServer, &pip, playerIdx);
 
     int mx = aServer->clients[playerIdx].player.mousePos.x = pip.mousePos.x;
@@ -295,7 +332,7 @@ void NET_serverUpdatePlayer(Server aServer, Packet aPacket){
         NET_projectileSpawn(aServer, aServer->projList, playerIdx);
     }
 
-    NET_serverSendPlayerPacket(aServer,LOBBY);
+    NET_serverSendPlayerPacket(aServer,state); 
 }
 
 void NET_serverUpdateEnemies(Server aServer, Enemies aEnemies){
@@ -341,10 +378,10 @@ void NET_serverChangeGameStateOnClient(Server aServer,Packet aPacket){
         return;
         }
     GameState newState = SDLNet_Read32(NET_packetGetPayload(aPacket));
-    if(newState == LOBBY || newState == MENU){}else NET_serverSetNewMap(aServer);
     NET_serverSendInt(aServer,GLOBAL,CHANGE_GAME_STATE_RESPONSE,newState,indexIP);
     printf("username: %s gameState is now %d\n",aServer->clients[indexIP].username,newState);
     aServer->clients[indexIP].State = newState;
+    if(newState == LOBBY || newState == MENU){}else NET_serverSetNewMap(aServer);
 }
 
 void NET_serverClientDisconnect(Server aServer){
@@ -526,6 +563,7 @@ void NET_serverClientConnected(Packet aPacket, Server aServer){
     newUser.player.projCounter = 0;
     newUser.State = MENU;
     newUser.colorIndex = NET_serverAssignColorIndex(aServer);
+    newUser.isHubVisible = false;
     NET_serverAddUser(aServer, newUser);
     NET_serverSendInt(aServer, GLOBAL, CONNECT_RESPONSE, 0, aServer->clientCount - 1);
     printf("username: %s connected to server\n", aServer->clients[aServer->clientCount - 1].username);

@@ -133,6 +133,7 @@ void NET_protocolSendArray(UDPpacket *pUDPpkg, UDPsocket Socket, IPaddress IP,
 
 bool NET_playerInputPacketCheck(PlayerInputPacket pip){
     for (int i = 0; i < NUM_PLAYER_INPUTS; i++){
+        if(i == PLAYER_INPUT_CHOOSE_PLANET) continue;
         if(pip.keys[i]) return true;
         else if(playerLastMousePosCheck(pip.mousePos.x, pip.mousePos.y)) 
             return true;

@@ -21,6 +21,18 @@ ServerMap NET_serverMapCreate() {
     return aServerMap;
 }
 
+void NET_serverMapSetEdgesToZero(ServerMap aServerMap){
+    for (int i = 0; i < MAP_WIDTH; i++){
+        aServerMap->MapTileId[0][i] = 0;
+        aServerMap->MapTileId[MAP_HEIGHT-1][i] = 0;
+    }
+    for (int i = 0; i < MAP_HEIGHT; i++){
+        aServerMap->MapTileId[i][0] = 0;
+        aServerMap->MapTileId[i][MAP_WIDTH - 1] = 0;
+    }
+}
+
+
 void NET_serverMapSetSeed(ServerMap aServerMap,uint32_t newSeed){
     aServerMap->seed = newSeed;
 }

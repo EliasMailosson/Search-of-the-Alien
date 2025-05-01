@@ -8,12 +8,15 @@ void MAP_generatePerlinNoise(int output[][MAP_WIDTH], int height, int width, int
     float fOutput[height * width];
     MAP_generate2DNoise(fOutput,height,width,seed);
     range--;
+    //printf("h %d w %d\n\n\n",height,width);
     for (int y = 0; y < height; y++){
         for(int x = 0;x < width; x++){
             int idx = y * width + x;
             output[y][x] = (int)(roundf(fOutput[idx]*range) + offset);
-        }
+            //printf("%d, ",output[y][x]);
+        }//printf("\n");
     }
+
 }
 
 void MAP_generate2DNoise(float *output,int outputHeight, int outputWidth,uint32_t seed){

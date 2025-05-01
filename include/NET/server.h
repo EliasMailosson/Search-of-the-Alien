@@ -35,12 +35,12 @@ void NET_serverClientConnected(Packet aPacket, Server aServer);
 void NET_serverClientDisconnect(Server aServer);
 void NET_serverChangeGameStateOnClient(Server aServer,Packet aPacket);
 
-void NET_serverUpdatePlayer(Server aServer, Packet aPacket);
+void NET_serverUpdatePlayer(Server aServer, Packet aPacket,GameState state);
+
 SDL_Rect NET_serverGetPlayerHitbox(Server aServer, int playerIndex);
 int NET_serverGetClientCount(Server aServer);
 void NET_serverSetPlayerHitbox(Server aServer, int playerIndex, SDL_Rect r);
 void NET_serverSetNewMap(Server aServer);
-void NET_serverUpdateClientMap(Server aServer);
 
 
 void NET_serverUpdateEnemies(Server aServer, Enemies aEnemies);
