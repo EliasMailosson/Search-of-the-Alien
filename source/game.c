@@ -174,15 +174,13 @@ static void renderLobby(ClientView *pView, Map aMap, Client aClient, TerminalHub
     SDL_RenderClear(pView->pRend);
 
     MAP_MapRender(pView->pRend, aMap);
-
-    
     
     renderPlayers(aClient, pView);
     for (int i = 0; i < NET_clientGetPlayerCount(aClient); i++){
         hudRender(pView->aHud,pView->pRend,NET_clientGetPlayerColorIndex(aClient,i),i);
     }
     //enemiesRender(pView->pRend, aClient);
-    renderEnemy(aClient, pView);
+    // renderEnemy(aClient, pView);
 
     if (terminalHub.isVisible) {
         renderTerminalHub(pView, terminalHub);
@@ -264,6 +262,7 @@ void renderPlanet(ClientView *pView, Map aMap, Client aClient){
 
     MAP_MapRender(pView->pRend, aMap);
     renderPlayers(aClient, pView);
+    renderEnemy(aClient, pView);
     
     renderProjectiles(aClient, pView);
 

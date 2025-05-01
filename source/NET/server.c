@@ -58,8 +58,7 @@ int main(int argc, char **argv ){
     while (isRunning){
         Uint32 nowTime = SDL_GetTicks();
         // 10ms is a good start
-        if (nowTime - lastSendTime > 10) {
-            
+        if (nowTime - lastSendTime > 100) {
             NET_serverUpdateEnemies(aServer, aEnemies);
             lastSendTime = nowTime;
         }
@@ -152,8 +151,6 @@ void NET_serverSendEnemiesPacket(Server aServer, GameState GS, Enemies aEnemies)
         //printf("enemy #%d: dir: %d\n", i, packet[i].direction);
 
     }
-
-
     Uint32 payloadSize = MAX_ENEMIES * sizeof(EnemyPacket);
     for (int i = 0; i < aServer->clientCount; i++){
         if(aServer->clients[i].State == GS || GS == -1){
@@ -368,7 +365,7 @@ void NET_serverUpdateEnemies(Server aServer, Enemies aEnemies){
         }
     }
     
-    NET_serverSendEnemiesPacket(aServer, LOBBY, aEnemies);
+    NET_serverSendEnemiesPacket(aServer, NEMUR, aEnemies);
 }
 
 void NET_serverChangeGameStateOnClient(Server aServer,Packet aPacket){
