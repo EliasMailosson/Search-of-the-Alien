@@ -14,6 +14,7 @@ struct Player{
     int colorIndex;
     SDL_Color color;
     int playerCharacter;
+    bool isShooting;
 };
 struct client{
     SDLNet_SocketSet socketSet;
@@ -21,7 +22,7 @@ struct client{
     UDPpacket *pReceivePacket;
     UDPpacket *pSendPacket;
     IPaddress serverAddr;
-    char selfUsername[MAX_USERNAME_LEN]; //andras usernames
+    char selfUsername[MAX_USERNAME_LEN]; //andras usernames // va?
 
     int PlayerCount;
     Player playerList[MAX_CLIENTS];
@@ -261,7 +262,12 @@ void NET_clientUpdatePlayerList(Client aClient, Packet aPacket){
         strcpy(aClient->playerList[i].username, packets[i].username);
         aClient->playerList[i].color = NET_clientGetColor(aClient->playerList[i].colorIndex);
         aClient->playerList[i].playerCharacter = packets[i].playerCharacter;
+        aClient->playerList[i].isShooting = packets[i].isShooting;
     }
+}
+
+int NET_clientIsShooting(Client aClient, int playerIdx) {
+    return aClient->playerList[playerIdx].isShooting;
 }
 
 void NET_clientUpdateProjList(Client aClient, Packet aPacket) {

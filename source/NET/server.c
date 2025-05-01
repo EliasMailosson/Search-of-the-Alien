@@ -15,6 +15,7 @@ struct Player{
     int character;
     Weapon weapon;
     int projCounter;
+    bool isShooting;
 };
 
 struct User{
@@ -174,6 +175,7 @@ void NET_serverSendPlayerPacket(Server aServer,GameState GS){
         packet[i].direction = aServer->clients[i].player.direction;
         packet[i].colorIndex = aServer->clients[i].colorIndex;
         packet[i].playerCharacter = aServer->clients[i].player.character;
+        packet[i].isShooting = aServer->clients[i].player.isShooting;
     }
     Uint32 payloadSize = aServer->clientCount * sizeof(PlayerPacket);
     for (int i = 0; i < aServer->clientCount; i++){
@@ -325,6 +327,7 @@ void NET_serverUpdatePlayer(Server aServer, Packet aPacket, GameState state){
     }
     aServer->clients[playerIdx].player.angle = (uint8_t)roundf(angle / (2.0f * M_PI) * 255.0f);
     int freq = aServer->clients[playerIdx].player.weapon.projFreq;
+    aServer->clients[playerIdx].player.isShooting = pip.keys[PLAYER_INPUT_MOUSEDOWN] && !pip.keys[PLAYER_INPUT_SPACE];
     if(pip.keys[PLAYER_INPUT_MOUSEDOWN] && !pip.keys[PLAYER_INPUT_SPACE] && 
         (aServer->clients[playerIdx].player.projCounter)++%freq == 0) // TODO: change frequency depending on weapon/character
     {

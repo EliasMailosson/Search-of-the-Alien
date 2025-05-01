@@ -104,6 +104,9 @@ void renderPlayers(Client aClient, ClientView *pView) {
             };
         }
         pView->PlayerPos[i] = (SDL_Point){.x = playerRect.x, .y = playerRect.y};
+
+        int shootAnimationOffset = 0;
+        if(NET_clientIsShooting(aClient, i)) shootAnimationOffset = 3;
         
         SDL_Rect src;
         switch(NET_clientGetPlayerAnimation(aClient, i)) {
@@ -117,7 +120,7 @@ void renderPlayers(Client aClient, ClientView *pView) {
                 src = (SDL_Rect){((frame/2)%24)*SPRITE_SIZE, direction*SPRITE_SIZE, SPRITE_SIZE, SPRITE_SIZE};
         }
         
-        int playerCharacter = NET_clientGetPlayerCharacter(aClient, i);
+        int playerCharacter = NET_clientGetPlayerCharacter(aClient, i) + shootAnimationOffset;
         SDL_RenderCopy(pView->pRend, pView->playerTexture[playerCharacter], &src, &playerRect);
         RenderPlayerName(aClient, pView, i, playerRect);
         // SDL_SetRenderDrawColor(pView->pRend, 255, 255, 255, 255);

@@ -15,6 +15,7 @@
 #include "../include/hud.h"
 
 #define MAX_PLAYER_CHARACTERS 3
+#define MAX_PLAYER_TEXTURES 6
 #define MAX_BUTTONS_TERMINAL_HUB 4
 
 typedef struct menu Menu;
@@ -33,7 +34,7 @@ typedef struct {
     char myUsername[MAX_USERNAME_LEN];
 
         SDL_Cursor *crosshair;
-        SDL_Texture *playerTexture[MAX_PLAYER_CHARACTERS];
+        SDL_Texture *playerTexture[MAX_PLAYER_TEXTURES];
         int playerRenderSize;
     TTF_Font *fonts;
     Hud aHud;

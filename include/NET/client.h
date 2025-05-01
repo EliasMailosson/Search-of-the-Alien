@@ -45,6 +45,7 @@ int NET_clientGetPlayerDirection(Client aClient, int playerIdx);
 void NET_clientGetSelfname(Client aClient, char* outputName);
 int NET_clientGetSelfIndex(Client aClient);
 int NET_clientGetPlayerColorIndex(Client aClient,int index);
+int NET_clientIsShooting(Client aClient, int playerIdx);
 
 int NET_clientGetPlayerCharacter(Client aClient, int playerIdx);
 void NET_clientGetProjList(Client aClient, Proj *outputProjList);
