@@ -3,6 +3,8 @@
 #include "../../include/NET/shared.h"
 #include "../../include/NET/protocol.h"
 #include "../../include/NET/serverLogic.h"
+//#include "../../include/CONCURRENCY/semaphore.h"
+#include "../../include/CONCURRENCY/threads.h"
 #include <math.h>
 
 #define MAX_COLORS 8
