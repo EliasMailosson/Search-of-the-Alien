@@ -1,5 +1,11 @@
 #include "../../include/NET/client.h"
 #include "../../include/UI/friend.h"
+
+struct enemy{
+    SDL_Point pos;
+    int direction;
+};
+
 struct Player{
     GameState state;
     char username[MAX_USERNAME_LEN]; //myusername
@@ -10,6 +16,7 @@ struct Player{
     SDL_Color color;
     int playerCharacter;
 };
+
 struct client{
     SDLNet_SocketSet socketSet;
     UDPsocket clientSocket;
@@ -20,6 +27,7 @@ struct client{
 
     int PlayerCount;
     Player playerList[MAX_CLIENTS];
+    Enemy enemies[MAX_ENEMIES];
     bool isHubVisible;
     uint32_t seed;
     Proj projList[MAX_CLIENT_PROJ];
@@ -137,6 +145,13 @@ SDL_Point NET_clientGetPlayerPos(Client aClient, int playerIdx) {
     else return (SDL_Point) {.x=-1, .y=-1};
 }
 
+SDL_Point NET_clientGetEnemyPos(Client aClient, int index){
+    if(index < MAX_CLIENTS) {
+        return aClient->enemies[index].pos;
+    }
+    else return (SDL_Point) {.x=-1, .y=-1};
+}
+
 void NET_clientDestroy(Client aClient){
     if(aClient->pReceivePacket != NULL){
         SDLNet_FreePacket(aClient->pReceivePacket);
@@ -219,6 +234,8 @@ void NET_clientReceiver(Client aClient, Map aMap,SDL_Window *pScreen){
             case PROJ_LIST:
                 NET_clientUpdateProjList(aClient, aPacket);
                 break;
+            case ENEMY_POS:
+                NET_clientUpdateEnemy(aClient, aPacket);
             case TRY_OPEN_TERMINAL_HUB:
                 aClient->isHubVisible = !aClient->isHubVisible;
                 break;
@@ -233,6 +250,12 @@ void NET_clientReceiver(Client aClient, Map aMap,SDL_Window *pScreen){
 
 int NET_clientGetPlayerDirection(Client aClient, int playerIdx) {
     return aClient->playerList[playerIdx].direction;
+}
+
+int NET_clientGetEnemyDirection(Client aClient, int index) {
+    if(0 <= aClient->enemies[index].direction && 7 >= aClient->enemies[index].direction)
+        return aClient->enemies[index].direction;
+    else return 0;
 }
 
 int NET_clientGetPlayerCharacter(Client aClient, int playerIdx) {
@@ -251,6 +274,17 @@ void NET_clientUpdatePlayerList(Client aClient, Packet aPacket){
         strcpy(aClient->playerList[i].username, packets[i].username);
         aClient->playerList[i].color = NET_clientGetColor(aClient->playerList[i].colorIndex);
         aClient->playerList[i].playerCharacter = packets[i].playerCharacter;
+    }
+}
+
+void NET_clientUpdateEnemy(Client aClient, Packet aPacket){
+    EnemyPacket packets[MAX_ENEMIES] = {0};
+    NET_enemyPacketReceive(aPacket, packets);
+    for (int i = 0; i < MAX_ENEMIES; i++){
+        //printf("fiende #%d: x: %d\n", i, packets[i].direction);
+        //printf("fiende #%d: x: %d\n", i, packets[i].pos.x);
+        aClient->enemies[i].pos = packets[i].pos;
+        aClient->enemies[i].direction = packets[i].direction;
     }
 }
 

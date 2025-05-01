@@ -46,6 +46,10 @@ int main(int argc, char **argv ){
     (void)argc; (void)argv;
     NET_serverInitSDL();
     Server aServer = {0};
+    Uint32 lastSendTime = SDL_GetTicks();
+    Enemies aEnemies = {0};
+    aEnemies = enemyCreate(MAX_ENEMIES);
+    enemySpawn(aEnemies);
     aServer = NET_serverCreate();
     memset(aServer->usedColors, 0, sizeof(aServer->usedColors));
     bool isRunning;
@@ -62,6 +66,18 @@ int main(int argc, char **argv ){
     thread_create(&projThread, projektil_threads,aServer);
 
     while (isRunning){
+        Uint32 nowTime = SDL_GetTicks();
+        // 10ms is a good start
+        if (nowTime - lastSendTime > 10) {
+            NET_serverUpdateEnemies(aServer, aEnemies);
+            lastSendTime = nowTime;
+        }
+
+        NET_projectilesUpdate(aServer, aServer->projList);
+        if(sendProjectileCounter++%5 == 0) {
+            NET_serverSendProjPacket(aServer);
+        } 
+
         int numReady = SDLNet_CheckSockets(aServer->socketSet, 10); 
         if (numReady == -1) {
             fprintf(stderr, "SDLNet_CheckSockets error: %s\n", SDLNet_GetError());
@@ -123,8 +139,10 @@ int main(int argc, char **argv ){
                 }
                 if(aPacket) NET_packetDestroy(aPacket);
             }
+
             if(aServer->isOff)break;
         }
+
     }
     mutex_lock(&stop_mutex);
     stop = 1;
@@ -132,6 +150,8 @@ int main(int argc, char **argv ){
 
     thread_join(projThread);
     mutex_destroy(&stop_mutex);
+
+    enemyDestroy(aEnemies);
 
     NET_serverDestroy(aServer);
     NET_serverDestroySDL();
@@ -152,6 +172,25 @@ void* projektil_threads(void *arg){
     }
     printf("Projectile thread exiting.\n");
     return NULL;
+}
+
+void NET_serverSendEnemiesPacket(Server aServer, GameState GS, Enemies aEnemies){
+    EnemyPacket packet[MAX_ENEMIES] = {0};
+    SDL_Point pos;
+    for (int i = 0; i < MAX_ENEMIES; i++){
+        pos = enemyGetPoint(aEnemies, i); 
+        // printf("Fiende #%d: x: %d\n", i, pos.x);
+        packet[i].pos = pos;
+        packet[i].direction = enemyGetDirection(aEnemies, i);
+        //printf("enemy #%d: dir: %d\n", i, packet[i].direction);
+
+    }
+    Uint32 payloadSize = MAX_ENEMIES * sizeof(EnemyPacket);
+    for (int i = 0; i < aServer->clientCount; i++){
+        if(aServer->clients[i].State == GS || GS == -1){
+            NET_serverSendArray(aServer, GLOBAL, ENEMY_POS, packet, payloadSize, i);
+        }
+    }
 }
 
 void NET_serverSetNewMap(Server aServer){
@@ -328,6 +367,38 @@ void NET_serverUpdatePlayer(Server aServer, Packet aPacket, GameState state){
     }
 
     NET_serverSendPlayerPacket(aServer,state); 
+}
+
+void NET_serverUpdateEnemies(Server aServer, Enemies aEnemies){
+    
+    for (int i = 0; i < MAX_ENEMIES; i++){
+        int closestDist = INT_MAX;
+
+        SDL_Point ClosestPlayerPos = {0,0};
+        SDL_Point EnemyPos = enemyGetPoint(aEnemies, i);
+        SDL_Point playerPos;
+
+        for (int j = 0; j <aServer->clientCount; j++)
+        {
+            playerPos.x = aServer->clients[j].player.hitBox.x;
+            playerPos.y = aServer->clients[j].player.hitBox.y;
+
+            int dx = playerPos.x - EnemyPos.x;
+            int dy = playerPos.y - EnemyPos.y;
+            int diff = dx * dx + dy * dy;
+
+            if (diff < closestDist){
+                closestDist = diff;
+                ClosestPlayerPos = playerPos;
+            }
+        } 
+
+        if (aServer->clientCount > 0){
+            PlayerTracker(aEnemies, ClosestPlayerPos, i);
+            enemyAngleTracker(aEnemies, ClosestPlayerPos, i);
+        }
+    }
+    NET_serverSendEnemiesPacket(aServer, NEMUR, aEnemies);
 }
 
 void NET_serverChangeGameStateOnClient(Server aServer,Packet aPacket){
@@ -548,3 +619,4 @@ int NET_serverAssignColorIndex(Server aServer){
     }
     return -1;
 }
+

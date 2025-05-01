@@ -53,6 +53,48 @@ void renderProjectiles(Client aClient, ClientView *pView) {
     }
 }
 
+void renderEnemy(Client aClient, ClientView *pView) {
+    static int frame = 0;
+    frame++;
+    int playerCount = NET_clientGetPlayerCount(aClient);
+    int selfIndex = NET_clientGetSelfIndex(aClient);
+    SDL_Point selfPos = NET_clientGetPlayerPos(aClient, selfIndex);
+    int centerX = pView->windowWidth/2;
+    int centerY = pView->windowHeight/2;
+    int renderSizeHalf = pView->playerRenderSize/2;
+
+    for(int i = 0; i < MAX_ENEMIES; i++) {
+        SDL_Point pos = NET_clientGetEnemyPos(aClient, i);
+
+        int worldOffsetX = pos.x - selfPos.x;
+        int worldOffsetY = pos.y - selfPos.y;
+        float scale = (float)pView->playerRenderSize / RENDER_SIZE;
+        float screenOffsetX = worldOffsetX * scale;
+        float screenOffsetY = worldOffsetY * scale;
+        int direction = NET_clientGetEnemyDirection(aClient, i);
+        if (direction < 0 || direction > 7) {
+            fprintf(stderr, "ERROR: Invalid direction: %d\n", direction);
+            direction = 0;  // or clamp, or skip rendering
+        }
+
+        SDL_Rect enemyRect;
+        enemyRect = (SDL_Rect){
+                .x = (int)(centerX + screenOffsetX - renderSizeHalf),
+                .y = (int)(centerY + screenOffsetY - renderSizeHalf),
+                .w = pView->playerRenderSize / 2,
+                .h = pView->playerRenderSize / 2
+            };
+        SDL_Rect src;
+        src = (SDL_Rect){((frame/2)%24)*SPRITE_SIZE, direction*SPRITE_SIZE, SPRITE_SIZE, SPRITE_SIZE};
+
+        //pView->PlayerPos[i] = (SDL_Point){.x = playerRect.x, .y = playerRect.y};
+        //SDL_SetRenderDrawColor(pView->pRend, 255, 0, 0, 255);
+        //SDL_RenderFillRect(pView->pRend, &enemyRect);
+
+        SDL_RenderCopy(pView->pRend, pView->enemyTexture, &src, &enemyRect);
+    }
+}
+
 void renderPlayers(Client aClient, ClientView *pView) {
     static int frame = 0;
     frame++;
@@ -103,6 +145,7 @@ void renderPlayers(Client aClient, ClientView *pView) {
                 .h = pView->playerRenderSize
             };
         }
+
         pView->PlayerPos[i] = (SDL_Point){.x = playerRect.x, .y = playerRect.y};
         
         SDL_Rect src;
@@ -120,9 +163,10 @@ void renderPlayers(Client aClient, ClientView *pView) {
         int playerCharacter = NET_clientGetPlayerCharacter(aClient, i);
         SDL_RenderCopy(pView->pRend, pView->playerTexture[playerCharacter], &src, &playerRect);
         RenderPlayerName(aClient, pView, i, playerRect);
-        // SDL_SetRenderDrawColor(pView->pRend, 255, 255, 255, 255);
+
+        //SDL_SetRenderDrawColor(pView->pRend, 255, 0, 0, 0);
         // SDL_Rect rpoint = {centerX-5,centerY-5 + renderSizeHalf, 10, 10};
-        // SDL_RenderFillRect(pView->pRend, &rpoint);
+        //SDL_RenderFillRect(pView->pRend, &playerRect);
     }
 }
 

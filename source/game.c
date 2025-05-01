@@ -64,6 +64,12 @@ void runLobby(Client aClient, Map aMap, ClientControl *pControl, ClientView *pVi
     SDL_Point lastPosition[MAX_CLIENTS];
     SDL_Point playerPos;
 
+    for (int i = 0; i < MAX_ENEMIES; i++)
+    {
+        SDL_Point point = NET_clientGetEnemyPos(aClient, i);
+        //printf("enemy #%d: pos: %d\n", i, point.x);
+    }
+
     enableMouseTexture(pView->crosshair);
     updatePositioning(aClient, lastPosition, &playerPos, selfIndex);
 
@@ -168,13 +174,12 @@ static void renderLobby(ClientView *pView, Map aMap, Client aClient, TerminalHub
     SDL_RenderClear(pView->pRend);
 
     MAP_MapRender(pView->pRend, aMap);
-
-    
     
     renderPlayers(aClient, pView);
     for (int i = 0; i < NET_clientGetPlayerCount(aClient); i++){
         hudRender(pView->aHud,pView->pRend,NET_clientGetPlayerColorIndex(aClient,i),i);
     }
+
     if (terminalHub.isVisible) {
         renderTerminalHub(pView, terminalHub);
     }
@@ -255,6 +260,8 @@ void renderPlanet(ClientView *pView, Map aMap, Client aClient){
 
     MAP_MapRender(pView->pRend, aMap);
     renderPlayers(aClient, pView);
+
+    renderEnemy(aClient, pView);
     
     renderProjectiles(aClient, pView);
 

@@ -4,6 +4,7 @@
 #include <stdlib.h>
 #include "../../include/NET/shared.h"
 #include "../../include/MAP/map.h"
+#include "../../include/NET/enemies.h"
 enum PlayerAnimationTypes{ANIMATION_IDLE, ANIMATION_RUNNING, EMOTE_TPOSE};
 
 typedef struct __attribute__((packed)) Proj {
@@ -13,7 +14,7 @@ typedef struct __attribute__((packed)) Proj {
 }Proj;
 
 typedef struct Player Player;
-
+typedef struct enemy Enemy;
 struct client;
 typedef struct client *Client;
 
@@ -61,4 +62,9 @@ SDL_Point NET_clientGetSelfPos(Client aClient);
 
 SDL_Color NET_clientGetColor(int index);
 SDL_Color NET_GetPlayerColor(Client aClient, int index);
+
+void NET_clientUpdateEnemy(Client aClient, Packet aPacket);
+SDL_Point NET_clientGetEnemyPos(Client aClient, int index);
+int NET_clientGetEnemyDirection(Client aClient, int index);
+
 #endif
