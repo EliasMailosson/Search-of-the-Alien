@@ -49,7 +49,7 @@ void renderProjectiles(Client aClient, ClientView *pView) {
                 .w = 20,
                 .h = 20
             };
-            SDL_RenderCopyEx(pView->pRend, pView->projectileTexture[PROJ_TEX_PURPLE_LASER], NULL, &projRect, angleDegrees, NULL, SDL_FLIP_NONE);
+            SDL_RenderCopyEx(pView->pRend, pView->projectileTexture[PROJ_TEX_BULLET], NULL, &projRect, angleDegrees, NULL, SDL_FLIP_NONE);
             // SDL_SetRenderDrawColor(pView->pRend, 255, 255, 0, 255);
             // SDL_RenderFillRect(pView->pRend, &projRect);
         }
