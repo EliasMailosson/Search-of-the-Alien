@@ -6,8 +6,8 @@
 #include <time.h>
 #include <inttypes.h>
 
-#define MAP_WIDTH 1000
-#define MAP_HEIGHT 1000
+#define MAP_WIDTH 600
+#define MAP_HEIGHT 600
 #define RANGE 13
 #define MAP_OFFSET 0
 
