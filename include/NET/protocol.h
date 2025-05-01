@@ -22,6 +22,7 @@ typedef struct PlayerPacket{
     int direction;
     int colorIndex;
     int playerCharacter;
+    bool isShooting;
 }PlayerPacket;  
 
 void NET_protocolSendInt(UDPpacket *pUDPpkg,UDPsocket Socket,IPaddress IP,

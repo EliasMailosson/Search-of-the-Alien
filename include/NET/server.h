@@ -10,6 +10,7 @@
 #define CLIENT_PROJ_RANGE 1200
 
 typedef struct Player Player;
+typedef struct Weapon Weapon;
 
 typedef struct User User;
 
@@ -40,6 +41,7 @@ SDL_Rect NET_serverGetPlayerHitbox(Server aServer, int playerIndex);
 int NET_serverGetClientCount(Server aServer);
 void NET_serverSetPlayerHitbox(Server aServer, int playerIndex, SDL_Rect r);
 void NET_serverSetNewMap(Server aServer);
+int NET_serverGetProjectileSpeed(Server aServer, int playerIdx);
 
 
 //server util

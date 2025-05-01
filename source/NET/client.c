@@ -1,5 +1,10 @@
 #include "../../include/NET/client.h"
 #include "../../include/UI/friend.h"
+
+struct WeaponStats {
+    int type;
+    int level;
+};
 struct Player{
     GameState state;
     char username[MAX_USERNAME_LEN]; //myusername
@@ -9,6 +14,7 @@ struct Player{
     int colorIndex;
     SDL_Color color;
     int playerCharacter;
+    bool isShooting;
 };
 struct client{
     SDLNet_SocketSet socketSet;
@@ -16,13 +22,14 @@ struct client{
     UDPpacket *pReceivePacket;
     UDPpacket *pSendPacket;
     IPaddress serverAddr;
-    char selfUsername[MAX_USERNAME_LEN]; //andras usernames
+    char selfUsername[MAX_USERNAME_LEN]; //andras usernames // va?
 
     int PlayerCount;
     Player playerList[MAX_CLIENTS];
     bool isHubVisible;
     uint32_t seed;
     Proj projList[MAX_CLIENT_PROJ];
+    WeaponStats weaponStatList[3];
 }; 
 
 bool NET_clientConnect(Client aClient){
@@ -77,6 +84,8 @@ Client NET_clientCreate(){
     strcpy(aClient->selfUsername,"None");
     aClient->isHubVisible = false;
     aClient->seed = 0;
+
+    NET_clientLoadWeaponStats(aClient);
     return aClient;
 }
 void NET_clientGetPlayerName(Client aClient, int playerIndex, char* username) {
@@ -138,6 +147,8 @@ SDL_Point NET_clientGetPlayerPos(Client aClient, int playerIdx) {
 }
 
 void NET_clientDestroy(Client aClient){
+    NET_clientSaveWeaponStats(aClient);
+
     if(aClient->pReceivePacket != NULL){
         SDLNet_FreePacket(aClient->pReceivePacket);
         aClient->pReceivePacket = NULL;
@@ -231,6 +242,10 @@ void NET_clientReceiver(Client aClient, Map aMap,SDL_Window *pScreen){
     }
 }
 
+int NET_clientGetClientState(Client aClient, int playerIdx) {
+    return aClient->playerList[playerIdx].state;
+}
+
 int NET_clientGetPlayerDirection(Client aClient, int playerIdx) {
     return aClient->playerList[playerIdx].direction;
 }
@@ -251,7 +266,12 @@ void NET_clientUpdatePlayerList(Client aClient, Packet aPacket){
         strcpy(aClient->playerList[i].username, packets[i].username);
         aClient->playerList[i].color = NET_clientGetColor(aClient->playerList[i].colorIndex);
         aClient->playerList[i].playerCharacter = packets[i].playerCharacter;
+        aClient->playerList[i].isShooting = packets[i].isShooting;
     }
+}
+
+int NET_clientIsShooting(Client aClient, int playerIdx) {
+    return aClient->playerList[playerIdx].isShooting;
 }
 
 void NET_clientUpdateProjList(Client aClient, Packet aPacket) {
@@ -316,4 +336,32 @@ int NET_clientGetPlayerColorIndex(Client aClient,int index){
 
 bool NET_clientGetTerminalHub(Client aClient){
     return aClient->isHubVisible;
+}
+
+void NET_clientLoadWeaponStats(Client aClient) {
+    FILE *fp ;
+    fp = fopen("data/weapon-stats.csv", "r");
+    if (fp != NULL)
+    {   
+        char buf[32];
+        for(int i = 0; i < 3; i++) {
+            fgets(buf, 32, fp);
+            sscanf_s(buf, "%d,%d", &aClient->weaponStatList[i].type, &aClient->weaponStatList[i].level);
+        }
+    }
+
+    fclose(fp);
+}
+
+void NET_clientSaveWeaponStats(Client aClient) {
+    FILE *fp ;
+    fp = fopen("data/weapon-stats.csv", "w");
+    if (fp != NULL)
+    {   
+        for(int i = 0; i < 3; i++) {
+            fprintf(fp, "%d,%d\n", aClient->weaponStatList[i].type, aClient->weaponStatList[i].level);
+        }
+    }
+
+    fclose(fp);
 }

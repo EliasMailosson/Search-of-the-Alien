@@ -62,7 +62,18 @@ void startClient(Client *aClient, ClientView *pView,ClientControl *pControl){
     SDL_FreeSurface(surface6);
     SDL_Surface *surface7 = IMG_Load("assets/images/Projectiles/purple Laser.png");
     pView->projectileTexture[PROJ_TEX_PURPLE_LASER] = SDL_CreateTextureFromSurface(pView->pRend, surface7);
-    SDL_FreeSurface(surface7);
+    SDL_Surface *surface8 = IMG_Load("assets/images/player/blowface_shooting.png");
+    pView->playerTexture[3] = SDL_CreateTextureFromSurface(pView->pRend, surface8);
+    SDL_FreeSurface(surface8);
+    SDL_Surface *surface9 = IMG_Load("assets/images/player/biggie_shooting.png");
+    pView->playerTexture[4] = SDL_CreateTextureFromSurface(pView->pRend, surface9);
+    SDL_FreeSurface(surface9);
+    SDL_Surface *surface10 = IMG_Load("assets/images/player/cleopatricia_shooting.png");
+    pView->playerTexture[5] = SDL_CreateTextureFromSurface(pView->pRend, surface10);
+    SDL_FreeSurface(surface10);
+    SDL_Surface *surface11 = IMG_Load("assets/images/player/shadow.png");
+    pView->shadowTexture = SDL_CreateTextureFromSurface(pView->pRend, surface11);
+    SDL_FreeSurface(surface11);
 
     pView->crosshair = createScaledCursor("assets/images/cursor/crosshair.png", 50, 50, 25, 25);
 
@@ -129,6 +140,7 @@ void killClient(Client *aClient, ClientView *pView){
         SDL_DestroyTexture(pView->playerTexture[i]);
         pView->playerTexture[i] = NULL;
     }
+    SDL_DestroyTexture(pView->shadowTexture);
 
     for (int i = 0; i < MAX_PROJECTILE_TEXTURES; i++)
     {

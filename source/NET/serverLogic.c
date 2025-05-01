@@ -162,7 +162,7 @@ void NET_projectileKill(Server aServer, Projectile *list, int projIdx) {
 void NET_projectilesUpdate(Server aServer, Projectile *list) {
     int projCount = NET_serverGetProjCount(aServer);
     for(int i = 0; i < projCount; i++) {
-        float speed = 10.0f; // TO DO: get projectile speed from player- weapon attributes
+        float speed = (float)NET_serverGetProjectileSpeed(aServer, list[i].srcPlayerIdx);
 
         float r = ((float)list[i].angle / 255.0f) * (2.0f * M_PI);
         float dx = cosf(r);

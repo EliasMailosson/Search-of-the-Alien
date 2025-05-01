@@ -15,6 +15,7 @@
 #include "../include/hud.h"
 
 #define MAX_PLAYER_CHARACTERS 3
+#define MAX_PLAYER_TEXTURES 6
 #define MAX_BUTTONS_TERMINAL_HUB 4
 #define MAX_PROJECTILE_TEXTURES 4
 
@@ -33,13 +34,14 @@ typedef struct {
     bool windowFullscreen;
     char myUsername[MAX_USERNAME_LEN];
 
-    SDL_Cursor *crosshair;
-    SDL_Texture *playerTexture[MAX_PLAYER_CHARACTERS];
-    int playerRenderSize;
+        SDL_Cursor *crosshair;
+        SDL_Texture *playerTexture[MAX_PLAYER_TEXTURES];
+        int playerRenderSize;
     TTF_Font *fonts;
     Hud aHud;
     SDL_Point PlayerPos[MAX_CLIENTS];
     SDL_Texture *projectileTexture[MAX_PROJECTILE_TEXTURES];
+    SDL_Texture *shadowTexture;
 }ClientView; 
 
 typedef struct {
