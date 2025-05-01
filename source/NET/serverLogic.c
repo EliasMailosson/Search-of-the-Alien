@@ -77,9 +77,7 @@ void NET_serverCheckPlayerCollision(Server aServer, int selfIdx, int *collide) {
         for (int j = i + 1; j < playerCount; j++) {
             SDL_Rect p1 = NET_serverGetPlayerHitbox(aServer, i);
             SDL_Rect p2 = NET_serverGetPlayerHitbox(aServer, j);
-            p1.x;
-            p2.x;
-
+            
             float p1CenterX = p1.x + p1.w / 2.0f;
             float p1CenterY = p1.y + p1.h / 2.0f;
             float p2CenterX = p2.x + p2.w / 2.0f;
