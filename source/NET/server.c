@@ -233,7 +233,10 @@ void NET_serverSendProjPacket(Server aServer) {
             }
 
             Uint32 payloadSize = MAX_CLIENT_PROJ * sizeof(ProjPacket);
-            NET_serverSendArray(aServer, GLOBAL, PROJ_LIST, packet, payloadSize, player);
+            UDPpacket* SendProj = SDLNet_AllocPacket(512);
+            NET_protocolSendArray(SendProj,aServer->serverSocket, aServer->clients[player].IP,GLOBAL,PROJ_LIST,packet,payloadSize);
+            //NET_serverSendArray(aServer, GLOBAL, PROJ_LIST, packet, payloadSize, player);
+            SDLNet_FreePacket(SendProj);
         }
     }
 }
