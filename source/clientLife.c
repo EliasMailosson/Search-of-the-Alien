@@ -62,6 +62,7 @@ void startClient(Client *aClient, ClientView *pView,ClientControl *pControl){
     SDL_FreeSurface(surface6);
     SDL_Surface *surface7 = IMG_Load("assets/images/Projectiles/purple Laser.png");
     pView->projectileTexture[PROJ_TEX_PURPLE_LASER] = SDL_CreateTextureFromSurface(pView->pRend, surface7);
+    SDL_FreeSurface(surface7);
     SDL_Surface *surface8 = IMG_Load("assets/images/player/blowface_shooting.png");
     pView->playerTexture[3] = SDL_CreateTextureFromSurface(pView->pRend, surface8);
     SDL_FreeSurface(surface8);

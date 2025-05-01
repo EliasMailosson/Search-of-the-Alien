@@ -17,7 +17,7 @@
 #define MAX_PLAYER_CHARACTERS 3
 #define MAX_PLAYER_TEXTURES 6
 #define MAX_BUTTONS_TERMINAL_HUB 4
-#define MAX_PROJECTILE_TEXTURES 4
+#define MAX_PROJECTILE_TEXTURES 5
 
 typedef struct menu Menu;
 typedef struct {
