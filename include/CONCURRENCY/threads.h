@@ -37,4 +37,6 @@ int mutex_lock(mutex_t* mutex);
 int mutex_unlock(mutex_t* mutex);
 int mutex_destroy(mutex_t* mutex);
 
+int mutex_trylock(mutex_t* mutex);
+
 #endif 

@@ -43,6 +43,10 @@ int mutex_lock(mutex_t* mutex) {
     return 0;
 }
 
+int mutex_trylock(mutex_t* mutex){
+    return TryEnterCriticalSection(mutex) ? 0 : EBUSY;
+}
+
 int mutex_unlock(mutex_t* mutex) {
     LeaveCriticalSection(mutex);
     return 0;
@@ -69,6 +73,10 @@ int mutex_init(mutex_t* mutex) {
 
 int mutex_lock(mutex_t* mutex) {
     return pthread_mutex_lock(mutex);
+}
+
+int mutex_trylock(mutex_t* mutex){
+    return pthread_mutex_trylock(mutex);
 }
 
 int mutex_unlock(mutex_t* mutex) {
