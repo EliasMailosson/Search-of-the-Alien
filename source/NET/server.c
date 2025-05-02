@@ -41,6 +41,7 @@ int stop = 0;
 mutex_t stop_mutex;
 thread_t projThread; 
 
+static int test = 1;
 
 int main(int argc, char **argv ){
     (void)argc; (void)argv;
@@ -48,7 +49,7 @@ int main(int argc, char **argv ){
     Server aServer = {0};
     Uint32 lastSendTime = SDL_GetTicks();
     Enemies aEnemies = {0};
-    aEnemies = enemyCreate(MAX_ENEMIES);
+    aEnemies = enemyCreate();
     int enemyCount = enemyGetCount(aEnemies);
     enemySpawn(aEnemies);
     aServer = NET_serverCreate();
@@ -366,7 +367,6 @@ void NET_serverUpdatePlayer(Server aServer, Packet aPacket, GameState state){
 }
 
 void NET_serverUpdateEnemies(Server aServer, Enemies aEnemies, int enemyCount){
-    int shotDamege = 1;
     for (int i = 0; i < enemyCount; i++){
         int closestDist = INT_MAX;
 
@@ -393,7 +393,6 @@ void NET_serverUpdateEnemies(Server aServer, Enemies aEnemies, int enemyCount){
             PlayerTracker(aEnemies, ClosestPlayerPos, i);
             enemyAngleTracker(aEnemies, ClosestPlayerPos, i);
         }
-        SDL_Rect result;
         SDL_Rect enemyRect = enemyGetRect(aEnemies, i);
         for (int j = 0; j < aServer->projCount; j++) {
             SDL_Rect projectileRect = {
@@ -402,15 +401,16 @@ void NET_serverUpdateEnemies(Server aServer, Enemies aEnemies, int enemyCount){
                 .w = PROJECTILEWIDTH,
                 .h = PROJECTILEWIDTH
             };
-        
-        if (SDL_IntersectRect(&projectileRect, &enemyRect, &result))
+
+        if (enemyColitino(projectileRect, enemyRect))
         {
+            test++;
             // enemyDamaged(aEnemies, shotDamege, i, &enemyCount);
             // printf("Rectangles intersect at (%d, %d, %d, %d)\n", result.x, result.y, result.w, result.h);
             // printf("Checking collision: proj (%d,%d,%d,%d) vs enemy (%d,%d,%d,%d)\n",
             //         projectileRect.x, projectileRect.y, projectileRect.w, projectileRect.h,
             //         enemyRect.x, enemyRect.y, enemyRect.w, enemyRect.h);
-            printf("%d\n", SDL_IntersectRect(&projectileRect, &enemyRect, &result));
+            printf("%d, %d\n", enemyColitino(projectileRect, enemyRect),test);
         }
         }
     }

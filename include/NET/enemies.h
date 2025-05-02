@@ -9,7 +9,7 @@ typedef struct enemy Enemy;
 // enum id?
 enum enemyID {LIGHT_ENEMY, HEAVY_ENEMY, BOSS_ENEMY};
 
-Enemies enemyCreate(int capacity);
+Enemies enemyCreate();
 
 SDL_Point enemyGetPoint(Enemies aEnemies, int index);
 
@@ -32,5 +32,7 @@ SDL_Rect enemyGetRect(Enemies aEnemies, int index);
 void enemyDamaged(Enemies aEnemies, int damage, int index, int *enemyCount);
 
 int enemyGetCount(Enemies aEnemies);
+
+bool enemyColitino(SDL_Rect A,SDL_Rect B);
 
 #endif

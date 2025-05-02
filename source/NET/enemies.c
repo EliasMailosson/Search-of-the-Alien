@@ -20,19 +20,19 @@ typedef struct enemies {
     int capacity;
 }enemies;
 
-Enemies enemyCreate(int capacity){
+Enemies enemyCreate(){
     Enemies aEnemies =  malloc(sizeof(struct enemies));
+    aEnemies->count = 1;
     if(aEnemies == NULL){
         fprintf(stderr,"Error allocating memory for server\n");
         return NULL;
     }
-    aEnemies->enemyList = malloc(sizeof(struct enemy) * capacity);
+    aEnemies->enemyList = malloc(sizeof(struct enemy) * aEnemies->count);
     if(aEnemies->enemyList == NULL){
         free(aEnemies);
         fprintf(stderr,"Error allocating memory for server\n");
         return NULL;
     }
-    aEnemies->count = capacity;
 
     return aEnemies;
 }
@@ -134,4 +134,15 @@ void enemyDamaged(Enemies aEmemies, int damage, int index, int *pEnemyCount){
 
 int enemyGetCount(Enemies aEnemies){
     return aEnemies->count;
+}
+
+bool enemyColitino(SDL_Rect A,SDL_Rect B){
+    if(A.x + A.w >= B.x && 
+        A.x <= B.x + B.w &&
+        A.y + A.h >= B.y &&
+        A.y <= B.y + B.h){
+        return true;
+    }else{
+        return false;
+    }
 }
