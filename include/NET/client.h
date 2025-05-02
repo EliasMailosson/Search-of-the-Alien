@@ -13,6 +13,7 @@ typedef struct __attribute__((packed)) Proj {
     uint8_t textureIdx;
 }Proj;
 
+typedef struct WeaponStats WeaponStats;
 typedef struct Player Player;
 typedef struct enemy Enemy;
 struct client;
@@ -34,6 +35,7 @@ int NET_clientGetState(Client aClient);
 void NET_clientSendInt(Client aClient,GameState GS, MessageType msgType,int placeHolder);
 void NET_clientSendString(Client aClient,GameState GS, MessageType msgType,const char* str);
 void NET_clientSendArray(Client aClient,GameState GS, MessageType msgType,const void* array, Uint32 arraySize);
+int NET_clientGetClientState(Client aClient, int playerIdx);
 
 void NET_clientSetSelfName(Client aClient, char* newName);
 
@@ -45,6 +47,7 @@ int NET_clientGetPlayerDirection(Client aClient, int playerIdx);
 void NET_clientGetSelfname(Client aClient, char* outputName);
 int NET_clientGetSelfIndex(Client aClient);
 int NET_clientGetPlayerColorIndex(Client aClient,int index);
+int NET_clientIsShooting(Client aClient, int playerIdx);
 
 int NET_clientGetPlayerCharacter(Client aClient, int playerIdx);
 void NET_clientGetProjList(Client aClient, Proj *outputProjList);
@@ -59,6 +62,9 @@ void NET_clientUpdateGameState(Client aClient,Packet aPacket);
 void NET_clientUpdatePlayerList(Client aClient,Packet aPacket);
 //----------
 SDL_Point NET_clientGetSelfPos(Client aClient);
+
+void NET_clientSaveWeaponStats(Client aClient);
+void NET_clientLoadWeaponStats(Client aClient);
 
 SDL_Color NET_clientGetColor(int index);
 SDL_Color NET_GetPlayerColor(Client aClient, int index);

@@ -51,6 +51,30 @@ void startClient(Client *aClient, ClientView *pView,ClientControl *pControl){
     SDL_Surface *surface3 = IMG_Load("assets/images/player/cleopatra.png");
     pView->playerTexture[CHARACTER_CLEOPATRA] = SDL_CreateTextureFromSurface(pView->pRend, surface3);
     SDL_FreeSurface(surface3);
+    SDL_Surface *surface4 = IMG_Load("assets/images/Projectiles/Bullet.png");
+    pView->projectileTexture[PROJ_TEX_BULLET] = SDL_CreateTextureFromSurface(pView->pRend, surface4);
+    SDL_FreeSurface(surface4);
+    SDL_Surface *surface5 = IMG_Load("assets/images/Projectiles/Fire projectile.png");
+    pView->projectileTexture[PROJ_TEX_FIRE] = SDL_CreateTextureFromSurface(pView->pRend, surface5);
+    SDL_FreeSurface(surface5);
+    SDL_Surface *surface6 = IMG_Load("assets/images/Projectiles/neon blue_laser.png");
+    pView->projectileTexture[PROJ_TEX_NEON_LASER] = SDL_CreateTextureFromSurface(pView->pRend, surface6);
+    SDL_FreeSurface(surface6);
+    SDL_Surface *surface7 = IMG_Load("assets/images/Projectiles/purple Laser.png");
+    pView->projectileTexture[PROJ_TEX_PURPLE_LASER] = SDL_CreateTextureFromSurface(pView->pRend, surface7);
+    SDL_FreeSurface(surface7);
+    SDL_Surface *surface8 = IMG_Load("assets/images/player/blowface_shooting.png");
+    pView->playerTexture[3] = SDL_CreateTextureFromSurface(pView->pRend, surface8);
+    SDL_FreeSurface(surface8);
+    SDL_Surface *surface9 = IMG_Load("assets/images/player/biggie_shooting.png");
+    pView->playerTexture[4] = SDL_CreateTextureFromSurface(pView->pRend, surface9);
+    SDL_FreeSurface(surface9);
+    SDL_Surface *surface10 = IMG_Load("assets/images/player/cleopatricia_shooting.png");
+    pView->playerTexture[5] = SDL_CreateTextureFromSurface(pView->pRend, surface10);
+    SDL_FreeSurface(surface10);
+    SDL_Surface *surface11 = IMG_Load("assets/images/player/shadow.png");
+    pView->shadowTexture = SDL_CreateTextureFromSurface(pView->pRend, surface11);
+    SDL_FreeSurface(surface11);
 
     SDL_Surface *surface4 = IMG_Load("assets/images/enemy/enemy_bear_running.png");
     pView->enemyTexture = SDL_CreateTextureFromSurface(pView->pRend, surface4);
@@ -122,6 +146,14 @@ void killClient(Client *aClient, ClientView *pView){
         pView->playerTexture[i] = NULL;
     }
     SDL_DestroyTexture(pView->enemyTexture);
+    SDL_DestroyTexture(pView->shadowTexture);
+
+    for (int i = 0; i < MAX_PROJECTILE_TEXTURES; i++)
+    {
+        SDL_DestroyTexture(pView->projectileTexture[i]);
+        pView->projectileTexture[i] = NULL;
+    }
+    
 
     hudDestroy(pView->aHud);
     NET_clientDestroy(*aClient);

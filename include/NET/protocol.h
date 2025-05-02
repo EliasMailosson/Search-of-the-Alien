@@ -7,7 +7,7 @@
 #define MAX_USERNAME_LEN 40
 #define MAX_CLIENT_PROJ 32
 
-enum ProjectileTextures{PROJ_TEX_NONE, PROJ_TEX_BULLET, PROJ_TEX_LASER, PROJ_TEX_FIRE};
+enum ProjectileTextures{PROJ_TEX_NONE, PROJ_TEX_BULLET, PROJ_TEX_FIRE, PROJ_TEX_NEON_LASER, PROJ_TEX_PURPLE_LASER};
 
 typedef struct __attribute__((packed)) projPacket {
     int16_t x, y;
@@ -22,6 +22,7 @@ typedef struct PlayerPacket{
     int direction;
     int colorIndex;
     int playerCharacter;
+    bool isShooting;
 }PlayerPacket;  
 
 typedef struct enemyPacket{

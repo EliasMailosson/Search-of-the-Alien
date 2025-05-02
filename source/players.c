@@ -34,21 +34,24 @@ void renderProjectiles(Client aClient, ClientView *pView) {
     int centerX = pView->windowWidth/2;
     int centerY = pView->windowHeight/2;
 
+    
     float scale = (float)pView->playerRenderSize / RENDER_SIZE;
-
+    
     for(int i = 0; i < MAX_CLIENT_PROJ; i++) {
         if(projList[i].textureIdx == PROJ_TEX_BULLET) {
             int screenX = (int)roundf(centerX - (float)projList[i].x * scale);
             int screenY = (int)roundf(centerY - (float)projList[i].y * scale);
+            double angleDegrees = (projList[i].angle / 255.0) * 360;
 
             SDL_Rect projRect = (SDL_Rect){
                 .x = screenX,
                 .y = screenY,
-                .w = 10,
-                .h = 10
+                .w = 20,
+                .h = 20
             };
-            SDL_SetRenderDrawColor(pView->pRend, 255, 255, 0, 255);
-            SDL_RenderFillRect(pView->pRend, &projRect);
+            SDL_RenderCopyEx(pView->pRend, pView->projectileTexture[PROJ_TEX_BULLET], NULL, &projRect, angleDegrees, NULL, SDL_FLIP_NONE);
+            // SDL_SetRenderDrawColor(pView->pRend, 255, 255, 0, 255);
+            // SDL_RenderFillRect(pView->pRend, &projRect);
         }
     }
 }
@@ -114,8 +117,51 @@ void renderPlayers(Client aClient, ClientView *pView) {
 
     sortByYaxis(aClient, playerCount, sortedIndex);
 
+    // shadow
     for(int n = 0; n < playerCount; n++) {
         int i = sortedIndex[n];
+        if(NET_clientGetState(aClient) != NET_clientGetClientState(aClient, i)) {
+            continue;
+        }
+
+        SDL_Point pos = NET_clientGetPlayerPos(aClient, i);
+        pos.x -= renderSizeHalf;
+        pos.y -= pView->playerRenderSize;
+
+        int worldOffsetX = pos.x - selfPos.x;
+        int worldOffsetY = pos.y - selfPos.y;
+        float scale = (float)pView->playerRenderSize / RENDER_SIZE;
+        float screenOffsetX = worldOffsetX * scale;
+        float screenOffsetY = worldOffsetY * scale;
+
+        SDL_Rect playerRect;
+        if(selfIndex == i) {
+            playerRect = (SDL_Rect){
+                .x = centerX - renderSizeHalf,
+                .y = centerY + renderSizeHalf/6,
+                .w = pView->playerRenderSize,
+                .h = renderSizeHalf
+            };
+        }
+        else {
+            playerRect = (SDL_Rect){
+                .x = (int)(centerX + screenOffsetX - pView->playerRenderSize/6),
+                .y = (int)(centerY + screenOffsetY + pView->playerRenderSize/5) + renderSizeHalf + renderSizeHalf/6,
+                .w = pView->playerRenderSize,
+                .h = renderSizeHalf
+            };
+        }
+        pView->PlayerPos[i] = (SDL_Point){.x = playerRect.x, .y = playerRect.y};
+        
+        SDL_RenderCopy(pView->pRend, pView->shadowTexture, NULL, &playerRect);
+    }
+
+    // character
+    for(int n = 0; n < playerCount; n++) {
+        int i = sortedIndex[n];
+        if(NET_clientGetState(aClient) != NET_clientGetClientState(aClient, i)) {
+            continue;
+        }
 
         SDL_Point pos = NET_clientGetPlayerPos(aClient, i);
         pos.x -= renderSizeHalf;
@@ -147,6 +193,9 @@ void renderPlayers(Client aClient, ClientView *pView) {
         }
 
         pView->PlayerPos[i] = (SDL_Point){.x = playerRect.x, .y = playerRect.y};
+
+        int shootAnimationOffset = 0;
+        if(NET_clientIsShooting(aClient, i)) shootAnimationOffset = 3;
         
         SDL_Rect src;
         switch(NET_clientGetPlayerAnimation(aClient, i)) {
@@ -160,7 +209,7 @@ void renderPlayers(Client aClient, ClientView *pView) {
                 src = (SDL_Rect){((frame/2)%24)*SPRITE_SIZE, direction*SPRITE_SIZE, SPRITE_SIZE, SPRITE_SIZE};
         }
         
-        int playerCharacter = NET_clientGetPlayerCharacter(aClient, i);
+        int playerCharacter = NET_clientGetPlayerCharacter(aClient, i) + shootAnimationOffset;
         SDL_RenderCopy(pView->pRend, pView->playerTexture[playerCharacter], &src, &playerRect);
         RenderPlayerName(aClient, pView, i, playerRect);
 

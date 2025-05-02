@@ -4,6 +4,7 @@ build/**
 assets/images/tiles/tileDesigns/**
 data/*.txt
 runClients.bat
+data/weapon-stats.csv
 
 # macOS junk
 .DS_Store
