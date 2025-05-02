@@ -161,7 +161,7 @@ void* enemies_threads(void *arg){
         NET_serverUpdateEnemies(aServer, aServer->aEnemies);
         sleep_ms(10);
     }
-    printf("Enemise thread exiting.\n");
+    printf("Enemise thread exiting. id: %lu\n",(unsigned long)thread_self());
     return NULL;
 }
 
@@ -178,7 +178,7 @@ void* projektil_threads(void *arg){
         NET_serverSendProjPacket(aServer);
         sleep_ms(10);
     }
-    printf("Projectile thread exiting.\n");
+    printf("Projectile thread exiting. id: %lu\n",(unsigned long)thread_self());
     return NULL;
 }
 
