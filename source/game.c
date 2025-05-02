@@ -261,11 +261,12 @@ void renderPlanet(ClientView *pView, Map aMap, Client aClient){
     SDL_RenderClear(pView->pRend);
 
     MAP_MapNewRender(pView->pRend, aMap, pView->pWin);
+    renderProjectiles(aClient, pView);
     renderPlayers(aClient, pView);
 
     renderEnemy(aClient, pView);
     
-    renderProjectiles(aClient, pView);
+    
 
     for (int i = 0; i < NET_clientGetPlayerCount(aClient); i++){
         hudRender(pView->aHud,pView->pRend,NET_clientGetPlayerColorIndex(aClient,i),i);

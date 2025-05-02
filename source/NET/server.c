@@ -385,7 +385,7 @@ void NET_serverUpdatePlayer(Server aServer, Packet aPacket, GameState state){
         aServer->clients[playerIdx].player.weapon.damage = 4;
         aServer->clients[playerIdx].player.weapon.projFreq = 30;
         aServer->clients[playerIdx].player.weapon.projSpeed = 14;
-        aServer->clients[playerIdx].player.weapon.projType = PROJ_TEX_BULLET;
+        aServer->clients[playerIdx].player.weapon.projType = PROJ_TEX_NEON_LASER;
         break;
 
         case CHARACTER_BIGGIE:
@@ -399,7 +399,7 @@ void NET_serverUpdatePlayer(Server aServer, Packet aPacket, GameState state){
         aServer->clients[playerIdx].player.weapon.damage = 10;
         aServer->clients[playerIdx].player.weapon.projFreq = 40;
         aServer->clients[playerIdx].player.weapon.projSpeed = 5;
-        aServer->clients[playerIdx].player.weapon.projType = PROJ_TEX_BULLET;
+        aServer->clients[playerIdx].player.weapon.projType = PROJ_TEX_PURPLE_LASER;
         break;
     }
 

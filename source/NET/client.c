@@ -57,6 +57,10 @@ void NET_clientGetProjList(Client aClient, Proj *outputProjList) {
     }
 }
 
+int NET_clientGetProjTexture(Client aClient, int projIdx) {
+    return aClient->projList[projIdx].textureIdx;
+}
+
 Client NET_clientCreate(){
 
     Client aClient = malloc(sizeof(struct client));

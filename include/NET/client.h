@@ -38,6 +38,7 @@ void NET_clientSendArray(Client aClient,GameState GS, MessageType msgType,const 
 int NET_clientGetClientState(Client aClient, int playerIdx);
 
 void NET_clientSetSelfName(Client aClient, char* newName);
+int NET_clientGetProjTexture(Client aClient, int projIdx);
 
 void NET_clientSetPlayerAnimation(Client aClient, int playerIdx, int newAnimation);
 int NET_clientGetPlayerAnimation(Client aClient, int playerIdx);
