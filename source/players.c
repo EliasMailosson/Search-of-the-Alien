@@ -44,8 +44,8 @@ void renderProjectiles(Client aClient, ClientView *pView) {
             SDL_Rect projRect = (SDL_Rect){
                 .x = screenX,
                 .y = screenY,
-                .w = 10,
-                .h = 10
+                .w = PROJECTILEWIDTH,
+                .h = PROJECTILEHEIGHT
             };
             SDL_SetRenderDrawColor(pView->pRend, 255, 255, 0, 255);
             SDL_RenderFillRect(pView->pRend, &projRect);

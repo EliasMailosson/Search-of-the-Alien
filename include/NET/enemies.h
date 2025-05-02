@@ -2,7 +2,7 @@
 #define ENEMIES_H
 #include "../../include/NET/shared.h"
 
-#define MAX_ENEMIES 5
+#define MAX_ENEMIES 1
 
 typedef struct enemies* Enemies;
 typedef struct enemy Enemy;
@@ -27,5 +27,10 @@ float enemyGetAngle(Enemies aEnemies, int index);
 
 void enemyDestroy(Enemies aEnemies);
 
+SDL_Rect enemyGetRect(Enemies aEnemies, int index);
+
+void enemyDamaged(Enemies aEnemies, int damage, int index, int *enemyCount);
+
+int enemyGetCount(Enemies aEnemies);
 
 #endif

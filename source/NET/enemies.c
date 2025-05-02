@@ -38,7 +38,7 @@ Enemies enemyCreate(int capacity){
 }
 
 void enemySpawn(Enemies aEnemies){
-    for (int i = 0; i < MAX_ENEMIES; i++){
+    for (int i = 0; i < aEnemies->count; i++){
         aEnemies->enemyList[i].enemyRect.x = i*64;
         aEnemies->enemyList[i].enemyRect.y = i*512;
         aEnemies->enemyList[i].enemyRect.w = 64;
@@ -117,4 +117,21 @@ SDL_Point enemyGetPoint(Enemies aEnemies, int index){
 void enemyDestroy(Enemies aEnemies){
     free(aEnemies);
     aEnemies = NULL;
+}
+
+SDL_Rect enemyGetRect(Enemies aEnemies, int index){
+    return aEnemies->enemyList[index].enemyRect;
+}
+
+void enemyDamaged(Enemies aEmemies, int damage, int index, int *pEnemyCount){
+    aEmemies->enemyList[index].HP.currentHP -= damage;
+    printf("%f\n", aEmemies->enemyList[index].HP.currentHP);
+    if (aEmemies->enemyList[index].HP.currentHP <= 0)
+    {
+        *pEnemyCount -= 1;
+    }
+}
+
+int enemyGetCount(Enemies aEnemies){
+    return aEnemies->count;
 }
