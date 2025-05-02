@@ -147,6 +147,30 @@ void checkEnemyCollision(Enemies aEnemies, int enemyindex, int *collide){
     }
 }
 
+void enemyAngleTracker(Enemies aEnemies, SDL_Point playerPos, int enemyIndex) {
+    Enemy *enemy = &aEnemies->enemyList[enemyIndex];
+    playerPos.x+=64;
+    playerPos.y+=64;
+
+    float dx = playerPos.x - (float)enemy->hitbox.x;
+    float dy = playerPos.y - (float)enemy->hitbox.y;
+    float angle = atan2f(dy, dx);   
+    enemy->angle = angle;
+
+    int raw = (int)roundf(angle / M_PI_4);  
+
+    enemy->direction = (raw + 3 + 8) % 8;         
+}
+
+
+int enemyGetDirection(Enemies aEnemies, int index){
+    return aEnemies->enemyList[index].direction;
+}
+
+float enemyGetAngle(Enemies aEnemies, int index){
+    return aEnemies->enemyList[index].angle;
+}
+
 void SetEnemyHitbox(Enemies aEnemies, int enemyindex, SDL_Rect HB){
     aEnemies->enemyList[enemyindex].hitbox = HB;
 }
