@@ -44,20 +44,20 @@ void enemySpawn(Enemies aEnemies){
     }
 }
 
-void enemyAI(Enemies aEnemies, SDL_Point playerpos, ServerMap aMap){
+void enemyAI(Enemies aEnemies, SDL_Point playerpos){
 
     Uint32 CurrentThinkTime = SDL_GetTicks();
     for (int i = 0; i < MAX_ENEMIES; i++)
     {
         if (CurrentThinkTime >= aEnemies->enemyList[i].ThinkTime)
         {
-            PlayerTracker(aEnemies, playerpos, i, aMap);
+            PlayerTracker(aEnemies, playerpos, i);
             aEnemies->enemyList[i].ThinkTime = CurrentThinkTime + 3000;
         }
     }
 }
 
-void PlayerTracker(Enemies aEnemies, SDL_Point playerPos, int enemyindex, ServerMap aMap){
+void PlayerTracker(Enemies aEnemies, SDL_Point playerPos, int enemyindex){
 
     const int speed = 1;
 

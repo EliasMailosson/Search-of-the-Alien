@@ -26,9 +26,9 @@ SDL_Rect enemyGetHitbox(Enemies aEnemies, int index);
 void SetEnemyHitbox(Enemies aEnemies, int enemyindex, SDL_Rect H);
 
 void enemySpawn(Enemies aEnemies);
-void enemyAI(Enemies aEnemies, SDL_Point playerpos, ServerMap aMap);
+void enemyAI(Enemies aEnemies, SDL_Point playerpos); //ServerMap aMap
 
-void PlayerTracker(Enemies aEnemies, SDL_Point playerPos, int enemyindex, ServerMap aMap);
+void PlayerTracker(Enemies aEnemies, SDL_Point playerPos, int enemyindex); //ServerMap aMap
 
 void enemyDestroy(Enemies aEnemies);
 
