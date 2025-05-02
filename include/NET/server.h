@@ -43,7 +43,7 @@ void NET_serverSetNewMap(Server aServer);
 void NET_serverUpdateClientMap(Server aServer);
 
 
-void NET_serverUpdateEnemies(Server aServer, Enemies aEnemies);
+void NET_serverUpdateEnemies(Server aServer, Enemies aEnemies, ServerMap aMap);
 
 //server util
 int NET_serverFindPlayerID(Server aServer, const char* str);

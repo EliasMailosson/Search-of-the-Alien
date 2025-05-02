@@ -27,14 +27,14 @@ Enemies enemyCreate(){
 }
 
 void enemySpawn(Enemies aEnemies){
-    aEnemies->enemyList[0].hitbox.x = 0;
-    aEnemies->enemyList[0].hitbox.y = 0;
+    aEnemies->enemyList[0].hitbox.x = 250;
+    aEnemies->enemyList[0].hitbox.y = 1000;
     
-    aEnemies->enemyList[1].hitbox.x = 256;
-    aEnemies->enemyList[1].hitbox.y = 256;
+    aEnemies->enemyList[1].hitbox.x = 200;
+    aEnemies->enemyList[1].hitbox.y = 1000;
 
-    aEnemies->enemyList[2].hitbox.x = 512;
-    aEnemies->enemyList[2].hitbox.y = 512;
+    aEnemies->enemyList[2].hitbox.x = 300;
+    aEnemies->enemyList[2].hitbox.y = 1000;
 
     for (int i = 0; i < MAX_ENEMIES; i++)
     {
@@ -44,20 +44,7 @@ void enemySpawn(Enemies aEnemies){
     }
 }
 
-void enemyAI(Enemies aEnemies, SDL_Point playerpos){
-
-    Uint32 CurrentThinkTime = SDL_GetTicks();
-    for (int i = 0; i < MAX_ENEMIES; i++)
-    {
-        if (CurrentThinkTime >= aEnemies->enemyList[i].ThinkTime)
-        {
-            PlayerTracker(aEnemies, playerpos, i);
-            aEnemies->enemyList[i].ThinkTime = CurrentThinkTime + 3000;
-        }
-    }
-}
-
-void PlayerTracker(Enemies aEnemies, SDL_Point playerPos, int enemyindex){
+void PlayerTracker(Enemies aEnemies, SDL_Point playerPos, int enemyindex, ServerMap aMap){
 
     const int speed = 1;
 
@@ -74,10 +61,11 @@ void PlayerTracker(Enemies aEnemies, SDL_Point playerPos, int enemyindex){
         else if (enemy->hitbox.y > playerPos.y)
             enemy->hitbox.y -= speed;
 
-        // if (MAP_TileNotWalkable(aMap, enemy->hitbox.x, enemy->hitbox.y)) {
-        //     enemy->hitbox = oldPos;
-        //     return;
-        // }
+        if (MAP_TileNotWalkable(aMap, enemy->hitbox.x, enemy->hitbox.y)) {
+            enemy->hitbox = oldPos;
+            printf("enemy not walk lol\n");
+            return;
+        }
 
         int collision = 0;
         checkEnemyCollision(aEnemies,enemyindex,&collision);
