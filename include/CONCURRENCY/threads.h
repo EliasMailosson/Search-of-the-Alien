@@ -5,7 +5,13 @@
 #include <windows.h>
 typedef HANDLE thread_t;
 typedef CRITICAL_SECTION mutex_t;
+
 static inline void sleep_ms(int ms) { Sleep(ms); }
+
+static inline uintptr_t thread_self(void) {
+        return (uintptr_t)GetCurrentThreadId();
+}
+
 #else
 #include <pthread.h>
 #include <unistd.h>
@@ -23,4 +29,8 @@ int mutex_lock(mutex_t* mutex);
 int mutex_unlock(mutex_t* mutex);
 int mutex_destroy(mutex_t* mutex);
 
-#endif // THREAD_H
+static inline uintptr_t thread_self(void) {
+    return (uintptr_t)pthread_self();
+}
+
+#endif 
