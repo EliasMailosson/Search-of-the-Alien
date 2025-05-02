@@ -70,7 +70,7 @@ void PlayerTracker(Enemies aEnemies, SDL_Point playerPos, int enemyindex, Server
 
         if (MAP_TileNotWalkable(aMap, enemy->hitbox.x, enemy->hitbox.y)) {
             enemy->hitbox = oldPos;
-            printf("enemy not walk lol\n");
+            //printf("enemy not walk lol\n");
             return;
         }
 

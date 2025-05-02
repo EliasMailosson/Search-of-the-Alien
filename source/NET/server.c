@@ -167,7 +167,7 @@ void* enemies_threads(void *arg){
         mutex_unlock(&stop_mutex);
         if(should_stop) break;
 
-        NET_serverUpdateEnemies(aServer, aServer->aEnemies);
+        NET_serverUpdateEnemies(aServer, aServer->aEnemies,aServer->aServerMap);
         sleep_ms(10);
     }
     printf("Enemise thread exiting. id: %lu\n",(unsigned long)thread_self());
