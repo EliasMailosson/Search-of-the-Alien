@@ -1,5 +1,6 @@
 #include "../../include/NET/client.h"
 #include "../../include/UI/friend.h"
+#include <stdio.h>
 
 struct WeaponStats {
     int type;
@@ -346,7 +347,7 @@ void NET_clientLoadWeaponStats(Client aClient) {
         char buf[32];
         for(int i = 0; i < 3; i++) {
             fgets(buf, 32, fp);
-            sscanf_s(buf, "%d,%d", &aClient->weaponStatList[i].type, &aClient->weaponStatList[i].level);
+            sscanf(buf, "%d,%d", &aClient->weaponStatList[i].type, &aClient->weaponStatList[i].level);
         }
     }
 
