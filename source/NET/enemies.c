@@ -39,10 +39,10 @@ Enemies enemyCreate(int capacity){
 
 void enemySpawn(Enemies aEnemies){
     for (int i = 0; i < MAX_ENEMIES; i++){
-        aEnemies->enemyList[i].enemyRect.x = i*64;
-        aEnemies->enemyList[i].enemyRect.y = i*512;
-        aEnemies->enemyList[i].enemyRect.w = 64;
-        aEnemies->enemyList[i].enemyRect.h = 64;
+        aEnemies->enemyList[i].hitbox.x = i*64;
+        aEnemies->enemyList[i].hitbox.y = i*512;
+        aEnemies->enemyList[i].hitbox.w = 64;
+        aEnemies->enemyList[i].hitbox.h = 64;
         aEnemies->enemyList[i].ThinkTime = 0;
         aEnemies->enemyList[i].direction = 0;
         aEnemies->enemyList[i].angle = 0.0f;
