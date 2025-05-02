@@ -78,7 +78,8 @@ int main(int argc, char **argv ){
         Uint32 nowTime = SDL_GetTicks();
         // 10ms is a good start
         if (nowTime - lastSendTime > 10) {
-            NET_serverUpdateEnemies(aServer, aEnemies);
+            
+            NET_serverUpdateEnemies(aServer, aEnemies, aServer->aServerMap);
             lastSendTime = nowTime;
         }
 
@@ -402,7 +403,7 @@ void NET_serverUpdatePlayer(Server aServer, Packet aPacket, GameState state){
     NET_serverSendPlayerPacket(aServer,state); 
 }
 
-void NET_serverUpdateEnemies(Server aServer, Enemies aEnemies){
+void NET_serverUpdateEnemies(Server aServer, Enemies aEnemies, ServerMap aMap){
     
     for (int i = 0; i < MAX_ENEMIES; i++){
         int closestDist = INT_MAX;
@@ -427,7 +428,7 @@ void NET_serverUpdateEnemies(Server aServer, Enemies aEnemies){
         } 
 
         if (aServer->clientCount > 0){
-            PlayerTracker(aEnemies, ClosestPlayerPos, i);
+            PlayerTracker(aEnemies, ClosestPlayerPos, i, aMap);
             enemyAngleTracker(aEnemies, ClosestPlayerPos, i);
         }
     }

@@ -48,7 +48,7 @@ void NET_serverSetNewMap(Server aServer);
 int NET_serverGetProjectileSpeed(Server aServer, int playerIdx);
 
 
-void NET_serverUpdateEnemies(Server aServer, Enemies aEnemies);
+void NET_serverUpdateEnemies(Server aServer, Enemies aEnemies, ServerMap aMap);
 
 //server util
 int NET_serverFindPlayerID(Server aServer, const char* str);

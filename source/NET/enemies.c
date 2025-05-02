@@ -6,7 +6,7 @@ typedef struct healthPoints {
 } HealthPoints;
 
 typedef struct enemy {
-    SDL_Rect enemyRect;
+    SDL_Rect hitbox;
     int enemyID;
     HealthPoints HP;
     Uint32 ThinkTime;
@@ -51,66 +51,122 @@ void enemySpawn(Enemies aEnemies){
     }
 }
 
-void enemyAI(Enemies aEnemies, SDL_Point playerpos){
+void PlayerTracker(Enemies aEnemies, SDL_Point playerPos, int enemyindex, ServerMap aMap){
 
-    Uint32 CurrentThinkTime = SDL_GetTicks();
-    for (int i = 0; i < MAX_ENEMIES; i++)
-    {
-        if (CurrentThinkTime >= aEnemies->enemyList[i].ThinkTime)
+    const int speed = 1;
+
+    Enemy* enemy = &aEnemies->enemyList[enemyindex];
+    SDL_Rect oldPos = enemy->hitbox;
+    
+        if (enemy->hitbox.x < playerPos.x)
+            enemy->hitbox.x += speed;
+        else if (enemy->hitbox.x > playerPos.x)
+            enemy->hitbox.x -= speed;
+
+        if (enemy->hitbox.y < playerPos.y)
+            enemy->hitbox.y += speed;
+        else if (enemy->hitbox.y > playerPos.y)
+            enemy->hitbox.y -= speed;
+
+        if (MAP_TileNotWalkable(aMap, enemy->hitbox.x, enemy->hitbox.y)) {
+            enemy->hitbox = oldPos;
+            printf("enemy not walk lol\n");
+            return;
+        }
+
+        int collision = 0;
+        checkEnemyCollision(aEnemies,enemyindex,&collision);
+
+        SDL_Rect playerHitbox = { playerPos.x, playerPos.y, enemy->hitbox.w, enemy->hitbox.h };
+        bool collidedWithPlayer = SDL_HasIntersection(&enemy->hitbox, &playerHitbox);
+
+        if (collision || collidedWithPlayer)
         {
-            PlayerTracker(aEnemies, playerpos, i);
-            enemyAngleTracker(aEnemies, playerpos, i);
-            aEnemies->enemyList[i].ThinkTime = CurrentThinkTime + 30;
+            enemy->hitbox = oldPos;
+        }
+}
+
+void checkEnemyCollision(Enemies aEnemies, int enemyindex, int *collide){
+    int enemyCount = MAX_ENEMIES;
+    float resistance = 1.0f;
+
+    *collide = 0;
+    for (int i = 0; i < enemyCount; i++)
+    {
+        for (int j = i + 1; j < enemyCount; j++)
+        {
+            SDL_Rect e1 = enemyGetHitbox(aEnemies,i);
+            SDL_Rect e2 = enemyGetHitbox(aEnemies,j);
+
+            float e1CenterX = e1.x + e1.w / 2.0f;
+            float e1CenterY = e1.y + e1.h / 2.0f;
+            float e2CenterX = e2.x + e2.w / 2.0f;
+            float e2CenterY = e2.y + e2.h / 2.0f;
+
+            bool isIntersected = (
+                e1.x < e2.x + e2.w &&
+                e1.x + e1.w > e2.x &&
+                e1.y < e2.y + e2.h &&
+                e1.y + e1.h > e2.y
+            );
+
+            if (isIntersected)
+            {
+                float intersectX = (e1.w / 2.0f + e2.w / 2.0f) - fabs(e1CenterX - e2CenterX);
+                float intersectY = (e1.h / 2.0f + e2.h / 2.0f) - fabs(e1CenterY - e2CenterY);
+
+                if (intersectX < intersectY)
+                {
+                    if ((enemyindex == i || enemyindex == j) && *collide == 0)
+                    {
+                        *collide = 1;
+                    }
+                    if (e1CenterX < e2CenterX){
+                        e1.x -= (int)ceil(resistance);
+                        e2.x += (int)ceil(resistance);
+                    }else{
+                        e1.x += (int)ceil(resistance);
+                        e2.x -= (int)ceil(resistance);
+                    } 
+                } else {
+                    if ((enemyindex == i || enemyindex == j) && *collide == 0)
+                    {
+                        *collide = 1;
+                    }
+                    if (e1CenterY < e2CenterY)
+                    {
+                        e1.y -= (int)ceil(resistance);
+                        e2.y += (int)ceil(resistance);
+                    } else {
+                        e1.y += (int)ceil(resistance);
+                        e2.y -= (int)ceil(resistance);
+                    }
+                }
+            }
         }
     }
 }
 
-void PlayerTracker(Enemies aEnemies, SDL_Point playerPos, int enemyindex){
-    const int speed = 1;
-    int dx = 0;
-    int dy = 0;
-
-    Enemy *enemy = &aEnemies->enemyList[enemyindex];
-
-    if (enemy->enemyRect.x < playerPos.x + 64)      dx =  speed; // Hard coded + 64 to get middle of the Player
-    else if (enemy->enemyRect.x > playerPos.x + 64) dx = -speed;
-
-    if (enemy->enemyRect.y < playerPos.y + 64)      dy =  speed;
-    else if (enemy->enemyRect.y > playerPos.y + 64) dy = -speed;
-
-    enemy->enemyRect.x += dx;
-    enemy->enemyRect.y += dy;
+void SetEnemyHitbox(Enemies aEnemies, int enemyindex, SDL_Rect HB){
+    aEnemies->enemyList[enemyindex].hitbox = HB;
 }
 
-void enemyAngleTracker(Enemies aEnemies, SDL_Point playerPos, int enemyIndex) {
-    Enemy *enemy = &aEnemies->enemyList[enemyIndex];
-    playerPos.x+=64;
-    playerPos.y+=64;
-
-    float dx = playerPos.x - (float)enemy->enemyRect.x;
-    float dy = playerPos.y - (float)enemy->enemyRect.y;
-    float angle = atan2f(dy, dx);   
-    enemy->angle = angle;
-
-    int raw = (int)roundf(angle / M_PI_4);  
-
-    enemy->direction = (raw + 3 + 8) % 8;         
-}
-
-
-int enemyGetDirection(Enemies aEnemies, int index){
-    return aEnemies->enemyList[index].direction;
-}
-
-float enemyGetAngle(Enemies aEnemies, int index){
-    return aEnemies->enemyList[index].angle;
+SDL_Rect enemyGetHitbox(Enemies aEnemies, int index){
+    SDL_Rect hitbox = {
+        .x = aEnemies->enemyList[index].hitbox.x,
+        .y = aEnemies->enemyList[index].hitbox.y,
+        .w = aEnemies->enemyList[index].hitbox.w,
+        .h = aEnemies->enemyList[index].hitbox.h
+    };
+    return hitbox;
 }
 
 SDL_Point enemyGetPoint(Enemies aEnemies, int index){
     SDL_Point point = {
-        .x = aEnemies->enemyList[index].enemyRect.x,
-        .y = aEnemies->enemyList[index].enemyRect.y
+        .x = aEnemies->enemyList[index].hitbox.x,
+        .y = aEnemies->enemyList[index].hitbox.y
     };
+
     return point;
 }
 
