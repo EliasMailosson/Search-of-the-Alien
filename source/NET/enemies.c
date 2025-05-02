@@ -154,11 +154,6 @@ SDL_Rect enemyGetHitbox(Enemies aEnemies, int index){
     return hitbox;
 }
 
-// int GetEnemyCount(Enemies aEnemies){
-//     aEnemies = (sizeof(aEnemies->enemyList)/sizeof(Enemies));
-//     return aEnemies->enemyList;
-// }
-
 SDL_Point enemyGetPoint(Enemies aEnemies, int index){
     SDL_Point point = {
         .x = aEnemies->enemyList[index].hitbox.x,
