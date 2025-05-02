@@ -22,7 +22,18 @@ int semaphore_destroy(semaphore_t* sem) {
 #else // POSIX
 
 int semaphore_init(semaphore_t* sem, unsigned int value) {
-    return sem_init(sem, 0, value); // 0 = shared between threads
+    #if defined(__clang__)
+    # pragma clang diagnostic push
+    # pragma clang diagnostic ignored "-Wdeprecated-declarations"
+    #endif
+
+    int result = sem_init(sem, 0, value);
+
+    #if defined(__clang__)
+    # pragma clang diagnostic pop
+    #endif
+
+    return result;
 }
 
 int semaphore_wait(semaphore_t* sem) {
@@ -34,8 +45,18 @@ int semaphore_post(semaphore_t* sem) {
 }
 
 int semaphore_destroy(semaphore_t* sem) {
-    return sem_destroy(sem);
+    #if defined(__clang__)
+    # pragma clang diagnostic push
+    # pragma clang diagnostic ignored "-Wdeprecated-declarations"
+    #endif
+
+    int result = sem_destroy(sem);
+
+    #if defined(__clang__)
+    # pragma clang diagnostic pop
+    #endif
+
+    return result;
 }
 
 #endif
-
