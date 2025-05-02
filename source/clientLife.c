@@ -76,9 +76,9 @@ void startClient(Client *aClient, ClientView *pView,ClientControl *pControl){
     pView->shadowTexture = SDL_CreateTextureFromSurface(pView->pRend, surface11);
     SDL_FreeSurface(surface11);
 
-    SDL_Surface *surface4 = IMG_Load("assets/images/enemy/enemy_bear_running.png");
-    pView->enemyTexture = SDL_CreateTextureFromSurface(pView->pRend, surface4);
-    SDL_FreeSurface(surface4);
+    SDL_Surface *surface12 = IMG_Load("assets/images/enemy/enemy_bear_running.png");
+    pView->enemyTexture = SDL_CreateTextureFromSurface(pView->pRend, surface12);
+    SDL_FreeSurface(surface12);
 
     pView->crosshair = createScaledCursor("assets/images/cursor/crosshair.png", 50, 50, 25, 25);
 
