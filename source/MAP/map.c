@@ -95,7 +95,6 @@ void MAP_MapNewRender(SDL_Renderer* rend, Map map, SDL_Window* win){
     const int quarterH  = tileH / 4;
     const int offsetX   = map->tileRect.x;
     const int offsetY   = map->tileRect.y;
-    int renderedCount   = 0;
 
     for (int y = 0; y < MAP_HEIGHT; ++y) {
         int edgeL = (int)ceil(( - tileW - offsetX + y*halfW) / (float)halfW);
@@ -109,11 +108,9 @@ void MAP_MapNewRender(SDL_Renderer* rend, Map map, SDL_Window* win){
             int screenY = (x + y)*quarterH + offsetY;
             if (screenY + tileH  < 0 || screenY > winH) continue;
             SDL_Rect dst = { screenX, screenY, tileW, tileH };
-            renderedCount++;
             MAP_TileRender(rend, map, y, x, &dst);
         }
     }
-    //printf("tiles rendered this frame: %d\n", renderedCount);
 }
 
 void MAP_TileRender(SDL_Renderer *pRend, Map aMap, int y, int x, SDL_Rect *currentRect){

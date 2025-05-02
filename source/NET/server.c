@@ -39,27 +39,29 @@ struct server {
     int projCount;
     bool isOff;
     ServerMap aServerMap;
+    Enemies aEnemies;
     bool usedColors[MAX_COLORS];
 };
 
 static void keyPressedListener(Server aServer, int playerIdx, ServerMap aServerMap);
 
 void* projektil_threads(void *arg);
+void* enemies_threads(void *arg);
 
 int stop = 0;
 mutex_t stop_mutex;
 thread_t projThread; 
+thread_t enemyThread;
 
 
 int main(int argc, char **argv ){
     (void)argc; (void)argv;
     NET_serverInitSDL();
     Server aServer = {0};
-    Uint32 lastSendTime = SDL_GetTicks();
-    Enemies aEnemies = {0};
-    aEnemies = enemyCreate(MAX_ENEMIES);
-    enemySpawn(aEnemies);
+
     aServer = NET_serverCreate();
+    aServer->aEnemies = enemyCreate(MAX_ENEMIES);
+    enemySpawn(aServer->aEnemies);
     memset(aServer->usedColors, 0, sizeof(aServer->usedColors));
     bool isRunning;
     aServer->aServerMap = NET_serverMapCreate();
@@ -73,16 +75,9 @@ int main(int argc, char **argv ){
     
     mutex_init(&stop_mutex);
     thread_create(&projThread, projektil_threads,aServer);
+    thread_create(&enemyThread,enemies_threads,aServer);
 
     while (isRunning){
-        Uint32 nowTime = SDL_GetTicks();
-        // 10ms is a good start
-        if (nowTime - lastSendTime > 10) {
-            
-            NET_serverUpdateEnemies(aServer, aEnemies, aServer->aServerMap);
-            lastSendTime = nowTime;
-        }
-
         int numReady = SDLNet_CheckSockets(aServer->socketSet, 10); 
         if (numReady == -1) {
             fprintf(stderr, "SDLNet_CheckSockets error: %s\n", SDLNet_GetError());
@@ -154,14 +149,31 @@ int main(int argc, char **argv ){
     mutex_unlock(&stop_mutex);
 
     thread_join(projThread);
+    thread_join(enemyThread);
     mutex_destroy(&stop_mutex);
 
-    enemyDestroy(aEnemies);
+    enemyDestroy(aServer->aEnemies);
 
     NET_serverDestroy(aServer);
     NET_serverDestroySDL();
     return 0;
 }
+
+void* enemies_threads(void *arg){
+    Server aServer = (Server)arg;
+    while (1){
+        mutex_lock(&stop_mutex);
+        int should_stop = stop;
+        mutex_unlock(&stop_mutex);
+        if(should_stop) break;
+
+        NET_serverUpdateEnemies(aServer, aServer->aEnemies);
+        sleep_ms(10);
+    }
+    printf("Enemise thread exiting. id: %lu\n",(unsigned long)thread_self());
+    return NULL;
+}
+
 
 void* projektil_threads(void *arg){
     Server aServer = (Server)arg;
@@ -175,7 +187,7 @@ void* projektil_threads(void *arg){
         NET_serverSendProjPacket(aServer);
         sleep_ms(10);
     }
-    printf("Projectile thread exiting.\n");
+    printf("Projectile thread exiting. id: %lu\n",(unsigned long)thread_self());
     return NULL;
 }
 
@@ -191,11 +203,14 @@ void NET_serverSendEnemiesPacket(Server aServer, GameState GS, Enemies aEnemies)
 
     }
     Uint32 payloadSize = MAX_ENEMIES * sizeof(EnemyPacket);
+    UDPpacket* SendEnemies = SDLNet_AllocPacket(512);
     for (int i = 0; i < aServer->clientCount; i++){
         if(aServer->clients[i].State == GS || GS == -1){
-            NET_serverSendArray(aServer, GLOBAL, ENEMY_POS, packet, payloadSize, i);
+            NET_protocolSendArray(SendEnemies,aServer->serverSocket, aServer->clients[i].IP, GLOBAL, ENEMY_POS, packet, payloadSize);
+            //NET_serverSendArray(aServer, GLOBAL, ENEMY_POS, packet, payloadSize, i);
         }
     }
+    SDLNet_FreePacket(SendEnemies);
 }
 
 void NET_serverSetNewMap(Server aServer){
