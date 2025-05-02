@@ -17,6 +17,7 @@
 #define MAX_PLAYER_CHARACTERS 3
 #define MAX_PLAYER_TEXTURES 6
 #define MAX_BUTTONS_TERMINAL_HUB 4
+#define MAX_PROJECTILE_TEXTURES 5
 
 typedef struct menu Menu;
 typedef struct {
@@ -39,6 +40,7 @@ typedef struct {
     TTF_Font *fonts;
     Hud aHud;
     SDL_Point PlayerPos[MAX_CLIENTS];
+    SDL_Texture *projectileTexture[MAX_PROJECTILE_TEXTURES];
     SDL_Texture *shadowTexture;
 }ClientView; 
 
