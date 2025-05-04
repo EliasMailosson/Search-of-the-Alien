@@ -9,6 +9,7 @@
 typedef struct enemies* Enemies;
 typedef struct enemy Enemy;
 typedef struct ServerMap *ServerMap;
+typedef struct server *Server;
 
 enum enemyID {
     LIGHT_ENEMY, 
@@ -27,7 +28,7 @@ void SetEnemyHitbox(Enemies aEnemies, int enemyindex, SDL_Rect H);
 
 void enemySpawn(Enemies aEnemies);
 
-void PlayerTracker(Enemies aEnemies, SDL_Point playerPos, int enemyindex, ServerMap aMap); //ServerMap aMap
+void PlayerTracker(Enemies aEnemies, Server aServer,int playerindex, int enemyindex, ServerMap aMap);
 
 void enemyAngleTracker(Enemies aEnemies, SDL_Point playerPos, int enemyIndex);
 

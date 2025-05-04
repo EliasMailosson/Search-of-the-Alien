@@ -419,32 +419,32 @@ void NET_serverUpdatePlayer(Server aServer, Packet aPacket, GameState state){
 }
 
 void NET_serverUpdateEnemies(Server aServer, Enemies aEnemies, ServerMap aMap){
-    
-    for (int i = 0; i < MAX_ENEMIES; i++){
-        int closestDist = INT_MAX;
+    for (int i = 0; i < MAX_ENEMIES; i++) {
+        float closestDist = INT_MAX;
+        int closestPlayerIndex = -1;
 
-        SDL_Point ClosestPlayerPos = {0,0};
-        SDL_Point EnemyPos = enemyGetPoint(aEnemies, i);
-        SDL_Point playerPos;
+        SDL_Point enemyPos = enemyGetPoint(aEnemies, i);
 
-        for (int j = 0; j <aServer->clientCount; j++)
-        {
-            playerPos.x = aServer->clients[j].player.hitBox.x;
-            playerPos.y = aServer->clients[j].player.hitBox.y;
+        for (int j = 0; j < aServer->clientCount; j++) {
+            SDL_Rect playerHitbox = aServer->clients[j].player.hitBox;
+            int dx = playerHitbox.x - enemyPos.x;
+            int dy = playerHitbox.y - enemyPos.y;
+            int distSq = dx * dx + dy * dy;
 
-            int dx = playerPos.x - EnemyPos.x;
-            int dy = playerPos.y - EnemyPos.y;
-            int diff = dx * dx + dy * dy;
-
-            if (diff < closestDist){
-                closestDist = diff;
-                ClosestPlayerPos = playerPos;
+            if (distSq < closestDist) {
+                closestDist = distSq;
+                closestPlayerIndex = j;
             }
-        } 
+        }
 
-        if (aServer->clientCount > 0){
-            PlayerTracker(aEnemies, ClosestPlayerPos, i, aMap);
-            enemyAngleTracker(aEnemies, ClosestPlayerPos, i);
+        if (closestPlayerIndex != -1) {
+            PlayerTracker(aEnemies, aServer, closestPlayerIndex, i, aMap);
+
+            SDL_Point closestPos = {
+                aServer->clients[closestPlayerIndex].player.hitBox.x,
+                aServer->clients[closestPlayerIndex].player.hitBox.y
+            };
+            enemyAngleTracker(aEnemies, closestPos, i);
         }
     }
     NET_serverSendEnemiesPacket(aServer, NEMUR, aEnemies);
