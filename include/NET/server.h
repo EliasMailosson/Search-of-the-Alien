@@ -15,6 +15,7 @@
 
 typedef struct Player Player;
 typedef struct Weapon Weapon;
+typedef struct Scenario Scenario;
 
 typedef struct User User;
 typedef struct enemies* Enemies;
@@ -58,6 +59,7 @@ void NET_serverAddUser(Server aServer, User newUser);
 int NET_serverGetProjCount(Server aServer);
 float NET_serverGetPlayerAngle(Server aServer, int playerIdx);
 void NET_serverSetProjCount(Server aServer, int count);
+void NET_serverScenarioUpdate(Scenario *s, ScenarioState state, uint32_t seed);
 
 /** Freeing memory after use, for server */
 void NET_serverDestroy(Server aServer);
