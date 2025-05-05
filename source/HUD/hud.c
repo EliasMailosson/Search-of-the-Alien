@@ -86,8 +86,14 @@ static void arrowRender(Arrow aArrow,SDL_Renderer *pRend,SDL_Texture *pImg){
     }
 }
 
-void hudRender(Hud aHud,SDL_Renderer *pRend,int colerIndex,int i){
-    arrowRender(aHud->indicators[i],pRend,aHud->imgArrow[colerIndex]);
+void hudRender(Client aClient, Hud aHud,SDL_Renderer *pRend){
+    for (int i = 0; i < NET_clientGetPlayerCount(aClient); i++){
+        int colorIdx = NET_clientGetPlayerColorIndex(aClient,i);
+        arrowRender(aHud->indicators[i],pRend,aHud->imgArrow[colorIdx]);
+    }
+
+    SDL_SetRenderDrawColor(pRend, 0, 0, 255, 255);
+    SDL_RenderFillRect(pRend, &((SDL_Rect){10, 10, 40, 40}));
 }
 
 SDL_Point hudGettArrowPos(Hud aHud, int index){

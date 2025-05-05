@@ -182,9 +182,7 @@ static void renderLobby(ClientView *pView, Map aMap, Client aClient, TerminalHub
     
     
     renderPlayers(aClient, pView);
-    for (int i = 0; i < NET_clientGetPlayerCount(aClient); i++){
-        hudRender(pView->aHud,pView->pRend,NET_clientGetPlayerColorIndex(aClient,i),i);
-    }
+    hudRender(aClient, pView->aHud,pView->pRend);
 
     if (terminalHub.isVisible) {
         renderTerminalHub(pView, terminalHub);
@@ -279,9 +277,7 @@ void renderPlanet(ClientView *pView, Map aMap, Client aClient, PauseMenu *pPause
         renderPauseMenu(pView, pPauseMenu);
     }
 
-    for (int i = 0; i < NET_clientGetPlayerCount(aClient); i++){
-        hudRender(pView->aHud,pView->pRend,NET_clientGetPlayerColorIndex(aClient,i),i);
-    }
+    hudRender(aClient, pView->aHud, pView->pRend);
     SDL_RenderPresent(pView->pRend);
 }
 
