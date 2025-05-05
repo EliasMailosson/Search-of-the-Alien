@@ -196,10 +196,9 @@ void NET_serverSendEnemiesPacket(Server aServer, GameState GS, Enemies aEnemies)
     SDL_Point pos;
     for (int i = 0; i < MAX_ENEMIES; i++){
         pos = enemyGetPoint(aEnemies, i); 
-        // printf("Fiende #%d: x: %d\n", i, pos.x);
-        packet[i].pos = pos;
-        packet[i].direction = enemyGetDirection(aEnemies, i);
-        //printf("enemy #%d: dir: %d\n", i, packet[i].direction);
+        packet[i].x = (uint16_t)(pos.x);
+        packet[i].y = (uint16_t)(pos.y);
+        packet[i].direction = (uint16_t)(enemyGetDirection(aEnemies, i));
 
     }
     Uint32 payloadSize = MAX_ENEMIES * sizeof(EnemyPacket);

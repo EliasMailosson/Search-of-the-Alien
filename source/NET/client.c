@@ -57,6 +57,10 @@ void NET_clientGetProjList(Client aClient, Proj *outputProjList) {
     }
 }
 
+int NET_clientGetProjTexture(Client aClient, int projIdx) {
+    return aClient->projList[projIdx].textureIdx;
+}
+
 Client NET_clientCreate(){
 
     Client aClient = malloc(sizeof(struct client));
@@ -295,11 +299,12 @@ void NET_clientUpdatePlayerList(Client aClient, Packet aPacket){
 
 void NET_clientUpdateEnemy(Client aClient, Packet aPacket){
     EnemyPacket packets[MAX_ENEMIES] = {0};
-    NET_enemyPacketReceive(aPacket, packets);
-    for (int i = 0; i < MAX_ENEMIES; i++){
-        // printf("fiende #%d: x: %d\n", i, packets[i].pos.x);
-        aClient->enemies[i].pos = packets[i].pos;
-        aClient->enemies[i].direction = packets[i].direction;
+    int count = 0;
+    NET_enemyPacketReceive(aPacket, packets,&count);
+    for (int i = 0; i < count; i++){
+        aClient->enemies[i].pos.x = (int)packets[i].x;
+        aClient->enemies[i].pos.y = (int)packets[i].y;
+        aClient->enemies[i].direction = (int)packets[i].direction;
     }
 }
 

@@ -25,9 +25,8 @@ typedef struct PlayerPacket{
     bool isShooting;
 }PlayerPacket;  
 
-typedef struct enemyPacket{
-    SDL_Point pos;
-    int direction;
+typedef struct __attribute__((packed)) enemyPacket{
+    uint16_t x, y, direction;
 }EnemyPacket;  
 
 void NET_protocolSendInt(UDPpacket *pUDPpkg,UDPsocket Socket,IPaddress IP,
@@ -42,7 +41,7 @@ void NET_protocolSendArray(UDPpacket *pUDPpkg,UDPsocket Socket,IPaddress IP,
 void NET_playerPacketReceive(Packet aPacket, PlayerPacket *list, int *count);
 void NET_projPacketReceive(Packet aPacket, ProjPacket *list, int *count);
 
-void NET_enemyPacketReceive(Packet aPacket, EnemyPacket *enemyData);
+void NET_enemyPacketReceive(Packet aPacket, EnemyPacket *enemyData,int *enemyCount);
 
 bool NET_playerInputPacketCheck(PlayerInputPacket pip);
 

@@ -19,7 +19,7 @@ void NET_playerPacketReceive(Packet aPacket, PlayerPacket *list, int *count){
     *count = playerCount;
 }
 
-void NET_enemyPacketReceive(Packet aPacket, EnemyPacket *enemyData){
+void NET_enemyPacketReceive(Packet aPacket, EnemyPacket *enemyData,int *enemyCount){
     Uint8* raw = NET_packetGetPayload(aPacket);
     Uint32 size = NET_packetGetPayloadSize(aPacket);
 
@@ -27,8 +27,10 @@ void NET_enemyPacketReceive(Packet aPacket, EnemyPacket *enemyData){
         printf("Raw error!\n");
         return;
     }
-    int enemyCount = size / sizeof(EnemyPacket);
-    memcpy(enemyData, raw, enemyCount * sizeof(EnemyPacket));
+    int count = size / sizeof(EnemyPacket);
+    memcpy(enemyData, raw, count * sizeof(EnemyPacket));
+    *enemyCount = count;
+
 }
 
 void NET_projPacketReceive(Packet aPacket, ProjPacket *list, int *count){
