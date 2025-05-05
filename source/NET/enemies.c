@@ -70,7 +70,7 @@ void PlayerTracker(Enemies aEnemies, Server aServer, int playerIndex, int enemyI
     float vx = (px - ex) * seekWeight;
     float vy = (py - ey) * seekWeight;
     
-    //Separation från alla andra fiender
+    //Separation från alla andra fiender, "o" står för "e2" egentligen
     for (int j = 0; j < aEnemies->count; j++) {
         if (j == enemyIndex) continue;
 
@@ -164,15 +164,15 @@ void SetEnemyHitbox(Enemies aEnemies, int enemyindex, SDL_Rect HB){
 	aEnemies->enemyList[enemyindex].hitbox = HB;
 }
 
-SDL_Rect enemyGetHitbox(Enemies aEnemies, int index){
-	SDL_Rect hitbox = {
-		.x = aEnemies->enemyList[index].hitbox.x,
-		.y = aEnemies->enemyList[index].hitbox.y,
-		.w = aEnemies->enemyList[index].hitbox.w,
-		.h = aEnemies->enemyList[index].hitbox.h
-	};
-	return hitbox;
-}
+// SDL_Rect enemyGetHitbox(Enemies aEnemies, int index){
+// 	SDL_Rect hitbox = {
+// 		.x = aEnemies->enemyList[index].hitbox.x,
+// 		.y = aEnemies->enemyList[index].hitbox.y,
+// 		.w = aEnemies->enemyList[index].hitbox.w,
+// 		.h = aEnemies->enemyList[index].hitbox.h
+// 	};
+// 	return hitbox;
+// }
 
 SDL_Point enemyGetPoint(Enemies aEnemies, int index){
 	SDL_Point point = {

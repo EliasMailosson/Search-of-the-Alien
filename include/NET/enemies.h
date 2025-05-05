@@ -22,7 +22,7 @@ Enemies enemyCreate(int capacity);
 SDL_Point enemyGetPoint(Enemies aEnemies, int index);
 
 void checkEnemyCollision(Enemies aEnemies, int enemyindex, int *collide);
-SDL_Rect enemyGetHitbox(Enemies aEnemies, int index);
+// SDL_Rect enemyGetHitbox(Enemies aEnemies, int index);
 // int GetEnemyCount(Enemies aEnemies);
 void SetEnemyHitbox(Enemies aEnemies, int enemyindex, SDL_Rect H);
 
