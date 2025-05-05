@@ -18,6 +18,7 @@ typedef struct Player Player;
 typedef struct enemy Enemy;
 struct client;
 typedef struct client *Client;
+typedef struct scenC ScenC;
 
 /** Connecting to host server via a specefic address and port */
 bool NET_clientConnect(Client aClient);
@@ -73,5 +74,6 @@ SDL_Color NET_GetPlayerColor(Client aClient, int index);
 void NET_clientUpdateEnemy(Client aClient, Packet aPacket);
 SDL_Point NET_clientGetEnemyPos(Client aClient, int index);
 int NET_clientGetEnemyDirection(Client aClient, int index);
+void NET_clientScenarioUpdate(Client aClient,uint32_t seed);
 
 #endif

@@ -257,19 +257,19 @@ void NET_serverScenarioUpdate(Scenario *s, ScenarioState state, uint32_t seed){
         s->difficulty = 1;
         s->spawnFrequency = 9;
         s->startPoint = (SDL_Point){.x = 50, .y = 50};
-        s->objectivePoint = (SDL_Point){.x = 0, .x = 0};
+        s->objectivePoint = (SDL_Point){.x = 0, .y = 0};
         break;
     case WAVE:
         s->difficulty = 1;
         s->spawnFrequency = 9;
         s->startPoint = (SDL_Point){.x = 50, .y = 50};
-        s->objectivePoint = (SDL_Point){.x = 0, .x = 0};
+        s->objectivePoint = (SDL_Point){.x = 0, .y = 0};
         break;
     case PATH:
         s->difficulty = 1;
         s->spawnFrequency = 9;
         s->startPoint = (SDL_Point){.x = 50, .y = 50};
-        s->objectivePoint = (SDL_Point){.x = seed % MAP_HEIGHT, .x = seed % MAP_WIDTH};
+        s->objectivePoint = (SDL_Point){.x = seed % MAP_HEIGHT, .y = seed % MAP_WIDTH};
         break;
     default:
         break;
