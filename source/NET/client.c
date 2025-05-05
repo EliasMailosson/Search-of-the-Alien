@@ -7,6 +7,10 @@ struct enemy{
     int direction;
 };
 
+struct scenC{
+    ScenarioState state;
+    SDL_Point objectivePoint; 
+};
 struct WeaponStats {
     int type;
     int level;
@@ -38,6 +42,7 @@ struct client{
     uint32_t seed;
     Proj projList[MAX_CLIENT_PROJ];
     WeaponStats weaponStatList[3];
+    ScenC scenario; 
 }; 
 
 bool NET_clientConnect(Client aClient){
@@ -96,7 +101,7 @@ Client NET_clientCreate(){
     strcpy(aClient->selfUsername,"None");
     aClient->isHubVisible = false;
     aClient->seed = 0;
-
+    
     NET_clientLoadWeaponStats(aClient);
     return aClient;
 }
@@ -245,6 +250,7 @@ void NET_clientReceiver(Client aClient, Map aMap,SDL_Window *pScreen){
                 printf("new seed: %u\n",aClient->seed);
                 MAP_mapSetPlanet(NET_clientGetState(aClient),aMap);
                 MAP_mapNewMap(aMap,aClient->seed);
+                NET_clientScenarioUpdate(aClient,aClient->seed);
                 break;
             case PROJ_LIST:
                 NET_clientUpdateProjList(aClient, aPacket);
@@ -260,6 +266,25 @@ void NET_clientReceiver(Client aClient, Map aMap,SDL_Window *pScreen){
             }
             if(aPacket) NET_packetDestroy(aPacket);
         }
+    }
+}
+
+
+void NET_clientScenarioUpdate(Client aClient,uint32_t seed){
+    aClient->scenario.state = seed % SCENARIO_COUNT;
+    switch (aClient->scenario.state){
+    case ELIMINATIONS:
+        aClient->scenario.objectivePoint = (SDL_Point){.x = 0, .y = 0};
+        break;
+    case WAVE:
+        aClient->scenario.objectivePoint = (SDL_Point){.x = 0, .y = 0};
+        break;
+    case PATH:
+        aClient->scenario.objectivePoint = (SDL_Point){.x = seed % MAP_HEIGHT, .y = seed % MAP_WIDTH};
+        break;
+    default:
+        printf("NO SCENARIO\n");
+        break;
     }
 }
 

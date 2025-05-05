@@ -1,5 +1,14 @@
 #include "../../include/NET/server.h"
 
+struct Scenario{
+    SDL_Point startPoint;
+    SDL_Point objectivePoint;
+    float spawnFrequency;
+    int difficulty;
+    ScenarioState scenario;
+    int totalKilldEnemise;
+};
+
 struct Weapon{
     int damage;
     int projFreq;
@@ -40,6 +49,7 @@ struct server {
     bool isOff;
     ServerMap aServerMap;
     Enemies aEnemies;
+    Scenario scenario;
     bool usedColors[MAX_COLORS];
 };
 
@@ -235,6 +245,34 @@ void NET_serverSetNewMap(Server aServer){
     NET_serverMapSetEdgesToZero(aServer->aServerMap);
     NET_serverSendInt(aServer,GLOBAL,NEW_SEED,(int)NET_serverMapGetSeed(aServer->aServerMap),indexIP);
     printf("%u\n",NET_serverMapGetSeed(aServer->aServerMap));
+    aServer->scenario.scenario = ((int)NET_serverMapGetSeed(aServer->aServerMap) % SCENARIO_COUNT);
+    NET_serverScenarioUpdate(&aServer->scenario,aServer->scenario.scenario,NET_serverMapGetSeed(aServer->aServerMap));
+}
+
+void NET_serverScenarioUpdate(Scenario *s, ScenarioState state, uint32_t seed){
+    s->totalKilldEnemise = 0;
+    switch (state){
+    case ELIMINATIONS:
+        s->difficulty = 1;
+        s->spawnFrequency = 9;
+        s->startPoint = (SDL_Point){.x = 50, .y = 50};
+        s->objectivePoint = (SDL_Point){.x = 0, .y = 0};
+        break;
+    case WAVE:
+        s->difficulty = 1;
+        s->spawnFrequency = 9;
+        s->startPoint = (SDL_Point){.x = 50, .y = 50};
+        s->objectivePoint = (SDL_Point){.x = 0, .y = 0};
+        break;
+    case PATH:
+        s->difficulty = 1;
+        s->spawnFrequency = 9;
+        s->startPoint = (SDL_Point){.x = 50, .y = 50};
+        s->objectivePoint = (SDL_Point){.x = seed % MAP_HEIGHT, .y = seed % MAP_WIDTH};
+        break;
+    default:
+        break;
+    }
 }
 
 void NET_serverSendPlayerPacket(Server aServer,GameState GS){
