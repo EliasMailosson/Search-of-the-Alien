@@ -214,10 +214,12 @@ void renderPlayers(Client aClient, ClientView *pView) {
         RenderPlayerName(aClient, pView, i, playerRect);
 
         //printf("Players HP: %d\n", (int)NET_clientGetHP(aClient, i));
-         
-        //SDL_SetRenderDrawColor(pView->pRend, 255, 0, 0, 0);
+        if(NET_clientGetHP(aClient, i) < 100){ 
+            SDL_SetRenderDrawColor(pView->pRend, 255, 0, 0, 255);
+            SDL_RenderFillRect(pView->pRend, &playerRect);
+        }
+
         // SDL_Rect rpoint = {centerX-5,centerY-5 + renderSizeHalf, 10, 10};
-        //SDL_RenderFillRect(pView->pRend, &playerRect);
     }
 }
 

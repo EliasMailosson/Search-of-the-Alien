@@ -427,11 +427,12 @@ void NET_serverUpdatePlayer(Server aServer, Packet aPacket, GameState state){
     NET_serverSendPlayerPacket(aServer,state); 
 }
 
-void enemyAttackPlayer(Server aServer, int index, SDL_Rect enemyHitbox){
+bool enemyAttackPlayer(Server aServer, int index, SDL_Rect enemyHitbox){
     if(!SDL_HasIntersection(&aServer->clients[index].player.hitBox, &enemyHitbox)){
-        return;
+        return false;
     }
     aServer->clients[index].player.HP -= 1;
+    return true;
     printf("Current HP: %d\n", aServer->clients[index].player.HP);
 }
 
@@ -465,7 +466,9 @@ void NET_serverUpdateEnemies(Server aServer, Enemies aEnemies, ServerMap aMap){
             SDL_Rect enemyHitbox = enemyGetHitbox(aEnemies, i);
             Uint32 currentTime = SDL_GetTicks(); 
             if(currentTime > enemyGetAttackTime(aEnemies, i) + 1000){
-                enemyAttackPlayer(aServer, closestPlayerIndex, enemyHitbox);
+                if(enemyAttackPlayer(aServer, closestPlayerIndex, enemyHitbox)){
+                    NET_serverSendPlayerPacket(aServer, GLOBAL);
+                }
                 enemySetAttackTime(aEnemies, i);
             }
             enemyAngleTracker(aEnemies, closestPos, i);

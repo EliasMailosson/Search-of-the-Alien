@@ -48,7 +48,7 @@ void NET_serverSetNewMap(Server aServer);
 int NET_serverGetProjectileSpeed(Server aServer, int playerIdx);
 
 //server update
-void enemyAttackPlayer(Server aServer, int index, SDL_Rect enemyHitbox);
+bool enemyAttackPlayer(Server aServer, int index, SDL_Rect enemyHitbox);
 void NET_serverUpdateEnemies(Server aServer, Enemies aEnemies, ServerMap aMap);
 
 //server util
