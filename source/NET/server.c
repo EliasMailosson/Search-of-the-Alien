@@ -70,8 +70,7 @@ int main(int argc, char **argv ){
     Server aServer = {0};
 
     aServer = NET_serverCreate();
-    aServer->aEnemies = enemyCreate(MAX_ENEMIES);
-    enemySpawn(aServer->aEnemies);
+    aServer->aEnemies = NET_enemiesCreate();
     memset(aServer->usedColors, 0, sizeof(aServer->usedColors));
     bool isRunning;
     aServer->aServerMap = NET_serverMapCreate();
@@ -162,7 +161,7 @@ int main(int argc, char **argv ){
     thread_join(enemyThread);
     mutex_destroy(&stop_mutex);
 
-    enemyDestroy(aServer->aEnemies);
+    NET_enemiesDestroy(aServer->aEnemies);
 
     NET_serverDestroy(aServer);
     NET_serverDestroySDL();
@@ -171,6 +170,11 @@ int main(int argc, char **argv ){
 
 void* enemies_threads(void *arg){
     Server aServer = (Server)arg;
+    NET_enemiesPush(aServer->aEnemies,NET_enemyCreate(250,200,LIGHT_ENEMY));
+    NET_enemiesPush(aServer->aEnemies,NET_enemyCreate(300,500,LIGHT_ENEMY));
+    NET_enemiesPush(aServer->aEnemies,NET_enemyCreate(210,400,LIGHT_ENEMY));
+    NET_enemiesPush(aServer->aEnemies,NET_enemyCreate(900,500,LIGHT_ENEMY));
+    NET_enemiesPush(aServer->aEnemies,NET_enemyCreate(900,600,LIGHT_ENEMY));
     while (1){
         mutex_lock(&stop_mutex);
         int should_stop = stop;
@@ -475,7 +479,7 @@ void NET_serverUpdateEnemies(Server aServer, Enemies aEnemies, ServerMap aMap){
         }
 
         if (closestPlayerIndex != -1) {
-            PlayerTracker(aEnemies, aServer, closestPlayerIndex, i, aMap);
+            PlayerTracker(aEnemies, aServer, closestPlayerIndex, i);
 
             SDL_Point closestPos = {
                 aServer->clients[closestPlayerIndex].player.hitBox.x,

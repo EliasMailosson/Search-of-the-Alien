@@ -2,10 +2,10 @@
 #include "../../include/UI/friend.h"
 #include <stdio.h>
 
-struct enemy{
+typedef struct clientEnemy{
     SDL_Point pos;
     int direction;
-};
+}ClientEnemy;
 
 struct scenC{
     ScenarioState state;
@@ -37,7 +37,7 @@ struct client{
 
     int PlayerCount;
     Player playerList[MAX_CLIENTS];
-    Enemy enemies[MAX_ENEMIES];
+    ClientEnemy enemies[MAX_ENEMIES];
     bool isHubVisible;
     uint32_t seed;
     Proj projList[MAX_CLIENT_PROJ];

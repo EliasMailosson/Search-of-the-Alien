@@ -6,18 +6,26 @@
 
 #define MAX_ENEMIES 5
 
+typedef struct enemy *Enemy;
 typedef struct enemies* Enemies;
-typedef struct enemy Enemy;
 typedef struct ServerMap *ServerMap;
 typedef struct server *Server;
 
-enum enemyID {
+typedef enum {
     LIGHT_ENEMY, 
     HEAVY_ENEMY, 
     BOSS_ENEMY
-};
+}EnemyID;
 
-Enemies enemyCreate(int capacity);
+//Enemies enemyCreate();
+Enemies NET_enemiesCreate(void);
+int NET_enemiesPush(Enemies aE, Enemy new);
+Enemy NET_enemiesPopAt(Enemies aE, size_t index);
+Enemy NET_enemiesPopAt(Enemies aE, size_t index);
+Enemy NET_enemyCreate(int pixelX, int pixelY, EnemyID id);
+Enemy NET_enemiesGetAt(Enemies aE, size_t index);
+void NET_enemiesDestroy(Enemies aEnemies);
+
 
 SDL_Point enemyGetPoint(Enemies aEnemies, int index);
 
@@ -26,9 +34,7 @@ void checkEnemyCollision(Enemies aEnemies, int enemyindex, int *collide);
 // int GetEnemyCount(Enemies aEnemies);
 void SetEnemyHitbox(Enemies aEnemies, int enemyindex, SDL_Rect H);
 
-void enemySpawn(Enemies aEnemies);
-
-void PlayerTracker(Enemies aEnemies, Server aServer,int playerindex, int enemyindex, ServerMap aMap);
+void PlayerTracker(Enemies aEnemies, Server aServer,int playerindex, int enemyindex);
 
 void enemyAngleTracker(Enemies aEnemies, SDL_Point playerPos, int enemyIndex);
 
@@ -36,7 +42,6 @@ int enemyGetDirection(Enemies aEnemies, int index);
 
 float enemyGetAngle(Enemies aEnemies, int index);
 
-void enemyDestroy(Enemies aEnemies);
 
 
 #endif

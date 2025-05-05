@@ -15,7 +15,6 @@ typedef struct __attribute__((packed)) Proj {
 
 typedef struct WeaponStats WeaponStats;
 typedef struct Player Player;
-typedef struct enemy Enemy;
 struct client;
 typedef struct client *Client;
 typedef struct scenC ScenC;
