@@ -59,6 +59,7 @@ void NET_serverAddUser(Server aServer, User newUser);
 int NET_serverGetProjCount(Server aServer);
 float NET_serverGetPlayerAngle(Server aServer, int playerIdx);
 void NET_serverSetProjCount(Server aServer, int count);
+uint8_t NET_serverGetPercentage(int currentHP, int maxHP);
 
 /** Freeing memory after use, for server */
 void NET_serverDestroy(Server aServer);

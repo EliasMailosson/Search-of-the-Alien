@@ -17,6 +17,7 @@ struct Player{
     int projCounter;
     bool isShooting;
     int HP;
+    int maxHP;
 };
 
 struct User{
@@ -239,6 +240,12 @@ void NET_serverSetNewMap(Server aServer){
     printf("%u\n",NET_serverMapGetSeed(aServer->aServerMap));
 }
 
+uint8_t NET_serverGetPercentage(int currentHP, int maxHP){
+    if (maxHP == 0) return 0; 
+    float percent = ((float)currentHP / (float)maxHP) * 100.0f;
+    return (uint8_t)(percent); 
+}
+
 void NET_serverSendPlayerPacket(Server aServer,GameState GS){
     PlayerPacket packet[MAX_CLIENTS] = {0};
     for (int i = 0; i < aServer->clientCount; i++){
@@ -255,6 +262,7 @@ void NET_serverSendPlayerPacket(Server aServer,GameState GS){
         packet[i].colorIndex = aServer->clients[i].colorIndex;
         packet[i].playerCharacter = aServer->clients[i].player.character;
         packet[i].isShooting = aServer->clients[i].player.isShooting;
+        packet[i].HpProcent = NET_serverGetPercentage(aServer->clients[i].player.HP , aServer->clients[i].player.maxHP);
     }
     Uint32 payloadSize = aServer->clientCount * sizeof(PlayerPacket);
     for (int i = 0; i < aServer->clientCount; i++){
@@ -661,6 +669,7 @@ void NET_serverClientConnected(Packet aPacket, Server aServer){
     newUser.player.weapon.projSpeed = 14;
     // Maybe init HP when switching to a character
     newUser.player.HP = 100;
+    newUser.player.maxHP = 100;
     newUser.player.weapon.projType = PROJ_TEX_BULLET;
     newUser.State = MENU;
     newUser.colorIndex = NET_serverAssignColorIndex(aServer);

@@ -21,7 +21,7 @@ struct Player{
     SDL_Color color;
     int playerCharacter;
     bool isShooting;
-    int HP;
+    uint8_t HpProcent;
 };
 
 struct client{
@@ -282,7 +282,6 @@ void NET_clientUpdatePlayerList(Client aClient, Packet aPacket){
     PlayerPacket packets[MAX_CLIENTS] = {0};
     NET_playerPacketReceive(aPacket, packets, &aClient->PlayerCount);
     for (int i = 0; i < aClient->PlayerCount; i++){
-
         aClient->playerList[i].pos = packets[i].pos;
         aClient->playerList[i].state = packets[i].state;
         aClient->playerList[i].direction = packets[i].direction;
@@ -291,6 +290,7 @@ void NET_clientUpdatePlayerList(Client aClient, Packet aPacket){
         aClient->playerList[i].color = NET_clientGetColor(aClient->playerList[i].colorIndex);
         aClient->playerList[i].playerCharacter = packets[i].playerCharacter;
         aClient->playerList[i].isShooting = packets[i].isShooting;
+        aClient->playerList[i].HpProcent = packets[i].HpProcent;
     }
 }
 
@@ -344,6 +344,10 @@ SDL_Point NET_clientGetSelfPos(Client aClient){
         }
     }
     return (SDL_Point){-1,-1};
+}
+
+int NET_clientGetHP(Client aClient, int index){
+    return aClient->playerList[index].HpProcent;
 }
 
 SDL_Color NET_clientGetColor(int index){

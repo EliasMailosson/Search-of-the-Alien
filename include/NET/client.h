@@ -69,6 +69,8 @@ void NET_clientLoadWeaponStats(Client aClient);
 SDL_Color NET_clientGetColor(int index);
 SDL_Color NET_GetPlayerColor(Client aClient, int index);
 
+int NET_clientGetHP(Client aClient, int index);
+
 void NET_clientUpdateEnemy(Client aClient, Packet aPacket);
 SDL_Point NET_clientGetEnemyPos(Client aClient, int index);
 int NET_clientGetEnemyDirection(Client aClient, int index);
