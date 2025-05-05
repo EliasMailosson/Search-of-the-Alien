@@ -133,6 +133,10 @@ int main(int argc, char **argv ){
                     keyPressedListener(aServer, playerIdx, aServer->aServerMap);
                     break;
                 }
+                case PAUSE_MENU_REQUEST:{
+                    int playerIdx = NET_serverCompIP(aServer); 
+                    NET_serverSendInt(aServer, GLOBAL, PAUSE_MENU_CONFIRM, 1, playerIdx);
+                }
                 default:
                     printf("Failed!\n");
                     break;

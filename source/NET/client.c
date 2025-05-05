@@ -1,5 +1,6 @@
 #include "../../include/NET/client.h"
 #include "../../include/UI/friend.h"
+#include "../../include/menu.h"
 #include <stdio.h>
 
 struct enemy{
@@ -35,6 +36,7 @@ struct client{
     Player playerList[MAX_CLIENTS];
     Enemy enemies[MAX_ENEMIES];
     bool isHubVisible;
+    bool showPauseMenu;
     uint32_t seed;
     Proj projList[MAX_CLIENT_PROJ];
     WeaponStats weaponStatList[3];
@@ -96,6 +98,7 @@ Client NET_clientCreate(){
     strcpy(aClient->selfUsername,"None");
     aClient->isHubVisible = false;
     aClient->seed = 0;
+    aClient->showPauseMenu = 0;
 
     NET_clientLoadWeaponStats(aClient);
     return aClient;
@@ -239,6 +242,7 @@ void NET_clientReceiver(Client aClient, Map aMap,SDL_Window *pScreen){
                 int w = 0,h = 0;
                 SDL_GetWindowSize(pScreen,&w,&h);
                 MAP_MapRefresh(aMap,w,h);
+                
                 break;
             case NEW_SEED:
                 aClient->seed = SDLNet_Read32(NET_packetGetPayload(aPacket));
@@ -254,6 +258,9 @@ void NET_clientReceiver(Client aClient, Map aMap,SDL_Window *pScreen){
             case TRY_OPEN_TERMINAL_HUB:
                 aClient->isHubVisible = !aClient->isHubVisible;
                 break;
+            case PAUSE_MENU_CONFIRM:
+                aClient->showPauseMenu = !aClient->showPauseMenu;
+                break;
             default:
                 printf("client recieved invalid msgType: %d!!\n", NET_packetGetMessageType(aPacket));
                 break;
@@ -261,6 +268,10 @@ void NET_clientReceiver(Client aClient, Map aMap,SDL_Window *pScreen){
             if(aPacket) NET_packetDestroy(aPacket);
         }
     }
+}
+
+bool NET_clientGetPauseState(Client aClient) {
+    return aClient->showPauseMenu;
 }
 
 int NET_clientGetClientState(Client aClient, int playerIdx) {

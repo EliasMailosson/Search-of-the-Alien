@@ -1,8 +1,8 @@
 #include <stdio.h>
 
-#include "../include/terminalHub.h"
-#include "../include/menu.h"
-#include "../include/game.h"
+#include "../../include/HUD/terminalHub.h"
+#include "../../include/menu.h"
+#include "../../include/game.h"
 
 void renderTerminalHub(ClientView *pView, TerminalHub terminalHub){ // ritar knappar och rektanglar... (pView)
 

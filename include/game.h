@@ -12,14 +12,20 @@
 //#include "../include/MAP/map.h"
 #include "UI/button.h"
 #include "UI/friend.h"
-#include "../include/hud.h"
+#include "../include/HUD/hud.h"
 
 #define MAX_PLAYER_CHARACTERS 3
 #define MAX_PLAYER_TEXTURES 6
 #define MAX_BUTTONS_TERMINAL_HUB 4
+#define MAX_BUTTONS_PAUSE_MENU 3
 #define MAX_PROJECTILE_TEXTURES 5
 
 typedef struct menu Menu;
+
+typedef struct {
+    bool isVisible;
+    Button button[MAX_BUTTONS_PAUSE_MENU];
+}PauseMenu;
 typedef struct {
     int hubWidth;
     int hubHeight;
@@ -61,9 +67,9 @@ typedef struct {
 
 void eventHandler(ClientControl *pControl);
 void gameLoop(Client aClient, ClientControl *pControl, ClientView *pView);
-void runLobby(Client aClient, Map aMap, ClientControl *pControl, ClientView *pView, TerminalHub *pTerminalHub);
+void runLobby(Client aClient, Map aMap, ClientControl *pControl, ClientView *pView, TerminalHub *pTerminalHub, PauseMenu *pPauseMenu);
 void runMenu(Client aClient, ClientControl *pControl, ClientView *pView, Menu *pMenu, Map aMap);
-void runPlanet(Client aClient, ClientControl *pControl, ClientView *pView, Map aMap);
+void runPlanet(Client aClient, ClientControl *pControl, ClientView *pView, Map aMap, PauseMenu *pPauseMenu, Menu *pMenu);
 
 void toggleFullscreen(ClientView *pView);
 

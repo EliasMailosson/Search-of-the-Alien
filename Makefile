@@ -56,9 +56,10 @@ SRCDIR = source
 NETDIR = source/NET
 UIDIR = source/UI
 MAPDIR = source/MAP
+HUDDIR = source/HUD
 CONCURRENCYDIR = source/CONCURRENCY
 BUILDDIR = build
-OBJ_CLIENT = $(BUILDDIR)/main.o $(BUILDDIR)/game.o $(BUILDDIR)/clientLife.o $(BUILDDIR)/menu.o $(BUILDDIR)/panel.o $(BUILDDIR)/client.o $(BUILDDIR)/label.o $(BUILDDIR)/button.o $(BUILDDIR)/checklist.o $(BUILDDIR)/protocol.o $(BUILDDIR)/packetHandler.o $(BUILDDIR)/inputfield.o $(BUILDDIR)/shared.o $(BUILDDIR)/friend.o $(BUILDDIR)/players.o $(BUILDDIR)/map.o $(BUILDDIR)/hud.o $(BUILDDIR)/animation.o $(BUILDDIR)/terminalHub.o $(BUILDDIR)/perlinNoise.o
+OBJ_CLIENT = $(BUILDDIR)/main.o $(BUILDDIR)/game.o $(BUILDDIR)/clientLife.o $(BUILDDIR)/menu.o $(BUILDDIR)/panel.o $(BUILDDIR)/client.o $(BUILDDIR)/label.o $(BUILDDIR)/button.o $(BUILDDIR)/checklist.o $(BUILDDIR)/protocol.o $(BUILDDIR)/packetHandler.o $(BUILDDIR)/inputfield.o $(BUILDDIR)/shared.o $(BUILDDIR)/friend.o $(BUILDDIR)/players.o $(BUILDDIR)/map.o $(BUILDDIR)/hud.o $(BUILDDIR)/animation.o $(BUILDDIR)/terminalHub.o $(BUILDDIR)/perlinNoise.o $(BUILDDIR)/pauseMenu.o
 OBJ_SERVER = $(BUILDDIR)/server.o $(BUILDDIR)/shared.o $(BUILDDIR)/protocol.o $(BUILDDIR)/packetHandler.o $(BUILDDIR)/serverLogic.o $(BUILDDIR)/map.o $(BUILDDIR)/perlinNoise.o $(BUILDDIR)/threads.o $(BUILDDIR)/enemies.o
 
 # Default Goal
@@ -136,13 +137,13 @@ $(BUILDDIR)/players.o: $(SRCDIR)/players.c
 $(BUILDDIR)/map.o: $(MAPDIR)/map.c
 	$(CC) $(CFLAGS) -c $< -o $@
 
-$(BUILDDIR)/hud.o: $(SRCDIR)/hud.c
+$(BUILDDIR)/hud.o: $(HUDDIR)/hud.c
 	$(CC) $(CFLAGS) -c $< -o $@
 
 $(BUILDDIR)/enemies.o: $(NETDIR)/enemies.c
 	$(CC) $(CFLAGS) -c $< -o $@
 
-$(BUILDDIR)/terminalHub.o: $(SRCDIR)/terminalHub.c
+$(BUILDDIR)/terminalHub.o: $(HUDDIR)/terminalHub.c
 	$(CC) $(CFLAGS) -c $< -o $@
 	
 $(BUILDDIR)/serverLogic.o: $(NETDIR)/serverLogic.c
@@ -155,6 +156,9 @@ $(BUILDDIR)/threads.o: $(CONCURRENCYDIR)/threads.c
 	$(CC) $(CFLAGS) -c $< -o $@
 
 $(BUILDDIR)/semaphore.o: $(CONCURRENCYDIR)/semaphore.c
+	$(CC) $(CFLAGS) -c $< -o $@
+
+$(BUILDDIR)/pauseMenu.o: $(HUDDIR)/pauseMenu.c
 	$(CC) $(CFLAGS) -c $< -o $@
 
 clean:

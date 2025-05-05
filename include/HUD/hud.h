@@ -1,7 +1,7 @@
 #ifndef HUD_H
 #define HUD_H
-#include "../include/NET/client.h"
-#include "../include/MAP/map.h"
+#include "../../include/NET/client.h"
+#include "../../include/MAP/map.h"
 #include <SDL_image.h>
 
 #define FILE_PHAT_ARROW_RED "assets/images/player/arrow_red.png"

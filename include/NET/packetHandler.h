@@ -28,7 +28,9 @@ typedef enum{
     TRY_OPEN_TERMINAL_HUB,
     TRY_OPEN_TERMINAL_HUB_RESPONSE,
     NEW_SEED,
-    PROJ_LIST
+    PROJ_LIST,
+    PAUSE_MENU_REQUEST, 
+    PAUSE_MENU_CONFIRM
 } MessageType;
 
 typedef enum{
