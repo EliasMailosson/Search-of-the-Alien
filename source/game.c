@@ -23,7 +23,7 @@ void gameLoop(Client aClient, ClientControl *pControl, ClientView *pView){
     initTerminalHub(pView, &terminalHub);
 
     PauseMenu pauseMenu;
-    initPauseMenu(pView, &pauseMenu); // TODO: destroy
+    initPauseMenu(pView, &pauseMenu);
     
     char username[MAX_USERNAME_LEN];
     NET_clientGetSelfname(aClient, username);
@@ -53,6 +53,7 @@ void gameLoop(Client aClient, ClientControl *pControl, ClientView *pView){
     }
 
     destroyTerminalHub(&terminalHub);
+    destroyPauseMenu(&pauseMenu);
     destroyMenu(&menu);
     MAP_MapDestroy(aMap);
     NET_clientGetSelfname(aClient, username);
@@ -247,7 +248,6 @@ static void lobbyTerminalHubToggle(ClientControl *pControl, int *pDelay, Client 
         *pDelay = 0;
     }
 }
-
 
 static void handlePlayerInput(Client aClient, ClientControl *pControl, ClientView *pView, int *pDelay) {
     PlayerInputPacket pip = prepareInputArray(pControl, pView->windowWidth, pView->windowHeight);

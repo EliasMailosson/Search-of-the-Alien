@@ -30,6 +30,7 @@ void updateMenu(Menu *pMenu, ClientControl *pControl, Client aClient) {
     }
 
     pMenu->isGameStarted = false;
+    strcpy(menuEvent.key, "");
 
     // behöver dubbel kollas med UI gänget om det är hållbart istället för en for loop
     UI_panelUpdate(pMenu->panels[pMenu->currentPanel], &menuEvent, pControl->isMouseUp, pControl->keys);

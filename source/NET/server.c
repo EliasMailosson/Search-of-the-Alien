@@ -136,9 +136,10 @@ int main(int argc, char **argv ){
                 case PAUSE_MENU_REQUEST:{
                     int playerIdx = NET_serverCompIP(aServer); 
                     NET_serverSendInt(aServer, GLOBAL, PAUSE_MENU_CONFIRM, 1, playerIdx);
+                    break;
                 }
                 default:
-                    printf("Failed!\n");
+                    printf("Failed! msgType: %d\n", NET_packetGetMessageType(aPacket));
                     break;
                 }
                 if(aPacket) NET_packetDestroy(aPacket);
@@ -464,7 +465,16 @@ void NET_serverChangeGameStateOnClient(Server aServer,Packet aPacket){
     NET_serverSendInt(aServer,GLOBAL,CHANGE_GAME_STATE_RESPONSE,newState,indexIP);
     printf("username: %s gameState is now %d\n",aServer->clients[indexIP].username,newState);
     aServer->clients[indexIP].State = newState;
-    if(newState == LOBBY || newState == MENU){}else NET_serverSetNewMap(aServer);
+    if(newState == LOBBY){
+        aServer->clients[indexIP].player.hitBox.x = 200;
+        aServer->clients[indexIP].player.hitBox.y = 800;
+        if(aServer->clients[indexIP].isHubVisible) {
+            aServer->clients[indexIP].isHubVisible = !aServer->clients[indexIP].isHubVisible;
+            NET_serverSendInt(aServer, GLOBAL, TRY_OPEN_TERMINAL_HUB, aServer->clients[indexIP].isHubVisible, indexIP);
+        }
+    } 
+    else if(newState == MENU) {}
+    else NET_serverSetNewMap(aServer);
 }
 
 void NET_serverClientDisconnect(Server aServer){
