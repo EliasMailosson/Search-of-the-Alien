@@ -1,18 +1,18 @@
 #include "../include/game.h"
 #include "../include/players.h"
 #include "../include/UI/friend.h"
-#include "../include/terminalHub.h"
+#include "../include/HUD/terminalHub.h"
+#include "../include/HUD/pauseMenu.h"
 #include "../include/menu.h"
 
 static void enableMouseTexture(SDL_Cursor *CurrentCursor);
 static void updatePositioning(Client aClient, SDL_Point lastPosition[MAX_CLIENTS], SDL_Point *playerPos, int selfIndex);
-static void lobbyFullscreenToggle(ClientControl *pControl, ClientView *pView, Map aMap, int *pDelay, TerminalHub *pTerminalHub);
+static void lobbyFullscreenToggle(ClientControl *pControl, ClientView *pView, Map aMap, int *pDelay, TerminalHub *pTerminalHub, PauseMenu *pPauseMenu);
 static void lobbyTerminalHubToggle(ClientControl *pControl, int *pDelay, Client aClient);
 static void handlePlayerInput(Client aClient, ClientControl *pControl, ClientView *pView, int *pDelay);
 static void updatePlayerAnimation(Client aClient, SDL_Point lastPosition[]);
 static void renderLobby(ClientView *pView, Map aMap, Client aClient, TerminalHub terminalHub);
-static void planetFullscreenToggle(ClientControl *pControl, ClientView *pView, Map aMap, int *pDelay);
-
+static void planetFullscreenToggle(ClientControl *pControl, ClientView *pView, Map aMap, int *pDelay, PauseMenu *pPauseMenu);
 
 void gameLoop(Client aClient, ClientControl *pControl, ClientView *pView){
     NET_clientConnect(aClient);
@@ -21,6 +21,9 @@ void gameLoop(Client aClient, ClientControl *pControl, ClientView *pView){
 
     TerminalHub terminalHub;
     initTerminalHub(pView, &terminalHub);
+
+    PauseMenu pauseMenu;
+    initPauseMenu(pView, &pauseMenu);
     
     char username[MAX_USERNAME_LEN];
     NET_clientGetSelfname(aClient, username);
@@ -39,10 +42,10 @@ void gameLoop(Client aClient, ClientControl *pControl, ClientView *pView){
             runMenu(aClient, pControl, pView, &menu, aMap);
             break;
         case LOBBY:
-            runLobby(aClient, aMap, pControl, pView, &terminalHub);
+            runLobby(aClient, aMap, pControl, pView, &terminalHub, &pauseMenu);
             break;
         case NEMUR:
-            runPlanet(aClient,pControl,pView,aMap);
+            runPlanet(aClient,pControl,pView,aMap, &pauseMenu, &menu);
             break;
         default:
             break;
@@ -50,6 +53,7 @@ void gameLoop(Client aClient, ClientControl *pControl, ClientView *pView){
     }
 
     destroyTerminalHub(&terminalHub);
+    destroyPauseMenu(&pauseMenu);
     destroyMenu(&menu);
     MAP_MapDestroy(aMap);
     NET_clientGetSelfname(aClient, username);
@@ -58,7 +62,7 @@ void gameLoop(Client aClient, ClientControl *pControl, ClientView *pView){
     }
 }
 
-void runLobby(Client aClient, Map aMap, ClientControl *pControl, ClientView *pView, TerminalHub *pTerminalHub) {
+void runLobby(Client aClient, Map aMap, ClientControl *pControl, ClientView *pView, TerminalHub *pTerminalHub, PauseMenu *pPauseMenu) {
     static int toggleDelay = 0;
     int selfIndex = NET_clientGetSelfIndex(aClient);
     SDL_Point lastPosition[MAX_CLIENTS];
@@ -75,7 +79,7 @@ void runLobby(Client aClient, Map aMap, ClientControl *pControl, ClientView *pVi
 
     toggleDelay++;
     
-    lobbyFullscreenToggle(pControl, pView, aMap, &toggleDelay, pTerminalHub);
+    lobbyFullscreenToggle(pControl, pView, aMap, &toggleDelay, pTerminalHub, pPauseMenu);
 
 
     pTerminalHub->isVisible = NET_clientGetTerminalHub(aClient);
@@ -178,9 +182,7 @@ static void renderLobby(ClientView *pView, Map aMap, Client aClient, TerminalHub
     
     
     renderPlayers(aClient, pView);
-    for (int i = 0; i < NET_clientGetPlayerCount(aClient); i++){
-        hudRender(pView->aHud,pView->pRend,NET_clientGetPlayerColorIndex(aClient,i),i);
-    }
+    hudRender(aClient, pView->aHud,pView->pRend);
 
     if (terminalHub.isVisible) {
         renderTerminalHub(pView, terminalHub);
@@ -219,19 +221,21 @@ static void updatePositioning(Client aClient, SDL_Point lastPosition[MAX_CLIENTS
         *playerPos = NET_clientGetPlayerPos(aClient, selfIndex);
 }
 
-static void lobbyFullscreenToggle(ClientControl *pControl, ClientView *pView, Map aMap, int *pDelay, TerminalHub *pTerminalHub) {
+static void lobbyFullscreenToggle(ClientControl *pControl, ClientView *pView, Map aMap, int *pDelay, TerminalHub *pTerminalHub, PauseMenu *pPauseMenu) {
     if (pControl->keys[SDL_SCANCODE_F] && *pDelay > 12) {
         toggleFullscreen(pView);
         MAP_MapRefresh(aMap, pView->windowWidth, pView->windowHeight);
         refreshTerminalHub(pView, pTerminalHub);
+        refreshPauseMenu(pView, pPauseMenu);
         *pDelay = 0;
     }
 }
 
-static void planetFullscreenToggle(ClientControl *pControl, ClientView *pView, Map aMap, int *pDelay){
+static void planetFullscreenToggle(ClientControl *pControl, ClientView *pView, Map aMap, int *pDelay, PauseMenu *pPauseMenu){
     if (pControl->keys[SDL_SCANCODE_F] && *pDelay > 12) {
         toggleFullscreen(pView);
         MAP_MapRefresh(aMap, pView->windowWidth, pView->windowHeight);
+        refreshPauseMenu(pView, pPauseMenu);
         *pDelay = 0;
     }
 }
@@ -243,7 +247,6 @@ static void lobbyTerminalHubToggle(ClientControl *pControl, int *pDelay, Client 
     }
 }
 
-
 static void handlePlayerInput(Client aClient, ClientControl *pControl, ClientView *pView, int *pDelay) {
     PlayerInputPacket pip = prepareInputArray(pControl, pView->windowWidth, pView->windowHeight);
 
@@ -254,9 +257,13 @@ static void handlePlayerInput(Client aClient, ClientControl *pControl, ClientVie
         NET_clientSendInt(aClient, LOBBY, TRY_OPEN_TERMINAL_HUB_RESPONSE, 1);
         *pDelay = 0;
     }
+    else if (pControl->keys[SDL_SCANCODE_ESCAPE] && *pDelay > 12){
+        NET_clientSendInt(aClient, LOBBY, PAUSE_MENU_REQUEST, 1);
+        *pDelay = 0;
+    }
 }
 
-void renderPlanet(ClientView *pView, Map aMap, Client aClient){
+void renderPlanet(ClientView *pView, Map aMap, Client aClient, PauseMenu *pPauseMenu){
     SDL_SetRenderDrawColor(pView->pRend, 0,0,0,0);
     SDL_RenderClear(pView->pRend);
 
@@ -266,15 +273,15 @@ void renderPlanet(ClientView *pView, Map aMap, Client aClient){
 
     renderEnemy(aClient, pView);
     
-    
-
-    for (int i = 0; i < NET_clientGetPlayerCount(aClient); i++){
-        hudRender(pView->aHud,pView->pRend,NET_clientGetPlayerColorIndex(aClient,i),i);
+    if (pPauseMenu->isVisible) {
+        renderPauseMenu(pView, pPauseMenu);
     }
+
+    hudRender(aClient, pView->aHud, pView->pRend);
     SDL_RenderPresent(pView->pRend);
 }
 
-void runPlanet(Client aClient, ClientControl *pControl, ClientView *pView, Map aMap){
+void runPlanet(Client aClient, ClientControl *pControl, ClientView *pView, Map aMap, PauseMenu *pPauseMenu, Menu *pMenu){
     static int toggleDelay = 0;
     int selfIndex = NET_clientGetSelfIndex(aClient);
     SDL_Point lastPosition[MAX_CLIENTS];
@@ -282,13 +289,20 @@ void runPlanet(Client aClient, ClientControl *pControl, ClientView *pView, Map a
 
     enableMouseTexture(pView->crosshair);
     updatePositioning(aClient, lastPosition, &playerPos, selfIndex);
-    handlePlayerInput(aClient, pControl, pView, &toggleDelay);
-
-    planetFullscreenToggle(pControl,pView,aMap,&toggleDelay);
+    if(!pPauseMenu->isVisible) {
+        handlePlayerInput(aClient, pControl, pView, &toggleDelay);
+    } else {
+        updatePauseMenu(pPauseMenu, aClient, pControl, &toggleDelay, pMenu);
+    }
+    
+    planetFullscreenToggle(pControl,pView,aMap,&toggleDelay, pPauseMenu);
     
     toggleDelay++;
 
     NET_clientReceiver(aClient,aMap,pView->pWin);
+
+    pPauseMenu->isVisible = NET_clientGetPauseState(aClient);
+
     updatePlayerAnimation(aClient, lastPosition);
 
     updateArrows(pView->aHud,pView->pWin,aClient,pView->PlayerPos);
@@ -300,5 +314,5 @@ void runPlanet(Client aClient, ClientControl *pControl, ClientView *pView, Map a
         (playerPos.y/(float)TILE_SIZE)*tileRect.h - pView->windowHeight/2 - pView->playerRenderSize + tileRect.h/2};
     MAP_MapMoveMap(aMap, mapMovePos);
     
-    renderPlanet(pView,aMap,aClient);
+    renderPlanet(pView,aMap,aClient,pPauseMenu);
 }
