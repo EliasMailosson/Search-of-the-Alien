@@ -36,7 +36,10 @@ int enemyGetDirection(Enemies aEnemies, int index);
 
 float enemyGetAngle(Enemies aEnemies, int index);
 
-void enemyDestroy(Enemies aEnemies);
+Uint32 enemyGetAttackTime(Enemies aEnemies, int enemyindex);
 
+void enemySetAttackTime(Enemies aEnemies, int enemyindex);
+
+void enemyDestroy(Enemies aEnemies);
 
 #endif

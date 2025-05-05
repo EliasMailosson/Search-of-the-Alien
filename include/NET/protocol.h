@@ -23,6 +23,7 @@ typedef struct PlayerPacket{
     int colorIndex;
     int playerCharacter;
     bool isShooting;
+    int HP;
 }PlayerPacket;  
 
 typedef struct enemyPacket{

@@ -21,6 +21,7 @@ struct Player{
     SDL_Color color;
     int playerCharacter;
     bool isShooting;
+    int HP;
 };
 
 struct client{

@@ -12,6 +12,7 @@ typedef struct enemy {
 	Uint32 ThinkTime;
 	int direction;
 	float angle;
+	Uint32 attackTime;
 } Enemy;
 
 typedef struct enemies {
@@ -48,6 +49,8 @@ void enemySpawn(Enemies aEnemies){
 		aEnemies->enemyList[i].angle = 0.0f;
 		aEnemies->enemyList[i].HP.maxHP = 100;
 		aEnemies->enemyList[i].HP.currentHP = 100;
+		aEnemies->enemyList[i].attackTime = 0;
+
 	}
 }
 
@@ -164,6 +167,14 @@ void SetEnemyHitbox(Enemies aEnemies, int enemyindex, SDL_Rect HB){
 	aEnemies->enemyList[enemyindex].hitbox = HB;
 }
 
+Uint32 enemyGetAttackTime(Enemies aEnemies, int enemyindex){
+	return aEnemies->enemyList[enemyindex].attackTime;
+}
+
+void enemySetAttackTime(Enemies aEnemies, int enemyindex){
+	aEnemies->enemyList[enemyindex].attackTime = SDL_GetTicks();
+}
+
 SDL_Rect enemyGetHitbox(Enemies aEnemies, int index){
 	SDL_Rect hitbox = {
 		.x = aEnemies->enemyList[index].hitbox.x,
@@ -187,3 +198,5 @@ void enemyDestroy(Enemies aEnemies){
 	free(aEnemies);
 	aEnemies = NULL;
 }
+
+

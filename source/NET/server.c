@@ -16,6 +16,7 @@ struct Player{
     Weapon weapon;
     int projCounter;
     bool isShooting;
+    int HP;
 };
 
 struct User{
@@ -418,6 +419,14 @@ void NET_serverUpdatePlayer(Server aServer, Packet aPacket, GameState state){
     NET_serverSendPlayerPacket(aServer,state); 
 }
 
+void enemyAttackPlayer(Server aServer, int index, SDL_Rect enemyHitbox){
+    if(!SDL_HasIntersection(&aServer->clients[index].player.hitBox, &enemyHitbox)){
+        return;
+    }
+    aServer->clients[index].player.HP -= 1;
+    printf("Current HP: %d\n", aServer->clients[index].player.HP);
+}
+
 void NET_serverUpdateEnemies(Server aServer, Enemies aEnemies, ServerMap aMap){
     for (int i = 0; i < MAX_ENEMIES; i++) {
         float closestDist = INT_MAX;
@@ -439,11 +448,18 @@ void NET_serverUpdateEnemies(Server aServer, Enemies aEnemies, ServerMap aMap){
 
         if (closestPlayerIndex != -1) {
             PlayerTracker(aEnemies, aServer, closestPlayerIndex, i, aMap);
+            
 
             SDL_Point closestPos = {
                 aServer->clients[closestPlayerIndex].player.hitBox.x,
                 aServer->clients[closestPlayerIndex].player.hitBox.y
             };
+            SDL_Rect enemyHitbox = enemyGetHitbox(aEnemies, i);
+            Uint32 currentTime = SDL_GetTicks(); 
+            if(currentTime > enemyGetAttackTime(aEnemies, i) + 1000){
+                enemyAttackPlayer(aServer, closestPlayerIndex, enemyHitbox);
+                enemySetAttackTime(aEnemies, i);
+            }
             enemyAngleTracker(aEnemies, closestPos, i);
         }
     }
@@ -643,6 +659,8 @@ void NET_serverClientConnected(Packet aPacket, Server aServer){
     newUser.player.weapon.damage = 1;
     newUser.player.weapon.projFreq = 10;
     newUser.player.weapon.projSpeed = 14;
+    // Maybe init HP when switching to a character
+    newUser.player.HP = 100;
     newUser.player.weapon.projType = PROJ_TEX_BULLET;
     newUser.State = MENU;
     newUser.colorIndex = NET_serverAssignColorIndex(aServer);
