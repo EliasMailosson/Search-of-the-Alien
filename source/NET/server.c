@@ -435,7 +435,7 @@ bool enemyAttackPlayer(Server aServer, int index, SDL_Rect enemyHitbox){
     if(aServer->clients[index].player.HP <= 0){
         aServer->clients[index].player.HP = 0;
     }
-    printf("Current HP: %d\n", aServer->clients[index].player.HP);
+    // printf("Current HP: %d\n", aServer->clients[index].player.HP);
     return true;
 }
 
@@ -468,9 +468,9 @@ void NET_serverUpdateEnemies(Server aServer, Enemies aEnemies, ServerMap aMap){
             };
             SDL_Rect enemyHitbox = enemyGetHitbox(aEnemies, i);
             Uint32 currentTime = SDL_GetTicks(); 
-            if(currentTime > enemyGetAttackTime(aEnemies, i) + 1000){
+            if(currentTime > enemyGetAttackTime(aEnemies, i) + 1000 && aServer->clients[closestPlayerIndex].State == NEMUR){
                 if(enemyAttackPlayer(aServer, closestPlayerIndex, enemyHitbox)){
-                    NET_serverSendPlayerPacket(aServer, GLOBAL);
+                    NET_serverSendPlayerPacket(aServer, aServer->clients[closestPlayerIndex].State);
                 }
                 enemySetAttackTime(aEnemies, i);
             }

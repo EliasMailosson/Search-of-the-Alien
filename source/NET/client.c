@@ -141,12 +141,11 @@ int NET_clientGetState(Client aClient) {
 }
 
  bool NET_clientIsPlayerDamaged(Client aClient, int selfIndex){
-    // Just nu hårdkodad lastHealth
     static uint8_t lastHealth[8] = {100, 100, 100, 100, 100, 100, 100, 100};
     if(aClient->playerList[selfIndex].HpProcent < lastHealth[selfIndex]){
         lastHealth[selfIndex] = aClient->playerList[selfIndex].HpProcent;
         int hp = (int)aClient->playerList[selfIndex].HpProcent;
-        printf("Your HP = %d\n", hp);
+        //printf("Your HP = %d\n", hp);
         return true;
     }
     return false;
