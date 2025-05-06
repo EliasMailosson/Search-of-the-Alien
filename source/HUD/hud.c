@@ -144,7 +144,7 @@ void updateHudPlayerList(Client aClient, Hud aHud, SDL_Renderer *pRend, int wind
     aHud->playerList.count = newCount;
 }
 
-void hudRender(Client aClient, Hud aHud,SDL_Renderer *pRend){
+void hudRender(Client aClient, Hud aHud,SDL_Renderer *pRend, int windowW, int windowH){
     for (int i = 0; i < NET_clientGetPlayerCount(aClient); i++){
         int colorIdx = NET_clientGetPlayerColorIndex(aClient,i);
         arrowRender(aHud->indicators[i],pRend,aHud->imgArrow[colorIdx]);
@@ -166,8 +166,15 @@ void hudRender(Client aClient, Hud aHud,SDL_Renderer *pRend){
     }
 
     int dashCooldown = NET_clientGetDashCooldown(aClient);
-    SDL_SetRenderDrawColor(pRend, 255, 255, 255, 255);
-    SDL_RenderFillRect(pRend, &((SDL_Rect){aHud->playerList.x, r.y + 24, 100, 4}));
+    int centerX = windowW/2;
+    int centerY = windowH/2;
+    if(dashCooldown != 100) {
+        SDL_SetRenderDrawColor(pRend, 150, 150, 150, 180);
+        SDL_RenderFillRect(pRend, &((SDL_Rect){centerX - 10, centerY+20, 20, 2}));
+        SDL_SetRenderDrawColor(pRend, 255, 255, 255, 180);
+        SDL_RenderFillRect(pRend, &((SDL_Rect){centerX - 10, centerY+20, dashCooldown/5, 2}));
+    }
+    
 }
 
 SDL_Point hudGettArrowPos(Hud aHud, int index){

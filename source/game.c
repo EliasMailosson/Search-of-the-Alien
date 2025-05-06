@@ -184,7 +184,7 @@ static void renderLobby(ClientView *pView, Map aMap, Client aClient, TerminalHub
     
     
     renderPlayers(aClient, pView);
-    hudRender(aClient, pView->aHud,pView->pRend);
+    hudRender(aClient, pView->aHud,pView->pRend, pView->windowWidth, pView->windowHeight);
 
     if (terminalHub.isVisible) {
         renderTerminalHub(pView, terminalHub);
@@ -281,7 +281,7 @@ void renderPlanet(ClientView *pView, Map aMap, Client aClient, PauseMenu *pPause
         renderPauseMenu(pView, pPauseMenu);
     }
 
-    hudRender(aClient, pView->aHud, pView->pRend);
+    hudRender(aClient, pView->aHud, pView->pRend, pView->windowWidth, pView->windowHeight);
     SDL_RenderPresent(pView->pRend);
 }
 
