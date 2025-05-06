@@ -241,7 +241,7 @@ void NET_serverSetNewMap(Server aServer){
 }
 
 uint8_t NET_serverGetPercentage(int currentHP, int maxHP){
-    if (maxHP == 0) return 0; 
+    if (maxHP <= 0) return 0; 
     float percent = ((float)currentHP / (float)maxHP) * 100.0f;
     return (uint8_t)(percent); 
 }
@@ -431,9 +431,12 @@ bool enemyAttackPlayer(Server aServer, int index, SDL_Rect enemyHitbox){
     if(!SDL_HasIntersection(&aServer->clients[index].player.hitBox, &enemyHitbox)){
         return false;
     }
-    aServer->clients[index].player.HP -= 1;
-    return true;
+    aServer->clients[index].player.HP -= 10;
+    if(aServer->clients[index].player.HP <= 0){
+        aServer->clients[index].player.HP = 0;
+    }
     printf("Current HP: %d\n", aServer->clients[index].player.HP);
+    return true;
 }
 
 void NET_serverUpdateEnemies(Server aServer, Enemies aEnemies, ServerMap aMap){
