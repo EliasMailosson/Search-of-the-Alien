@@ -1,9 +1,11 @@
 #ifndef ENEMIES_H
 #define ENEMIES_H
 #include "../../include/NET/shared.h"
+#include "serverLogic.h"
 
-#define MAX_ENEMIES 1
+#define MAX_ENEMIES 3
 
+typedef struct ServerMap *ServerMap;
 typedef struct enemies* Enemies;
 typedef struct enemy Enemy;
 // enum id?
@@ -13,7 +15,7 @@ Enemies enemyCreate();
 
 SDL_Point enemyGetPoint(Enemies aEnemies, int index);
 
-void enemySpawn(Enemies aEnemies);
+void enemySpawn(Enemies aEnemies, ServerMap aServerMap);
 
 void enemyAI(Enemies aEnemies, SDL_Point playerpos);
 

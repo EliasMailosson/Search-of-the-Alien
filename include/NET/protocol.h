@@ -41,7 +41,7 @@ void NET_protocolSendArray(UDPpacket *pUDPpkg,UDPsocket Socket,IPaddress IP,
 void NET_playerPacketReceive(Packet aPacket, PlayerPacket *list, int *count);
 void NET_projPacketReceive(Packet aPacket, ProjPacket *list, int *count);
 
-void NET_enemyPacketReceive(Packet aPacket, EnemyPacket *enemyData);
+void NET_enemyPacketReceive(Packet aPacket, EnemyPacket *enemyData, int *pEnemyCount);
 
 bool NET_playerInputPacketCheck(PlayerInputPacket pip);
 

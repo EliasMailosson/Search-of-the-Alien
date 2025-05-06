@@ -79,8 +79,8 @@ void renderEnemy(Client aClient, ClientView *pView) {
 
         SDL_Rect enemyRect;
         enemyRect = (SDL_Rect){
-                .x = (int)(centerX + screenOffsetX - renderSizeHalf),
-                .y = (int)(centerY + screenOffsetY - renderSizeHalf),
+                .x = (int)(centerX + screenOffsetX) + renderSizeHalf,
+                .y = (int)(centerY + screenOffsetY) + renderSizeHalf,
                 .w = pView->playerRenderSize / 2,
                 .h = pView->playerRenderSize / 2
             };
@@ -88,10 +88,10 @@ void renderEnemy(Client aClient, ClientView *pView) {
         src = (SDL_Rect){((frame/2)%24)*SPRITE_SIZE, direction*SPRITE_SIZE, SPRITE_SIZE, SPRITE_SIZE};
 
         //pView->PlayerPos[i] = (SDL_Point){.x = playerRect.x, .y = playerRect.y};
-        SDL_SetRenderDrawColor(pView->pRend, 255, 0, 0, 255);
-        SDL_RenderFillRect(pView->pRend, &enemyRect);
+        // SDL_SetRenderDrawColor(pView->pRend, 255, 0, 0, 255);
+        // SDL_RenderFillRect(pView->pRend, &enemyRect);
 
-        // SDL_RenderCopy(pView->pRend, pView->enemyTexture, &src, &enemyRect);
+        SDL_RenderCopy(pView->pRend, pView->enemyTexture, &src, &enemyRect);
     }
 }
 

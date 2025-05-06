@@ -22,7 +22,7 @@ typedef struct enemies {
 
 Enemies enemyCreate(){
     Enemies aEnemies =  malloc(sizeof(struct enemies));
-    aEnemies->count = 1;
+    aEnemies->count = MAX_ENEMIES;
     if(aEnemies == NULL){
         fprintf(stderr,"Error allocating memory for server\n");
         return NULL;
@@ -37,12 +37,13 @@ Enemies enemyCreate(){
     return aEnemies;
 }
 
-void enemySpawn(Enemies aEnemies){
+void enemySpawn(Enemies aEnemies, ServerMap aServerMap){
+    int renderSize = getTileHeight(aServerMap) / 2;
     for (int i = 0; i < aEnemies->count; i++){
         aEnemies->enemyList[i].enemyRect.x = i*64;
         aEnemies->enemyList[i].enemyRect.y = i*512;
-        aEnemies->enemyList[i].enemyRect.w = 64;
-        aEnemies->enemyList[i].enemyRect.h = 64;
+        aEnemies->enemyList[i].enemyRect.w = renderSize;
+        aEnemies->enemyList[i].enemyRect.h = renderSize;
         aEnemies->enemyList[i].ThinkTime = 0;
         aEnemies->enemyList[i].direction = 0;
         aEnemies->enemyList[i].angle = 0.0f;
@@ -123,12 +124,20 @@ SDL_Rect enemyGetRect(Enemies aEnemies, int index){
     return aEnemies->enemyList[index].enemyRect;
 }
 
-void enemyDamaged(Enemies aEmemies, int damage, int index, int *pEnemyCount){
-    aEmemies->enemyList[index].HP.currentHP -= damage;
-    printf("%f\n", aEmemies->enemyList[index].HP.currentHP);
-    if (aEmemies->enemyList[index].HP.currentHP <= 0)
-    {
-        *pEnemyCount -= 1;
+void enemyDamaged(Enemies aEnemies, int damage, int index, int *pEnemyCount){
+    aEnemies->enemyList[index].HP.currentHP -= damage;
+    printf("%f\n", aEnemies->enemyList[index].HP.currentHP);
+
+    if (aEnemies->enemyList[index].HP.currentHP <= 0) {
+        for (int i = index; i < *pEnemyCount - 1; i++) {
+            aEnemies->enemyList[i] = aEnemies->enemyList[i + 1];
+        }
+        (*pEnemyCount)--;
+        aEnemies->enemyList[index].enemyRect.x = 0;
+        aEnemies->enemyList[index].enemyRect.y = 0;
+        aEnemies->enemyList[index].enemyRect.w = 0;
+        aEnemies->enemyList[index].enemyRect.h = 0;
+        printf("Enemy %d killed\n", index);
     }
 }
 

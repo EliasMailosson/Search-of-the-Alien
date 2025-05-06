@@ -279,8 +279,9 @@ void NET_clientUpdatePlayerList(Client aClient, Packet aPacket){
 
 void NET_clientUpdateEnemy(Client aClient, Packet aPacket){
     EnemyPacket packets[MAX_ENEMIES] = {0};
-    NET_enemyPacketReceive(aPacket, packets);
-    for (int i = 0; i < MAX_ENEMIES; i++){
+    int enemyCount = 0;
+    NET_enemyPacketReceive(aPacket, packets, &enemyCount);
+    for (int i = 0; i < enemyCount; i++){
         //printf("fiende #%d: x: %d\n", i, packets[i].direction);
         //printf("fiende #%d: x: %d\n", i, packets[i].pos.x);
         aClient->enemies[i].pos = packets[i].pos;
