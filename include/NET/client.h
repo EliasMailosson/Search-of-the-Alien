@@ -15,7 +15,6 @@ typedef struct __attribute__((packed)) Proj {
 
 typedef struct WeaponStats WeaponStats;
 typedef struct Player Player;
-typedef struct enemy Enemy;
 struct client;
 typedef struct client *Client;
 typedef struct scenC ScenC;
@@ -77,5 +76,6 @@ void NET_clientUpdateEnemy(Client aClient, Packet aPacket);
 SDL_Point NET_clientGetEnemyPos(Client aClient, int index);
 int NET_clientGetEnemyDirection(Client aClient, int index);
 void NET_clientScenarioUpdate(Client aClient,uint32_t seed);
+int NET_clientGetEnemiesCount(Client aClinet);
 
 #endif

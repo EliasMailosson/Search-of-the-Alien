@@ -70,8 +70,7 @@ int main(int argc, char **argv ){
     Server aServer = {0};
 
     aServer = NET_serverCreate();
-    aServer->aEnemies = enemyCreate(MAX_ENEMIES);
-    enemySpawn(aServer->aEnemies);
+    aServer->aEnemies = NET_enemiesCreate();
     memset(aServer->usedColors, 0, sizeof(aServer->usedColors));
     bool isRunning;
     aServer->aServerMap = NET_serverMapCreate();
@@ -167,7 +166,7 @@ int main(int argc, char **argv ){
     thread_join(enemyThread);
     mutex_destroy(&stop_mutex);
 
-    enemyDestroy(aServer->aEnemies);
+    NET_enemiesDestroy(aServer->aEnemies);
 
     NET_serverDestroy(aServer);
     NET_serverDestroySDL();
@@ -176,12 +175,18 @@ int main(int argc, char **argv ){
 
 void* enemies_threads(void *arg){
     Server aServer = (Server)arg;
+
+    for (int i = 0; i < 20; i++){
+        NET_enemiesPush(aServer->aEnemies,NET_enemyCreate(10+10*i,10+10*i,LIGHT_ENEMY));
+    }
+    
+
     while (1){
         mutex_lock(&stop_mutex);
         int should_stop = stop;
         mutex_unlock(&stop_mutex);
         if(should_stop) break;
-
+        
         NET_serverUpdateEnemies(aServer, aServer->aEnemies,aServer->aServerMap);
         sleep_ms(10);
     }
@@ -207,16 +212,16 @@ void* projektil_threads(void *arg){
 }
 
 void NET_serverSendEnemiesPacket(Server aServer, GameState GS, Enemies aEnemies){
-    EnemyPacket packet[MAX_ENEMIES] = {0};
+    EnemyPacket packet[MAX_ENEMIES_CLIENT_SIDE] = {0};
     SDL_Point pos;
-    for (int i = 0; i < MAX_ENEMIES; i++){
+    for (int i = 0; i < (int)NET_enemiesGetSize(aEnemies); i++){
         pos = enemyGetPoint(aEnemies, i); 
         packet[i].x = (uint16_t)(pos.x);
         packet[i].y = (uint16_t)(pos.y);
         packet[i].direction = (uint16_t)(enemyGetDirection(aEnemies, i));
 
     }
-    Uint32 payloadSize = MAX_ENEMIES * sizeof(EnemyPacket);
+    Uint32 payloadSize = (int)NET_enemiesGetSize(aEnemies) * sizeof(EnemyPacket);
     UDPpacket* SendEnemies = SDLNet_AllocPacket(512);
     for (int i = 0; i < aServer->clientCount; i++){
         if(aServer->clients[i].State == GS || GS == -1){
@@ -461,7 +466,7 @@ void NET_serverUpdatePlayer(Server aServer, Packet aPacket, GameState state){
 }
 
 void NET_serverUpdateEnemies(Server aServer, Enemies aEnemies, ServerMap aMap){
-    for (int i = 0; i < MAX_ENEMIES; i++) {
+    for (int i = 0; i < (int)NET_enemiesGetSize(aEnemies); i++) {
         float closestDist = INT_MAX;
         int closestPlayerIndex = -1;
 
@@ -480,7 +485,7 @@ void NET_serverUpdateEnemies(Server aServer, Enemies aEnemies, ServerMap aMap){
         }
 
         if (closestPlayerIndex != -1) {
-            PlayerTracker(aEnemies, aServer, closestPlayerIndex, i, aMap);
+            PlayerTracker(aEnemies, aServer, closestPlayerIndex, i);
 
             SDL_Point closestPos = {
                 aServer->clients[closestPlayerIndex].player.hitBox.x,

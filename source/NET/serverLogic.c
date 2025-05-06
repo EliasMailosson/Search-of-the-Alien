@@ -64,6 +64,22 @@ void MAP_ScreenToTile(ServerMap aServerMap, int screenX, int screenY, int *outTi
     *outTileY = ty;
 }
 
+bool NET_serverFindSpawnTile(ServerMap aServerMap, int *freekoordX, int *freekoordY) {
+    const int maxAttempts = 1000;
+
+    for (int attempt = 0; attempt < maxAttempts; attempt++) {
+        int x = rand() % MAP_WIDTH;
+        int y = rand();
+
+        if (aServerMap->MapTileId[y][x] != 0) {
+            *freekoordX = x;
+            *freekoordY= y;
+            return true;
+        }
+    }
+    return false;
+}
+
 bool MAP_TileNotWalkable(ServerMap aServerMap, int screenX, int screenY) {
     int tileX, tileY;
     MAP_ScreenToTile(aServerMap, screenX, screenY, &tileX, &tileY);
