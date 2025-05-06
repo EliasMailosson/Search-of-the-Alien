@@ -240,7 +240,7 @@ PlayerInputPacket prepareInputArray(ClientControl *pControl, int windowWidth, in
             pControl->keys[SDL_SCANCODE_E],
             pControl->keys[SDL_SCANCODE_SPACE],
             mouseDown,
-            // pControl->isMouseUp, en för mycket
+            // pControl->isMouseUp,
         },
         .selecterPlayerCharacter = pControl->selectedCharacter
     };

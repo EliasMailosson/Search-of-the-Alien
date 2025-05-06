@@ -98,6 +98,7 @@ void runLobby(Client aClient, Map aMap, ClientControl *pControl, ClientView *pVi
 
     // update HUD?
     updateArrows(pView->aHud,pView->pWin,aClient,pView->PlayerPos);
+    if(toggleDelay%20 == 0) updateHudPlayerList(aClient, pView->aHud, pView->pRend, pView->windowWidth, pView->windowHeight);
     SDL_Rect tileRect = MAP_getTileRect(aMap);
     pView->playerRenderSize = tileRect.h;
 
@@ -309,6 +310,7 @@ void runPlanet(Client aClient, ClientControl *pControl, ClientView *pView, Map a
     updatePlayerAnimation(aClient, lastPosition);
 
     updateArrows(pView->aHud,pView->pWin,aClient,pView->PlayerPos);
+    if(toggleDelay%20 == 0) updateHudPlayerList(aClient, pView->aHud, pView->pRend, pView->windowWidth, pView->windowHeight);
     SDL_Rect tileRect = MAP_getTileRect(aMap);
     pView->playerRenderSize = tileRect.h;
 

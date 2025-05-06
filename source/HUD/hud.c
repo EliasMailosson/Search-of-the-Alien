@@ -123,9 +123,17 @@ static void arrowRender(Arrow aArrow,SDL_Renderer *pRend,SDL_Texture *pImg){
 
 void updateHudPlayerList(Client aClient, Hud aHud, SDL_Renderer *pRend, int windowW, int windowH) {
     aHud->playerList.count = NET_clientGetPlayerCount(aClient);
+    int sortArr[MAX_CLIENTS];
+    int newCount = 0;
     for(int i = 0; i < aHud->playerList.count; i++) {
+        if(NET_clientGetState(aClient) == NET_clientGetClientState(aClient, i)) {
+            sortArr[newCount++] = i;
+        }
+    }
+    aHud->playerList.x = windowW - 140;
+    for(int n = 0; n < newCount; n++) {
+        int i = sortArr[n];
         SDL_Color color = NET_GetPlayerColor(aClient, i);
-        aHud->playerList.x = windowW - 140;
         UI_labelSetAppearance(pRend, aHud->playerList.usernames[i], aHud->playerList.x, 10 + i*40, color, aHud->playerList.pFont);
 
         char username[48];
@@ -133,6 +141,7 @@ void updateHudPlayerList(Client aClient, Hud aHud, SDL_Renderer *pRend, int wind
         UI_labelSetText(aHud->playerList.usernames[i], username);
         UI_labelRefreshTexture(pRend, aHud->playerList.usernames[i]);
     }
+    aHud->playerList.count = newCount;
 }
 
 void hudRender(Client aClient, Hud aHud,SDL_Renderer *pRend){
@@ -141,18 +150,19 @@ void hudRender(Client aClient, Hud aHud,SDL_Renderer *pRend){
         arrowRender(aHud->indicators[i],pRend,aHud->imgArrow[colorIdx]);
     }
 
-    // SDL_RenderFillRect(pRend, )
-
     for(int i = 0; i < aHud->playerList.count; i++) {
         SDL_Rect r = {
-            .x = aHud->playerList.x - 30,
+            .x = aHud->playerList.x - 34,
             .y = 14 + i*40,
-            .w = 20,
-            .h = 20
+            .w = 28,
+            .h = 28
         };
         int character = NET_clientGetPlayerCharacter(aClient, i);
         SDL_RenderCopy(pRend, aHud->playerIconTexture[character], NULL, &r);
         UI_labelRender(pRend, aHud->playerList.usernames[i]);
+
+        SDL_SetRenderDrawColor(pRend, 255, 255, 255, 255);
+        SDL_RenderFillRect(pRend, &((SDL_Rect){aHud->playerList.x, r.y + 24, 100, 4}));
     }
 }
 
