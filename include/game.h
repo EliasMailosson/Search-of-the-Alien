@@ -38,6 +38,7 @@ typedef struct {
         SDL_Texture *playerTexture[MAX_PLAYER_TEXTURES];
         int playerRenderSize;
     
+    SDL_Texture *vignetteTexture;
     SDL_Texture *enemyTexture;
     TTF_Font *fonts;
     Hud aHud;

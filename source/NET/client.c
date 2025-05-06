@@ -140,6 +140,16 @@ int NET_clientGetState(Client aClient) {
     return -1;
 }
 
+ bool NET_clientIsPlayerDamaged(Client aClient, int selfIndex){
+    static uint8_t lastHealth[8] = {95, 95, 95, 95, 95, 95, 95, 95};
+    
+    if(aClient->playerList[selfIndex].HpProcent < lastHealth[selfIndex]){
+        lastHealth[selfIndex] = aClient->playerList[selfIndex].HpProcent;
+        return true;
+    }
+    return false;
+}
+
 int NET_clientGetPlayerCount(Client aClient) {
     return aClient->PlayerCount;
 }
