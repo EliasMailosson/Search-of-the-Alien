@@ -51,7 +51,7 @@ int NET_serverGetProjectileSpeed(Server aServer, int playerIdx);
 //server update
 bool enemyAttackPlayer(Server aServer, int index, SDL_Rect enemyHitbox);
 void NET_serverUpdateEnemies(Server aServer, Enemies aEnemies, ServerMap aMap);
-void NET_serverSendEnemiesPacket(Server aServer, GameState GS, Enemies aEnemies, int *pEnemyCount);
+void NET_serverSendEnemiesPacket(Server aServer, GameState GS, Enemies aEnemies);
 
 //server util
 int NET_serverFindPlayerID(Server aServer, const char* str);

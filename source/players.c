@@ -65,8 +65,6 @@ void renderEnemy(Client aClient, ClientView *pView) {
     int centerX = pView->windowWidth/2;
     int centerY = pView->windowHeight/2;
     int renderSizeHalf = pView->playerRenderSize/2;
-    int enemyCount = NET_enemyGetCount(aClient);
-
     for(int i = 0; i < NET_clientGetEnemiesCount(aClient); i++) {
         SDL_Point pos = NET_clientGetEnemyPos(aClient, i);
         //printf("index %d, X: %d, Y: %d \n",i,pos.x,pos.y);

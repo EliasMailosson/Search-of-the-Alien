@@ -252,3 +252,39 @@ size_t NET_enemiesGetSize(Enemies aEnemies){
 }
 
 
+void enemyDamaged(Enemies aEnemies, int damage, int index, int *pEnemyCount){
+    aEnemies->enemyList[index]->HP.currentHP -= damage;
+    printf("%f\n", aEnemies->enemyList[index]->HP.currentHP);
+
+    if (aEnemies->enemyList[index]->HP.currentHP <= 0) {
+        printf("Enemy %d killed\n", index);
+
+        // Shift all enemies after the dead one down
+        for (size_t i = index; i < aEnemies->size - 1; i++) {
+            aEnemies->enemyList[i] = aEnemies->enemyList[i + 1];
+        }
+
+        // Clear the now-unused last element (optional but good hygiene)
+        aEnemies->enemyList[aEnemies->size - 1] = (Enemy){0};
+
+        aEnemies->size--;
+        if (pEnemyCount) {
+            *pEnemyCount = aEnemies->size;
+        }
+    }
+}
+
+int enemyGetCount(Enemies aEnemies){
+    return aEnemies->size;
+}
+
+bool enemyColitino(SDL_Rect A,SDL_Rect B){
+    if(A.x + A.w >= B.x && 
+        A.x <= B.x + B.w &&
+        A.y + A.h >= B.y &&
+        A.y <= B.y + B.h){
+        return true;
+    }else{
+        return false;
+    }
+}

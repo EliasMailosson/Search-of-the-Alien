@@ -78,13 +78,6 @@ int main(int argc, char **argv ){
     memset(aServer->usedColors, 0, sizeof(aServer->usedColors));
     bool isRunning;
     aServer->aServerMap = NET_serverMapCreate();
-    aEnemies = enemyCreate();
-    int enemyCount = enemyGetCount(aEnemies);
-    if (enemyCount > 0)
-    {
-        enemySpawn(aEnemies, aServer->aServerMap);
-    }
-    
     // if Server has allocated memory then the server is running on "PORT"
     if(aServer == NULL){
         isRunning = false;
@@ -223,6 +216,11 @@ void* projektil_threads(void *arg){
 }
 
 void NET_serverSendEnemiesPacket(Server aServer, GameState GS, Enemies aEnemies){
+    if ((int)NET_enemiesGetSize(aEnemies) < 0 || (int)NET_enemiesGetSize(aEnemies) > MAX_ENEMIES_CLIENT_SIDE) {
+        fprintf(stderr, "Error: invalid pEnemyCount (%d)\n",(int)NET_enemiesGetSize(aEnemies));
+        return;
+    }
+
     EnemyPacket packet[MAX_ENEMIES_CLIENT_SIDE] = {0};
     SDL_Point pos;
     for (int i = 0; i < (int)NET_enemiesGetSize(aEnemies); i++){
@@ -233,6 +231,7 @@ void NET_serverSendEnemiesPacket(Server aServer, GameState GS, Enemies aEnemies)
 
     }
     Uint32 payloadSize = (int)NET_enemiesGetSize(aEnemies) * sizeof(EnemyPacket);
+    if((int)NET_enemiesGetSize(aEnemies) == 0) payloadSize = 1;
     UDPpacket* SendEnemies = SDLNet_AllocPacket(512);
     for (int i = 0; i < aServer->clientCount; i++){
         if(aServer->clients[i].State == GS || GS == -1){
@@ -508,43 +507,63 @@ bool enemyAttackPlayer(Server aServer, int index, SDL_Rect enemyHitbox){
 }
 
 void NET_serverUpdateEnemies(Server aServer, Enemies aEnemies, ServerMap aMap){
-    for (int i = 0; i < (int)NET_enemiesGetSize(aEnemies); i++) {
-        float closestDist = INT_MAX;
-        int closestPlayerIndex = -1;
+    int enemyCount = (int)NET_enemiesGetSize(aEnemies);
+    int damage = 5;
+    if (enemyCount >= 0){
+        for (int i = 0; i < enemyCount; i++) {
+            float closestDist = INT_MAX;
+            int closestPlayerIndex = -1;
 
-        SDL_Point enemyPos = enemyGetPoint(aEnemies, i);
+            SDL_Point enemyPos = enemyGetPoint(aEnemies, i);
 
-        for (int j = 0; j < aServer->clientCount; j++) {
-            SDL_Rect playerHitbox = aServer->clients[j].player.hitBox;
-            int dx = playerHitbox.x - enemyPos.x;
-            int dy = playerHitbox.y - enemyPos.y;
-            int distSq = dx * dx + dy * dy;
+            for (int j = 0; j < aServer->clientCount; j++) {
+                SDL_Rect playerHitbox = aServer->clients[j].player.hitBox;
+                int dx = playerHitbox.x - enemyPos.x;
+                int dy = playerHitbox.y - enemyPos.y;
+                int distSq = dx * dx + dy * dy;
 
-            if (distSq < closestDist) {
-                closestDist = distSq;
-                closestPlayerIndex = j;
-            }
-        }
-
-        if (closestPlayerIndex != -1) {
-            PlayerTracker(aEnemies, aServer, closestPlayerIndex, i);
-
-            SDL_Point closestPos = {
-                aServer->clients[closestPlayerIndex].player.hitBox.x,
-                aServer->clients[closestPlayerIndex].player.hitBox.y
-            };
-            SDL_Rect enemyHitbox = enemyGetHitbox(aEnemies, i);
-            Uint32 currentTime = SDL_GetTicks(); 
-            if(currentTime > enemyGetAttackTime(aEnemies, i) + 1000 && aServer->clients[closestPlayerIndex].State == NEMUR){
-                if(enemyAttackPlayer(aServer, closestPlayerIndex, enemyHitbox)){
-                    NET_serverSendPlayerPacket(aServer, aServer->clients[closestPlayerIndex].State);
+                if (distSq < closestDist) {
+                    closestDist = distSq;
+                    closestPlayerIndex = j;
                 }
-                enemySetAttackTime(aEnemies, i);
             }
-            enemyAngleTracker(aEnemies, closestPos, i);
+            SDL_Rect enemyHitbox = enemyGetHitbox(aEnemies, i);
+            if (closestPlayerIndex != -1) {
+                PlayerTracker(aEnemies, aServer, closestPlayerIndex, i);
+
+                SDL_Point closestPos = {
+                    aServer->clients[closestPlayerIndex].player.hitBox.x,
+                    aServer->clients[closestPlayerIndex].player.hitBox.y
+                };
+                Uint32 currentTime = SDL_GetTicks(); 
+                if(currentTime > enemyGetAttackTime(aEnemies, i) + 1000 && aServer->clients[closestPlayerIndex].State == NEMUR){
+                    if(enemyAttackPlayer(aServer, closestPlayerIndex, enemyHitbox)){
+                        NET_serverSendPlayerPacket(aServer, aServer->clients[closestPlayerIndex].State);
+                    }
+                    enemySetAttackTime(aEnemies, i);
+                }
+                enemyAngleTracker(aEnemies, closestPos, i);
+            }
+
+            for (int j = 0; j < aServer->projCount; j++) {
+                SDL_Rect projectileRect = {
+                    .x = aServer->projList[j].x - PROJECTILEWIDTH / 2,
+                    .y = aServer->projList[j].y - PROJECTILEHEIGHT / 2,
+                    .w = PROJECTILEWIDTH,
+                    .h = PROJECTILEWIDTH
+                };
+               
+                if (enemyColitino(projectileRect, enemyHitbox)){
+                    enemyDamaged(aEnemies, damage, i, &enemyCount);
+                    NET_projectileKill(aServer, &aServer->projList[j], j);
+                }
+            }
         }
+        NET_serverSendEnemiesPacket(aServer, NEMUR, aEnemies);
+        // if (enemyCount == 0){
+        //     enemyCount--;
+        // }
     }
-    NET_serverSendEnemiesPacket(aServer, NEMUR, aEnemies);
 }
 
 void NET_serverChangeGameStateOnClient(Server aServer,Packet aPacket){
@@ -782,3 +801,4 @@ int NET_serverAssignColorIndex(Server aServer){
     }
     return -1;
 }
+

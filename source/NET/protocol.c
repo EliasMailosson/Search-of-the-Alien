@@ -19,7 +19,7 @@ void NET_playerPacketReceive(Packet aPacket, PlayerPacket *list, int *count){
     *count = playerCount;
 }
 
-void NET_enemyPacketReceive(Packet aPacket, EnemyPacket *enemyData,int *enemyCount){
+void NET_enemyPacketReceive(Packet aPacket, EnemyPacket *enemyData, int *pEnemyCount){
     Uint8* raw = NET_packetGetPayload(aPacket);
     Uint32 size = NET_packetGetPayloadSize(aPacket);
 
@@ -29,8 +29,7 @@ void NET_enemyPacketReceive(Packet aPacket, EnemyPacket *enemyData,int *enemyCou
     }
     int count = size / sizeof(EnemyPacket);
     memcpy(enemyData, raw, count * sizeof(EnemyPacket));
-    *enemyCount = count;
-
+    *pEnemyCount = count;
 }
 
 void NET_projPacketReceive(Packet aPacket, ProjPacket *list, int *count){

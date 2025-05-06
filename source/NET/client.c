@@ -365,7 +365,7 @@ void NET_clientUpdateEnemy(Client aClient, Packet aPacket){
     }
 
     for (int i = aClient->EnemiesCount; i < MAX_ENEMIES_CLIENT_SIDE; i++) {
-        aClient->enemies[i] = (Enemy){0};
+        aClient->enemies[i] = (ClientEnemy){0};
     }
 }
 
