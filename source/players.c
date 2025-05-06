@@ -66,9 +66,9 @@ void renderEnemy(Client aClient, ClientView *pView) {
     int centerY = pView->windowHeight/2;
     int renderSizeHalf = pView->playerRenderSize/2;
 
-    for(int i = 0; i < MAX_ENEMIES; i++) {
+    for(int i = 0; i < NET_clientGetEnemiesCount(aClient); i++) {
         SDL_Point pos = NET_clientGetEnemyPos(aClient, i);
-
+        printf("index %d, X: %d, Y: %d \n",i,pos.x,pos.y);
         int worldOffsetX = pos.x - selfPos.x;
         int worldOffsetY = pos.y - selfPos.y;
         float scale = (float)pView->playerRenderSize / RENDER_SIZE;

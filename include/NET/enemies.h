@@ -4,7 +4,7 @@
 #include "../../include/NET/shared.h"
 #include "../../include/NET/serverLogic.h"
 
-#define MAX_ENEMIES 5
+#define MAX_ENEMIES_CLIENT_SIDE 80
 
 typedef struct enemy *Enemy;
 typedef struct enemies* Enemies;
@@ -25,6 +25,7 @@ Enemy NET_enemiesPopAt(Enemies aE, size_t index);
 Enemy NET_enemyCreate(int pixelX, int pixelY, EnemyID id);
 Enemy NET_enemiesGetAt(Enemies aE, size_t index);
 void NET_enemiesDestroy(Enemies aEnemies);
+size_t NET_enemiesGetSize(Enemies aEnemies);
 
 
 SDL_Point enemyGetPoint(Enemies aEnemies, int index);

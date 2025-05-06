@@ -170,17 +170,18 @@ int main(int argc, char **argv ){
 
 void* enemies_threads(void *arg){
     Server aServer = (Server)arg;
-    NET_enemiesPush(aServer->aEnemies,NET_enemyCreate(250,200,LIGHT_ENEMY));
-    NET_enemiesPush(aServer->aEnemies,NET_enemyCreate(300,500,LIGHT_ENEMY));
-    NET_enemiesPush(aServer->aEnemies,NET_enemyCreate(210,400,LIGHT_ENEMY));
-    NET_enemiesPush(aServer->aEnemies,NET_enemyCreate(900,500,LIGHT_ENEMY));
-    NET_enemiesPush(aServer->aEnemies,NET_enemyCreate(900,600,LIGHT_ENEMY));
+
+    for (int i = 0; i < 79; i++){
+        NET_enemiesPush(aServer->aEnemies,NET_enemyCreate(10+10*i,10+10*i,LIGHT_ENEMY));
+    }
+    
+
     while (1){
         mutex_lock(&stop_mutex);
         int should_stop = stop;
         mutex_unlock(&stop_mutex);
         if(should_stop) break;
-
+        
         NET_serverUpdateEnemies(aServer, aServer->aEnemies,aServer->aServerMap);
         sleep_ms(10);
     }
@@ -206,16 +207,16 @@ void* projektil_threads(void *arg){
 }
 
 void NET_serverSendEnemiesPacket(Server aServer, GameState GS, Enemies aEnemies){
-    EnemyPacket packet[MAX_ENEMIES] = {0};
+    EnemyPacket packet[MAX_ENEMIES_CLIENT_SIDE] = {0};
     SDL_Point pos;
-    for (int i = 0; i < MAX_ENEMIES; i++){
+    for (int i = 0; i < (int)NET_enemiesGetSize(aEnemies); i++){
         pos = enemyGetPoint(aEnemies, i); 
         packet[i].x = (uint16_t)(pos.x);
         packet[i].y = (uint16_t)(pos.y);
         packet[i].direction = (uint16_t)(enemyGetDirection(aEnemies, i));
 
     }
-    Uint32 payloadSize = MAX_ENEMIES * sizeof(EnemyPacket);
+    Uint32 payloadSize = (int)NET_enemiesGetSize(aEnemies) * sizeof(EnemyPacket);
     UDPpacket* SendEnemies = SDLNet_AllocPacket(512);
     for (int i = 0; i < aServer->clientCount; i++){
         if(aServer->clients[i].State == GS || GS == -1){
@@ -460,7 +461,7 @@ void NET_serverUpdatePlayer(Server aServer, Packet aPacket, GameState state){
 }
 
 void NET_serverUpdateEnemies(Server aServer, Enemies aEnemies, ServerMap aMap){
-    for (int i = 0; i < MAX_ENEMIES; i++) {
+    for (int i = 0; i < (int)NET_enemiesGetSize(aEnemies); i++) {
         float closestDist = INT_MAX;
         int closestPlayerIndex = -1;
 

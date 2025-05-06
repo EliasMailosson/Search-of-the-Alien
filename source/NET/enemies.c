@@ -155,12 +155,11 @@ void PlayerTracker(Enemies aEnemies, Server aServer, int playerIndex, int enemyI
 }
 
 void checkEnemyCollision(Enemies aEnemies, int enemyindex, int *collide){
-	int enemyCount = MAX_ENEMIES;
 	Enemy movingEnemy = aEnemies->enemyList[enemyindex];
 	SDL_Rect *movingHitbox = &movingEnemy->hitbox;
 
 	*collide = 0;
-	for (int i = 0; i < enemyCount; i++) {
+	for (int i = 0; i < (int)aEnemies->size; i++) {
 		if (i == enemyindex) continue; 
 	
 		Enemy otherEnemy = aEnemies->enemyList[i];
@@ -237,4 +236,8 @@ void NET_enemiesDestroy(Enemies aEnemies){
         aEnemies->enemyList[i] = NULL;
     }
     free(aEnemies);
+}
+
+size_t NET_enemiesGetSize(Enemies aEnemies){
+    return aEnemies->size;
 }
