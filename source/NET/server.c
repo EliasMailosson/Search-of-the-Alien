@@ -73,7 +73,7 @@ int main(int argc, char **argv ){
         Uint32 nowTime = SDL_GetTicks();
         // 10ms is a good start
         if (nowTime - lastSendTime > 10) {
-            NET_serverUpdateEnemies(aServer, aEnemies, enemyCount);
+            NET_serverUpdateEnemies(aServer, aEnemies, &enemyCount);
             lastSendTime = nowTime;
         }
 
@@ -173,18 +173,20 @@ void* projektil_threads(void *arg){
     return NULL;
 }
 
-void NET_serverSendEnemiesPacket(Server aServer, GameState GS, Enemies aEnemies, int enemyCount){
+void NET_serverSendEnemiesPacket(Server aServer, GameState GS, Enemies aEnemies, int *pEnemyCount){
+        
+    if (*pEnemyCount < 0 || *pEnemyCount > MAX_ENEMIES) {
+        fprintf(stderr, "Error: invalid pEnemyCount (%d)\n", *pEnemyCount);
+        return;
+    }
     EnemyPacket packet[MAX_ENEMIES] = {0};
     SDL_Point pos;
-    for (int i = 0; i < enemyCount; i++){
+    for (int i = 0; i < *pEnemyCount; i++){
         pos = enemyGetPoint(aEnemies, i); 
-        // printf("Fiende #%d: x: %d\n", i, pos.x);
         packet[i].pos = pos;
         packet[i].direction = enemyGetDirection(aEnemies, i);
-        //printf("enemy #%d: dir: %d\n", i, packet[i].direction);
-
     }
-    Uint32 payloadSize = enemyCount * sizeof(EnemyPacket);
+    Uint32 payloadSize = *pEnemyCount * sizeof(EnemyPacket);
     for (int i = 0; i < aServer->clientCount; i++){
         if(aServer->clients[i].State == GS || GS == -1){
             NET_serverSendArray(aServer, GLOBAL, ENEMY_POS, packet, payloadSize, i);
@@ -368,10 +370,10 @@ void NET_serverUpdatePlayer(Server aServer, Packet aPacket, GameState state){
     NET_serverSendPlayerPacket(aServer,state); 
 }
 
-void NET_serverUpdateEnemies(Server aServer, Enemies aEnemies, int enemyCount){
+void NET_serverUpdateEnemies(Server aServer, Enemies aEnemies, int *pEnemyCount){
     int damage = 5;
-    if (enemyCount > 0){
-    for (int i = 0; i < enemyCount; i++){
+    if (*pEnemyCount >= 0){
+    for (int i = 0; i < *pEnemyCount; i++){
         int closestDist = INT_MAX;
 
         SDL_Point ClosestPlayerPos = {0,0};
@@ -400,23 +402,28 @@ void NET_serverUpdateEnemies(Server aServer, Enemies aEnemies, int enemyCount){
         SDL_Rect enemyRect = enemyGetRect(aEnemies, i);
         for (int j = 0; j < aServer->projCount; j++) {
             SDL_Rect projectileRect = {
-                .x = aServer->projList[j].x,
-                .y = aServer->projList[j].y,
+                .x = aServer->projList[j].x - PROJECTILEWIDTH / 2,
+                .y = aServer->projList[j].y - PROJECTILEHEIGHT / 2,
                 .w = PROJECTILEWIDTH,
                 .h = PROJECTILEWIDTH
             };
 
         if (enemyColitino(projectileRect, enemyRect)){
-            // bool killed = enemyDamaged(aEnemies, damage, i, &enemyCount);
-            enemyDamaged(aEnemies, damage, i, &enemyCount);
+            enemyDamaged(aEnemies, damage, i, pEnemyCount);
             NET_projectileKill(aServer, &aServer->projList[j], j);
-            // if (killed){
-            //     i--;
-            // }
         }
         }
     }
-        NET_serverSendEnemiesPacket(aServer, NEMUR, aEnemies, enemyCount);
+        NET_serverSendEnemiesPacket(aServer, NEMUR, aEnemies, pEnemyCount);
+        if (*pEnemyCount == 0){
+            int indexIP = NET_serverCompIP(aServer);
+            if(indexIP == -1) {
+                printf("Error NET_serverCompIP return -1\n");
+                return;
+            }
+            NET_serverSendInt(aServer, GLOBAL, LASTENEMYDEAD, *pEnemyCount, indexIP);
+            (*pEnemyCount)--;
+        }
     }
 }
 

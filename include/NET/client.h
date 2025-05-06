@@ -67,4 +67,6 @@ void NET_clientUpdateEnemy(Client aClient, Packet aPacket);
 SDL_Point NET_clientGetEnemyPos(Client aClient, int index);
 int NET_clientGetEnemyDirection(Client aClient, int index);
 
+int NET_enemyGetCount(Client aClient);
+
 #endif

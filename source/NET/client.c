@@ -28,6 +28,7 @@ struct client{
     int PlayerCount;
     Player playerList[MAX_CLIENTS];
     Enemy enemies[MAX_ENEMIES];
+    int enemyCount;
     bool isHubVisible;
     uint32_t seed;
     Proj projList[MAX_CLIENT_PROJ];
@@ -239,6 +240,9 @@ void NET_clientReceiver(Client aClient, Map aMap,SDL_Window *pScreen){
             case TRY_OPEN_TERMINAL_HUB:
                 aClient->isHubVisible = !aClient->isHubVisible;
                 break;
+            case LASTENEMYDEAD:
+                aClient->enemyCount = 0;
+                break;
             default:
                 printf("client recieved invalid msgType: %d!!\n", NET_packetGetMessageType(aPacket));
                 break;
@@ -281,11 +285,15 @@ void NET_clientUpdateEnemy(Client aClient, Packet aPacket){
     EnemyPacket packets[MAX_ENEMIES] = {0};
     int enemyCount = 0;
     NET_enemyPacketReceive(aPacket, packets, &enemyCount);
+    aClient->enemyCount = enemyCount;
+
     for (int i = 0; i < enemyCount; i++){
-        //printf("fiende #%d: x: %d\n", i, packets[i].direction);
-        //printf("fiende #%d: x: %d\n", i, packets[i].pos.x);
         aClient->enemies[i].pos = packets[i].pos;
         aClient->enemies[i].direction = packets[i].direction;
+    }
+
+    for (int i = enemyCount; i < MAX_ENEMIES; i++) {
+        aClient->enemies[i] = (Enemy){0};
     }
 }
 
@@ -351,4 +359,8 @@ int NET_clientGetPlayerColorIndex(Client aClient,int index){
 
 bool NET_clientGetTerminalHub(Client aClient){
     return aClient->isHubVisible;
+}
+
+int NET_enemyGetCount(Client aClient){
+    return aClient->enemyCount;
 }

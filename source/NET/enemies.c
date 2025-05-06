@@ -23,6 +23,7 @@ typedef struct enemies {
 Enemies enemyCreate(){
     Enemies aEnemies =  malloc(sizeof(struct enemies));
     aEnemies->count = MAX_ENEMIES;
+    aEnemies->capacity = MAX_ENEMIES;
     if(aEnemies == NULL){
         fprintf(stderr,"Error allocating memory for server\n");
         return NULL;
@@ -129,15 +130,20 @@ void enemyDamaged(Enemies aEnemies, int damage, int index, int *pEnemyCount){
     printf("%f\n", aEnemies->enemyList[index].HP.currentHP);
 
     if (aEnemies->enemyList[index].HP.currentHP <= 0) {
-        for (int i = index; i < *pEnemyCount - 1; i++) {
+        printf("Enemy %d killed\n", index);
+
+        // Shift all enemies after the dead one down
+        for (int i = index; i < aEnemies->count - 1; i++) {
             aEnemies->enemyList[i] = aEnemies->enemyList[i + 1];
         }
-        (*pEnemyCount)--;
-        aEnemies->enemyList[index].enemyRect.x = 0;
-        aEnemies->enemyList[index].enemyRect.y = 0;
-        aEnemies->enemyList[index].enemyRect.w = 0;
-        aEnemies->enemyList[index].enemyRect.h = 0;
-        printf("Enemy %d killed\n", index);
+
+        // Clear the now-unused last element (optional but good hygiene)
+        aEnemies->enemyList[aEnemies->count - 1] = (Enemy){0};
+
+        aEnemies->count--;
+        if (pEnemyCount) {
+            *pEnemyCount = aEnemies->count;
+        }
     }
 }
 

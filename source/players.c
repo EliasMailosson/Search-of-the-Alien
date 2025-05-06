@@ -56,14 +56,15 @@ void renderProjectiles(Client aClient, ClientView *pView) {
 void renderEnemy(Client aClient, ClientView *pView) {
     static int frame = 0;
     frame++;
-    int playerCount = NET_clientGetPlayerCount(aClient);
+    // int playerCount = NET_clientGetPlayerCount(aClient);
     int selfIndex = NET_clientGetSelfIndex(aClient);
     SDL_Point selfPos = NET_clientGetPlayerPos(aClient, selfIndex);
     int centerX = pView->windowWidth/2;
     int centerY = pView->windowHeight/2;
     int renderSizeHalf = pView->playerRenderSize/2;
+    int enemyCount = NET_enemyGetCount(aClient);
 
-    for(int i = 0; i < MAX_ENEMIES; i++) {
+    for(int i = 0; i < enemyCount; i++) {
         SDL_Point pos = NET_clientGetEnemyPos(aClient, i);
 
         int worldOffsetX = pos.x - selfPos.x;
