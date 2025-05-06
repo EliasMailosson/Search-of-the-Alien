@@ -1,8 +1,9 @@
 #ifndef HUD_H
 #define HUD_H
+#include <SDL_image.h>
+#include <SDL_ttf.h>
 #include "../../include/NET/client.h"
 #include "../../include/MAP/map.h"
-#include <SDL_image.h>
 
 #define FILE_PHAT_ARROW_RED "assets/images/player/arrow_red.png"
 #define FILE_PHAT_ARROW_BLUE "assets/images/player/arrow_blue.png"
@@ -26,6 +27,7 @@ void hudRender(Client aClient, Hud aHud,SDL_Renderer *pRend);
 Arrow arrowCreate();
 void updateArrows(Hud aHud,SDL_Window *pWin,Client aClient, SDL_Point playerPos[MAX_CLIENTS]);
 SDL_Point hudGettArrowPos(Hud aHud, int index);
+void updateHudPlayerList(Client aClient, Hud aHud, SDL_Renderer *pRend, int windowW, int windowH);
 
 
 bool pointInRect(SDL_Rect rect, SDL_Point point);

@@ -1,4 +1,13 @@
 #include "../../include/HUD/hud.h"
+#include "../../include/UI/label.h"
+#include <stdlib.h>
+#include <string.h>
+
+typedef struct playerList {
+    Label usernames[MAX_CLIENTS];
+    TTF_Font *pFont;
+    int count;
+} PlayerList;
 
 struct Arrow{
     double angel;
@@ -9,7 +18,7 @@ struct Arrow{
 struct Hud{
     SDL_Texture *imgArrow[MAX_CLIENTS]; 
     Arrow indicators[MAX_CLIENTS-1];
-    //
+    PlayerList playerList;
 };
 
 Arrow arrowCreate(){
@@ -63,6 +72,11 @@ Hud hudCreate(SDL_Renderer *pRend){
     for (int i = 0; i < MAX_CLIENTS-1; i++){
         aHud->indicators[i] = arrowCreate();
     }
+
+    aHud->playerList.pFont = TTF_OpenFont("assets/fonts/jura.ttf", 20);
+    for(int i = 0; i < MAX_CLIENTS; i++) {
+        aHud->playerList.usernames[i] = UI_labelCreate();
+    }
     return aHud;
 }
 
@@ -74,6 +88,10 @@ void hudDestroy(Hud aHud){
         if(aHud->indicators[i] != NULL) free(aHud->indicators[i]);
         aHud->indicators[i] = NULL;
     }
+
+    TTF_CloseFont(aHud->playerList.pFont);
+    aHud->playerList.pFont = NULL;
+
     if(aHud != NULL) free(aHud);
     aHud = NULL;
 }
@@ -86,14 +104,30 @@ static void arrowRender(Arrow aArrow,SDL_Renderer *pRend,SDL_Texture *pImg){
     }
 }
 
+void updateHudPlayerList(Client aClient, Hud aHud, SDL_Renderer *pRend, int windowW, int windowH) {
+    aHud->playerList.count = NET_clientGetPlayerCount(aClient);
+    for(int i = 0; i < aHud->playerList.count; i++) {
+        SDL_Color color = NET_GetPlayerColor(aClient, i);
+        UI_labelSetAppearance(pRend, aHud->playerList.usernames[i], windowW - 140, 10 + i*40, color, aHud->playerList.pFont);
+
+        char username[48];
+        NET_clientGetPlayerName(aClient, i, username);
+        UI_labelSetText(aHud->playerList.usernames[i], username);
+        UI_labelRefreshTexture(pRend, aHud->playerList.usernames[i]);
+    }
+}
+
 void hudRender(Client aClient, Hud aHud,SDL_Renderer *pRend){
     for (int i = 0; i < NET_clientGetPlayerCount(aClient); i++){
         int colorIdx = NET_clientGetPlayerColorIndex(aClient,i);
         arrowRender(aHud->indicators[i],pRend,aHud->imgArrow[colorIdx]);
     }
 
-    SDL_SetRenderDrawColor(pRend, 0, 0, 255, 255);
-    SDL_RenderFillRect(pRend, &((SDL_Rect){10, 10, 40, 40}));
+    SDL_RenderFillRect(pRend, )
+
+    for(int i = 0; i < aHud->playerList.count; i++) {
+        UI_labelRender(pRend, aHud->playerList.usernames[i]);
+    }
 }
 
 SDL_Point hudGettArrowPos(Hud aHud, int index){

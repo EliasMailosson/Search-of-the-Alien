@@ -93,6 +93,7 @@ void startClient(Client *aClient, ClientView *pView,ClientControl *pControl){
         SDL_Quit();
     }
     pView->aHud = hudCreate(pView->pRend);
+    updateHudPlayerList(*aClient, pView->aHud, pView->pRend, pView->windowWidth, pView->windowHeight);
 
     pControl->selectedCharacter = CHARACTER_BLUEFACE;
 }
