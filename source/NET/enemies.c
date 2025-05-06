@@ -5,71 +5,97 @@ typedef struct healthPoints {
 	float currentHP;
 } HealthPoints;
 
-typedef struct enemy {
+struct enemy{
 	SDL_Rect hitbox;
 	int enemyID;
 	HealthPoints HP;
 	Uint32 ThinkTime;
 	int direction;
 	float angle;
-	Uint32 attackTime;
-} Enemy;
-
-typedef struct enemies {
+};
+struct enemies {
 	Enemy *enemyList;
-	int count;
-	int capacity;
-}enemies;
+	size_t size;
+	size_t capacity;
+};
 
-Enemies enemyCreate(int capacity){
-	Enemies aEnemies =  malloc(sizeof(struct enemies));
+Enemies NET_enemiesCreate(void){
+	Enemies aEnemies =  malloc(sizeof(*aEnemies));
 	if(aEnemies == NULL){
 		fprintf(stderr,"Error allocating memory for server\n");
 		return NULL;
 	}
-	aEnemies->enemyList = malloc(sizeof(struct enemy) * capacity);
-	if(aEnemies->enemyList == NULL){
-		free(aEnemies);
-		fprintf(stderr,"Error allocating memory for server\n");
-		return NULL;
-	}
-	aEnemies->count = capacity;
-
+    aEnemies->enemyList = NULL;
+	aEnemies->size = 0;
+    aEnemies->capacity = 0;
 	return aEnemies;
 }
 
-void enemySpawn(Enemies aEnemies){
-	// int spawnX, spawnY;
-
-	for (int i = 0; i < MAX_ENEMIES; i++){
-		
-		// if (NET_serverFindSpawnTile(serverMap, &spawnX, &spawnY)) {
-		// 	//här ska man konvertera tile till world-position för att kunna spawna fienden
-		// } else {
-		// 	printf("Kunde inte hitta plats för fiende!\n");
-		// }
-
-		aEnemies->enemyList[i].hitbox.x = i*64;
-		aEnemies->enemyList[i].hitbox.y = i*512;
-		aEnemies->enemyList[i].hitbox.w = 50;
-		aEnemies->enemyList[i].hitbox.h = 50;
-		aEnemies->enemyList[i].ThinkTime = 0;
-		aEnemies->enemyList[i].direction = 0;
-		aEnemies->enemyList[i].angle = 0.0f;
-		aEnemies->enemyList[i].HP.maxHP = 100;
-		aEnemies->enemyList[i].HP.currentHP = 100;
-		aEnemies->enemyList[i].attackTime = 0;
-
-	}
+int NET_enemiesPush(Enemies aE, Enemy new){
+    if (aE->size == aE->capacity) {
+        size_t new_cap = aE->capacity ? aE->capacity * 2 : 4;
+        Enemy *tmp = realloc(aE->enemyList, new_cap * sizeof *tmp);
+        if (!tmp) return -1;
+        aE->enemyList     = tmp;
+        aE->capacity = new_cap;
+    }
+    aE->enemyList[aE->size++] = new;
+    return 0;
 }
 
-void PlayerTracker(Enemies aEnemies, Server aServer, int playerIndex, int enemyIndex, ServerMap aMap) {
+Enemy NET_enemiesPopAt(Enemies aE, size_t index){
+    if (!aE || index >= aE->size) {
+        return NULL;
+    }
+    Enemy popped = aE->enemyList[index];
+    for (size_t i = index; i < aE->size - 1; ++i) {
+        aE->enemyList[i] = aE->enemyList[i + 1];
+    }
+    aE->enemyList[aE->size - 1] = NULL;
+    aE->size--;
+    return popped;
+}
+
+Enemy NET_enemyCreate(int pixelX, int pixelY, EnemyID id){
+    Enemy e = malloc(sizeof(*e));
+    if (!e) {
+        fprintf(stderr, "Failed to allocate memory for Enemy\n");
+        return NULL;
+    }
+    e->hitbox.y = pixelY;
+    e->hitbox.x = pixelX;
+    switch (id){
+    case LIGHT_ENEMY:
+        e->hitbox.h = e->hitbox.w = 50;
+        e->ThinkTime = e->direction = 0;
+        e->HP.maxHP = e->HP.currentHP = 100;
+        e->enemyID = LIGHT_ENEMY;
+        break;
+    case HEAVY_ENEMY:
+        break;
+    case BOSS_ENEMY:
+        break;
+    default:  
+        printf("Wrong enemy id in file enemies.c\n");
+        break;
+    }
+    return e;
+}
+
+Enemy NET_enemiesGetAt(Enemies aE, size_t index){
+    if (!aE || index >= aE->size) {
+        return NULL;
+    }
+    return aE->enemyList[index];
+}
+
+void PlayerTracker(Enemies aEnemies, Server aServer, int playerIndex, int enemyIndex) {
     const float speed       = 1.0f;
     const float seekWeight  = 1.0f;
     const float sepWeight   = 3.0f;// styr hur stark separationen är
     const float sepRadius   = 64.0f;//hur nära en fiende ska va för att den ska börja knuffa dem
     
-    Enemy* e = &aEnemies->enemyList[enemyIndex];
+    Enemy e = aEnemies->enemyList[enemyIndex];
     SDL_Rect old = e->hitbox;
     
     //Hämta seek‐vektor mot spelaren
@@ -82,11 +108,11 @@ void PlayerTracker(Enemies aEnemies, Server aServer, int playerIndex, int enemyI
     float vx = (px - ex) * seekWeight;
     float vy = (py - ey) * seekWeight;
     
-    //Separation från alla andra fiender
-    for (int j = 0; j < aEnemies->count; j++) {
-        if (j == enemyIndex) continue;
+    //Separation från alla andra fiender, "o" står för "e2" egentligen
+    for (size_t j = 0; j < aEnemies->size; j++) {
+        if (j == (size_t)enemyIndex) continue;
 
-        Enemy* o = &aEnemies->enemyList[j];
+        Enemy o = aEnemies->enemyList[j];
         float ox = o->hitbox.x + o->hitbox.w/2.0f;
         float oy = o->hitbox.y + o->hitbox.h/2.0f;
         
@@ -129,15 +155,14 @@ void PlayerTracker(Enemies aEnemies, Server aServer, int playerIndex, int enemyI
 }
 
 void checkEnemyCollision(Enemies aEnemies, int enemyindex, int *collide){
-	int enemyCount = MAX_ENEMIES;
-	Enemy *movingEnemy = &aEnemies->enemyList[enemyindex];
+	Enemy movingEnemy = aEnemies->enemyList[enemyindex];
 	SDL_Rect *movingHitbox = &movingEnemy->hitbox;
 
 	*collide = 0;
-	for (int i = 0; i < enemyCount; i++) {
+	for (int i = 0; i < (int)aEnemies->size; i++) {
 		if (i == enemyindex) continue; 
 	
-		Enemy *otherEnemy = &aEnemies->enemyList[i];
+		Enemy otherEnemy = aEnemies->enemyList[i];
 		SDL_Rect *otherHitbox = &otherEnemy->hitbox;
 	
 		if (SDL_HasIntersection(movingHitbox, otherHitbox)) {
@@ -149,7 +174,7 @@ void checkEnemyCollision(Enemies aEnemies, int enemyindex, int *collide){
 
 
 void enemyAngleTracker(Enemies aEnemies, SDL_Point playerPos, int enemyIndex) {
-	Enemy *enemy = &aEnemies->enemyList[enemyIndex];
+	Enemy enemy = aEnemies->enemyList[enemyIndex];
 	playerPos.x+=64;
 	playerPos.y+=64;
 
@@ -165,15 +190,24 @@ void enemyAngleTracker(Enemies aEnemies, SDL_Point playerPos, int enemyIndex) {
 
 
 int enemyGetDirection(Enemies aEnemies, int index){
-	return aEnemies->enemyList[index].direction;
+    if (!aEnemies || index >= (int)aEnemies->size) {
+        return 0;
+    }
+	return aEnemies->enemyList[index]->direction;
 }
 
 float enemyGetAngle(Enemies aEnemies, int index){
-	return aEnemies->enemyList[index].angle;
+    if (!aEnemies || index >= (int)aEnemies->size) {
+        return 0.0f;
+    }
+	return aEnemies->enemyList[index]->angle;
 }
 
 void SetEnemyHitbox(Enemies aEnemies, int enemyindex, SDL_Rect HB){
-	aEnemies->enemyList[enemyindex].hitbox = HB;
+    if (!aEnemies || enemyindex >= (int)aEnemies->size) {
+        return;
+    }
+	aEnemies->enemyList[enemyindex]->hitbox = HB;
 }
 
 Uint32 enemyGetAttackTime(Enemies aEnemies, int enemyindex){
@@ -184,28 +218,36 @@ void enemySetAttackTime(Enemies aEnemies, int enemyindex){
 	aEnemies->enemyList[enemyindex].attackTime = SDL_GetTicks();
 }
 
-SDL_Rect enemyGetHitbox(Enemies aEnemies, int index){
-	SDL_Rect hitbox = {
-		.x = aEnemies->enemyList[index].hitbox.x,
-		.y = aEnemies->enemyList[index].hitbox.y,
-		.w = aEnemies->enemyList[index].hitbox.w,
-		.h = aEnemies->enemyList[index].hitbox.h
-	};
-	return hitbox;
+// SDL_Rect enemyGetHitbox(Enemies aEnemies, int index){
+// 	SDL_Rect hitbox = {
+// 		.x = aEnemies->enemyList[index].hitbox.x,
+// 		.y = aEnemies->enemyList[index].hitbox.y,
+// 		.w = aEnemies->enemyList[index].hitbox.w,
+// 		.h = aEnemies->enemyList[index].hitbox.h
+// 	};
+// 	return hitbox;
+// }
+
+SDL_Point enemyGetPoint(Enemies aEnemies, int index) {
+    if (!aEnemies || index < 0 || (size_t)index >= aEnemies->size) {
+        fprintf(stderr, "enemyGetPoint: Invalid index %d (size: %zu)\n", index, aEnemies ? aEnemies->size : 0);
+        return (SDL_Point){0, 0}; // or handle differently
+    }
+    return (SDL_Point){
+        .x = aEnemies->enemyList[index]->hitbox.x,
+        .y = aEnemies->enemyList[index]->hitbox.y};
 }
 
-SDL_Point enemyGetPoint(Enemies aEnemies, int index){
-	SDL_Point point = {
-		.x = aEnemies->enemyList[index].hitbox.x,
-		.y = aEnemies->enemyList[index].hitbox.y
-	};
-
-	return point;
+void NET_enemiesDestroy(Enemies aEnemies){
+    for (size_t i = 0; i < aEnemies->size; i++){
+        if(aEnemies->enemyList[i] != NULL) free(aEnemies->enemyList[i]);
+        aEnemies->enemyList[i] = NULL;
+    }
+    free(aEnemies);
 }
 
-void enemyDestroy(Enemies aEnemies){
-	free(aEnemies);
-	aEnemies = NULL;
+size_t NET_enemiesGetSize(Enemies aEnemies){
+    return aEnemies->size;
 }
 
 

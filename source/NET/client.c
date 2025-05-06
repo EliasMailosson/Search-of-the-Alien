@@ -2,10 +2,10 @@
 #include "../../include/UI/friend.h"
 #include <stdio.h>
 
-struct enemy{
+typedef struct clientEnemy{
     SDL_Point pos;
     int direction;
-};
+}ClientEnemy;
 
 struct scenC{
     ScenarioState state;
@@ -37,7 +37,8 @@ struct client{
 
     int PlayerCount;
     Player playerList[MAX_CLIENTS];
-    Enemy enemies[MAX_ENEMIES];
+    int EnemiesCount;
+    ClientEnemy enemies[MAX_ENEMIES_CLIENT_SIDE];
     bool isHubVisible;
     uint32_t seed;
     Proj projList[MAX_CLIENT_PROJ];
@@ -101,7 +102,7 @@ Client NET_clientCreate(){
     strcpy(aClient->selfUsername,"None");
     aClient->isHubVisible = false;
     aClient->seed = 0;
-    
+    aClient->EnemiesCount = 0;
     NET_clientLoadWeaponStats(aClient);
     return aClient;
 }
@@ -164,7 +165,7 @@ SDL_Point NET_clientGetPlayerPos(Client aClient, int playerIdx) {
 }
 
 SDL_Point NET_clientGetEnemyPos(Client aClient, int index){
-    if(index < MAX_CLIENTS) {
+    if(index < aClient->EnemiesCount) {
         return aClient->enemies[index].pos;
     }
     else return (SDL_Point) {.x=-1, .y=-1};
@@ -297,9 +298,11 @@ int NET_clientGetPlayerDirection(Client aClient, int playerIdx) {
 }
 
 int NET_clientGetEnemyDirection(Client aClient, int index) {
-    if(0 <= aClient->enemies[index].direction && 7 >= aClient->enemies[index].direction)
-        return aClient->enemies[index].direction;
-    else return 0;
+    if (index < 0 || index >= MAX_ENEMIES_CLIENT_SIDE) {
+        fprintf(stderr, "ERROR: enemy index %d out of bounds\n", index);
+        return -1;
+    }
+    return aClient->enemies[index].direction;
 }
 
 int NET_clientGetPlayerCharacter(Client aClient, int playerIdx) {
@@ -323,14 +326,18 @@ void NET_clientUpdatePlayerList(Client aClient, Packet aPacket){
 }
 
 void NET_clientUpdateEnemy(Client aClient, Packet aPacket){
-    EnemyPacket packets[MAX_ENEMIES] = {0};
-    int count = 0;
-    NET_enemyPacketReceive(aPacket, packets,&count);
-    for (int i = 0; i < count; i++){
+    EnemyPacket packets[MAX_ENEMIES_CLIENT_SIDE] = {0};
+    NET_enemyPacketReceive(aPacket, packets,&aClient->EnemiesCount);
+    //printf("%d enemies for client\n",aClient->EnemiesCount);
+    for (int i = 0; i < aClient->EnemiesCount; i++){
         aClient->enemies[i].pos.x = (int)packets[i].x;
         aClient->enemies[i].pos.y = (int)packets[i].y;
         aClient->enemies[i].direction = (int)packets[i].direction;
     }
+}
+
+int NET_clientGetEnemiesCount(Client aClinet){
+    return aClinet->EnemiesCount;
 }
 
 int NET_clientIsShooting(Client aClient, int playerIdx) {
