@@ -27,6 +27,7 @@ struct Player{
     int playerCharacter;
     bool isShooting;
     int dashCooldown;
+    uint8_t HpProcent;
 };
 
 struct client{
@@ -151,6 +152,17 @@ int NET_clientGetState(Client aClient) {
         if(strcmp(aClient->selfUsername,aClient->playerList[i].username) == 0) return aClient->playerList[i].state;
     }
     return -1;
+}
+
+ bool NET_clientIsPlayerDamaged(Client aClient, int selfIndex){
+    static uint8_t lastHealth[8] = {100, 100, 100, 100, 100, 100, 100, 100};
+    if(aClient->playerList[selfIndex].HpProcent < lastHealth[selfIndex]){
+        lastHealth[selfIndex] = aClient->playerList[selfIndex].HpProcent;
+        int hp = (int)aClient->playerList[selfIndex].HpProcent;
+        //printf("Your HP = %d\n", hp);
+        return true;
+    }
+    return false;
 }
 
 int NET_clientGetPlayerCount(Client aClient) {
@@ -325,7 +337,6 @@ void NET_clientUpdatePlayerList(Client aClient, Packet aPacket){
     PlayerPacket packets[MAX_CLIENTS] = {0};
     NET_playerPacketReceive(aPacket, packets, &aClient->PlayerCount);
     for (int i = 0; i < aClient->PlayerCount; i++){
-
         aClient->playerList[i].pos = packets[i].pos;
         aClient->playerList[i].state = packets[i].state;
         aClient->playerList[i].direction = packets[i].direction;
@@ -335,6 +346,7 @@ void NET_clientUpdatePlayerList(Client aClient, Packet aPacket){
         aClient->playerList[i].playerCharacter = packets[i].playerCharacter;
         aClient->playerList[i].isShooting = packets[i].isShooting;
         aClient->playerList[i].dashCooldown = packets[i].dashCoolDown;
+        aClient->playerList[i].HpProcent = packets[i].HpProcent;
     }
 }
 
@@ -397,6 +409,10 @@ SDL_Point NET_clientGetSelfPos(Client aClient){
         }
     }
     return (SDL_Point){-1,-1};
+}
+
+int NET_clientGetHP(Client aClient, int index){
+    return aClient->playerList[index].HpProcent;
 }
 
 SDL_Color NET_clientGetColor(int index){

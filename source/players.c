@@ -102,6 +102,7 @@ void renderPlayers(Client aClient, ClientView *pView) {
     static int frame = 0;
     frame++;
     int playerCount = NET_clientGetPlayerCount(aClient);
+    static Uint32 damageTime = 0;
 
     int selfIndex = NET_clientGetSelfIndex(aClient);
     SDL_Point selfPos = NET_clientGetPlayerPos(aClient, selfIndex);
@@ -154,6 +155,7 @@ void renderPlayers(Client aClient, ClientView *pView) {
         pView->PlayerPos[i] = (SDL_Point){.x = playerRect.x, .y = playerRect.y};
         
         SDL_RenderCopy(pView->pRend, pView->shadowTexture, NULL, &playerRect);
+
     }
 
     // character
@@ -213,9 +215,22 @@ void renderPlayers(Client aClient, ClientView *pView) {
         SDL_RenderCopy(pView->pRend, pView->playerTexture[playerCharacter], &src, &playerRect);
         RenderPlayerName(aClient, pView, i, playerRect);
 
-        //SDL_SetRenderDrawColor(pView->pRend, 255, 0, 0, 0);
+        //printf("Players HP: %d\n", (int)NET_clientGetHP(aClient, i));
+        /*if(NET_clientGetHP(aClient, i) < 100){ 
+            SDL_SetRenderDrawColor(pView->pRend, 255, 0, 0, 255);
+            SDL_RenderFillRect(pView->pRend, &playerRect);
+        }*/
+
+        SDL_Rect vignetteRect = {.x = 0, .y = 0, .w = 1920, .h = 1080};
+        SDL_Rect screenRect = {.x = 0, .y = 0, .w = pView->windowWidth, .h = pView->windowHeight};
+
+        if (NET_clientIsPlayerDamaged(aClient, selfIndex)) {
+            damageTime = SDL_GetTicks();
+        }
+        if (SDL_GetTicks() - damageTime < 250) {
+            SDL_RenderCopy(pView->pRend, pView->vignetteTexture, &vignetteRect, &screenRect);
+        }
         // SDL_Rect rpoint = {centerX-5,centerY-5 + renderSizeHalf, 10, 10};
-        //SDL_RenderFillRect(pView->pRend, &playerRect);
     }
 }
 

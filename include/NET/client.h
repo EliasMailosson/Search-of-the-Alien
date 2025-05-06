@@ -49,6 +49,8 @@ void NET_clientGetSelfname(Client aClient, char* outputName);
 int NET_clientGetSelfIndex(Client aClient);
 int NET_clientGetPlayerColorIndex(Client aClient,int index);
 int NET_clientIsShooting(Client aClient, int playerIdx);
+bool NET_clientIsPlayerDamaged(Client aClient, int selfIndex);
+
 
 int NET_clientGetPlayerCharacter(Client aClient, int playerIdx);
 void NET_clientGetProjList(Client aClient, Proj *outputProjList);
@@ -73,6 +75,8 @@ void NET_clientLoadWeaponStats(Client aClient);
 
 SDL_Color NET_clientGetColor(int index);
 SDL_Color NET_GetPlayerColor(Client aClient, int index);
+
+int NET_clientGetHP(Client aClient, int index);
 
 void NET_clientUpdateEnemy(Client aClient, Packet aPacket);
 SDL_Point NET_clientGetEnemyPos(Client aClient, int index);

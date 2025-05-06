@@ -80,6 +80,10 @@ void startClient(Client *aClient, ClientView *pView,ClientControl *pControl){
     pView->enemyTexture = SDL_CreateTextureFromSurface(pView->pRend, surface12);
     SDL_FreeSurface(surface12);
 
+    SDL_Surface *surface13 = IMG_Load("assets/images/vignette/red_vignette.png");
+    pView->vignetteTexture = SDL_CreateTextureFromSurface(pView->pRend, surface13);
+    SDL_FreeSurface(surface13);
+
     pView->crosshair = createScaledCursor("assets/images/cursor/crosshair.png", 50, 50, 25, 25);
 
     pView->playerRenderSize = 128;
@@ -154,7 +158,7 @@ void killClient(Client *aClient, ClientView *pView){
         SDL_DestroyTexture(pView->projectileTexture[i]);
         pView->projectileTexture[i] = NULL;
     }
-    
+    SDL_DestroyTexture(pView->vignetteTexture);
 
     hudDestroy(pView->aHud);
     NET_clientDestroy(*aClient);

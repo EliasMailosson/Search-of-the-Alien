@@ -31,7 +31,7 @@ size_t NET_enemiesGetSize(Enemies aEnemies);
 SDL_Point enemyGetPoint(Enemies aEnemies, int index);
 
 void checkEnemyCollision(Enemies aEnemies, int enemyindex, int *collide);
-// SDL_Rect enemyGetHitbox(Enemies aEnemies, int index);
+SDL_Rect enemyGetHitbox(Enemies aEnemies, int index);
 // int GetEnemyCount(Enemies aEnemies);
 void SetEnemyHitbox(Enemies aEnemies, int enemyindex, SDL_Rect H);
 
@@ -42,6 +42,11 @@ void enemyAngleTracker(Enemies aEnemies, SDL_Point playerPos, int enemyIndex);
 int enemyGetDirection(Enemies aEnemies, int index);
 
 float enemyGetAngle(Enemies aEnemies, int index);
+
+Uint32 enemyGetAttackTime(Enemies aEnemies, int enemyindex);
+
+void enemySetAttackTime(Enemies aEnemies, int enemyindex);
+
 
 
 
