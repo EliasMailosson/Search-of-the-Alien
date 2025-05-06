@@ -4,7 +4,7 @@
 #include "../../include/NET/shared.h"
 #include "../../include/NET/serverLogic.h"
 
-#define MAX_ENEMIES_CLIENT_SIDE 80
+#define MAX_ENEMIES_CLIENT_SIDE 25
 
 typedef struct enemy *Enemy;
 typedef struct enemies* Enemies;

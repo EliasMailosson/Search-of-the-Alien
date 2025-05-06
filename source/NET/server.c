@@ -655,15 +655,15 @@ void NET_serverRemoveUser(Server aServer,int index){
     for (int i = index; i < aServer->clientCount - 1; i++){
         aServer->clients[i] = aServer->clients[i + 1];
     }
-    User* temp = NULL;
-    if(aServer->clientCount - 1 > 0){
-        temp = realloc(aServer->clients, (aServer->clientCount - 1) * sizeof(User));
-        if(temp == NULL){
-            printf("Realloc failed when removing user\n");
-            return;
-        }
-    }
-    aServer->clients = temp;
+    // User* temp = NULL;
+    // if(aServer->clientCount - 1 > 0){
+    //     temp = realloc(aServer->clients, (aServer->clientCount - 1) * sizeof(User));
+    //     if(temp == NULL){
+    //         printf("Realloc failed when removing user\n");
+    //         return;
+    //     }
+    // }
+    // aServer->clients = temp;
     aServer->clientCount--;
 }
 
