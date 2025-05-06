@@ -186,6 +186,7 @@ void NET_serverSendEnemiesPacket(Server aServer, GameState GS, Enemies aEnemies,
         packet[i].direction = enemyGetDirection(aEnemies, i);
     }
     Uint32 payloadSize = *pEnemyCount * sizeof(EnemyPacket);
+    if(*pEnemyCount == 0) payloadSize = 1;
     for (int i = 0; i < aServer->clientCount; i++){
         if(aServer->clients[i].State == GS || GS == -1){
             NET_serverSendArray(aServer, GLOBAL, ENEMY_POS, packet, payloadSize, i);
@@ -415,22 +416,7 @@ void NET_serverUpdateEnemies(Server aServer, Enemies aEnemies, int *pEnemyCount)
     }
         NET_serverSendEnemiesPacket(aServer, NEMUR, aEnemies, pEnemyCount);
         if (*pEnemyCount == 0){
-            NET_serverSendEnemiesDeadPacket(aServer, NEMUR, pEnemyCount);
             (*pEnemyCount)--;
-        }
-    }
-}
-
-void NET_serverSendEnemiesDeadPacket(Server aServer, GameState GS, int *pEnemyCount){
-    int indexIP = NET_serverCompIP(aServer);
-    if(indexIP == -1) {
-        printf("Error NET_serverCompIP return -1\n");
-        return;
-    }
-    for (int i = 0; i < aServer->clientCount; i++){
-        if(aServer->clients[i].State == GS || GS == -1){
-            NET_serverSendInt(aServer, GLOBAL, LASTENEMYDEAD, *pEnemyCount, indexIP);
-
         }
     }
 }
