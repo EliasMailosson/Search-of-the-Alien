@@ -363,6 +363,10 @@ void NET_clientUpdateEnemy(Client aClient, Packet aPacket){
         aClient->enemies[i].pos.y = (int)packets[i].y;
         aClient->enemies[i].direction = (int)packets[i].direction;
     }
+
+    for (int i = aClient->EnemiesCount; i < MAX_ENEMIES_CLIENT_SIDE; i++) {
+        aClient->enemies[i] = (Enemy){0};
+    }
 }
 
 int NET_clientGetEnemiesCount(Client aClinet){

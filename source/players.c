@@ -59,12 +59,13 @@ void renderProjectiles(Client aClient, ClientView *pView) {
 void renderEnemy(Client aClient, ClientView *pView) {
     static int frame = 0;
     frame++;
-    int playerCount = NET_clientGetPlayerCount(aClient);
+    // int playerCount = NET_clientGetPlayerCount(aClient);
     int selfIndex = NET_clientGetSelfIndex(aClient);
     SDL_Point selfPos = NET_clientGetPlayerPos(aClient, selfIndex);
     int centerX = pView->windowWidth/2;
     int centerY = pView->windowHeight/2;
     int renderSizeHalf = pView->playerRenderSize/2;
+    int enemyCount = NET_enemyGetCount(aClient);
 
     for(int i = 0; i < NET_clientGetEnemiesCount(aClient); i++) {
         SDL_Point pos = NET_clientGetEnemyPos(aClient, i);
@@ -82,8 +83,8 @@ void renderEnemy(Client aClient, ClientView *pView) {
 
         SDL_Rect enemyRect;
         enemyRect = (SDL_Rect){
-                .x = (int)(centerX + screenOffsetX - renderSizeHalf),
-                .y = (int)(centerY + screenOffsetY - renderSizeHalf),
+                .x = (int)(centerX + screenOffsetX) + renderSizeHalf,
+                .y = (int)(centerY + screenOffsetY) + renderSizeHalf,
                 .w = pView->playerRenderSize / 2,
                 .h = pView->playerRenderSize / 2
             };
@@ -91,8 +92,8 @@ void renderEnemy(Client aClient, ClientView *pView) {
         src = (SDL_Rect){((frame/2)%24)*SPRITE_SIZE, direction*SPRITE_SIZE, SPRITE_SIZE, SPRITE_SIZE};
 
         //pView->PlayerPos[i] = (SDL_Point){.x = playerRect.x, .y = playerRect.y};
-        //SDL_SetRenderDrawColor(pView->pRend, 255, 0, 0, 255);
-        //SDL_RenderFillRect(pView->pRend, &enemyRect);
+        // SDL_SetRenderDrawColor(pView->pRend, 255, 0, 0, 255);
+        // SDL_RenderFillRect(pView->pRend, &enemyRect);
 
         SDL_RenderCopy(pView->pRend, pView->enemyTexture, &src, &enemyRect);
     }

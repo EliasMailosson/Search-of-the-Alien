@@ -9,6 +9,9 @@
 #include "../../include/NET/protocol.h"
 #include "server.h"
 
+#define PROJECTILEWIDTH 20
+#define PROJECTILEHEIGHT 20
+
 #define MAX_CLIENTS 8
 #define PORT 1234
 #define JON_IP "127.0.0.1"

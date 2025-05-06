@@ -47,7 +47,13 @@ Uint32 enemyGetAttackTime(Enemies aEnemies, int enemyindex);
 
 void enemySetAttackTime(Enemies aEnemies, int enemyindex);
 
+SDL_Rect enemyGetRect(Enemies aEnemies, int index);
 
+void enemyDamaged(Enemies aEnemies, int damage, int index, int *enemyCount);
+
+int enemyGetCount(Enemies aEnemies);
+
+bool enemyColitino(SDL_Rect A,SDL_Rect B);
 
 
 #endif

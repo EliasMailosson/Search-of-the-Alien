@@ -190,3 +190,7 @@ void NET_projectilesUpdate(Server aServer, Projectile *list) {
         }
     }
 }
+
+int getTileHeight(ServerMap aServerMap){
+    return aServerMap->tileRect.h;
+}

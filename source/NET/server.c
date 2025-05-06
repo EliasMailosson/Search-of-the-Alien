@@ -78,6 +78,13 @@ int main(int argc, char **argv ){
     memset(aServer->usedColors, 0, sizeof(aServer->usedColors));
     bool isRunning;
     aServer->aServerMap = NET_serverMapCreate();
+    aEnemies = enemyCreate();
+    int enemyCount = enemyGetCount(aEnemies);
+    if (enemyCount > 0)
+    {
+        enemySpawn(aEnemies, aServer->aServerMap);
+    }
+    
     // if Server has allocated memory then the server is running on "PORT"
     if(aServer == NULL){
         isRunning = false;
@@ -775,4 +782,3 @@ int NET_serverAssignColorIndex(Server aServer){
     }
     return -1;
 }
-
