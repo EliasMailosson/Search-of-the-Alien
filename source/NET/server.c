@@ -171,7 +171,7 @@ int main(int argc, char **argv ){
 void* enemies_threads(void *arg){
     Server aServer = (Server)arg;
 
-    for (int i = 0; i < 79; i++){
+    for (int i = 0; i < 20; i++){
         NET_enemiesPush(aServer->aEnemies,NET_enemyCreate(10+10*i,10+10*i,LIGHT_ENEMY));
     }
     

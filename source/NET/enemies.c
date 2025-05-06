@@ -210,13 +210,6 @@ void SetEnemyHitbox(Enemies aEnemies, int enemyindex, SDL_Rect HB){
 	aEnemies->enemyList[enemyindex]->hitbox = HB;
 }
 
-Uint32 enemyGetAttackTime(Enemies aEnemies, int enemyindex){
-	return aEnemies->enemyList[enemyindex].attackTime;
-}
-
-void enemySetAttackTime(Enemies aEnemies, int enemyindex){
-	aEnemies->enemyList[enemyindex].attackTime = SDL_GetTicks();
-}
 
 // SDL_Rect enemyGetHitbox(Enemies aEnemies, int index){
 // 	SDL_Rect hitbox = {
