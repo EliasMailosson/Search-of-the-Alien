@@ -58,6 +58,8 @@ void NET_clientUpdateProjList(Client aClient, Packet aPacket);
 bool NET_clientGetTerminalHub(Client aClient);
 void NET_clientReceiver(Client aClient, Map aMap,SDL_Window *pScreen);
 
+int NET_clientGetDashCooldown(Client aClient);
+
 bool NET_clientGetPauseState(Client aClient);
 
 int NET_clientFindPlayer(Client aClient, char* str);

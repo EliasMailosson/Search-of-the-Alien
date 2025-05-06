@@ -164,6 +164,10 @@ void hudRender(Client aClient, Hud aHud,SDL_Renderer *pRend){
         SDL_SetRenderDrawColor(pRend, 255, 255, 255, 255);
         SDL_RenderFillRect(pRend, &((SDL_Rect){aHud->playerList.x, r.y + 24, 100, 4}));
     }
+
+    int dashCooldown = NET_clientGetDashCooldown(aClient);
+    SDL_SetRenderDrawColor(pRend, 255, 255, 255, 255);
+    SDL_RenderFillRect(pRend, &((SDL_Rect){aHud->playerList.x, r.y + 24, 100, 4}));
 }
 
 SDL_Point hudGettArrowPos(Hud aHud, int index){

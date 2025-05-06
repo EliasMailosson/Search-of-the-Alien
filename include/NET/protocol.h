@@ -22,6 +22,7 @@ typedef struct PlayerPacket{
     int direction;
     int colorIndex;
     int playerCharacter;
+    int dashCoolDown;
     bool isShooting;
 }PlayerPacket;  
 

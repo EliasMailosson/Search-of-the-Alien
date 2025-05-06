@@ -26,6 +26,7 @@ struct Player{
     SDL_Color color;
     int playerCharacter;
     bool isShooting;
+    int dashCooldown;
 };
 
 struct client{
@@ -331,7 +332,12 @@ void NET_clientUpdatePlayerList(Client aClient, Packet aPacket){
         aClient->playerList[i].color = NET_clientGetColor(aClient->playerList[i].colorIndex);
         aClient->playerList[i].playerCharacter = packets[i].playerCharacter;
         aClient->playerList[i].isShooting = packets[i].isShooting;
+        aClient->playerList[i].dashCooldown = packets[i].dashCoolDown;
     }
+}
+
+int NET_clientGetDashCooldown(Client aClient) {
+    return aClient->playerList[NET_clientGetSelfIndex(aClient)].dashCooldown;
 }
 
 void NET_clientUpdateEnemy(Client aClient, Packet aPacket){

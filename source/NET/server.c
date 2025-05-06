@@ -25,6 +25,8 @@ struct Player{
     Weapon weapon;
     int projCounter;
     bool isShooting;
+    int dashCooldown;
+    int lastDashTime;
 };
 
 struct User{
@@ -296,6 +298,7 @@ void NET_serverSendPlayerPacket(Server aServer,GameState GS){
         packet[i].colorIndex = aServer->clients[i].colorIndex;
         packet[i].playerCharacter = aServer->clients[i].player.character;
         packet[i].isShooting = aServer->clients[i].player.isShooting;
+        packet[i].dashCoolDown = aServer->clients[i].player.dashCooldown;
     }
     Uint32 payloadSize = aServer->clientCount * sizeof(PlayerPacket);
     for (int i = 0; i < aServer->clientCount; i++){
@@ -357,8 +360,17 @@ static void calcMovement(Server aServer, PlayerInputPacket *pip, int playerIdx){
     if (pip->keys[PLAYER_INPUT_RIGHT]) dx += 2.0f;
 
     // dash
-    if (pip->keys[PLAYER_INPUT_SPACE]){
+    int time = SDL_GetTicks();
+    aServer->clients[playerIdx].player.dashCooldown = (time - aServer->clients[playerIdx].player.lastDashTime) / 40;
+    if (pip->keys[PLAYER_INPUT_SPACE] && (aServer->clients[playerIdx].player.dashCooldown < 10 || aServer->clients[playerIdx].player.dashCooldown > 100)){
         speed *= dDash;
+        if(aServer->clients[playerIdx].player.dashCooldown > 100) {
+            aServer->clients[playerIdx].player.lastDashTime = SDL_GetTicks();
+            aServer->clients[playerIdx].player.dashCooldown = 0;
+        }
+    }
+    if(aServer->clients[playerIdx].player.dashCooldown > 100) {
+        aServer->clients[playerIdx].player.dashCooldown = 100;
     }
 
     // Normalize movement vector if diagonal
@@ -695,6 +707,7 @@ void NET_serverClientConnected(Packet aPacket, Server aServer){
     newUser.player.weapon.projFreq = 10;
     newUser.player.weapon.projSpeed = 14;
     newUser.player.weapon.projType = PROJ_TEX_BULLET;
+    newUser.player.dashCooldown = 100;
     newUser.State = MENU;
     newUser.colorIndex = NET_serverAssignColorIndex(aServer);
     newUser.isHubVisible = false;
