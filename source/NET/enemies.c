@@ -19,7 +19,7 @@ typedef struct enemies {
 	Enemy *enemyList;
 	size_t size;
 	size_t capacity;
-};
+}enemies;
 
 Enemies NET_enemiesCreate(void){
 	Enemies aEnemies =  malloc(sizeof(*aEnemies));
@@ -190,7 +190,6 @@ void enemyAngleTracker(Enemies aEnemies, SDL_Point playerPos, int enemyIndex) {
 	enemy->direction = (raw + 3 + 8) % 8;         
 }
 
-
 int enemyGetDirection(Enemies aEnemies, int index){
     if (!aEnemies || index >= (int)aEnemies->size) {
         return 0;
@@ -213,28 +212,19 @@ void SetEnemyHitbox(Enemies aEnemies, int enemyindex, SDL_Rect HB){
 }
 
 Uint32 enemyGetAttackTime(Enemies aEnemies, int enemyindex){
-	return aEnemies->enemyList[enemyindex].attackTime;
+	return aEnemies->enemyList[enemyindex]->attackTime;
 }
 
 void enemySetAttackTime(Enemies aEnemies, int enemyindex){
-	aEnemies->enemyList[enemyindex].attackTime = SDL_GetTicks();
+	aEnemies->enemyList[enemyindex]->attackTime = SDL_GetTicks();
 }
-
-Uint32 enemyGetAttackTime(Enemies aEnemies, int enemyindex){
-	return aEnemies->enemyList[enemyindex].attackTime;
-}
-
-void enemySetAttackTime(Enemies aEnemies, int enemyindex){
-	aEnemies->enemyList[enemyindex].attackTime = SDL_GetTicks();
-}
-
 
 SDL_Rect enemyGetHitbox(Enemies aEnemies, int index){
     SDL_Rect hitbox = {
-        .x = aEnemies->enemyList[index].hitbox.x,
-        .y = aEnemies->enemyList[index].hitbox.y,
-        .w = aEnemies->enemyList[index].hitbox.w,
-        .h = aEnemies->enemyList[index].hitbox.h
+        .x = aEnemies->enemyList[index]->hitbox.x,
+        .y = aEnemies->enemyList[index]->hitbox.y,
+        .w = aEnemies->enemyList[index]->hitbox.w,
+        .h = aEnemies->enemyList[index]->hitbox.h
     };
     return hitbox;
 }
