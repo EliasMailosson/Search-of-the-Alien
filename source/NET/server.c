@@ -27,6 +27,8 @@ struct Player{
     bool isShooting;
     int dashCooldown;
     int lastDashTime;
+    int HP;
+    int maxHP;
 };
 
 struct User{
@@ -287,6 +289,14 @@ void NET_serverScenarioUpdate(Scenario *s, ScenarioState state, uint32_t seed){
     }
 }
 
+uint8_t NET_serverGetPercentage(int currentHP, int maxHP){
+    if (maxHP <= 0) return 0; 
+    float percent = ((float)currentHP / (float)maxHP) * 100.0f;
+    return (uint8_t)(percent); 
+}
+
+
+
 void NET_serverSendPlayerPacket(Server aServer,GameState GS){
     PlayerPacket packet[MAX_CLIENTS] = {0};
     for (int i = 0; i < aServer->clientCount; i++){
@@ -304,6 +314,7 @@ void NET_serverSendPlayerPacket(Server aServer,GameState GS){
         packet[i].playerCharacter = aServer->clients[i].player.character;
         packet[i].isShooting = aServer->clients[i].player.isShooting;
         packet[i].dashCoolDown = aServer->clients[i].player.dashCooldown;
+        packet[i].HpProcent = NET_serverGetPercentage(aServer->clients[i].player.HP , aServer->clients[i].player.maxHP);
     }
     Uint32 payloadSize = aServer->clientCount * sizeof(PlayerPacket);
     for (int i = 0; i < aServer->clientCount; i++){
@@ -477,6 +488,18 @@ void NET_serverUpdatePlayer(Server aServer, Packet aPacket, GameState state){
     NET_serverSendPlayerPacket(aServer,state); 
 }
 
+bool enemyAttackPlayer(Server aServer, int index, SDL_Rect enemyHitbox){
+    if(!SDL_HasIntersection(&aServer->clients[index].player.hitBox, &enemyHitbox)){
+        return false;
+    }
+    aServer->clients[index].player.HP -= 10;
+    if(aServer->clients[index].player.HP <= 0){
+        aServer->clients[index].player.HP = 0;
+    }
+    // printf("Current HP: %d\n", aServer->clients[index].player.HP);
+    return true;
+}
+
 void NET_serverUpdateEnemies(Server aServer, Enemies aEnemies, ServerMap aMap){
     for (int i = 0; i < (int)NET_enemiesGetSize(aEnemies); i++) {
         float closestDist = INT_MAX;
@@ -503,6 +526,14 @@ void NET_serverUpdateEnemies(Server aServer, Enemies aEnemies, ServerMap aMap){
                 aServer->clients[closestPlayerIndex].player.hitBox.x,
                 aServer->clients[closestPlayerIndex].player.hitBox.y
             };
+            SDL_Rect enemyHitbox = enemyGetHitbox(aEnemies, i);
+            Uint32 currentTime = SDL_GetTicks(); 
+            if(currentTime > enemyGetAttackTime(aEnemies, i) + 1000 && aServer->clients[closestPlayerIndex].State == NEMUR){
+                if(enemyAttackPlayer(aServer, closestPlayerIndex, enemyHitbox)){
+                    NET_serverSendPlayerPacket(aServer, aServer->clients[closestPlayerIndex].State);
+                }
+                enemySetAttackTime(aEnemies, i);
+            }
             enemyAngleTracker(aEnemies, closestPos, i);
         }
     }
@@ -711,6 +742,9 @@ void NET_serverClientConnected(Packet aPacket, Server aServer){
     newUser.player.weapon.damage = 1;
     newUser.player.weapon.projFreq = 10;
     newUser.player.weapon.projSpeed = 14;
+    // Maybe init HP when switching to a character
+    newUser.player.HP = 100;
+    newUser.player.maxHP = 100;
     newUser.player.weapon.projType = PROJ_TEX_BULLET;
     newUser.player.dashCooldown = 100;
     newUser.State = MENU;

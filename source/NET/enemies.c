@@ -12,8 +12,10 @@ struct enemy{
 	Uint32 ThinkTime;
 	int direction;
 	float angle;
+    Uint32 attackTime;
 };
-struct enemies {
+
+typedef struct enemies {
 	Enemy *enemyList;
 	size_t size;
 	size_t capacity;
@@ -67,7 +69,7 @@ Enemy NET_enemyCreate(int pixelX, int pixelY, EnemyID id){
     switch (id){
     case LIGHT_ENEMY:
         e->hitbox.h = e->hitbox.w = 50;
-        e->ThinkTime = e->direction = 0;
+        e->ThinkTime = e->direction = e->attackTime = 0;
         e->HP.maxHP = e->HP.currentHP = 100;
         e->enemyID = LIGHT_ENEMY;
         break;
@@ -210,16 +212,32 @@ void SetEnemyHitbox(Enemies aEnemies, int enemyindex, SDL_Rect HB){
 	aEnemies->enemyList[enemyindex]->hitbox = HB;
 }
 
+Uint32 enemyGetAttackTime(Enemies aEnemies, int enemyindex){
+	return aEnemies->enemyList[enemyindex].attackTime;
+}
 
-// SDL_Rect enemyGetHitbox(Enemies aEnemies, int index){
-// 	SDL_Rect hitbox = {
-// 		.x = aEnemies->enemyList[index].hitbox.x,
-// 		.y = aEnemies->enemyList[index].hitbox.y,
-// 		.w = aEnemies->enemyList[index].hitbox.w,
-// 		.h = aEnemies->enemyList[index].hitbox.h
-// 	};
-// 	return hitbox;
-// }
+void enemySetAttackTime(Enemies aEnemies, int enemyindex){
+	aEnemies->enemyList[enemyindex].attackTime = SDL_GetTicks();
+}
+
+Uint32 enemyGetAttackTime(Enemies aEnemies, int enemyindex){
+	return aEnemies->enemyList[enemyindex].attackTime;
+}
+
+void enemySetAttackTime(Enemies aEnemies, int enemyindex){
+	aEnemies->enemyList[enemyindex].attackTime = SDL_GetTicks();
+}
+
+
+SDL_Rect enemyGetHitbox(Enemies aEnemies, int index){
+    SDL_Rect hitbox = {
+        .x = aEnemies->enemyList[index].hitbox.x,
+        .y = aEnemies->enemyList[index].hitbox.y,
+        .w = aEnemies->enemyList[index].hitbox.w,
+        .h = aEnemies->enemyList[index].hitbox.h
+    };
+    return hitbox;
+}
 
 SDL_Point enemyGetPoint(Enemies aEnemies, int index) {
     if (!aEnemies || index < 0 || (size_t)index >= aEnemies->size) {

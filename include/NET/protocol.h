@@ -24,6 +24,7 @@ typedef struct PlayerPacket{
     int playerCharacter;
     int dashCoolDown;
     bool isShooting;
+    uint8_t HpProcent;
 }PlayerPacket;  
 
 typedef struct __attribute__((packed)) enemyPacket{

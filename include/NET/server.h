@@ -48,7 +48,8 @@ void NET_serverSetPlayerHitbox(Server aServer, int playerIndex, SDL_Rect r);
 void NET_serverSetNewMap(Server aServer);
 int NET_serverGetProjectileSpeed(Server aServer, int playerIdx);
 
-
+//server update
+bool enemyAttackPlayer(Server aServer, int index, SDL_Rect enemyHitbox);
 void NET_serverUpdateEnemies(Server aServer, Enemies aEnemies, ServerMap aMap);
 
 //server util
@@ -60,6 +61,7 @@ int NET_serverGetProjCount(Server aServer);
 float NET_serverGetPlayerAngle(Server aServer, int playerIdx);
 void NET_serverSetProjCount(Server aServer, int count);
 void NET_serverScenarioUpdate(Scenario *s, ScenarioState state, uint32_t seed);
+uint8_t NET_serverGetPercentage(int currentHP, int maxHP);
 
 /** Freeing memory after use, for server */
 void NET_serverDestroy(Server aServer);
