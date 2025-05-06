@@ -12,6 +12,7 @@ typedef struct enemy {
 	Uint32 ThinkTime;
 	int direction;
 	float angle;
+	Uint32 attackTime;
 } Enemy;
 
 typedef struct enemies {
@@ -38,7 +39,16 @@ Enemies enemyCreate(int capacity){
 }
 
 void enemySpawn(Enemies aEnemies){
+	// int spawnX, spawnY;
+
 	for (int i = 0; i < MAX_ENEMIES; i++){
+		
+		// if (NET_serverFindSpawnTile(serverMap, &spawnX, &spawnY)) {
+		// 	//här ska man konvertera tile till world-position för att kunna spawna fienden
+		// } else {
+		// 	printf("Kunde inte hitta plats för fiende!\n");
+		// }
+
 		aEnemies->enemyList[i].hitbox.x = i*64;
 		aEnemies->enemyList[i].hitbox.y = i*512;
 		aEnemies->enemyList[i].hitbox.w = 50;
@@ -48,6 +58,8 @@ void enemySpawn(Enemies aEnemies){
 		aEnemies->enemyList[i].angle = 0.0f;
 		aEnemies->enemyList[i].HP.maxHP = 100;
 		aEnemies->enemyList[i].HP.currentHP = 100;
+		aEnemies->enemyList[i].attackTime = 0;
+
 	}
 }
 
@@ -70,7 +82,7 @@ void PlayerTracker(Enemies aEnemies, Server aServer, int playerIndex, int enemyI
     float vx = (px - ex) * seekWeight;
     float vy = (py - ey) * seekWeight;
     
-    //Separation från alla andra fiender, "o" står för "e2" egentligen
+    //Separation från alla andra fiender
     for (int j = 0; j < aEnemies->count; j++) {
         if (j == enemyIndex) continue;
 
@@ -164,15 +176,23 @@ void SetEnemyHitbox(Enemies aEnemies, int enemyindex, SDL_Rect HB){
 	aEnemies->enemyList[enemyindex].hitbox = HB;
 }
 
-// SDL_Rect enemyGetHitbox(Enemies aEnemies, int index){
-// 	SDL_Rect hitbox = {
-// 		.x = aEnemies->enemyList[index].hitbox.x,
-// 		.y = aEnemies->enemyList[index].hitbox.y,
-// 		.w = aEnemies->enemyList[index].hitbox.w,
-// 		.h = aEnemies->enemyList[index].hitbox.h
-// 	};
-// 	return hitbox;
-// }
+Uint32 enemyGetAttackTime(Enemies aEnemies, int enemyindex){
+	return aEnemies->enemyList[enemyindex].attackTime;
+}
+
+void enemySetAttackTime(Enemies aEnemies, int enemyindex){
+	aEnemies->enemyList[enemyindex].attackTime = SDL_GetTicks();
+}
+
+SDL_Rect enemyGetHitbox(Enemies aEnemies, int index){
+	SDL_Rect hitbox = {
+		.x = aEnemies->enemyList[index].hitbox.x,
+		.y = aEnemies->enemyList[index].hitbox.y,
+		.w = aEnemies->enemyList[index].hitbox.w,
+		.h = aEnemies->enemyList[index].hitbox.h
+	};
+	return hitbox;
+}
 
 SDL_Point enemyGetPoint(Enemies aEnemies, int index){
 	SDL_Point point = {
@@ -187,3 +207,5 @@ void enemyDestroy(Enemies aEnemies){
 	free(aEnemies);
 	aEnemies = NULL;
 }
+
+
