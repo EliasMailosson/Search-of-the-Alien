@@ -47,6 +47,7 @@ void NET_serverSetNewMap(Server aServer);
 
 void NET_serverUpdateEnemies(Server aServer, Enemies aEnemies, int *pEnemyCount);
 void NET_serverSendEnemiesPacket(Server aServer, GameState GS, Enemies aEnemies, int *pEnemyCount);
+void NET_serverSendEnemiesDeadPacket(Server aServer, GameState GS, int *pEnemyCount);
 
 //server util
 int NET_serverFindPlayerID(Server aServer, const char* str);

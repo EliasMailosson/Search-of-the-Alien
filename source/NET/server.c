@@ -174,7 +174,6 @@ void* projektil_threads(void *arg){
 }
 
 void NET_serverSendEnemiesPacket(Server aServer, GameState GS, Enemies aEnemies, int *pEnemyCount){
-        
     if (*pEnemyCount < 0 || *pEnemyCount > MAX_ENEMIES) {
         fprintf(stderr, "Error: invalid pEnemyCount (%d)\n", *pEnemyCount);
         return;
@@ -416,13 +415,13 @@ void NET_serverUpdateEnemies(Server aServer, Enemies aEnemies, int *pEnemyCount)
     }
         NET_serverSendEnemiesPacket(aServer, NEMUR, aEnemies, pEnemyCount);
         if (*pEnemyCount == 0){
-            NET_serverSendEnemiesDeadPacket(aServer, NEMUR, aEnemies, pEnemyCount);
+            NET_serverSendEnemiesDeadPacket(aServer, NEMUR, pEnemyCount);
             (*pEnemyCount)--;
         }
     }
 }
 
-NET_serverSendEnemiesDeadPacket(Server aServer, GameState GS, Enemies aEnemies, int *pEnemyCount){
+void NET_serverSendEnemiesDeadPacket(Server aServer, GameState GS, int *pEnemyCount){
     int indexIP = NET_serverCompIP(aServer);
     if(indexIP == -1) {
         printf("Error NET_serverCompIP return -1\n");
