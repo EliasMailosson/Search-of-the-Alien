@@ -4,6 +4,7 @@
 #include <string.h>
 
 typedef struct playerList {
+    int x;
     Label usernames[MAX_CLIENTS];
     TTF_Font *pFont;
     int count;
@@ -19,6 +20,7 @@ struct Hud{
     SDL_Texture *imgArrow[MAX_CLIENTS]; 
     Arrow indicators[MAX_CLIENTS-1];
     PlayerList playerList;
+    SDL_Texture *playerIconTexture[3];
 };
 
 Arrow arrowCreate(){
@@ -77,6 +79,16 @@ Hud hudCreate(SDL_Renderer *pRend){
     for(int i = 0; i < MAX_CLIENTS; i++) {
         aHud->playerList.usernames[i] = UI_labelCreate();
     }
+
+    SDL_Surface *surf1 = IMG_Load("assets/images/hud/biggie-icon.png");
+    aHud->playerIconTexture[1] = SDL_CreateTextureFromSurface(pRend, surf1);
+    SDL_FreeSurface(surf1);
+    SDL_Surface *surf2 = IMG_Load("assets/images/hud/blowface-icon.png");
+    aHud->playerIconTexture[0] = SDL_CreateTextureFromSurface(pRend, surf2);
+    SDL_FreeSurface(surf2);
+    SDL_Surface *surf3 = IMG_Load("assets/images/hud/cleo-icon.png");
+    aHud->playerIconTexture[2] = SDL_CreateTextureFromSurface(pRend, surf3);
+    SDL_FreeSurface(surf3);
     return aHud;
 }
 
@@ -87,6 +99,11 @@ void hudDestroy(Hud aHud){
     for (int i = 0; i < MAX_CLIENTS-1; i++){
         if(aHud->indicators[i] != NULL) free(aHud->indicators[i]);
         aHud->indicators[i] = NULL;
+    }
+    for(int i = 0; i < 3; i++) {
+        if(aHud->playerIconTexture[i] != NULL) {
+            SDL_DestroyTexture(aHud->playerIconTexture[i]);
+        }
     }
 
     TTF_CloseFont(aHud->playerList.pFont);
@@ -108,7 +125,8 @@ void updateHudPlayerList(Client aClient, Hud aHud, SDL_Renderer *pRend, int wind
     aHud->playerList.count = NET_clientGetPlayerCount(aClient);
     for(int i = 0; i < aHud->playerList.count; i++) {
         SDL_Color color = NET_GetPlayerColor(aClient, i);
-        UI_labelSetAppearance(pRend, aHud->playerList.usernames[i], windowW - 140, 10 + i*40, color, aHud->playerList.pFont);
+        aHud->playerList.x = windowW - 140;
+        UI_labelSetAppearance(pRend, aHud->playerList.usernames[i], aHud->playerList.x, 10 + i*40, color, aHud->playerList.pFont);
 
         char username[48];
         NET_clientGetPlayerName(aClient, i, username);
@@ -123,9 +141,17 @@ void hudRender(Client aClient, Hud aHud,SDL_Renderer *pRend){
         arrowRender(aHud->indicators[i],pRend,aHud->imgArrow[colorIdx]);
     }
 
-    SDL_RenderFillRect(pRend, )
+    // SDL_RenderFillRect(pRend, )
 
     for(int i = 0; i < aHud->playerList.count; i++) {
+        SDL_Rect r = {
+            .x = aHud->playerList.x - 30,
+            .y = 14 + i*40,
+            .w = 20,
+            .h = 20
+        };
+        int character = NET_clientGetPlayerCharacter(aClient, i);
+        SDL_RenderCopy(pRend, aHud->playerIconTexture[character], NULL, &r);
         UI_labelRender(pRend, aHud->playerList.usernames[i]);
     }
 }
