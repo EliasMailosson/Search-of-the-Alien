@@ -416,13 +416,22 @@ void NET_serverUpdateEnemies(Server aServer, Enemies aEnemies, int *pEnemyCount)
     }
         NET_serverSendEnemiesPacket(aServer, NEMUR, aEnemies, pEnemyCount);
         if (*pEnemyCount == 0){
-            int indexIP = NET_serverCompIP(aServer);
-            if(indexIP == -1) {
-                printf("Error NET_serverCompIP return -1\n");
-                return;
-            }
-            NET_serverSendInt(aServer, GLOBAL, LASTENEMYDEAD, *pEnemyCount, indexIP);
+            NET_serverSendEnemiesDeadPacket(aServer, NEMUR, aEnemies, pEnemyCount);
             (*pEnemyCount)--;
+        }
+    }
+}
+
+NET_serverSendEnemiesDeadPacket(Server aServer, GameState GS, Enemies aEnemies, int *pEnemyCount){
+    int indexIP = NET_serverCompIP(aServer);
+    if(indexIP == -1) {
+        printf("Error NET_serverCompIP return -1\n");
+        return;
+    }
+    for (int i = 0; i < aServer->clientCount; i++){
+        if(aServer->clients[i].State == GS || GS == -1){
+            NET_serverSendInt(aServer, GLOBAL, LASTENEMYDEAD, *pEnemyCount, indexIP);
+
         }
     }
 }
@@ -645,4 +654,3 @@ int NET_serverAssignColorIndex(Server aServer){
     }
     return -1;
 }
-
