@@ -5,6 +5,7 @@
 #include "../../include/NET/serverLogic.h"
 
 #define MAX_ENEMIES_CLIENT_SIDE 25
+#define MAX_ENEMIES_RANGE 1200
 
 typedef struct enemy *Enemy;
 typedef struct enemies* Enemies;
