@@ -31,6 +31,7 @@ struct Player{
 };
 
 typedef struct gameConfig {
+    int nextGraphicsQuality;
     int graphicsQuality; // 1: high, 2: medium
 }GameConfig;
 
@@ -110,6 +111,7 @@ Client NET_clientCreate(){
     }
 
     NET_clientReadGraphicsConfig(aClient);
+    aClient->config.nextGraphicsQuality = aClient->config.graphicsQuality;
 
     aClient->PlayerCount = 1;
     aClient->playerList[0].state = MENU;
@@ -146,9 +148,17 @@ void NET_clientReadGraphicsConfig(Client aClient) {
     fclose(file);
 }
 
+void NET_clientSetNextGraphicsConfig(Client aClient, int value) {
+    aClient->config.nextGraphicsQuality = value;
+}
+
+int NET_clientGetNextGraphicsConfig(Client aClient) {
+    return aClient->config.nextGraphicsQuality;
+}
+
 void NET_clientSaveGraphicsConfig(Client aClient) {
     FILE *file = fopen("data/graphics.config", "w");
-    fprintf(file, "QUALITY=%d", aClient->config.graphicsQuality);
+    fprintf(file, "QUALITY=%d", aClient->config.nextGraphicsQuality);
     fclose(file);
 }
 
