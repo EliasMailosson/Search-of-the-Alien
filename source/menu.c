@@ -9,6 +9,7 @@
 #include "../include/NET/client.h"
 #include "../include/game.h"
 #include <stdio.h>
+#include <string.h>
 
 void renderMenu(SDL_Renderer *pRend, Menu *pMenu) {
     SDL_SetRenderDrawColor(pRend, 0,0,0,0);
@@ -20,7 +21,7 @@ void renderMenu(SDL_Renderer *pRend, Menu *pMenu) {
     SDL_RenderPresent(pRend);
 }
 
-void updateMenu(Menu *pMenu, ClientControl *pControl, Client aClient) {
+void updateMenu(Menu *pMenu, ClientControl *pControl, ClientView *pView, Client aClient) {
     static MenuEvent menuEvent;
     static int switchDelay = 0;
     switchDelay++;
@@ -80,6 +81,12 @@ void updateMenu(Menu *pMenu, ClientControl *pControl, Client aClient) {
                     UI_clientAddFriend(aFriendList, friend);
                     UI_updateFriendList(aFriendList);
                 }
+                if (strcmp("Options-quality-sel", menuEvent.key) == 0) {
+                    int current = NET_clientGetNextGraphicsConfig(aClient);
+                    if(current == 2) NET_clientSetNextGraphicsConfig(aClient, 1);
+                    if(current == 1) NET_clientSetNextGraphicsConfig(aClient, 2);
+                    refreshMenu(aClient, pView->pRend, pMenu, pView);
+                }
                 if (strcmp("player-r", menuEvent.key) == 0) {
                     Animation a1 = (Animation)UI_panelGetComponent(pMenu->panels[PANEL_PLAYER_SELECT], "player-animation");
                     UI_animationSetMode(a1, PLAYBACK_FORWARD);
@@ -109,7 +116,7 @@ void updateFriendList(Menu *pMenu, Client aClient) {
     }
 }
 
-void refreshMenu(SDL_Renderer *pRend, Menu *pMenu, ClientView *pView) {
+void refreshMenu(Client aClient, SDL_Renderer *pRend, Menu *pMenu, ClientView *pView) {
     for(int i = 0; i < PANEL_COUNT; i++) {
         UI_panelSetAppearance(pMenu->panels[i], 
             (SDL_Rect) { .x = 0, .y = 0, .w = pView->windowWidth, .h = pView->windowHeight }, 
@@ -242,6 +249,20 @@ void refreshMenu(SDL_Renderer *pRend, Menu *pMenu, ClientView *pView) {
         100, 100, BIGBUTTONWIDTH, SMALLBUTTONHEIGHT, pRend, (SDL_Color) { .r = 0, .g = 0, .b = 0, .a = 255 }, 
         pMenu->fonts[0], (SDL_Color) { .r = 255, .g = 255, .b = 255, .a = 255 }
     );
+    
+    char graphicsText[64];
+    int quality = NET_clientGetNextGraphicsConfig(aClient);
+    if(quality == 1) strcpy(graphicsText, "Graphics Quality: High");
+    else if(quality == 2) strcpy(graphicsText, "Graphics Quality: Medium");
+    Button b50 = (Button)UI_panelGetComponent(pMenu->panels[PANEL_OPTIONS], "Options-quality-sel");
+    UI_buttonConfigure(b50, graphicsText, 
+        100, 150, BIGBUTTONWIDTH, SMALLBUTTONHEIGHT, pRend, (SDL_Color) { .r = 0, .g = 0, .b = 0, .a = 255 }, 
+        pMenu->fonts[0], (SDL_Color) { .r = 255, .g = 255, .b = 255, .a = 255 }
+    );
+
+    Label l3 = (Label)UI_panelGetComponent(pMenu->panels[PANEL_OPTIONS], "Options-quality-disclaimer");
+    UI_labelSetText(l3, "(NOTE: Restart game for change to take effect!)");
+    UI_labelSetAppearance(pView->pRend, l3, 450, 150, (SDL_Color) { .r = 255, .g = 255, .b = 255, .a = 255 }, pMenu->fonts[0]);
 
     // PANEL_PLAYER_SELECT //////////////////
     Animation a1 = (Animation)UI_panelGetComponent(pMenu->panels[PANEL_PLAYER_SELECT], "player-animation");
@@ -387,6 +408,12 @@ Menu initMenu(SDL_Renderer *pRend, ClientView *pView, Client aClient) {
     UI_panelAddComponent(menu.panels[PANEL_OPTIONS], b71, UI_BUTTON, "Options-player-sel");
     UI_panelSetComponentLink(menu.panels[PANEL_OPTIONS], "Options-player-sel", PANEL_PLAYER_SELECT);
 
+    Button b50 = UI_buttonCreate();
+    UI_panelAddComponent(menu.panels[PANEL_OPTIONS], b50, UI_BUTTON, "Options-quality-sel");
+
+    Label l3 = UI_labelCreate();
+    UI_panelAddComponent(menu.panels[PANEL_OPTIONS], l3, UI_LABEL, "Options-quality-disclaimer");
+
     // PANEL_PLAYER_SELECT //////////////////
     UI_panelSetImage(pRend, menu.panels[PANEL_PLAYER_SELECT], "assets/images/menu/background2.png");
 
@@ -404,7 +431,7 @@ Menu initMenu(SDL_Renderer *pRend, ClientView *pView, Client aClient) {
     UI_panelAddComponent(menu.panels[PANEL_PLAYER_SELECT], bSel, UI_BUTTON, "player-sel");
     UI_panelSetComponentLink(menu.panels[PANEL_PLAYER_SELECT], "player-sel", PANEL_START);
 
-    refreshMenu(pRend, &menu, pView);
+    refreshMenu(aClient,pRend, &menu, pView);
     return menu;
 }
 

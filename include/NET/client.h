@@ -25,6 +25,7 @@ bool NET_clientConnect(Client aClient);
 Client NET_clientCreate();
 /** Freeing client memory after use and sett to NULL */
 void NET_clientDestroy(Client aClient);
+void NET_clientReadGraphicsConfig(Client aClient);
 
 int NET_clientGetPlayerCount(Client aClient);
 const Player* NET_clientGetPlayerList(Client aClient);
@@ -42,6 +43,7 @@ int NET_clientGetProjTexture(Client aClient, int projIdx);
 
 void NET_clientSetPlayerAnimation(Client aClient, int playerIdx, int newAnimation);
 int NET_clientGetPlayerAnimation(Client aClient, int playerIdx);
+void NET_clientSetNextGraphicsConfig(Client aClient, int value);
 
 void NET_clientGetPlayerName(Client aClient, int playerIndex, char* username);
 int NET_clientGetPlayerDirection(Client aClient, int playerIdx);
@@ -50,7 +52,8 @@ int NET_clientGetSelfIndex(Client aClient);
 int NET_clientGetPlayerColorIndex(Client aClient,int index);
 int NET_clientIsShooting(Client aClient, int playerIdx);
 bool NET_clientIsPlayerDamaged(Client aClient, int selfIndex);
-
+int NET_clientGetGraphicsQuality(Client aClient);
+int NET_clientGetNextGraphicsConfig(Client aClient);
 
 int NET_clientGetPlayerCharacter(Client aClient, int playerIdx);
 void NET_clientGetProjList(Client aClient, Proj *outputProjList);

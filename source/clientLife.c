@@ -1,5 +1,7 @@
 #include "../include/clientLife.h"
 
+#define SPRITE_SHEET_COUNT 7
+
 SDL_Cursor* createScaledCursor(const char *filePath, int newWidth, int newHeight, int hotX, int hotY);
 
 void startClient(Client *aClient, ClientView *pView,ClientControl *pControl){
@@ -42,15 +44,37 @@ void startClient(Client *aClient, ClientView *pView,ClientControl *pControl){
 
     *aClient = NET_clientCreate();
 
-    SDL_Surface *surface = IMG_Load("assets/images/player/bluethan.png");
-    pView->playerTexture[CHARACTER_BLUEFACE] = SDL_CreateTextureFromSurface(pView->pRend, surface);
-    SDL_FreeSurface(surface);
-    SDL_Surface *surface2 = IMG_Load("assets/images/player/biggie_gun.png");
-    pView->playerTexture[CHARACTER_BIGGIE] = SDL_CreateTextureFromSurface(pView->pRend, surface2);
-    SDL_FreeSurface(surface2);
-    SDL_Surface *surface3 = IMG_Load("assets/images/player/cleopatra.png");
-    pView->playerTexture[CHARACTER_CLEOPATRA] = SDL_CreateTextureFromSurface(pView->pRend, surface3);
-    SDL_FreeSurface(surface3);
+    int quality = NET_clientGetGraphicsQuality(*aClient);
+    char spriteSheetsHigh[SPRITE_SHEET_COUNT][64] = {
+        "assets/images/player/bluethan.png", "assets/images/player/biggie_gun.png",
+        "assets/images/player/cleopatra.png", "assets/images/player/blowface_shooting.png",
+        "assets/images/player/biggie_shooting.png", "assets/images/player/cleopatricia_shooting.png",
+        "assets/images/enemy/enemy_bear_running.png"
+    };
+    char spriteSheetsMedium[SPRITE_SHEET_COUNT][64] = {
+        "assets/images/player/medium-res/bluethan.png", "assets/images/player/medium-res/biggie_gun.png",
+        "assets/images/player/medium-res/cleopatra.png", "assets/images/player/medium-res/blowface_shooting.png",
+        "assets/images/player/medium-res/biggie_shooting.png", "assets/images/player/medium-res/cleopatricia_shooting.png",
+        "assets/images/enemy/medium-res/enemy_bear_running.png"
+    };
+
+    for(int i = 0; i < SPRITE_SHEET_COUNT; i++) {
+        SDL_Surface *surface;
+        switch(quality) {
+            case 1: surface = IMG_Load(spriteSheetsHigh[i]); break;
+            case 2: surface = IMG_Load(spriteSheetsMedium[i]); break;
+            default: printf("Invalid graphics setting: %d\n", quality);
+        }
+        
+        if(i == 6) {
+            pView->enemyTexture = SDL_CreateTextureFromSurface(pView->pRend, surface);
+            printf("loading: %s\n", spriteSheetsHigh[i]);
+        } else {
+            pView->playerTexture[i] = SDL_CreateTextureFromSurface(pView->pRend, surface);
+        }
+        SDL_FreeSurface(surface);
+    }
+
     SDL_Surface *surface4 = IMG_Load("assets/images/Projectiles/Bullet.png");
     pView->projectileTexture[PROJ_TEX_BULLET] = SDL_CreateTextureFromSurface(pView->pRend, surface4);
     SDL_FreeSurface(surface4);
@@ -63,23 +87,9 @@ void startClient(Client *aClient, ClientView *pView,ClientControl *pControl){
     SDL_Surface *surface7 = IMG_Load("assets/images/Projectiles/purple Laser.png");
     pView->projectileTexture[PROJ_TEX_PURPLE_LASER] = SDL_CreateTextureFromSurface(pView->pRend, surface7);
     SDL_FreeSurface(surface7);
-    SDL_Surface *surface8 = IMG_Load("assets/images/player/blowface_shooting.png");
-    pView->playerTexture[3] = SDL_CreateTextureFromSurface(pView->pRend, surface8);
-    SDL_FreeSurface(surface8);
-    SDL_Surface *surface9 = IMG_Load("assets/images/player/biggie_shooting.png");
-    pView->playerTexture[4] = SDL_CreateTextureFromSurface(pView->pRend, surface9);
-    SDL_FreeSurface(surface9);
-    SDL_Surface *surface10 = IMG_Load("assets/images/player/cleopatricia_shooting.png");
-    pView->playerTexture[5] = SDL_CreateTextureFromSurface(pView->pRend, surface10);
-    SDL_FreeSurface(surface10);
     SDL_Surface *surface11 = IMG_Load("assets/images/player/shadow.png");
     pView->shadowTexture = SDL_CreateTextureFromSurface(pView->pRend, surface11);
     SDL_FreeSurface(surface11);
-
-    SDL_Surface *surface12 = IMG_Load("assets/images/enemy/enemy_bear_running.png");
-    pView->enemyTexture = SDL_CreateTextureFromSurface(pView->pRend, surface12);
-    SDL_FreeSurface(surface12);
-
     SDL_Surface *surface13 = IMG_Load("assets/images/vignette/red_vignette.png");
     pView->vignetteTexture = SDL_CreateTextureFromSurface(pView->pRend, surface13);
     SDL_FreeSurface(surface13);

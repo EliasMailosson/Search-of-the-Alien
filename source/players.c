@@ -6,7 +6,7 @@
 #include "../include/game.h"
 #include "../include/clientLife.h"
 
-#define SPRITE_SIZE 256
+// #define SPRITE_SIZE 256
 #define RENDER_SIZE 128
 
 void sortByYaxis(Client aClient, int playerCount, int indices[]){
@@ -57,6 +57,8 @@ void renderProjectiles(Client aClient, ClientView *pView) {
 }
 
 void renderEnemy(Client aClient, ClientView *pView) {
+    int graphicsMode = NET_clientGetGraphicsQuality(aClient);
+    int SPRITE_SIZE = 256/pow(2, graphicsMode-1);
     static int frame = 0;
     frame++;
     // int playerCount = NET_clientGetPlayerCount(aClient);
@@ -87,7 +89,9 @@ void renderEnemy(Client aClient, ClientView *pView) {
                 .h = pView->playerRenderSize / 2
             };
         SDL_Rect src;
-        src = (SDL_Rect){((frame/2)%24)*SPRITE_SIZE, direction*SPRITE_SIZE, SPRITE_SIZE, SPRITE_SIZE};
+        int graphicsModePow2 = (int)pow(2, graphicsMode);
+        int currentFrame = ( (frame/graphicsModePow2) % (24/((int)pow(2, graphicsMode-1))) ) * (int)pow(2, graphicsMode-1);
+        src = (SDL_Rect){currentFrame*SPRITE_SIZE, direction*SPRITE_SIZE, SPRITE_SIZE, SPRITE_SIZE};
 
         //pView->PlayerPos[i] = (SDL_Point){.x = playerRect.x, .y = playerRect.y};
         // SDL_SetRenderDrawColor(pView->pRend, 255, 0, 0, 255);
@@ -98,6 +102,8 @@ void renderEnemy(Client aClient, ClientView *pView) {
 }
 
 void renderPlayers(Client aClient, ClientView *pView) {
+    int graphicsMode = NET_clientGetGraphicsQuality(aClient);
+    int SPRITE_SIZE = 256/pow(2, graphicsMode-1);
     static int frame = 0;
     frame++;
     int playerCount = NET_clientGetPlayerCount(aClient);
@@ -198,16 +204,19 @@ void renderPlayers(Client aClient, ClientView *pView) {
         int shootAnimationOffset = 0;
         if(NET_clientIsShooting(aClient, i)) shootAnimationOffset = 3;
         
+        int graphicsModePow2 = (int)pow(2, graphicsMode);
+        int currentPlayerFrame = ( (frame/graphicsModePow2) % (24/((int)pow(2, graphicsMode-1))) );
+
         SDL_Rect src;
         switch(NET_clientGetPlayerAnimation(aClient, i)) {
             case ANIMATION_IDLE:
-                src = (SDL_Rect){((frame/2)%24)*SPRITE_SIZE, (direction+8)*SPRITE_SIZE, SPRITE_SIZE, SPRITE_SIZE};
+                src = (SDL_Rect){currentPlayerFrame*SPRITE_SIZE, (direction+8)*SPRITE_SIZE, SPRITE_SIZE, SPRITE_SIZE};
                 break;
             case ANIMATION_RUNNING:
-                src = (SDL_Rect){((frame/2)%24)*SPRITE_SIZE, direction*SPRITE_SIZE, SPRITE_SIZE, SPRITE_SIZE};
+                src = (SDL_Rect){currentPlayerFrame*SPRITE_SIZE, direction*SPRITE_SIZE, SPRITE_SIZE, SPRITE_SIZE};
                 break;
             default:
-                src = (SDL_Rect){((frame/2)%24)*SPRITE_SIZE, direction*SPRITE_SIZE, SPRITE_SIZE, SPRITE_SIZE};
+                src = (SDL_Rect){currentPlayerFrame*SPRITE_SIZE, direction*SPRITE_SIZE, SPRITE_SIZE, SPRITE_SIZE};
         }
         
         int playerCharacter = NET_clientGetPlayerCharacter(aClient, i) + shootAnimationOffset;

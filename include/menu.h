@@ -39,8 +39,8 @@ typedef struct menu {
 
 Menu initMenu(SDL_Renderer *pRend, ClientView *pView, Client aClient);
 void renderMenu(SDL_Renderer *pRend, Menu *pMenu);
-void refreshMenu(SDL_Renderer *pRend, Menu *pMenu, ClientView *pView);
-void updateMenu(Menu *pMenu, ClientControl *pControl, Client aClient);
+void refreshMenu(Client aClient, SDL_Renderer *pRend, Menu *pMenu, ClientView *pView);
+void updateMenu(Menu *pMenu, ClientControl *pControl, ClientView *pView, Client aClient);
 void updateFriendList(Menu *pMenu, Client aClient);
 void destroyMenu(Menu *pMenu);
 void checkUsername(Menu *pMenu, Client aClient);

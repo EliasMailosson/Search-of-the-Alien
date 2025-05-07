@@ -113,7 +113,7 @@ void runMenu(Client aClient, ClientControl *pControl, ClientView *pView, Menu *p
     toggleDelay++;
     if(pControl->keys[SDL_SCANCODE_F] && toggleDelay > 12) {
         toggleFullscreen(pView);
-        refreshMenu(pView->pRend, pMenu, pView);
+        refreshMenu(aClient, pView->pRend, pMenu, pView);
         toggleDelay = 0;
     }
 
@@ -121,7 +121,7 @@ void runMenu(Client aClient, ClientControl *pControl, ClientView *pView, Menu *p
     //     UI_FriendNameToggle(pMenu->friendList, pControl->mousePos.x, pControl->mousePos.y);
     // }    
     
-    updateMenu(pMenu, pControl, aClient);
+    updateMenu(pMenu, pControl, pView, aClient);
     if (pMenu->isGameStarted) {
         updateHudPlayerList(aClient, pView->aHud, pView->pRend, pView->windowWidth, pView->windowHeight);
         NET_clientSendInt(aClient, MENU, CHANGE_GAME_STATE, LOBBY);
