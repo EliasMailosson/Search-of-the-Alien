@@ -59,20 +59,16 @@ void renderProjectiles(Client aClient, ClientView *pView) {
 void renderEnemy(Client aClient, ClientView *pView) {
     static int frame = 0;
     frame++;
-    // int playerCount = NET_clientGetPlayerCount(aClient);
-    int selfIndex = NET_clientGetSelfIndex(aClient);
-    SDL_Point selfPos = NET_clientGetPlayerPos(aClient, selfIndex);
     int centerX = pView->windowWidth/2;
     int centerY = pView->windowHeight/2;
+
     int renderSizeHalf = pView->playerRenderSize/2;
+    float scale = (float)pView->playerRenderSize / RENDER_SIZE;
+
     for(int i = 0; i < NET_clientGetEnemiesCount(aClient); i++) {
         SDL_Point pos = NET_clientGetEnemyPos(aClient, i);
-        printf("index %d, X: %d, Y: %d \n",i,pos.x,pos.y);
-        int worldOffsetX = pos.x - selfPos.x;
-        int worldOffsetY = pos.y - selfPos.y;
-        float scale = (float)pView->playerRenderSize / RENDER_SIZE;
-        float screenOffsetX = worldOffsetX * scale;
-        float screenOffsetY = worldOffsetY * scale;
+        int screenX = (int)roundf(centerX - (float)pos.x * scale);
+        int screenY = (int)roundf(centerY - (float)pos.y * scale);
         int direction = NET_clientGetEnemyDirection(aClient, i);
         if (direction < 0 || direction > 7) {
             fprintf(stderr, "ERROR: Invalid direction: %d\n", direction);
@@ -81,8 +77,8 @@ void renderEnemy(Client aClient, ClientView *pView) {
 
         SDL_Rect enemyRect;
         enemyRect = (SDL_Rect){
-                .x = (int)(centerX + screenOffsetX) + renderSizeHalf,
-                .y = (int)(centerY + screenOffsetY) + renderSizeHalf,
+                .x = (int)(screenX - renderSizeHalf / 2),
+                .y = (int)(screenY - renderSizeHalf / 2),
                 .w = pView->playerRenderSize / 2,
                 .h = pView->playerRenderSize / 2
             };
