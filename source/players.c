@@ -205,7 +205,7 @@ void renderPlayers(Client aClient, ClientView *pView) {
         if(NET_clientIsShooting(aClient, i)) shootAnimationOffset = 3;
         
         int graphicsModePow2 = (int)pow(2, graphicsMode);
-        int currentPlayerFrame = ( (frame/graphicsModePow2) % (24/((int)pow(2, graphicsMode-1))) ) * (int)pow(2, graphicsMode-1);
+        int currentPlayerFrame = ( (frame/graphicsModePow2) % (24/((int)pow(2, graphicsMode-1))) );
 
         SDL_Rect src;
         switch(NET_clientGetPlayerAnimation(aClient, i)) {
