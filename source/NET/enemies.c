@@ -19,6 +19,8 @@ typedef struct enemies {
 	Enemy *enemyList;
 	size_t size;
 	size_t capacity;
+    SDL_Rect *zones;
+    int zoneCount;
 }enemies;
 
 Enemies NET_enemiesCreate(void){
@@ -58,7 +60,7 @@ Enemy NET_enemiesPopAt(Enemies aE, size_t index){
     return popped;
 }
 
-SDL_Rect NET_getEnemySpawnZone(SDL_Rect playerRect, int tile) { //osynlig rect för spawnZone
+SDL_Rect NET_getEnemySpawnZone(SDL_Rect playerRect, int tile) {
     
 	SDL_Rect zone;
     int paddingPixels = tile * TILE_SIZE; //hur många "tile" bort, TILE_SIZE konverterar det till en pixel mått

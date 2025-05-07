@@ -180,24 +180,33 @@ int main(int argc, char **argv ){
 void* enemies_threads(void *arg){
     Server aServer = (Server)arg;
     int previousTime = (int)SDL_GetTicks();
-    // for (int i = 0; i < 20; i++){
-    //     NET_enemiesPush(aServer->aEnemies,NET_enemyCreate(10+10*i,10+10*i,LIGHT_ENEMY));
-    // }
+
     while (1){
         mutex_lock(&stop_mutex);
         int should_stop = stop;
         mutex_unlock(&stop_mutex);
         if(should_stop) break;
+
         for (int i = 0; i < aServer->clientCount; i++){
+
             if(aServer->clients[i].State != MENU && 
             aServer->clients[i].State != LOBBY &&
             (int)SDL_GetTicks() >= 5000+previousTime -(aServer->scenario.spawnFrequency*100) && 
             (int)NET_enemiesGetSize(aServer->aEnemies) <= MAX_ENEMIES_CLIENT_SIDE)// temporery
             {
                 previousTime = SDL_GetTicks();
-                NET_enemiesPush(aServer->aEnemies,NET_enemyCreate(50,50,LIGHT_ENEMY,aServer->scenario.difficulty));
+
+                SDL_Rect spawnZone = NET_getEnemySpawnZone(aServer->clients[i].player.hitBox, 2); 
+                int spawnX, spawnY;
+                bool found = NET_findEnemySpawnPoint(aServer->aServerMap, spawnZone, NULL, 0, &spawnX, &spawnY);
+                
+                if (found)
+                {
+                    NET_enemiesPush(aServer->aEnemies,NET_enemyCreate(spawnX,spawnY,LIGHT_ENEMY,aServer->scenario.difficulty));
+                }
             }
         }
+
         NET_serverUpdateEnemies(aServer, aServer->aEnemies,aServer->aServerMap);
         sleep_ms(10);
     }

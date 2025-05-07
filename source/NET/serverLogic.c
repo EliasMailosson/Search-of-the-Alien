@@ -81,8 +81,7 @@ bool NET_serverFindSpawnTile(ServerMap aServerMap, int *freekoordX, int *freekoo
 }
 
 bool NET_findEnemySpawnPoint(ServerMap aMap, SDL_Rect spawnZone, SDL_Rect *otherZones, int otherZoneCount, int *outX, int *outY) {
-    
-	const int maxAttempts = 20;
+    const int maxAttempts = 20;
 
     for (int attempt = 0; attempt < maxAttempts; attempt++) {
         int side = rand() % 4;
@@ -90,8 +89,8 @@ bool NET_findEnemySpawnPoint(ServerMap aMap, SDL_Rect spawnZone, SDL_Rect *other
 
         SDL_Rect sideRect;
 
-        switch (side) { // kontrollerarar ifall ena "SpawnZonen" överlappar en annans "SpawnZone"
-            case 0: // Top
+        switch (side) {
+            case 0: // Toppen
                 sideRect = (SDL_Rect){ spawnZone.x, spawnZone.y, spawnZone.w, 1 };
                 break;
             case 1: // Botten
@@ -105,7 +104,7 @@ bool NET_findEnemySpawnPoint(ServerMap aMap, SDL_Rect spawnZone, SDL_Rect *other
                 break;
         }
 
-        // Kontrollera överlappning med andra spelares spawnzoner
+        //Kontrollera överlappning med andra spelares spawnzoner
         bool overlaps = false;
         for (int i = 0; i < otherZoneCount; i++) {
             if (SDL_HasIntersection(&sideRect, &otherZones[i])) {
@@ -119,26 +118,26 @@ bool NET_findEnemySpawnPoint(ServerMap aMap, SDL_Rect spawnZone, SDL_Rect *other
 
         // Väljer en slumpmässig punkt
         switch (side) {
-            case 0: // Top
-				tileX = sideRect.x + (rand() % sideRect.w);
-				tileY = sideRect.y;
-				break;
-            case 1: // Botten
-            	tileX = sideRect.x + (rand() % sideRect.w);
+            case 0: // Toppen
+                tileX = sideRect.x + (rand() % sideRect.w);
                 tileY = sideRect.y;
                 break;
-            case 2: // vänster
-				tileX = sideRect.x + sideRect.w - 1;
-				tileY = sideRect.y + (rand() % sideRect.h);
-				break;
-            case 3: // Höger
+            case 1: // Botten
+                tileX = sideRect.x + (rand() % sideRect.w);
+                tileY = sideRect.y;
+                break;
+            case 2: // Vänster
                 tileX = sideRect.x;
+                tileY = sideRect.y + (rand() % sideRect.h);
+                break;
+            case 3: // Höger
+                tileX = sideRect.x + sideRect.w - 1;
                 tileY = sideRect.y + (rand() % sideRect.h);
                 break;
         }
 
         // Kontroll: karta inom bounds och tile inte -1
-        if (tileX >= -1 && tileY >= -1 && tileX < MAP_WIDTH && tileY < MAP_HEIGHT) {
+        if (tileX >= 0 && tileY >= 0 && tileX < MAP_WIDTH && tileY < MAP_HEIGHT) {
             if (aMap->MapTileId[tileY][tileX] != -1) {
                 *outX = tileX;
                 *outY = tileY;

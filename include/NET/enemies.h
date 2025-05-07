@@ -21,7 +21,7 @@ typedef enum {
 Enemies NET_enemiesCreate(void);
 int NET_enemiesPush(Enemies aE, Enemy new);
 Enemy NET_enemiesPopAt(Enemies aE, size_t index);
-Enemy NET_enemiesPopAt(Enemies aE, size_t index);
+// Enemy NET_enemiesPopAt(Enemies aE, size_t index);
 Enemy NET_enemyCreate(int pixelX, int pixelY, EnemyID id, const int difficulty);
 Enemy NET_enemiesGetAt(Enemies aE, size_t index);
 void NET_enemiesDestroy(Enemies aEnemies);
@@ -47,7 +47,7 @@ Uint32 enemyGetAttackTime(Enemies aEnemies, int enemyindex);
 
 void enemySetAttackTime(Enemies aEnemies, int enemyindex);
 
-SDL_Rect enemyGetRect(Enemies aEnemies, int index);
+// SDL_Rect enemyGetRect(Enemies aEnemies, int index);
 
 void enemyDamaged(Enemies aEnemies, int damage, int index, int *enemyCount);
 
