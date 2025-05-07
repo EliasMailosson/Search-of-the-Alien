@@ -25,6 +25,7 @@ bool NET_clientConnect(Client aClient);
 Client NET_clientCreate();
 /** Freeing client memory after use and sett to NULL */
 void NET_clientDestroy(Client aClient);
+void NET_clientReadGraphicsConfig(Client aClient);
 
 int NET_clientGetPlayerCount(Client aClient);
 const Player* NET_clientGetPlayerList(Client aClient);
