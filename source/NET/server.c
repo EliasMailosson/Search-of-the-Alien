@@ -179,18 +179,25 @@ int main(int argc, char **argv ){
 
 void* enemies_threads(void *arg){
     Server aServer = (Server)arg;
-
-    for (int i = 0; i < 20; i++){
-        NET_enemiesPush(aServer->aEnemies,NET_enemyCreate(10+10*i,10+10*i,LIGHT_ENEMY));
-    }
-    
-
+    int previousTime = (int)SDL_GetTicks();
+    // for (int i = 0; i < 20; i++){
+    //     NET_enemiesPush(aServer->aEnemies,NET_enemyCreate(10+10*i,10+10*i,LIGHT_ENEMY));
+    // }
     while (1){
         mutex_lock(&stop_mutex);
         int should_stop = stop;
         mutex_unlock(&stop_mutex);
         if(should_stop) break;
-        
+        for (int i = 0; i < aServer->clientCount; i++){
+            if(aServer->clients[i].State != MENU && 
+            aServer->clients[i].State != LOBBY &&
+            (int)SDL_GetTicks() >= 5000+previousTime -(aServer->scenario.spawnFrequency*100) && 
+            (int)NET_enemiesGetSize(aServer->aEnemies) <= MAX_ENEMIES_CLIENT_SIDE)// temporery
+            {
+                previousTime = SDL_GetTicks();
+                NET_enemiesPush(aServer->aEnemies,NET_enemyCreate(50,50,LIGHT_ENEMY,aServer->scenario.difficulty));
+            }
+        }
         NET_serverUpdateEnemies(aServer, aServer->aEnemies,aServer->aServerMap);
         sleep_ms(10);
     }
@@ -225,9 +232,9 @@ void NET_serverSendEnemiesPacket(Server aServer, GameState GS, Enemies aEnemies)
     SDL_Point pos;
     for (int i = 0; i < (int)NET_enemiesGetSize(aEnemies); i++){
         pos = enemyGetPoint(aEnemies, i); 
-        packet[i].x = (uint16_t)(pos.x);
-        packet[i].y = (uint16_t)(pos.y);
-        packet[i].direction = (uint16_t)(enemyGetDirection(aEnemies, i));
+        packet[i].x = (int16_t)(pos.x);
+        packet[i].y = (int16_t)(pos.y);
+        packet[i].direction = (int16_t)(enemyGetDirection(aEnemies, i));
 
     }
     Uint32 payloadSize = (int)NET_enemiesGetSize(aEnemies) * sizeof(EnemyPacket);

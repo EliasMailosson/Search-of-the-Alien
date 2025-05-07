@@ -22,7 +22,7 @@ Enemies NET_enemiesCreate(void);
 int NET_enemiesPush(Enemies aE, Enemy new);
 Enemy NET_enemiesPopAt(Enemies aE, size_t index);
 Enemy NET_enemiesPopAt(Enemies aE, size_t index);
-Enemy NET_enemyCreate(int pixelX, int pixelY, EnemyID id);
+Enemy NET_enemyCreate(int pixelX, int pixelY, EnemyID id, const int difficulty);
 Enemy NET_enemiesGetAt(Enemies aE, size_t index);
 void NET_enemiesDestroy(Enemies aEnemies);
 size_t NET_enemiesGetSize(Enemies aEnemies);

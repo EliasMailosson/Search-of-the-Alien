@@ -58,7 +58,7 @@ Enemy NET_enemiesPopAt(Enemies aE, size_t index){
     return popped;
 }
 
-Enemy NET_enemyCreate(int pixelX, int pixelY, EnemyID id){
+Enemy NET_enemyCreate(int pixelX, int pixelY, EnemyID id, const int difficulty){
     Enemy e = malloc(sizeof(*e));
     if (!e) {
         fprintf(stderr, "Failed to allocate memory for Enemy\n");
@@ -70,7 +70,7 @@ Enemy NET_enemyCreate(int pixelX, int pixelY, EnemyID id){
     case LIGHT_ENEMY:
         e->hitbox.h = e->hitbox.w = 50;
         e->ThinkTime = e->direction = e->attackTime = 0;
-        e->HP.maxHP = e->HP.currentHP = 100;
+        e->HP.maxHP = e->HP.currentHP = 100 * difficulty;
         e->enemyID = LIGHT_ENEMY;
         break;
     case HEAVY_ENEMY:
