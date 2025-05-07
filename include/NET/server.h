@@ -16,7 +16,7 @@
 typedef struct Player Player;
 typedef struct Weapon Weapon;
 typedef struct Scenario Scenario;
-
+typedef struct enemies *Enemies;
 typedef struct User User;
 struct server;
 typedef struct server *Server;

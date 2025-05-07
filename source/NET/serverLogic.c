@@ -81,7 +81,7 @@ bool NET_serverFindSpawnTile(ServerMap aServerMap, int *freekoordX, int *freekoo
 }
 
 bool NET_findEnemySpawnPoint(ServerMap aMap, SDL_Rect spawnZone, SDL_Rect *otherZones, int otherZoneCount, int *outX, int *outY) {
-    const int maxAttempts = 20;
+    const int maxAttempts = 100;
 
     for (int attempt = 0; attempt < maxAttempts; attempt++) {
         int side = rand() % 4;
@@ -135,10 +135,13 @@ bool NET_findEnemySpawnPoint(ServerMap aMap, SDL_Rect spawnZone, SDL_Rect *other
                 tileY = sideRect.y + (rand() % sideRect.h);
                 break;
         }
+		// int mapTileX = tileX / TILE_SIZE;
+		// int mapTileY = tileY / TILE_SIZE;
 
         // Kontroll: karta inom bounds och tile inte -1
         if (tileX >= 0 && tileY >= 0 && tileX < MAP_WIDTH && tileY < MAP_HEIGHT) {
             if (aMap->MapTileId[tileY][tileX] != -1) {
+				printf("  Checking tile (%d,%d) and tileId: %d\n", tileX, tileY, aMap->MapTileId[tileY][tileX]);
                 *outX = tileX;
                 *outY = tileY;
                 return true;
@@ -147,7 +150,6 @@ bool NET_findEnemySpawnPoint(ServerMap aMap, SDL_Rect spawnZone, SDL_Rect *other
     }
     return false;
 }
-
 
 bool MAP_TileNotWalkable(ServerMap aServerMap, int screenX, int screenY) {
     int tileX, tileY;

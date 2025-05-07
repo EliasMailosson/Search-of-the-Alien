@@ -70,6 +70,8 @@ SDL_Rect NET_getEnemySpawnZone(SDL_Rect playerRect, int tile) {
     zone.w = playerRect.w + 2 * paddingPixels;
     zone.h = playerRect.h + 2 * paddingPixels;
 
+	printf("SpawnZone around player: x=%d y=%d w=%d h=%d\n", zone.x, zone.y, zone.w, zone.h);
+
     return zone;
 }
 
