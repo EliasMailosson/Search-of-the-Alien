@@ -17,6 +17,12 @@ static void planetFullscreenToggle(Client aClient, ClientControl *pControl, Clie
 void gameLoop(Client aClient, ClientControl *pControl, ClientView *pView){
     NET_clientConnect(aClient);
 
+    pView->currentMusic = MUSIC_NONE;
+
+    int volume = 128; // 0 - 128
+    Mix_VolumeMusic(volume);
+    Mix_Volume(-1, volume);
+
     Menu menu = initMenu(pView->pRend, pView, aClient);
 
     TerminalHub terminalHub;
@@ -111,6 +117,9 @@ void runLobby(Client aClient, Map aMap, ClientControl *pControl, ClientView *pVi
 void runMenu(Client aClient, ClientControl *pControl, ClientView *pView, Menu *pMenu,Map aMap) {
     static int toggleDelay = 0;
     toggleDelay++;
+
+    playMusicIfChanged(pView->backgroundMusic1, MUSIC_MENU, &pView->currentMusic);
+
     if(pControl->keys[SDL_SCANCODE_F] && toggleDelay > 12) {
         toggleFullscreen(pView);
         refreshMenu(pView->pRend, pMenu, pView);
@@ -291,6 +300,8 @@ void runPlanet(Client aClient, ClientControl *pControl, ClientView *pView, Map a
     SDL_Point lastPosition[MAX_CLIENTS];
     SDL_Point playerPos;
 
+    playMusicIfChanged(pView->backgroundMusicNEMUR, MUSIC_NEMUR, &pView->currentMusic);
+
     enableMouseTexture(pView->crosshair);
     updatePositioning(aClient, lastPosition, &playerPos, selfIndex);
     if(!pPauseMenu->isVisible) {
@@ -321,3 +332,11 @@ void runPlanet(Client aClient, ClientControl *pControl, ClientView *pView, Map a
     
     renderPlanet(pView,aMap,aClient,pPauseMenu);
 }
+
+// void playMusicIfChanged(Mix_Music *newMusic, MusicTrack newTrack, MusicTrack *currentTrack) {
+//     if (*currentTrack != newTrack) {
+//         Mix_HaltMusic();
+//         Mix_PlayMusic(newMusic, -1);
+//         *currentTrack = newTrack;
+//     }
+// }

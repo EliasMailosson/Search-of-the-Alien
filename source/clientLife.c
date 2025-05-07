@@ -21,6 +21,10 @@ void startClient(Client *aClient, ClientView *pView,ClientControl *pControl){
         printf("Net_Init error: %s\n", SDLNet_GetError());
     }
 
+    SDL_Init(SDL_INIT_AUDIO);
+    Mix_OpenAudio(44100, MIX_DEFAULT_FORMAT, 2, 2048);
+    Mix_AllocateChannels(16);
+
     pView->pWin = SDL_CreateWindow("main",SDL_WINDOWPOS_CENTERED,SDL_WINDOWPOS_CENTERED,pView->windowWidth,pView->windowHeight,0);
     if (!pView->pWin) {
         printf("Error creating window: %s\n", SDL_GetError());
@@ -84,6 +88,13 @@ void startClient(Client *aClient, ClientView *pView,ClientControl *pControl){
     pView->vignetteTexture = SDL_CreateTextureFromSurface(pView->pRend, surface13);
     SDL_FreeSurface(surface13);
 
+    //Mix_Chunk *sound = Mix_LoadWAV("hit.wav");
+    Mix_Music *backgroundMusic1 = Mix_LoadMUS("assets/music/space-whisper-long.mp3");
+    pView->backgroundMusic1 = backgroundMusic1;
+
+    Mix_Music *backgroundMusicNEMUR = Mix_LoadMUS("assets/music/marchmusic.mp3");
+    pView->backgroundMusicNEMUR = backgroundMusicNEMUR;
+
     pView->crosshair = createScaledCursor("assets/images/cursor/crosshair.png", 50, 50, 25, 25);
 
     pView->playerRenderSize = 128;
@@ -145,6 +156,8 @@ SDL_Cursor* createScaledCursor(const char *filePath, int newWidth, int newHeight
 }
 
 void killClient(Client *aClient, ClientView *pView){
+    Mix_FreeMusic(pView->backgroundMusicNEMUR);
+    Mix_FreeMusic(pView->backgroundMusic1);
     SDL_FreeCursor(pView->crosshair);
     for(int i = 0; i < MAX_PLAYER_CHARACTERS; i++) {
         SDL_DestroyTexture(pView->playerTexture[i]);
