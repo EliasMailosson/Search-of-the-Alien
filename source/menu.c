@@ -8,7 +8,6 @@
 #include "../include/players.h"
 #include "../include/NET/client.h"
 #include "../include/game.h"
-#include <stdio.h>
 
 void renderMenu(SDL_Renderer *pRend, Menu *pMenu) {
     SDL_SetRenderDrawColor(pRend, 0,0,0,0);
@@ -420,7 +419,8 @@ void destroyMenu(Menu *pMenu) {
 }
 
 void checkUsername(Menu *pMenu, Client aClient){
-    FILE *fp = fopen("data/myUsername.txt", "r");
+    FILE *fp;
+    fp = fopen("data/myUsername.txt", "r");
     if (fp == NULL)
     {
         pMenu->currentPanel = PANEL_MYUSERNAME;

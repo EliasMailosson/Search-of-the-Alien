@@ -10,6 +10,12 @@ typedef struct playerList {
     int count;
 } PlayerList;
 
+typedef struct Objectives {
+    int x, y;
+    Label objectiveText;
+    TTF_Font *pFont;
+} Objectives;
+
 struct Arrow{
     double angel;
     SDL_FRect pos;
@@ -21,6 +27,7 @@ struct Hud{
     Arrow indicators[MAX_CLIENTS-1];
     PlayerList playerList;
     SDL_Texture *playerIconTexture[3];
+    Objectives objectives[OBJECTIVECOUNT];
 };
 
 Arrow arrowCreate(){
@@ -80,6 +87,13 @@ Hud hudCreate(SDL_Renderer *pRend){
         aHud->playerList.usernames[i] = UI_labelCreate();
     }
 
+    //OBJECTIVES
+    aHud->objectives->pFont = TTF_OpenFont("assets/fonts/jura.ttf", 20);
+    for (int i = 0; i < OBJECTIVECOUNT; i++) {
+       aHud->objectives[i].objectiveText = UI_labelCreate(); 
+    }
+    
+
     SDL_Surface *surf1 = IMG_Load("assets/images/hud/biggie-icon.png");
     aHud->playerIconTexture[1] = SDL_CreateTextureFromSurface(pRend, surf1);
     SDL_FreeSurface(surf1);
@@ -105,7 +119,12 @@ void hudDestroy(Hud aHud){
             SDL_DestroyTexture(aHud->playerIconTexture[i]);
         }
     }
-
+    
+    aHud->objectives->pFont = TTF_OpenFont("assets/fonts/jura.ttf", 20);
+    for (int i = 0; i < OBJECTIVECOUNT; i++) {
+       aHud->objectives[i].objectiveText = UI_labelCreate(); 
+    }
+    TTF_CloseFont(aHud->objectives->pFont);
     TTF_CloseFont(aHud->playerList.pFont);
     aHud->playerList.pFont = NULL;
 
