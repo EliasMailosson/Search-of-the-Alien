@@ -26,7 +26,7 @@ Enemy NET_enemyCreate(int pixelX, int pixelY, EnemyID id, const int difficulty);
 Enemy NET_enemiesGetAt(Enemies aE, size_t index);
 void NET_enemiesDestroy(Enemies aEnemies);
 size_t NET_enemiesGetSize(Enemies aEnemies);
-
+SDL_Rect NET_getEnemySpawnZone(SDL_Rect playerRect, int tile);
 
 SDL_Point enemyGetPoint(Enemies aEnemies, int index);
 

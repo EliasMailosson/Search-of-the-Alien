@@ -58,6 +58,19 @@ Enemy NET_enemiesPopAt(Enemies aE, size_t index){
     return popped;
 }
 
+SDL_Rect NET_getEnemySpawnZone(SDL_Rect playerRect, int tile) { //osynlig rect för spawnZone
+    
+	SDL_Rect zone;
+    int paddingPixels = tile * TILE_SIZE; //hur många "tile" bort, TILE_SIZE konverterar det till en pixel mått
+
+    zone.x = playerRect.x - paddingPixels;
+    zone.y = playerRect.y - paddingPixels;
+    zone.w = playerRect.w + 2 * paddingPixels;
+    zone.h = playerRect.h + 2 * paddingPixels;
+
+    return zone;
+}
+
 Enemy NET_enemyCreate(int pixelX, int pixelY, EnemyID id, const int difficulty){
     Enemy e = malloc(sizeof(*e));
     if (!e) {

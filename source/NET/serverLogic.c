@@ -64,12 +64,12 @@ void MAP_ScreenToTile(ServerMap aServerMap, int screenX, int screenY, int *outTi
     *outTileY = ty;
 }
 
-bool NET_serverFindSpawnTile(ServerMap aServerMap, int *freekoordX, int *freekoordY) {
-    const int maxAttempts = 1000;
+bool NET_serverFindSpawnTile(ServerMap aServerMap, int *freekoordX, int *freekoordY) { //kan användas för att generera random objekt i en viss radius av koordinat
+    const int maxAttempts = 100;
 
     for (int attempt = 0; attempt < maxAttempts; attempt++) {
         int x = rand() % MAP_WIDTH;
-        int y = rand();
+        int y = rand()% MAP_HEIGHT;
 
         if (aServerMap->MapTileId[y][x] != 0) {
             *freekoordX = x;
@@ -79,6 +79,76 @@ bool NET_serverFindSpawnTile(ServerMap aServerMap, int *freekoordX, int *freekoo
     }
     return false;
 }
+
+bool NET_findEnemySpawnPoint(ServerMap aMap, SDL_Rect spawnZone, SDL_Rect *otherZones, int otherZoneCount, int *outX, int *outY) {
+    
+	const int maxAttempts = 20;
+
+    for (int attempt = 0; attempt < maxAttempts; attempt++) {
+        int side = rand() % 4;
+        int tileX = -1, tileY = -1;
+
+        SDL_Rect sideRect;
+
+        switch (side) { // kontrollerarar ifall ena "SpawnZonen" överlappar en annans "SpawnZone"
+            case 0: // Top
+                sideRect = (SDL_Rect){ spawnZone.x, spawnZone.y, spawnZone.w, 1 };
+                break;
+            case 1: // Botten
+                sideRect = (SDL_Rect){ spawnZone.x, spawnZone.y + spawnZone.h - 1, spawnZone.w, 1 };
+                break;
+            case 2: // Vänster
+                sideRect = (SDL_Rect){ spawnZone.x, spawnZone.y, 1, spawnZone.h };
+                break;
+            case 3: // Höger
+                sideRect = (SDL_Rect){ spawnZone.x + spawnZone.w - 1, spawnZone.y, 1, spawnZone.h };
+                break;
+        }
+
+        // Kontrollera överlappning med andra spelares spawnzoner
+        bool overlaps = false;
+        for (int i = 0; i < otherZoneCount; i++) {
+            if (SDL_HasIntersection(&sideRect, &otherZones[i])) {
+                overlaps = true;
+                break;
+            }
+        }
+
+        if (overlaps)
+            continue;
+
+        // Väljer en slumpmässig punkt
+        switch (side) {
+            case 0: // Top
+				tileX = sideRect.x + (rand() % sideRect.w);
+				tileY = sideRect.y;
+				break;
+            case 1: // Botten
+            	tileX = sideRect.x + (rand() % sideRect.w);
+                tileY = sideRect.y;
+                break;
+            case 2: // vänster
+				tileX = sideRect.x + sideRect.w - 1;
+				tileY = sideRect.y + (rand() % sideRect.h);
+				break;
+            case 3: // Höger
+                tileX = sideRect.x;
+                tileY = sideRect.y + (rand() % sideRect.h);
+                break;
+        }
+
+        // Kontroll: karta inom bounds och tile inte -1
+        if (tileX >= -1 && tileY >= -1 && tileX < MAP_WIDTH && tileY < MAP_HEIGHT) {
+            if (aMap->MapTileId[tileY][tileX] != -1) {
+                *outX = tileX;
+                *outY = tileY;
+                return true;
+            }
+        }
+    }
+    return false;
+}
+
 
 bool MAP_TileNotWalkable(ServerMap aServerMap, int screenX, int screenY) {
     int tileX, tileY;
