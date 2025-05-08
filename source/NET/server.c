@@ -236,7 +236,7 @@ void NET_serverSendEnemiesPacket(Server aServer, GameState GS, Enemies aEnemies)
             entries[i].enemy = NET_enemiesGetAt(aServer->aEnemies,i);
             entries[i].dist = NET_enemiesCompute_dist(entries[i].enemy, p.player.hitBox);
         }
-        qsort(entries, n, sizeof *entries, NET_enemisCompEntries);
+        qsort(entries, n, sizeof *entries, NET_enemiesCompEntries);
         for (int i = 0; i < (int)NET_enemiesGetSize(aEnemies); i++){
             Enemy en = entries[i].enemy;
             pos = NET_enemyGetPos(en);
