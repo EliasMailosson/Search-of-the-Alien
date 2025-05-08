@@ -30,7 +30,7 @@ typedef struct entityContext {
     float scale;
 }EntityContext;
 
-int cmpYPos(void* a, void* b) {
+int cmpYPos(const void* a, const void* b) {
     Entity *ea = (Entity*)a;
     Entity *eb = (Entity*)b;
     int aY = ea->screenY;
