@@ -13,6 +13,24 @@ typedef struct __attribute__((packed)) Proj {
     uint8_t textureIdx;
 }Proj;
 
+typedef struct clientEnemy{
+    SDL_Point pos;
+    int direction;
+}ClientEnemy;
+struct Player{
+    GameState state;
+    char username[MAX_USERNAME_LEN]; //myusername
+    SDL_Point pos;
+    int direction;
+    int currentPlayerAnimation;
+    int colorIndex;
+    SDL_Color color;
+    int playerCharacter;
+    bool isShooting;
+    int dashCooldown;
+    uint8_t HpProcent;
+};
+
 typedef struct WeaponStats WeaponStats;
 typedef struct Player Player;
 struct client;
@@ -33,10 +51,14 @@ SDL_Point NET_clientGetPlayerPos(Client aClient, int playerIdx);
 void NET_clientGetFriendsName(Client aClient, char outputNames[][MAX_USERNAME_LEN]);
 int NET_clientGetState(Client aClient);
 
+ClientEnemy *NET_clientGetEnemy(Client aClient, int idx);
+Player *NET_clientGetPlayer(Client aClient, int idx);
+
 void NET_clientSendInt(Client aClient,GameState GS, MessageType msgType,int placeHolder);
 void NET_clientSendString(Client aClient,GameState GS, MessageType msgType,const char* str);
 void NET_clientSendArray(Client aClient,GameState GS, MessageType msgType,const void* array, Uint32 arraySize);
 int NET_clientGetClientState(Client aClient, int playerIdx);
+bool NET_clientIsMyUsername(Client aClient, char *name);
 
 void NET_clientSetSelfName(Client aClient, char* newName);
 int NET_clientGetProjTexture(Client aClient, int projIdx);
