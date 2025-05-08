@@ -519,9 +519,35 @@ bool enemyAttackPlayer(Server aServer, int index, SDL_Rect enemyHitbox){
     aServer->clients[index].player.HP -= 10;
     if(aServer->clients[index].player.HP <= 0){
         aServer->clients[index].player.HP = 0;
+        NET_serverForceGameStateChange(aServer,LOBBY,index);
+        aServer->clients[index].State = LOBBY;
     }
     // printf("Current HP: %d\n", aServer->clients[index].player.HP);
     return true;
+}
+
+void NET_serverForceGameStateChange(Server aServer, GameState state, int index){
+    switch (state){
+    case MENU:
+        break;
+    case LOBBY:
+        aServer->clients[index].player.HP = aServer->clients[index].player.maxHP;
+        aServer->clients[index].player.hitBox.x = 200;
+        aServer->clients[index].player.hitBox.y = 800;
+        aServer->clients[index].isHubVisible = !aServer->clients[index].isHubVisible;
+        NET_serverSendInt(aServer,GLOBAL,CHANGE_GAME_STATE_RESPONSE,state,index);
+        NET_serverSendInt(aServer,GLOBAL,TRY_OPEN_TERMINAL_HUB,aServer->clients[index].isHubVisible,index);
+        break;
+    case NEMUR:
+        break;
+    case CINDORA:
+        break;
+    case AURANTIC:
+        break;
+    default:
+        printf("do not support thet State\n");
+        break;
+    }
 }
 
 void NET_serverUpdateEnemies(Server aServer, Enemies aEnemies, ServerMap aMap){
@@ -557,6 +583,7 @@ void NET_serverUpdateEnemies(Server aServer, Enemies aEnemies, ServerMap aMap){
                 if(currentTime > enemyGetAttackTime(aEnemies, i) + 1000){
                     if(enemyAttackPlayer(aServer, closestPlayerIndex, enemyHitbox)){
                         NET_serverSendPlayerPacket(aServer, aServer->clients[closestPlayerIndex].State);
+                        
                     }
                     enemySetAttackTime(aEnemies, i);
                 }
