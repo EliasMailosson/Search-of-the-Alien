@@ -191,10 +191,10 @@ void* enemies_threads(void *arg){
         for (int i = 0; i < aServer->clientCount; i++){
             if(aServer->clients[i].State != MENU && 
             aServer->clients[i].State != LOBBY &&
-            (int)SDL_GetTicks() >= 5000+previousTime -(aServer->scenario.spawnFrequency*100) && 
-            (int)NET_enemiesGetSize(aServer->aEnemies) < MAX_ENEMIES_CLIENT_SIDE)// temporery
+            (int)SDL_GetTicks() >= 2000+previousTime -(aServer->scenario.spawnFrequency*100) && 
+            (int)NET_enemiesGetSize(aServer->aEnemies) < MAX_ENEMIES_CLIENT_SIDE + 10)// temporery
             {
-                //printf("enemy count %d\n",(int)NET_enemiesGetSize(aServer->aEnemies));
+                printf("enemy count %d\n",(int)NET_enemiesGetSize(aServer->aEnemies));
                 previousTime = SDL_GetTicks();
                 NET_enemiesPush(aServer->aEnemies,NET_enemyCreate(50,50,LIGHT_ENEMY,aServer->scenario.difficulty));
             }
@@ -224,29 +224,33 @@ void* projektil_threads(void *arg){
 }
 
 void NET_serverSendEnemiesPacket(Server aServer, GameState GS, Enemies aEnemies){
-    // if ((int)NET_enemiesGetSize(aEnemies) < 0 || (int)NET_enemiesGetSize(aEnemies) > MAX_ENEMIES_CLIENT_SIDE) {
-    //     fprintf(stderr, "Error: invalid pEnemyCount (%d)\n",(int)NET_enemiesGetSize(aEnemies));
-    //     return;
-    // }
     EnemyPacket packet[MAX_ENEMIES_CLIENT_SIDE] = {0};
     SDL_Point pos;
     for (int i = 0; i <aServer->clientCount ; i++){
         User p = aServer->clients[i];
         if(p.State == MENU || p.State == LOBBY) continue;
         int enemySendCount = 0;
+        size_t n = NET_enemiesGetSize(aServer->aEnemies);
+        SortEntry *entries = malloc(n * sizeof *entries);
+        for (size_t i = 0; i < n; ++i) {
+            entries[i].enemy = NET_enemiesGetAt(aServer->aEnemies,i);
+            entries[i].dist = NET_enemiesCompute_dist(entries[i].enemy, p.player.hitBox);
+        }
+        qsort(entries, n, sizeof *entries, NET_enemisCompEntries);
         for (int i = 0; i < (int)NET_enemiesGetSize(aEnemies); i++){
-            pos = enemyGetPoint(aEnemies, i); 
+            Enemy en = entries[i].enemy;
+            pos = NET_enemyGetPos(en);
             if( abs(p.player.hitBox.y - pos.y) < MAX_ENEMIES_RANGE &&
                 abs(p.player.hitBox.x - pos.x) < MAX_ENEMIES_RANGE){
                     if(enemySendCount < MAX_ENEMIES_CLIENT_SIDE){
-                        packet[i].x = (int16_t)(p.player.hitBox.x - pos.x);
-                        packet[i].y = (int16_t)(p.player.hitBox.y - pos.y);
-                        packet[i].direction = (int16_t)(enemyGetDirection(aEnemies, i));
+                        packet[enemySendCount].x = (int16_t)(p.player.hitBox.x - pos.x);
+                        packet[enemySendCount].y = (int16_t)(p.player.hitBox.y - pos.y);
+                        packet[enemySendCount].direction = (int16_t)(NET_enemyGetDirection(en));
                         enemySendCount++;
                     }
-                }
-            
+            }
         }
+        free(entries);
         Uint32 payloadSize = enemySendCount * sizeof(EnemyPacket);
         if((int)NET_enemiesGetSize(aEnemies) == 0) payloadSize = 1;
         UDPpacket* SendEnemies = SDLNet_AllocPacket(512);

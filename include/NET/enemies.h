@@ -18,6 +18,11 @@ typedef enum {
     BOSS_ENEMY
 }EnemyID;
 
+typedef struct {
+    Enemy enemy;
+    float dist;
+} SortEntry;
+
 //Enemies enemyCreate();
 Enemies NET_enemiesCreate(void);
 int NET_enemiesPush(Enemies aE, Enemy new);
@@ -27,6 +32,11 @@ Enemy NET_enemyCreate(int pixelX, int pixelY, EnemyID id, const int difficulty);
 Enemy NET_enemiesGetAt(Enemies aE, size_t index);
 void NET_enemiesDestroy(Enemies aEnemies);
 size_t NET_enemiesGetSize(Enemies aEnemies);
+
+int NET_enemiesCompEntries(const void *a, const void *b);
+float NET_enemiesCompute_dist(const Enemy e, SDL_Rect playerRect);
+SDL_Point NET_enemyGetPos(Enemy aEnemy);
+int NET_enemyGetDirection(Enemy aEnemy);
 
 
 SDL_Point enemyGetPoint(Enemies aEnemies, int index);

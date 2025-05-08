@@ -288,3 +288,30 @@ bool enemyColitino(SDL_Rect A,SDL_Rect B){
         return false;
     }
 }
+
+float NET_enemiesCompute_dist(const Enemy e, SDL_Rect playerRect){
+    float ex = e->hitbox.x + e->hitbox.w * 0.5f;
+    float ey = e->hitbox.y + e->hitbox.h * 0.5f;
+
+    float px = playerRect.x + playerRect.w * 0.5f;
+    float py = playerRect.y + playerRect.h * 0.5f;
+    
+    float dx = fabsf(ex - px);
+    float dy = fabsf(ey - py);
+    return dx*dx + dy*dy;
+}
+
+int NET_enemiesCompEntries(const void *a, const void *b){
+    const SortEntry *A = a, *B = b;
+    if (A->dist < B->dist) return -1;
+    if (A->dist > B->dist) return 1;
+    return A->enemy->enemyID - B->enemy->enemyID;
+}
+
+SDL_Point NET_enemyGetPos(Enemy aEnemy){
+    return (SDL_Point){.x = aEnemy->hitbox.x, .y = aEnemy->hitbox.y};
+}
+
+int NET_enemyGetDirection(Enemy aEnemy){
+    return aEnemy->direction;
+}
