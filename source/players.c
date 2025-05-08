@@ -88,7 +88,14 @@ void renderEnemy(Client aClient, ClientView *pView) {
         int graphicsModePow2 = (int)pow(2, graphicsMode);
         int currentFrame = ( (frame/graphicsModePow2) % (24/((int)pow(2, graphicsMode-1))) ) * (int)pow(2, graphicsMode-1);
         src = (SDL_Rect){currentFrame*SPRITE_SIZE, direction*SPRITE_SIZE, SPRITE_SIZE, SPRITE_SIZE};
-
+        
+        int enemyHealth = NET_clientGetEnemyHP(aClient, i);
+        if(enemyHealth < 100){
+            SDL_SetRenderDrawColor(pView->pRend, 150, 150, 150, 180);
+            SDL_RenderFillRect(pView->pRend, &((SDL_Rect){enemyRect.x, enemyRect.y-20, 100 * 0.4, 4}));
+            SDL_SetRenderDrawColor(pView->pRend, 255, 0, 0, 180);
+            SDL_RenderFillRect(pView->pRend, &((SDL_Rect){enemyRect.x, enemyRect.y-20, enemyHealth * 0.4, 4}));
+        }
         //pView->PlayerPos[i] = (SDL_Point){.x = playerRect.x, .y = playerRect.y};
         // SDL_SetRenderDrawColor(pView->pRend, 255, 0, 0, 255);
         // SDL_RenderFillRect(pView->pRend, &enemyRect);

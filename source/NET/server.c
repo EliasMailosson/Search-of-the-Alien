@@ -242,6 +242,7 @@ void NET_serverSendEnemiesPacket(Server aServer, GameState GS, Enemies aEnemies)
                         packet[i].x = (int16_t)(p.player.hitBox.x - pos.x);
                         packet[i].y = (int16_t)(p.player.hitBox.y - pos.y);
                         packet[i].direction = (int16_t)(enemyGetDirection(aEnemies, i));
+                        packet[i].hp = (uint8_t)getEnemyHP(aEnemies, i);
                         enemySendCount++;
                     }
                 }

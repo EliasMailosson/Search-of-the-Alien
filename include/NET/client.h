@@ -86,7 +86,6 @@ SDL_Point NET_clientGetEnemyPos(Client aClient, int index);
 int NET_clientGetEnemyDirection(Client aClient, int index);
 void NET_clientScenarioUpdate(Client aClient,uint32_t seed);
 int NET_clientGetEnemiesCount(Client aClinet);
-
-int NET_enemyGetCount(Client aClient);
+int NET_clientGetEnemyHP(Client aClient, int index);
 
 #endif

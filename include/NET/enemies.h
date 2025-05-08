@@ -56,5 +56,7 @@ int enemyGetCount(Enemies aEnemies);
 
 bool enemyColitino(SDL_Rect A,SDL_Rect B);
 
+int getEnemyHP(Enemies aEnemies, int index);
+
 
 #endif

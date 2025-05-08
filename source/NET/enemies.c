@@ -288,3 +288,7 @@ bool enemyColitino(SDL_Rect A,SDL_Rect B){
         return false;
     }
 }
+
+int getEnemyHP(Enemies aEnemies, int index){
+    return aEnemies->enemyList[index]->HP.currentHP;
+}
