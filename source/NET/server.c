@@ -7,6 +7,7 @@ struct Scenario{
     int difficulty;
     ScenarioState scenario;
     int totalKilldEnemise;
+    bool victory;
 };
 
 struct Weapon{
@@ -157,10 +158,9 @@ int main(int argc, char **argv ){
                 }
                 if(aPacket) NET_packetDestroy(aPacket);
             }
-
+            NET_serverScenarioCheckForVictory(aServer);
             if(aServer->isOff)break;
         }
-
     }
     mutex_lock(&stop_mutex);
     stop = 1;
@@ -192,9 +192,9 @@ void* enemies_threads(void *arg){
             if(aServer->clients[i].State != MENU && 
             aServer->clients[i].State != LOBBY &&
             (int)SDL_GetTicks() >= 2000+previousTime -(aServer->scenario.spawnFrequency*100) && 
-            (int)NET_enemiesGetSize(aServer->aEnemies) < MAX_ENEMIES_CLIENT_SIDE + 10)// temporery
+            (int)NET_enemiesGetSize(aServer->aEnemies) < MAX_ENEMIES_CLIENT_SIDE)// temporery
             {
-                printf("enemy count %d\n",(int)NET_enemiesGetSize(aServer->aEnemies));
+                //printf("enemy count %d\n",(int)NET_enemiesGetSize(aServer->aEnemies));
                 previousTime = SDL_GetTicks();
                 NET_enemiesPush(aServer->aEnemies,NET_enemyCreate(50,50,LIGHT_ENEMY,aServer->scenario.difficulty));
             }
@@ -290,6 +290,7 @@ void NET_serverSetNewMap(Server aServer){
 
 void NET_serverScenarioUpdate(Scenario *s, ScenarioState state, uint32_t seed){
     s->totalKilldEnemise = 0;
+    s->victory = false;
     switch (state){
     case ELIMINATIONS:
         s->difficulty = 1;
@@ -310,8 +311,36 @@ void NET_serverScenarioUpdate(Scenario *s, ScenarioState state, uint32_t seed){
         s->objectivePoint = (SDL_Point){.x = seed % MAP_HEIGHT, .y = seed % MAP_WIDTH};
         break;
     default:
+        printf("Not a Scenario\n");
         break;
     }
+}
+
+void NET_serverScenarioCheckForVictory(Server aServer){
+    switch(aServer->scenario.scenario){
+        case ELIMINATIONS:
+            if(aServer->scenario.totalKilldEnemise == 50 * aServer->scenario.difficulty){
+                aServer->scenario.victory = true;
+            }
+        break;
+        case WAVE:
+            if(aServer->scenario.totalKilldEnemise == 50 * aServer->scenario.difficulty){
+                aServer->scenario.victory = true;
+            }
+        break;
+        case PATH:
+            for(int i = 0;i < aServer->clientCount; i++){
+                if(aServer->clients[i].player.hitBox.x == aServer->scenario.objectivePoint.x &&
+                    aServer->clients[i].player.hitBox.y == aServer->scenario.objectivePoint.y){
+                    aServer->scenario.victory = true;
+                }
+            }
+        break;
+        default:
+            printf("Not a Scenario\n");
+        break;
+    }
+    //printf("kill count\n %d",aServer->scenario.totalKilldEnemise);
 }
 
 uint8_t NET_serverGetPercentage(int currentHP, int maxHP){
@@ -602,7 +631,7 @@ void NET_serverUpdateEnemies(Server aServer, Enemies aEnemies, ServerMap aMap){
                     .h = PROJECTILEWIDTH
                 };
                 if (enemyColitino(projectileRect, enemyHitbox)){
-                    enemyDamaged(aEnemies, aServer->clients[aServer->projList[j].srcPlayerIdx].player.weapon.damage, i, &enemyCount);
+                    aServer->scenario.totalKilldEnemise += enemyDamaged(aEnemies, aServer->clients[aServer->projList[j].srcPlayerIdx].player.weapon.damage, i, &enemyCount);
                     NET_projectileKill(aServer, &aServer->projList[j], j);
                 }
             }
