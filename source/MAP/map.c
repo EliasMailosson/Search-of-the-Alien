@@ -9,6 +9,7 @@ struct Map{
     SDL_Texture *texture;
     SDL_Rect tileIndex[MAX_COUNT_SPRITE_TILES];
     int tileID[MAP_HEIGHT][MAP_WIDTH];
+    int lobbyTileID[LOBBY_HEIGHT][LOBBY_WIDTH];
     SDL_Rect tileRect; 
     SDL_Rect baseRect;
     PlanetLUT planet;
@@ -65,7 +66,13 @@ void MAP_mapSetEdgesToZero(int tileID[][MAP_WIDTH]){
     }
 }
 
-void MAP_MapRender(SDL_Renderer *pRend, Map aMap){
+void MAP_RenderTileLobby(SDL_Renderer *pRend, Map aMap, int y, int x, SDL_Rect *currentRect){
+    int id = aMap->lobbyTileID[y][x]; 
+    if(id <= 0 || id >= MAX_COUNT_SPRITE_TILES) return;
+    SDL_RenderCopy(pRend, aMap->texture, &aMap->tileIndex[id], currentRect);
+}
+
+void MAP_MapRenderLobby(SDL_Renderer *pRend, Map aMap){
     int tileW = aMap->tileRect.w;
     int tileH = aMap->tileRect.h;
 
@@ -73,14 +80,14 @@ void MAP_MapRender(SDL_Renderer *pRend, Map aMap){
     currentRect.w = tileW;
     currentRect.h = tileH;
 
-    for(int y = 0; y < MAP_HEIGHT; y++){ 
-        for(int x = 0; x < MAP_WIDTH; x++){
+    for(int y = 0; y < LOBBY_HEIGHT; y++){ 
+        for(int x = 0; x < LOBBY_WIDTH; x++){
             
             currentRect.x = (int)roundf((x - y) * (tileW * 0.5f)
                                         + aMap->tileRect.x);
             currentRect.y = (int)roundf((x + y) * (tileH * 0.25f)
                                         + aMap->tileRect.y);
-            MAP_TileRender(pRend, aMap, y, x, &currentRect);
+            MAP_RenderTileLobby(pRend, aMap, y, x, &currentRect);
         }
     }
 }
@@ -133,7 +140,7 @@ Map MAP_MapCreate(SDL_Renderer *pRend, int winW, int winH){
         }
     }
     MAP_TilesFillWithBlank(aMap->tileID);
-    MAP_MapGetTilesFromLobby(aMap->tileID);
+    MAP_MapGetTilesFromLobby(aMap->lobbyTileID);
     //MAP_convertTiles(aMap->tileID,NEMUR_LUT);
     MAP_mapSetEdgesToZero(aMap->tileID);
 
@@ -182,7 +189,7 @@ void MAP_MapDestroy(Map aMap){
     aMap = NULL;
 }
 
-void MAP_MapGetTilesFromLobby(int tileID[MAP_HEIGHT][MAP_WIDTH]){
+void MAP_MapGetTilesFromLobby(int lobbyTileID[LOBBY_HEIGHT][LOBBY_WIDTH]){
     char buffer[256];
     FILE *fp = fopen(FILE_PHAT_LOBBY_DATA, "r");
     if (fp == NULL) {
@@ -202,7 +209,7 @@ void MAP_MapGetTilesFromLobby(int tileID[MAP_HEIGHT][MAP_WIDTH]){
             substring(buffer, oldIndex, index, tmp);
             int id = atoi(tmp);
             if (id < 0 || id >= TILE_INDEX_COUNT) id = 0;
-            tileID[y][x++] = id;
+            lobbyTileID[y][x++] = id;
             oldIndex = index + 1;
         }
         if (x < LOBBY_WIDTH && oldIndex < (int)strlen(buffer)){
@@ -210,7 +217,7 @@ void MAP_MapGetTilesFromLobby(int tileID[MAP_HEIGHT][MAP_WIDTH]){
             substring(buffer, oldIndex, strlen(buffer), tmp);
             int id = atoi(tmp);
             if (id < 0 || id >= TILE_INDEX_COUNT) id = 0;
-            tileID[y][x++] = id;
+            lobbyTileID[y][x++] = id;
         }
         y++;
     }

@@ -17,7 +17,8 @@ typedef struct ServerMap *ServerMap;
 
 ServerMap NET_serverMapCreate();
 void MAP_ScreenToTile(ServerMap aServerMap, int screenX, int screenY, int *outTileX, int *outTileY);
-bool MAP_TileNotWalkable(ServerMap aServerMap, int screenX, int screenY);
+bool MAP_TileNotWalkable(ServerMap aServerMap, int screenX, int screenY, GameState state);
+
 bool NET_serverFindSpawnTile(ServerMap aServerMap, int *freekoordX, int *freekoordY);
 void NET_serverCheckPlayerCollision(Server aServer, int selfIdx, int *collide);
 void NET_projectileSpawn(Server aServer, Projectile *list, uint8_t srcPlayerIdx);

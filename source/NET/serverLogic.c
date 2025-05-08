@@ -6,6 +6,7 @@
 struct ServerMap
 {
     int MapTileId[MAP_HEIGHT][MAP_WIDTH];
+    int LobbyTileId[LOBBY_HEIGHT][LOBBY_WIDTH];
     SDL_Rect tileRect;
     uint32_t seed;
 };
@@ -14,7 +15,7 @@ ServerMap NET_serverMapCreate() {
     ServerMap aServerMap = malloc(sizeof *aServerMap);
 
     MAP_TilesFillWithBlank(aServerMap->MapTileId);
-    MAP_MapGetTilesFromLobby(aServerMap->MapTileId);
+    MAP_MapGetTilesFromLobby(aServerMap->LobbyTileId);
 
     aServerMap->tileRect = (SDL_Rect) {.x = 0, .y = 0, .w = TILE_SIZE, .h = TILE_SIZE};
 
@@ -80,17 +81,18 @@ bool NET_serverFindSpawnTile(ServerMap aServerMap, int *freekoordX, int *freekoo
     return false;
 }
 
-bool MAP_TileNotWalkable(ServerMap aServerMap, int screenX, int screenY) {
+bool MAP_TileNotWalkable(ServerMap aServerMap, int screenX, int screenY, GameState state){
     int tileX, tileY;
     MAP_ScreenToTile(aServerMap, screenX, screenY, &tileX, &tileY);
-    // printf("tileY: %d, tileX: %d ,tileID:%d\n", tileY, tileX, aServerMap->MapTileId[tileX][tileY]);
-    if (aServerMap->MapTileId[tileY][tileX] == 0){
-        return true;
+    switch (state){
+    case LOBBY:
+        if(aServerMap->LobbyTileId[tileY][tileX] == 0) return true;
+        break;
+    default:
+        if (aServerMap->MapTileId[tileY][tileX] == 0) return true;
+        break;
     }
-    else 
-    {
-        return false;
-    }
+    return false;
 }
 
 void NET_serverCheckPlayerCollision(Server aServer, int selfIdx, int *collide) {

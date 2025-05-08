@@ -418,7 +418,10 @@ static void calcMovement(Server aServer, PlayerInputPacket *pip, int playerIdx){
         dy = dy / 2;
     }
 
-    if(MAP_TileNotWalkable(aServer->aServerMap, aServer->clients[playerIdx].player.hitBox.x + (int)dx * speed, aServer->clients[playerIdx].player.hitBox.y + (int)dy * speed)) return;
+    if(MAP_TileNotWalkable(aServer->aServerMap,
+        aServer->clients[playerIdx].player.hitBox.x + (int)dx * speed,
+        aServer->clients[playerIdx].player.hitBox.y + (int)dy * speed,
+        aServer->clients[playerIdx].State)) return;
 
     int collisionType;
     NET_serverCheckPlayerCollision(aServer, playerIdx, &collisionType);

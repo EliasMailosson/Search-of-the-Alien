@@ -179,9 +179,8 @@ static void renderLobby(ClientView *pView, Map aMap, Client aClient, TerminalHub
     SDL_SetRenderDrawColor(pView->pRend, 0,0,0,0);
     SDL_RenderClear(pView->pRend);
 
-    MAP_MapNewRender(pView->pRend, aMap, pView->pWin);
-
-    
+    //MAP_MapNewRender(pView->pRend, aMap, pView->pWin);
+    MAP_MapRenderLobby(pView->pRend,aMap);
     
     renderPlayers(aClient, pView);
     hudRender(aClient, pView->aHud,pView->pRend, pView->windowWidth, pView->windowHeight);
