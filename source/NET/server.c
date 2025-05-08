@@ -242,11 +242,11 @@ void NET_serverSendEnemiesPacket(Server aServer, GameState GS, Enemies aEnemies)
             pos = NET_enemyGetPos(en);
             if( abs(p.player.hitBox.y - pos.y) < MAX_ENEMIES_RANGE &&
                 abs(p.player.hitBox.x - pos.x) < MAX_ENEMIES_RANGE){
-                    if(enemySendCount < MAX_ENEMIES_CLIENT_SIDE){
+                    if(enemySendCount < MAX_ENEMIES_CLIENT_SIDE - 1){
                         packet[enemySendCount].x = (int16_t)(p.player.hitBox.x - pos.x);
                         packet[enemySendCount].y = (int16_t)(p.player.hitBox.y - pos.y);
                         packet[enemySendCount].direction = (int16_t)(NET_enemyGetDirection(en));
-                        packet[enemySendCount].hp = (uint8_t)getEnemyHP(aEnemies, enemySendCount);
+                        packet[enemySendCount].hp = (uint8_t)getEnemyHP(aEnemies, i);
                         enemySendCount++;
                     }
             }
