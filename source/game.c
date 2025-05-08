@@ -183,7 +183,8 @@ static void renderLobby(ClientView *pView, Map aMap, Client aClient, TerminalHub
 
     
     
-    renderPlayers(aClient, pView);
+    // renderPlayers(aClient, pView);
+    renderEntities(aClient, pView);
     hudRender(aClient, pView->aHud,pView->pRend, pView->windowWidth, pView->windowHeight);
 
     if (terminalHub.isVisible) {
@@ -273,9 +274,8 @@ void renderPlanet(ClientView *pView, Map aMap, Client aClient, PauseMenu *pPause
 
     MAP_MapNewRender(pView->pRend, aMap, pView->pWin);
     renderProjectiles(aClient, pView);
-    renderPlayers(aClient, pView);
 
-    renderEnemy(aClient, pView);
+    renderEntities(aClient, pView);
     
     if (pPauseMenu->isVisible) {
         renderPauseMenu(pView, pPauseMenu);

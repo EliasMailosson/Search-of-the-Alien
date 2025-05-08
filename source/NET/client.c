@@ -3,11 +3,6 @@
 #include "../../include/menu.h"
 #include <stdio.h>
 
-typedef struct clientEnemy{
-    SDL_Point pos;
-    int direction;
-}ClientEnemy;
-
 struct scenC{
     ScenarioState state;
     SDL_Point objectivePoint; 
@@ -15,19 +10,6 @@ struct scenC{
 struct WeaponStats {
     int type;
     int level;
-};
-struct Player{
-    GameState state;
-    char username[MAX_USERNAME_LEN]; //myusername
-    SDL_Point pos;
-    int direction;
-    int currentPlayerAnimation;
-    int colorIndex;
-    SDL_Color color;
-    int playerCharacter;
-    bool isShooting;
-    int dashCooldown;
-    uint8_t HpProcent;
 };
 
 typedef struct gameConfig {
@@ -78,6 +60,14 @@ void NET_clientGetProjList(Client aClient, Proj *outputProjList) {
 
 int NET_clientGetProjTexture(Client aClient, int projIdx) {
     return aClient->projList[projIdx].textureIdx;
+}
+
+ClientEnemy *NET_clientGetEnemy(Client aClient, int idx) {
+    return &aClient->enemies[idx];
+}
+
+Player *NET_clientGetPlayer(Client aClient, int idx) {
+    return &aClient->playerList[idx];
 }
 
 Client NET_clientCreate(){
