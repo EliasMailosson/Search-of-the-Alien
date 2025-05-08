@@ -12,8 +12,10 @@ typedef struct playerList {
 
 typedef struct Objectives {
     int x, y;
-    Label objectiveText;
+    Label objectiveLabel;
+    char labelText[50];
     TTF_Font *pFont;
+    SDL_Color textColor;
 } Objectives;
 
 struct Arrow{
@@ -90,7 +92,7 @@ Hud hudCreate(SDL_Renderer *pRend){
     //OBJECTIVES
     aHud->objectives->pFont = TTF_OpenFont("assets/fonts/jura.ttf", 20);
     for (int i = 0; i < OBJECTIVECOUNT; i++) {
-       aHud->objectives[i].objectiveText = UI_labelCreate(); 
+       aHud->objectives[i].objectiveLabel = UI_labelCreate(); 
     }
     
 
@@ -120,13 +122,16 @@ void hudDestroy(Hud aHud){
         }
     }
     
-    aHud->objectives->pFont = TTF_OpenFont("assets/fonts/jura.ttf", 20);
-    for (int i = 0; i < OBJECTIVECOUNT; i++) {
-       aHud->objectives[i].objectiveText = UI_labelCreate(); 
-    }
-    TTF_CloseFont(aHud->objectives->pFont);
     TTF_CloseFont(aHud->playerList.pFont);
     aHud->playerList.pFont = NULL;
+    
+    //OBJECTIVES
+    TTF_CloseFont(aHud->objectives->pFont);
+    aHud->objectives->pFont = NULL;
+    for (int i = 0; i < OBJECTIVECOUNT; i++) {
+       aHud->objectives[i].objectiveLabel = UI_labelCreate(); 
+    }
+    ////////////
 
     if(aHud != NULL) free(aHud);
     aHud = NULL;
@@ -161,6 +166,16 @@ void updateHudPlayerList(Client aClient, Hud aHud, SDL_Renderer *pRend, int wind
         UI_labelRefreshTexture(pRend, aHud->playerList.usernames[i]);
     }
     aHud->playerList.count = newCount;
+}
+
+void updateHudObjectives(Hud aHud, SDL_Renderer *pRend, int windowW, int windowH) {
+    aHud->objectives->x = windowW - 140;
+    
+    for (int i = 0; i < OBJECTIVECOUNT; i++) {
+        aHud->objectives[i].textColor = (SDL_Color){.r = 0, .g = 0, .b = 0, .a = 0};
+        UI_labelSetAppearance(pRend, aHud->objectives[i].objectiveLabel, aHud->objectives->x, (20 + 8*40) + i*40, aHud->objectives->textColor, aHud->objectives->pFont);
+        UI_labelSetText(aHud->objectives[i].objectiveLabel)
+    }
 }
 
 void hudRender(Client aClient, Hud aHud,SDL_Renderer *pRend, int windowW, int windowH){
