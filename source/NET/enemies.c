@@ -315,3 +315,6 @@ SDL_Point NET_enemyGetPos(Enemy aEnemy){
 int NET_enemyGetDirection(Enemy aEnemy){
     return aEnemy->direction;
 }
+int getEnemyHP(Enemies aEnemies, int index){
+    return aEnemies->enemyList[index]->HP.currentHP;
+}

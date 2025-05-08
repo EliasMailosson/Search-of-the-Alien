@@ -6,6 +6,7 @@
 typedef struct clientEnemy{
     SDL_Point pos;
     int direction;
+    uint8_t hpEnemy;
 }ClientEnemy;
 
 struct scenC{
@@ -409,6 +410,7 @@ void NET_clientUpdateEnemy(Client aClient, Packet aPacket){
         aClient->enemies[i].pos.x = (int)packets[i].x;
         aClient->enemies[i].pos.y = (int)packets[i].y;
         aClient->enemies[i].direction = (int)packets[i].direction;
+        aClient->enemies[i].hpEnemy = (uint8_t)packets[i].hp;
     }
 
     for (int i = aClient->EnemiesCount; i < MAX_ENEMIES_CLIENT_SIDE; i++) {
@@ -518,4 +520,8 @@ void NET_clientSaveWeaponStats(Client aClient) {
     }
 
     fclose(fp);
+}
+
+int NET_clientGetEnemyHP(Client aClient, int index){
+    return aClient->enemies[index].hpEnemy;
 }
