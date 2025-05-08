@@ -17,10 +17,10 @@ typedef struct entity{
     int type;
 }Entity;
 typedef struct entityContext {
+    Entity currentEntity;
     int graphicsMode;
     int spriteSize;
     int frame;
-    Uint32 damageTime;
     int selfIndex;
     SDL_Point selfPos;
     int centerX;
@@ -49,6 +49,9 @@ int cmpYPos(void* a, void* b) {
 void sortEntities(Client aClient, int *count, Entity *outputEntityList) {
     int n = 0;
     for(int i = 0; i < NET_clientGetPlayerCount(aClient); i++) {
+        if(NET_clientGetState(aClient) != NET_clientGetClientState(aClient, i)) {
+            continue;
+        }
         outputEntityList[n].instance = NET_clientGetPlayer(aClient, i);
         outputEntityList[n].type = ENTITY_PLAYER;
         n++;
@@ -63,99 +66,82 @@ void sortEntities(Client aClient, int *count, Entity *outputEntityList) {
     qsort(outputEntityList, n, sizeof(Entity), cmpYPos);
 }
 
-void renderPlayer(EntityContext context, ClientView *pView) {
-    // int i = sortedIndex[n];
-    // if(NET_clientGetState(aClient) != NET_clientGetClientState(aClient, i)) {
-    //     continue;
-    // }
+void renderPlayer(EntityContext context, ClientView *pView, bool isSelf) {
+    Player player = *((Player*)context.currentEntity.instance);
+    player.pos.x -= context.renderSizeHalf;
+    player.pos.y -= pView->playerRenderSize;
 
-    // SDL_Point pos = NET_clientGetPlayerPos(aClient, i);
-    // pos.x -= renderSizeHalf;
-    // pos.y -= pView->playerRenderSize;
-    // int direction = NET_clientGetPlayerDirection(aClient, i);
+    int worldOffsetX = player.pos.x - context.selfPos.x;
+    int worldOffsetY = player.pos.y - context.selfPos.y;
+    float screenOffsetX = worldOffsetX * context.scale;
+    float screenOffsetY = worldOffsetY * context.scale;
 
-    // int worldOffsetX = pos.x - selfPos.x;
-    // int worldOffsetY = pos.y - selfPos.y;
-    // float scale = (float)pView->playerRenderSize / RENDER_SIZE;
-    // float screenOffsetX = worldOffsetX * scale;
-    // float screenOffsetY = worldOffsetY * scale;
+    SDL_Rect playerRect;
+    if(isSelf) {
+        playerRect = (SDL_Rect){
+            .x = context.centerX - context.renderSizeHalf,
+            .y = context.centerY - context.renderSizeHalf,
+            .w = pView->playerRenderSize,
+            .h = pView->playerRenderSize
+        };
+    }
+    else {
+        playerRect = (SDL_Rect){
+            .x = (int)(context.centerX + screenOffsetX - pView->playerRenderSize/6),
+            .y = (int)(context.centerY + screenOffsetY + pView->playerRenderSize/5),
+            .w = pView->playerRenderSize,
+            .h = pView->playerRenderSize
+        };
+    }
 
-    // SDL_Rect playerRect;
-    // if(selfIndex == i) {
-    //     playerRect = (SDL_Rect){
-    //         .x = centerX - renderSizeHalf,
-    //         .y = centerY - renderSizeHalf,
-    //         .w = pView->playerRenderSize,
-    //         .h = pView->playerRenderSize
-    //     };
-    // }
-    // else {
-    //     playerRect = (SDL_Rect){
-    //         .x = (int)(centerX + screenOffsetX - pView->playerRenderSize/6),
-    //         .y = (int)(centerY + screenOffsetY + pView->playerRenderSize/5),
-    //         .w = pView->playerRenderSize,
-    //         .h = pView->playerRenderSize
-    //     };
-    // }
+    // pView->PlayerPos[i] = (SDL_Point){.x = playerRect.x, .y = playerRect.y}; // VIKTIGT
 
-    // pView->PlayerPos[i] = (SDL_Point){.x = playerRect.x, .y = playerRect.y};
-
-    // int shootAnimationOffset = 0;
-    // if(NET_clientIsShooting(aClient, i)) shootAnimationOffset = 3;
+    int shootAnimationOffset = 0;
+    if(player.isShooting) shootAnimationOffset = 3;
     
-    // int graphicsModePow2 = (int)pow(2, graphicsMode);
-    // int currentPlayerFrame = ( (frame/graphicsModePow2) % (24/((int)pow(2, graphicsMode-1))) );
+    int graphicsModePow2 = (int)pow(2, context.graphicsMode);
+    int currentPlayerFrame = ( (context.frame/graphicsModePow2) % (24/((int)pow(2, context.graphicsMode-1))) );
 
-    // SDL_Rect src;
-    // switch(NET_clientGetPlayerAnimation(aClient, i)) {
-    //     case ANIMATION_IDLE:
-    //         src = (SDL_Rect){currentPlayerFrame*SPRITE_SIZE, (direction+8)*SPRITE_SIZE, SPRITE_SIZE, SPRITE_SIZE};
-    //         break;
-    //     case ANIMATION_RUNNING:
-    //         src = (SDL_Rect){currentPlayerFrame*SPRITE_SIZE, direction*SPRITE_SIZE, SPRITE_SIZE, SPRITE_SIZE};
-    //         break;
-    //     default:
-    //         src = (SDL_Rect){currentPlayerFrame*SPRITE_SIZE, direction*SPRITE_SIZE, SPRITE_SIZE, SPRITE_SIZE};
-    // }
+    SDL_Rect src;
+    switch(player.currentPlayerAnimation) {
+        case ANIMATION_IDLE:
+            src = (SDL_Rect){currentPlayerFrame*context.spriteSize, (player.direction+8)*context.spriteSize, context.spriteSize, context.spriteSize};
+            break;
+        case ANIMATION_RUNNING:
+            src = (SDL_Rect){currentPlayerFrame*context.spriteSize, player.direction*context.spriteSize, context.spriteSize, context.spriteSize};
+            break;
+        default:
+            src = (SDL_Rect){currentPlayerFrame*context.spriteSize, player.direction*context.spriteSize, context.spriteSize, context.spriteSize};
+    }
     
-    // int playerCharacter = NET_clientGetPlayerCharacter(aClient, i) + shootAnimationOffset;
-    // SDL_RenderCopy(pView->pRend, pView->playerTexture[playerCharacter], &src, &playerRect);
-    // RenderPlayerName(aClient, pView, i, playerRect);
-
-    // SDL_Rect vignetteRect = {.x = 0, .y = 0, .w = 1920, .h = 1080};
-    // SDL_Rect screenRect = {.x = 0, .y = 0, .w = pView->windowWidth, .h = pView->windowHeight};
-
-    // if (NET_clientIsPlayerDamaged(aClient, selfIndex)) {
-    //     damageTime = SDL_GetTicks();
-    // }
-    // if (SDL_GetTicks() - damageTime < 250) {
-    //     SDL_RenderCopy(pView->pRend, pView->vignetteTexture, &vignetteRect, &screenRect);
-    // }
+    int playerCharacter = player.playerCharacter + shootAnimationOffset;
+    SDL_RenderCopy(pView->pRend, pView->playerTexture[playerCharacter], &src, &playerRect);
+    // RenderPlayerName(aClient, pView, i, playerRect); VIKTIGT
 }
 
 void renderEnemy(EntityContext context, ClientView *pView) {
-    SDL_Point pos = NET_clientGetEnemyPos(aClient, i);
-    int screenX = (int)roundf(centerX - (float)pos.x * scale);
-    int screenY = (int)roundf(centerY - (float)pos.y * scale);
-    int direction = NET_clientGetEnemyDirection(aClient, i);
-    if (direction < 0 || direction > 7) {
-        fprintf(stderr, "ERROR: Invalid direction: %d\n", direction);
-        direction = 0;  // or clamp, or skip rendering
-    }
+    // SDL_Point pos = NET_clientGetEnemyPos(aClient, i);
+    // int screenX = (int)roundf(centerX - (float)pos.x * scale);
+    // int screenY = (int)roundf(centerY - (float)pos.y * scale);
+    // int direction = NET_clientGetEnemyDirection(aClient, i);
+    // if (direction < 0 || direction > 7) {
+    //     fprintf(stderr, "ERROR: Invalid direction: %d\n", direction);
+    //     direction = 0;  // or clamp, or skip rendering
+    // }
 
-    SDL_Rect enemyRect;
-    enemyRect = (SDL_Rect){
-            .x = (int)(screenX - renderSizeHalf / 2),
-            .y = (int)(screenY - renderSizeHalf / 2),
-            .w = pView->playerRenderSize / 2,
-            .h = pView->playerRenderSize / 2
-        };
-    SDL_Rect src;
-    int graphicsModePow2 = (int)pow(2, graphicsMode);
-    int currentFrame = ( (frame/graphicsModePow2) % (24/((int)pow(2, graphicsMode-1))) ) * (int)pow(2, graphicsMode-1);
-    src = (SDL_Rect){currentFrame*SPRITE_SIZE, direction*SPRITE_SIZE, SPRITE_SIZE, SPRITE_SIZE};
+    // SDL_Rect enemyRect;
+    // enemyRect = (SDL_Rect){
+    //         .x = (int)(screenX - renderSizeHalf / 2),
+    //         .y = (int)(screenY - renderSizeHalf / 2),
+    //         .w = pView->playerRenderSize / 2,
+    //         .h = pView->playerRenderSize / 2
+    //     };
+    // SDL_Rect src;
+    // int graphicsModePow2 = (int)pow(2, graphicsMode);
+    // int currentFrame = ( (frame/graphicsModePow2) % (24/((int)pow(2, graphicsMode-1))) ) * (int)pow(2, graphicsMode-1);
+    // src = (SDL_Rect){currentFrame*SPRITE_SIZE, direction*SPRITE_SIZE, SPRITE_SIZE, SPRITE_SIZE};
 
-    SDL_RenderCopy(pView->pRend, pView->enemyTexture, &src, &enemyRect);
+    // SDL_RenderCopy(pView->pRend, pView->enemyTexture, &src, &enemyRect);
 }
 
 void renderShadows() {
@@ -205,33 +191,42 @@ void renderEntities(Client aClient, ClientView *pView) {
     sortEntities(aClient, &count, entityList);
 
     EntityContext context;
-    int graphicsMode = NET_clientGetGraphicsQuality(aClient);
-    int SPRITE_SIZE = 256/pow(2, graphicsMode-1);
+    context.graphicsMode = NET_clientGetGraphicsQuality(aClient);
+    context.spriteSize = 256/pow(2, context.graphicsMode-1);
     static int frame = 0; frame++;
-
+    context.frame = frame;
     int playerCount = NET_clientGetPlayerCount(aClient);
     static Uint32 damageTime = 0;
-    int selfIndex = NET_clientGetSelfIndex(aClient);
-    SDL_Point selfPos = NET_clientGetPlayerPos(aClient, selfIndex);
-
-    int centerX = pView->windowWidth/2;
-    int centerY = pView->windowHeight/2;
-
-    int renderSizeHalf = pView->playerRenderSize/2;
-    float scale = (float)pView->playerRenderSize / RENDER_SIZE;
+    context.selfIndex = NET_clientGetSelfIndex(aClient);
+    context.selfPos = NET_clientGetPlayerPos(aClient, context.selfIndex);
+    context.centerX = pView->windowWidth/2;
+    context.centerY = pView->windowHeight/2;
+    context.renderSizeHalf = pView->playerRenderSize/2;
+    context.scale = (float)pView->playerRenderSize / RENDER_SIZE;
 
     renderShadows();
     for(int i = 0; i < count; i++) {
+        context.currentEntity = entityList[i];
         switch(entityList[i].type) {
             case ENTITY_ENEMY:
                 renderEnemy(context, pView);
                 break;
 
             case ENTITY_PLAYER:
-                renderPlayer(context, pView);
+                Player player = *((Player*)context.currentEntity.instance);
+                renderPlayer(context, pView, NET_clientIsMyUsername(aClient, player.username));
                 break;
         }
     }
+
+    // SDL_Rect vignetteRect = {.x = 0, .y = 0, .w = 1920, .h = 1080};
+    // SDL_Rect screenRect = {.x = 0, .y = 0, .w = pView->windowWidth, .h = pView->windowHeight};
+    // if (NET_clientIsPlayerDamaged(aClient, selfIndex)) {
+    //     damageTime = SDL_GetTicks();
+    // }
+    // if (SDL_GetTicks() - damageTime < 250) {
+    //     SDL_RenderCopy(pView->pRend, pView->vignetteTexture, &vignetteRect, &screenRect);
+    // }
 }
 
 PlayerInputPacket prepareInputArray(ClientControl *pControl, int windowWidth, int windowHeight) {

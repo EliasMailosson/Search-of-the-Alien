@@ -70,6 +70,12 @@ Player *NET_clientGetPlayer(Client aClient, int idx) {
     return &aClient->playerList[idx];
 }
 
+bool NET_clientIsMyUsername(Client aClient, char *name) {
+    if(strcmp(name, aClient->selfUsername) == 0) {
+        return true;
+    } else return false;
+}
+
 Client NET_clientCreate(){
 
     Client aClient = malloc(sizeof(struct client));
