@@ -252,12 +252,12 @@ size_t NET_enemiesGetSize(Enemies aEnemies){
 }
 
 
-void enemyDamaged(Enemies aEnemies, int damage, int index, int *pEnemyCount){
+int enemyDamaged(Enemies aEnemies, int damage, int index, int *pEnemyCount){
     aEnemies->enemyList[index]->HP.currentHP -= damage;
     printf("%f\n", aEnemies->enemyList[index]->HP.currentHP);
 
     if (aEnemies->enemyList[index]->HP.currentHP <= 0) {
-        printf("Enemy %d killed\n", index);
+        //printf("Enemy %d killed\n", index);
 
         // Shift all enemies after the dead one down
         for (size_t i = index; i < aEnemies->size - 1; i++) {
@@ -271,7 +271,9 @@ void enemyDamaged(Enemies aEnemies, int damage, int index, int *pEnemyCount){
         if (pEnemyCount) {
             *pEnemyCount = aEnemies->size;
         }
+        return 1;
     }
+    return 0;
 }
 
 int enemyGetCount(Enemies aEnemies){
