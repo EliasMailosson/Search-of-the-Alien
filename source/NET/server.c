@@ -212,17 +212,14 @@ void* enemies_threads(void *arg){
                 {
                     NET_enemiesPush(aServer->aEnemies,NET_enemyCreate(spawnX,spawnY,LIGHT_ENEMY,aServer->scenario.difficulty));
                 }
-                // printf("PlayerPos: x=%d y=%d | SpawnZone: x=%d y=%d w=%d h=%d\n",
-                //     aServer->clients[i].player.hitBox.x,
-                //     aServer->clients[i].player.hitBox.y,
-                //     spawnZone.x, spawnZone.y, spawnZone.w, spawnZone.h);             
+                printf("PlayerPos: x=%d y=%d | SpawnZone: x=%d y=%d w=%d h=%d\n", aServer->clients[i].player.hitBox.x, aServer->clients[i].player.hitBox.y,spawnZone.x, spawnZone.y, spawnZone.w, spawnZone.h);             
             }
         }
 
         NET_serverUpdateEnemies(aServer, aServer->aEnemies,aServer->aServerMap);
         sleep_ms(10);
     }
-    printf("Enemise thread exiting. id: %lu\n",(unsigned long)thread_self());
+    // printf("Enemise thread exiting. id: %lu\n",(unsigned long)thread_self());
     return NULL;
 }
 
@@ -245,7 +242,7 @@ void* projektil_threads(void *arg){
 
 void NET_serverSendEnemiesPacket(Server aServer, GameState GS, Enemies aEnemies){
     if ((int)NET_enemiesGetSize(aEnemies) < 0 || (int)NET_enemiesGetSize(aEnemies) > MAX_ENEMIES_CLIENT_SIDE) {
-        fprintf(stderr, "Error: invalid pEnemyCount (%d)\n",(int)NET_enemiesGetSize(aEnemies));
+        // fprintf(stderr, "Error: invalid pEnemyCount (%d)\n",(int)NET_enemiesGetSize(aEnemies));
         return;
     }
 
