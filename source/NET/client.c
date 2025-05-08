@@ -203,6 +203,10 @@ int NET_clientGetState(Client aClient) {
         int hp = (int)aClient->playerList[selfIndex].HpProcent;
         //printf("Your HP = %d\n", hp);
         return true;
+    }else{
+        if(aClient->playerList[selfIndex].HpProcent == 100){
+            lastHealth[selfIndex] = 100;
+        }
     }
     return false;
 }

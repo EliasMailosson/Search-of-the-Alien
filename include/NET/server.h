@@ -63,6 +63,7 @@ float NET_serverGetPlayerAngle(Server aServer, int playerIdx);
 void NET_serverSetProjCount(Server aServer, int count);
 void NET_serverScenarioUpdate(Scenario *s, ScenarioState state, uint32_t seed);
 uint8_t NET_serverGetPercentage(int currentHP, int maxHP);
+void NET_serverForceGameStateChange(Server aServer, GameState state, int index);
 
 /** Freeing memory after use, for server */
 void NET_serverDestroy(Server aServer);
