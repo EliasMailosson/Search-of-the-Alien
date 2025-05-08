@@ -16,6 +16,7 @@ typedef struct __attribute__((packed)) Proj {
 typedef struct clientEnemy{
     SDL_Point pos;
     int direction;
+    uint8_t hpEnemy;
 }ClientEnemy;
 struct Player{
     GameState state;
