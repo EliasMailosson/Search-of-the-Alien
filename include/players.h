@@ -7,5 +7,6 @@ PlayerInputPacket prepareInputArray(ClientControl *pControl, int windowWidth, in
 void renderPlayers(Client aClient, ClientView *pView);
 void renderEnemy(Client aClient, ClientView *pView);
 void renderProjectiles(Client aClient, ClientView *pView);
+//bool canPlaySound(Uint32 *lastPlayedTime, Uint32 timeMs);
 
 #endif

@@ -27,18 +27,40 @@ void sortByYaxis(Client aClient, int playerCount, int indices[]){
     }
 }
 
+/*bool canPlaySound(Uint32 *lastPlayedTime, Uint32 timeMs){
+    Uint32 now = SDL_GetTicks();
+    if (now - *lastPlayedTime >= timeMs) {
+        *lastPlayedTime = now;
+        return true;
+    }
+    return false;
+}*/
+
 void renderProjectiles(Client aClient, ClientView *pView) {
     Proj projList[MAX_CLIENT_PROJ];
     NET_clientGetProjList(aClient, projList);
+    static Uint32 lastShotSoundTime = 0;
+
+    bool isAnyProjectileActive = false;
+    static int biggieShotChannel = -1;
+    static int lastProjectileCount = 0;
+
+    static Uint32 lastProjectileHash = 0;
+
 
     int centerX = pView->windowWidth/2;
     int centerY = pView->windowHeight/2;
 
     
     float scale = (float)pView->playerRenderSize / RENDER_SIZE;
-    
+
+    int currentProjectileCount = 0;
     for(int i = 0; i < MAX_CLIENT_PROJ; i++) {
         if(projList[i].textureIdx != PROJ_TEX_NONE) {
+            //isAnyProjectileActive = true;
+
+            currentProjectileCount++;
+
             int screenX = (int)roundf(centerX - (float)projList[i].x * scale);
             int screenY = (int)roundf(centerY - (float)projList[i].y * scale);
             double angleDegrees = (projList[i].angle / 255.0) * 360;
@@ -49,9 +71,24 @@ void renderProjectiles(Client aClient, ClientView *pView) {
                 .w = 20,
                 .h = 20
             };
+            // if (!isChunkPlaying(pView->biggieShot)) {
+            //     Mix_PlayChannel(-1, pView->biggieShot, -1);
+            // }
             SDL_RenderCopyEx(pView->pRend, pView->projectileTexture[projList[i].textureIdx], NULL, &projRect, angleDegrees, NULL, SDL_FLIP_NONE);
             // SDL_SetRenderDrawColor(pView->pRend, 255, 255, 0, 255);
             // SDL_RenderFillRect(pView->pRend, &projRect);
+        }
+    }
+
+    if (currentProjectileCount > lastProjectileCount) {
+        if (biggieShotChannel == -1 || !Mix_Playing(biggieShotChannel)) {
+            biggieShotChannel = Mix_PlayChannel(-1, pView->biggieShot, currentProjectileCount - 1);  // Loop while projectiles exist
+        }
+    } 
+    else if(currentProjectileCount <= lastProjectileCount) {
+        if (biggieShotChannel != -1 && Mix_Playing(biggieShotChannel)) {
+            Mix_HaltChannel(biggieShotChannel);
+            biggieShotChannel = -1;
         }
     }
 }
@@ -196,7 +233,10 @@ void renderPlayers(Client aClient, ClientView *pView) {
         pView->PlayerPos[i] = (SDL_Point){.x = playerRect.x, .y = playerRect.y};
 
         int shootAnimationOffset = 0;
-        if(NET_clientIsShooting(aClient, i)) shootAnimationOffset = 3;
+        if(NET_clientIsShooting(aClient, i)) {
+            shootAnimationOffset = 3; 
+           
+        }
         
         SDL_Rect src;
         switch(NET_clientGetPlayerAnimation(aClient, i)) {

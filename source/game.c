@@ -20,7 +20,7 @@ void gameLoop(Client aClient, ClientControl *pControl, ClientView *pView){
     pView->currentMusic = MUSIC_NONE;
 
     int volume = 128; // 0 - 128
-    Mix_VolumeMusic(volume);
+    Mix_VolumeMusic(volume-50);
     Mix_Volume(-1, volume);
 
     Menu menu = initMenu(pView->pRend, pView, aClient);

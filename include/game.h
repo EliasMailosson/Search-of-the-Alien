@@ -63,10 +63,11 @@ typedef struct {
 
     Mix_Music *backgroundMusic1;
     Mix_Music *backgroundMusicNEMUR;
-
     MusicTrack currentMusic;
 
-    //Sound *sound;
+    Mix_Chunk *blueShot;
+    Mix_Chunk *biggieShot;
+
 
 }ClientView; 
 
