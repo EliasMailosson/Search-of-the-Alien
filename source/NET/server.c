@@ -526,7 +526,6 @@ bool enemyAttackPlayer(Server aServer, int index, SDL_Rect enemyHitbox){
 
 void NET_serverUpdateEnemies(Server aServer, Enemies aEnemies, ServerMap aMap){
     int enemyCount = (int)NET_enemiesGetSize(aEnemies);
-    int damage = 5;
     if (enemyCount >= 0){
         for (int i = 0; i < enemyCount; i++) {
             float closestDist = INT_MAX;
@@ -535,6 +534,7 @@ void NET_serverUpdateEnemies(Server aServer, Enemies aEnemies, ServerMap aMap){
             SDL_Point enemyPos = enemyGetPoint(aEnemies, i);
 
             for (int j = 0; j < aServer->clientCount; j++) {
+                if(aServer->clients[j].State == LOBBY || aServer->clients[j].State == MENU) continue;
                 SDL_Rect playerHitbox = aServer->clients[j].player.hitBox;
                 int dx = playerHitbox.x - enemyPos.x;
                 int dy = playerHitbox.y - enemyPos.y;
@@ -554,7 +554,7 @@ void NET_serverUpdateEnemies(Server aServer, Enemies aEnemies, ServerMap aMap){
                     aServer->clients[closestPlayerIndex].player.hitBox.y
                 };
                 Uint32 currentTime = SDL_GetTicks(); 
-                if(currentTime > enemyGetAttackTime(aEnemies, i) + 1000 && aServer->clients[closestPlayerIndex].State == NEMUR){
+                if(currentTime > enemyGetAttackTime(aEnemies, i) + 1000){
                     if(enemyAttackPlayer(aServer, closestPlayerIndex, enemyHitbox)){
                         NET_serverSendPlayerPacket(aServer, aServer->clients[closestPlayerIndex].State);
                     }
@@ -570,9 +570,8 @@ void NET_serverUpdateEnemies(Server aServer, Enemies aEnemies, ServerMap aMap){
                     .w = PROJECTILEWIDTH,
                     .h = PROJECTILEWIDTH
                 };
-               
                 if (enemyColitino(projectileRect, enemyHitbox)){
-                    enemyDamaged(aEnemies, damage, i, &enemyCount);
+                    enemyDamaged(aEnemies, aServer->clients[aServer->projList[j].srcPlayerIdx].player.weapon.damage, i, &enemyCount);
                     NET_projectileKill(aServer, &aServer->projList[j], j);
                 }
             }
