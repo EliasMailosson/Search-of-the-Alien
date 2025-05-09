@@ -20,7 +20,7 @@ typedef struct enemies {
 	size_t size;
 	size_t capacity;
 }enemies;
-
+    
 Enemies NET_enemiesCreate(void){
 	Enemies aEnemies =  malloc(sizeof(*aEnemies));
 	if(aEnemies == NULL){

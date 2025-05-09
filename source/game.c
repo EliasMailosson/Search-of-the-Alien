@@ -15,13 +15,9 @@ static void renderLobby(ClientView *pView, Map aMap, Client aClient, TerminalHub
 static void planetFullscreenToggle(Client aClient, ClientControl *pControl, ClientView *pView, Map aMap, int *pDelay, PauseMenu *pPauseMenu);
 
 void gameLoop(Client aClient, ClientControl *pControl, ClientView *pView){
-    NET_clientConnect(aClient);
+    NET_clientConnect(aClient);    
 
-    pView->currentMusic = MUSIC_NONE;
-
-    int volume = 128; // 0 - 128
-    Mix_VolumeMusic(volume-50);
-    Mix_Volume(-1, volume);
+    SOUND_setVolume(10, 128);
 
     Menu menu = initMenu(pView->pRend, pView, aClient);
 
@@ -118,7 +114,7 @@ void runMenu(Client aClient, ClientControl *pControl, ClientView *pView, Menu *p
     static int toggleDelay = 0;
     toggleDelay++;
 
-    playMusicIfChanged(pView->backgroundMusic1, MUSIC_MENU, &pView->currentMusic);
+    SOUND_playMusicIfChanged(pView->pSound, MUSIC_MENU);
 
     if(pControl->keys[SDL_SCANCODE_F] && toggleDelay > 12) {
         toggleFullscreen(pView);
@@ -190,8 +186,6 @@ static void renderLobby(ClientView *pView, Map aMap, Client aClient, TerminalHub
 
     MAP_MapNewRender(pView->pRend, aMap, pView->pWin);
 
-    
-    
     renderPlayers(aClient, pView);
     hudRender(aClient, pView->aHud,pView->pRend, pView->windowWidth, pView->windowHeight);
 
@@ -300,7 +294,7 @@ void runPlanet(Client aClient, ClientControl *pControl, ClientView *pView, Map a
     SDL_Point lastPosition[MAX_CLIENTS];
     SDL_Point playerPos;
 
-    playMusicIfChanged(pView->backgroundMusicNEMUR, MUSIC_NEMUR, &pView->currentMusic);
+    SOUND_playMusicIfChanged(pView->pSound, MUSIC_NEMUR);
 
     enableMouseTexture(pView->crosshair);
     updatePositioning(aClient, lastPosition, &playerPos, selfIndex);
@@ -332,11 +326,3 @@ void runPlanet(Client aClient, ClientControl *pControl, ClientView *pView, Map a
     
     renderPlanet(pView,aMap,aClient,pPauseMenu);
 }
-
-// void playMusicIfChanged(Mix_Music *newMusic, MusicTrack newTrack, MusicTrack *currentTrack) {
-//     if (*currentTrack != newTrack) {
-//         Mix_HaltMusic();
-//         Mix_PlayMusic(newMusic, -1);
-//         *currentTrack = newTrack;
-//     }
-// }

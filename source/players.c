@@ -27,40 +27,19 @@ void sortByYaxis(Client aClient, int playerCount, int indices[]){
     }
 }
 
-/*bool canPlaySound(Uint32 *lastPlayedTime, Uint32 timeMs){
-    Uint32 now = SDL_GetTicks();
-    if (now - *lastPlayedTime >= timeMs) {
-        *lastPlayedTime = now;
-        return true;
-    }
-    return false;
-}*/
-
 void renderProjectiles(Client aClient, ClientView *pView) {
     Proj projList[MAX_CLIENT_PROJ];
     NET_clientGetProjList(aClient, projList);
-    static Uint32 lastShotSoundTime = 0;
-
-    bool isAnyProjectileActive = false;
-    static int biggieShotChannel = -1;
-    static int lastProjectileCount = 0;
-
-    static Uint32 lastProjectileHash = 0;
-
 
     int centerX = pView->windowWidth/2;
     int centerY = pView->windowHeight/2;
-
     
     float scale = (float)pView->playerRenderSize / RENDER_SIZE;
 
-    int currentProjectileCount = 0;
     for(int i = 0; i < MAX_CLIENT_PROJ; i++) {
-        if(projList[i].textureIdx != PROJ_TEX_NONE) {
-            //isAnyProjectileActive = true;
-
-            currentProjectileCount++;
-
+        bool isActive = (projList[i].textureIdx != PROJ_TEX_NONE);
+        SOUND_projectileSoundOnce(pView->pSound, (int)projList[i].textureIdx, i, isActive);
+        if(isActive) {
             int screenX = (int)roundf(centerX - (float)projList[i].x * scale);
             int screenY = (int)roundf(centerY - (float)projList[i].y * scale);
             double angleDegrees = (projList[i].angle / 255.0) * 360;
@@ -71,24 +50,9 @@ void renderProjectiles(Client aClient, ClientView *pView) {
                 .w = 20,
                 .h = 20
             };
-            // if (!isChunkPlaying(pView->biggieShot)) {
-            //     Mix_PlayChannel(-1, pView->biggieShot, -1);
-            // }
             SDL_RenderCopyEx(pView->pRend, pView->projectileTexture[projList[i].textureIdx], NULL, &projRect, angleDegrees, NULL, SDL_FLIP_NONE);
             // SDL_SetRenderDrawColor(pView->pRend, 255, 255, 0, 255);
             // SDL_RenderFillRect(pView->pRend, &projRect);
-        }
-    }
-
-    if (currentProjectileCount > lastProjectileCount) {
-        if (biggieShotChannel == -1 || !Mix_Playing(biggieShotChannel)) {
-            biggieShotChannel = Mix_PlayChannel(-1, pView->biggieShot, currentProjectileCount - 1);  // Loop while projectiles exist
-        }
-    } 
-    else if(currentProjectileCount <= lastProjectileCount) {
-        if (biggieShotChannel != -1 && Mix_Playing(biggieShotChannel)) {
-            Mix_HaltChannel(biggieShotChannel);
-            biggieShotChannel = -1;
         }
     }
 }
@@ -145,6 +109,10 @@ void renderPlayers(Client aClient, ClientView *pView) {
     int centerX = pView->windowWidth/2;
     int centerY = pView->windowHeight/2;
     int renderSizeHalf = pView->playerRenderSize/2;
+
+    // sound related
+    static int runningChannels[MAX_CLIENTS] = { -1 };
+    static bool runningFlags[MAX_CLIENTS] = { false };
 
     int sortedIndex[playerCount];
 
@@ -237,14 +205,17 @@ void renderPlayers(Client aClient, ClientView *pView) {
             shootAnimationOffset = 3; 
            
         }
-        
+
+        int currentState = NET_clientGetClientState(aClient, i); // using state for footsteps
         SDL_Rect src;
         switch(NET_clientGetPlayerAnimation(aClient, i)) {
             case ANIMATION_IDLE:
                 src = (SDL_Rect){((frame/2)%24)*SPRITE_SIZE, (direction+8)*SPRITE_SIZE, SPRITE_SIZE, SPRITE_SIZE};
+                SOUND_playLoopIfRunning(pView->pSound, i, false, runningChannels, runningFlags, currentState);
                 break;
             case ANIMATION_RUNNING:
                 src = (SDL_Rect){((frame/2)%24)*SPRITE_SIZE, direction*SPRITE_SIZE, SPRITE_SIZE, SPRITE_SIZE};
+                SOUND_playLoopIfRunning(pView->pSound, i, true, runningChannels, runningFlags, currentState);
                 break;
             default:
                 src = (SDL_Rect){((frame/2)%24)*SPRITE_SIZE, direction*SPRITE_SIZE, SPRITE_SIZE, SPRITE_SIZE};

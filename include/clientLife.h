@@ -5,7 +5,7 @@
 void startClient(Client *aClient, ClientView *pView, ClientControl *pControl);
 
 void RenderPlayerName(Client aClient, ClientView *pView, int i, SDL_Rect playerRect);
-void killClient(Client *aClient, ClientView *pView);
+void killClient(Client *aClient, ClientView *pViewaSound);
 
 
 #endif

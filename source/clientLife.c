@@ -88,6 +88,7 @@ void startClient(Client *aClient, ClientView *pView,ClientControl *pControl){
     pView->vignetteTexture = SDL_CreateTextureFromSurface(pView->pRend, surface13);
     SDL_FreeSurface(surface13);
 
+    /*
     // MUSIC
     Mix_Music *backgroundMusic1 = Mix_LoadMUS("assets/music/space-whisper-long.mp3");
     pView->backgroundMusic1 = backgroundMusic1;
@@ -100,6 +101,15 @@ void startClient(Client *aClient, ClientView *pView,ClientControl *pControl){
     pView->blueShot = blueShot;
     Mix_Chunk *biggieShot = Mix_LoadWAV("assets/sound/biggieShotShort.wav");
     pView->biggieShot = biggieShot;
+
+    // MENU SOUND FX
+    Mix_Chunk *hoverSound = Mix_LoadWAV("assets/sound/hoverSound.wav");
+
+    Mix_Chunk *confirmSound = Mix_LoadWAV("assets/sound/confirmSound.wav");
+    */
+
+    pView->pSound = SOUND_create();
+
 
     pView->crosshair = createScaledCursor("assets/images/cursor/crosshair.png", 50, 50, 25, 25);
 
@@ -162,11 +172,14 @@ SDL_Cursor* createScaledCursor(const char *filePath, int newWidth, int newHeight
 }
 
 void killClient(Client *aClient, ClientView *pView){
-    Mix_FreeChunk(pView->biggieShot);
+    /*Mix_FreeChunk(pView->biggieShot);
     Mix_FreeChunk(pView->blueShot);
     Mix_FreeMusic(pView->backgroundMusicNEMUR);
     Mix_FreeMusic(pView->backgroundMusic1);
-    SDL_FreeCursor(pView->crosshair);
+    SDL_FreeCursor(pView->crosshair);*/
+
+    SOUND_destroy(pView->pSound);
+
     for(int i = 0; i < MAX_PLAYER_CHARACTERS; i++) {
         SDL_DestroyTexture(pView->playerTexture[i]);
         pView->playerTexture[i] = NULL;
