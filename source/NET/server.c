@@ -191,7 +191,7 @@ void* enemies_threads(void *arg){
 
             if(aServer->clients[i].State != MENU && 
             aServer->clients[i].State != LOBBY &&
-            (int)SDL_GetTicks() >= 5000+previousTime -(aServer->scenario.spawnFrequency*100) && 
+            (int)SDL_GetTicks() >= 2000+previousTime -(aServer->scenario.spawnFrequency*100) && 
             (int)NET_enemiesGetSize(aServer->aEnemies) <= MAX_ENEMIES_CLIENT_SIDE)// temporery
             {
                 previousTime = SDL_GetTicks();
@@ -201,18 +201,20 @@ void* enemies_threads(void *arg){
                 int otherCount = 0;
                 
                 for (int j = 0; j < aServer->clientCount; j++) {
-                    if (j != i && aServer->clients[j].State == 3) {
-                        otherZones[otherCount++] = NET_getEnemySpawnZone(NET_serverGetPlayerHitbox(aServer, j), 2);
+                    // if (j != i && aServer->clients[j].State == 3) {
+                    if(j == i){
+                        continue;
                     }
+                    otherZones[otherCount++] = NET_getEnemySpawnZone(NET_serverGetPlayerHitbox(aServer, j), 2);
                 }
+
                 int spawnX, spawnY;
                 bool found = NET_findEnemySpawnPoint(aServer->aServerMap, spawnZone, otherZones, otherCount, &spawnX, &spawnY);
                 
                 if (found)
                 {
                     NET_enemiesPush(aServer->aEnemies,NET_enemyCreate(spawnX,spawnY,LIGHT_ENEMY,aServer->scenario.difficulty));
-                }
-                printf("PlayerPos: x=%d y=%d | SpawnZone: x=%d y=%d w=%d h=%d\n", aServer->clients[i].player.hitBox.x, aServer->clients[i].player.hitBox.y,spawnZone.x, spawnZone.y, spawnZone.w, spawnZone.h);             
+                }             
             }
         }
 

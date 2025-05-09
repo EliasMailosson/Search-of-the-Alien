@@ -84,70 +84,45 @@ bool NET_findEnemySpawnPoint(ServerMap aMap, SDL_Rect spawnZone, SDL_Rect *other
     const int maxAttempts = 100;
 
     for (int attempt = 0; attempt < maxAttempts; attempt++) {
-        int side = rand() % 4;
-        int tileX = -1, tileY = -1;
+    int side = rand() % 4; 
 
-        SDL_Rect sideRect;
+        SDL_Point spawnpoint;
 
         switch (side) {
             case 0: // Toppen
-                sideRect = (SDL_Rect){ spawnZone.x, spawnZone.y, spawnZone.w, 1 };
+                spawnpoint.x = spawnZone.x + (rand() % spawnZone.w);
+                spawnpoint.y = spawnZone.y;
                 break;
             case 1: // Botten
-                sideRect = (SDL_Rect){ spawnZone.x, spawnZone.y + spawnZone.h - 1, spawnZone.w, 1 };
+                spawnpoint.x = spawnZone.x + (rand() % spawnZone.w);
+                spawnpoint.y = spawnZone.y + spawnZone.h - 1;
                 break;
             case 2: // Vänster
-                sideRect = (SDL_Rect){ spawnZone.x, spawnZone.y, 1, spawnZone.h };
+                spawnpoint.x = spawnZone.x;
+                spawnpoint.y = spawnZone.y + (rand() % spawnZone.h);
                 break;
             case 3: // Höger
-                sideRect = (SDL_Rect){ spawnZone.x + spawnZone.w - 1, spawnZone.y, 1, spawnZone.h };
+                spawnpoint.x = spawnZone.x + spawnZone.w - 1;
+                spawnpoint.y = spawnZone.y + (rand() % spawnZone.h);
                 break;
         }
 
-        //Kontrollera överlappning med andra spelares spawnzoner
+        // Kontrollera överlappning
         bool overlaps = false;
         for (int i = 0; i < otherZoneCount; i++) {
-            if (SDL_HasIntersection(&sideRect, &otherZones[i])) {
+            if (SDL_PointInRect(&spawnpoint, &otherZones[i])) {
                 overlaps = true;
                 break;
             }
         }
 
-        if (overlaps)
-            continue;
+        if (overlaps) continue;
 
-        // Väljer en slumpmässig punkt
-        switch (side) {
-            case 0: // Toppen
-                tileX = sideRect.x + (rand() % sideRect.w);
-                tileY = sideRect.y;
-                break;
-            case 1: // Botten
-                tileX = sideRect.x + (rand() % sideRect.w);
-                tileY = sideRect.y;
-                break;
-            case 2: // Vänster
-                tileX = sideRect.x;
-                tileY = sideRect.y + (rand() % sideRect.h);
-                break;
-            case 3: // Höger
-                tileX = sideRect.x + sideRect.w - 1;
-                tileY = sideRect.y + (rand() % sideRect.h);
-                break;
-        }
-		// int mapTileX = tileX / TILE_SIZE;
-		// int mapTileY = tileY / TILE_SIZE;
-
-        // Kontroll: karta inom bounds och tile inte -1
-        if (tileX >= 0 && tileY >= 0 && tileX < MAP_WIDTH && tileY < MAP_HEIGHT) {
-            if (aMap->MapTileId[tileY][tileX] != -1) {
-				printf("  Checking tile (%d,%d) and tileId: %d\n", tileX, tileY, aMap->MapTileId[tileY][tileX]);
-                *outX = tileX;
-                *outY = tileY;
-                return true;
-            }
-        }
+        *outX = spawnpoint.x;
+        *outY = spawnpoint.y;
+        return true;
     }
+
     return false;
 }
 
