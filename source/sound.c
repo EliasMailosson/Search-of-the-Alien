@@ -153,7 +153,7 @@ void SOUND_projectileSoundOnce(Sound aSound, int projectileType, int projIndex, 
             case 1:
                 fx = aSound->biggieShot[biggieShotIndex];
                 biggieShotIndex = (biggieShotIndex + 1) % 16;  // Cycle 0–15
-                printf("%d\n", biggieShotIndex);
+                //printf("%d\n", biggieShotIndex);
                 break;
             case 3:
                 fx = aSound->blueShot;
