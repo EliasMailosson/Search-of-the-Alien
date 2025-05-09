@@ -6,6 +6,8 @@
 struct scenC{
     ScenarioState state;
     SDL_Point objectivePoint; 
+    int Wave;
+    int killCount;
 };
 struct WeaponStats {
     int type;
@@ -304,7 +306,6 @@ void NET_clientReceiver(Client aClient, Map aMap,SDL_Window *pScreen){
                 int w = 0,h = 0;
                 SDL_GetWindowSize(pScreen,&w,&h);
                 MAP_MapRefresh(aMap,w,h);
-                
                 break;
             case NEW_SEED:
                 aClient->seed = SDLNet_Read32(NET_packetGetPayload(aPacket));
@@ -323,6 +324,12 @@ void NET_clientReceiver(Client aClient, Map aMap,SDL_Window *pScreen){
                 break;
             case PAUSE_MENU_CONFIRM:
                 aClient->showPauseMenu = !aClient->showPauseMenu;
+                break;
+            case GET_WAVE:
+                aClient->scenario.Wave = SDLNet_Read32(NET_packetGetPayload(aPacket));
+                break;
+            case KILLCOUNT:
+                aClient->scenario.killCount = SDLNet_Read32(NET_packetGetPayload(aPacket));
                 break;
             default:
                 printf("client recieved invalid msgType: %d!!\n", NET_packetGetMessageType(aPacket));
