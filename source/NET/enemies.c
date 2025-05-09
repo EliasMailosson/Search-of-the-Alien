@@ -61,7 +61,7 @@ Enemy NET_enemiesPopAt(Enemies aE, size_t index){
 }
 
 SDL_Rect NET_getEnemySpawnZone(SDL_Rect playerRect, int tile) {
-    
+    tile = 1;
 	SDL_Rect zone;
     int paddingPixels = tile * TILE_SIZE; //hur många "tile" bort, TILE_SIZE konverterar det till en pixel mått
 
@@ -70,7 +70,7 @@ SDL_Rect NET_getEnemySpawnZone(SDL_Rect playerRect, int tile) {
     zone.w = playerRect.w + 2 * paddingPixels;
     zone.h = playerRect.h + 2 * paddingPixels;
 
-	printf("SpawnZone around player: x=%d y=%d w=%d h=%d\n", zone.x, zone.y, zone.w, zone.h);
+	// printf("SpawnZone around player: x=%d y=%d w=%d h=%d\n", zone.x, zone.y, zone.w, zone.h);
 
     return zone;
 }

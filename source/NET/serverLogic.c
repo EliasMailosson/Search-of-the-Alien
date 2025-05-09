@@ -64,7 +64,7 @@ void MAP_ScreenToTile(ServerMap aServerMap, int screenX, int screenY, int *outTi
     *outTileY = ty;
 }
 
-bool NET_serverFindSpawnTile(ServerMap aServerMap, int *freekoordX, int *freekoordY) { //kan användas för att generera random objekt i en viss radius av koordinat
+bool NET_serverSpawnForObj(ServerMap aServerMap, int *freekoordX, int *freekoordY) {
     const int maxAttempts = 100;
 
     for (int attempt = 0; attempt < maxAttempts; attempt++) {
@@ -129,7 +129,6 @@ bool NET_findEnemySpawnPoint(ServerMap aMap, SDL_Rect spawnZone, SDL_Rect *other
 bool MAP_TileNotWalkable(ServerMap aServerMap, int screenX, int screenY) {
     int tileX, tileY;
     MAP_ScreenToTile(aServerMap, screenX, screenY, &tileX, &tileY);
-    // printf("tileY: %d, tileX: %d ,tileID:%d\n", tileY, tileX, aServerMap->MapTileId[tileX][tileY]);
     if (aServerMap->MapTileId[tileY][tileX] == 0){
         return true;
     }

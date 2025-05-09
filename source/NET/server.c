@@ -177,6 +177,7 @@ int main(int argc, char **argv ){
     return 0;
 }
 
+// sizeOfSpawnZone är arean på rekten
 void* enemies_threads(void *arg){
     Server aServer = (Server)arg;
     int previousTime = (int)SDL_GetTicks();
@@ -186,7 +187,7 @@ void* enemies_threads(void *arg){
         int should_stop = stop;
         mutex_unlock(&stop_mutex);
         if(should_stop) break;
-        int sizeOfSpawnZone;
+        int sizeOfSpawnZone=6;
         for (int i = 0; i < aServer->clientCount; i++){
 
             if(aServer->clients[i].State != MENU && 
@@ -196,12 +197,11 @@ void* enemies_threads(void *arg){
             {
                 previousTime = SDL_GetTicks();
 
-                SDL_Rect spawnZone = NET_getEnemySpawnZone(aServer->clients[i].player.hitBox, sizeOfSpawnZone); // sizeOfSpawnZone är radius på rekten som är redan +9 tiles bort från spelaren
+                SDL_Rect spawnZone = NET_getEnemySpawnZone(aServer->clients[i].player.hitBox, sizeOfSpawnZone);
                 SDL_Rect otherZones[MAX_CLIENTS];
                 int otherCount = 0;
                 
                 for (int j = 0; j < aServer->clientCount; j++) {
-                    // if (j != i && aServer->clients[j].State == 3) {
                     if(j == i){
                         continue;
                     }
