@@ -377,7 +377,7 @@ void NET_serverScenarioCheckForVictory(Server aServer){
             }
         break;
         default:
-            printf("Not a Scenario\n");
+            //printf("Not a Scenario\n");
         break;
     }
     //printf("kill count\n %d",aServer->scenario.totalKilldEnemise);
@@ -624,7 +624,7 @@ void NET_serverForceGameStateChange(Server aServer, GameState state, int index){
     case AURANTIC:
         break;
     default:
-        printf("do not support thet State\n");
+        //printf("do not support thet State\n");
         break;
     }
 }
