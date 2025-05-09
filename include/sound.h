@@ -1,7 +1,7 @@
 #ifndef SOUND_H
 #define SOUND_H
 
-#define MAX_SOUND_CHANNELS 16
+#define MAX_SOUND_CHANNELS 32
 
 typedef enum {
     MUSIC_NONE,
@@ -19,6 +19,9 @@ typedef struct sound{
     Mix_Chunk *biggieShot[16];
     Mix_Chunk *cleoShot;
 
+    Mix_Chunk *biggieShotLoop;
+
+    Mix_Chunk *dashSound;
 
     Mix_Chunk *lobbySteps;
     Mix_Chunk *nemurSteps;
@@ -46,7 +49,11 @@ bool SOUND_isChunkPlaying(Sound aSound, Mix_Chunk *chunk);
 
 // void SOUND_projectileSound(int *channel, Mix_Chunk *soundFX, int currentProjectileCount, int lastProjectileCount);
 
+void SOUND_biggieLoopControl(Sound aSound, Proj *projList, int currentBiggieCount);
+
 void SOUND_projectileSoundOnce(Sound aSound, int projectileType, int projIndex, bool isActive);
+
+void SOUND_playDash(Sound aSound);
 
 void SOUND_playLoopIfRunning(Sound aSound, int playerIndex, bool isRunning, int *channelArray, bool *playingArray, GameState state);
 

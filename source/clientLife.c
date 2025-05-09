@@ -23,7 +23,7 @@ void startClient(Client *aClient, ClientView *pView,ClientControl *pControl){
 
     SDL_Init(SDL_INIT_AUDIO);
     Mix_OpenAudio(44100, MIX_DEFAULT_FORMAT, 2, 2048);
-    Mix_AllocateChannels(16);
+    Mix_AllocateChannels(MAX_SOUND_CHANNELS);
 
     pView->pWin = SDL_CreateWindow("main",SDL_WINDOWPOS_CENTERED,SDL_WINDOWPOS_CENTERED,pView->windowWidth,pView->windowHeight,0);
     if (!pView->pWin) {
@@ -108,7 +108,7 @@ void startClient(Client *aClient, ClientView *pView,ClientControl *pControl){
     Mix_Chunk *confirmSound = Mix_LoadWAV("assets/sound/confirmSound.wav");
     */
 
-    pView->pSound = SOUND_create();
+    pView->aSound = SOUND_create();
 
 
     pView->crosshair = createScaledCursor("assets/images/cursor/crosshair.png", 50, 50, 25, 25);
@@ -178,7 +178,7 @@ void killClient(Client *aClient, ClientView *pView){
     Mix_FreeMusic(pView->backgroundMusic1);
     SDL_FreeCursor(pView->crosshair);*/
 
-    SOUND_destroy(pView->pSound);
+    SOUND_destroy(pView->aSound);
 
     for(int i = 0; i < MAX_PLAYER_CHARACTERS; i++) {
         SDL_DestroyTexture(pView->playerTexture[i]);

@@ -20,12 +20,18 @@ Sound SOUND_create(void) {
     aSound->musicNEMUR = musicNEMUR;
 
     // SOUND FX
+    Mix_Chunk *dashSound = Mix_LoadWAV("assets/sound/dashSound.wav");
+    aSound->dashSound = dashSound;
+
     Mix_Chunk *blueShot = Mix_LoadWAV("assets/sound/blueShot.mp3");
     aSound->blueShot = blueShot;
     //Mix_Chunk *biggieShot = Mix_LoadWAV("assets/sound/biggieShotShort.wav");
     //aSound->biggieShot = biggieShot;
     Mix_Chunk *cleoShot = Mix_LoadWAV("assets/sound/cleoShot.wav");
     aSound->cleoShot = cleoShot;
+
+    Mix_Chunk * biggieShotLoop = Mix_LoadWAV("assets/sound/biggieShot2step.wav");
+    aSound->biggieShotLoop = biggieShotLoop;
 
     Mix_Chunk *biggieShot[16];
     for (int i = 0; i < 16; i++) {
@@ -59,11 +65,13 @@ void SOUND_destroy(Sound aSound) {
     Mix_FreeMusic(aSound->musicMENU);
     Mix_FreeMusic(aSound->musicNEMUR);
     Mix_FreeChunk(aSound->blueShot);
+    Mix_FreeChunk(aSound->biggieShotLoop);
     
     for (int i = 0; i < 16; i++)
     {
         Mix_FreeChunk(aSound->biggieShot[i]);
     }
+    Mix_FreeChunk(aSound->dashSound);
     
     Mix_FreeChunk(aSound->cleoShot);
     Mix_FreeChunk(aSound->confirmSound);
@@ -137,9 +145,31 @@ bool SOUND_isChunkPlaying(Sound aSound, Mix_Chunk *chunk) {
     }
 }*/
 
+void SOUND_biggieLoopControl(Sound aSound, Proj *projList, int currentBiggieCount) {
+    static bool biggiePlaying = false;
+    static int biggieChannel = -1;
+    static int lastBiggieCount = 0;
+
+
+    // Start loop if new biggie projectiles appeared
+    if (currentBiggieCount > lastBiggieCount && !biggiePlaying) {
+        biggieChannel = Mix_PlayChannel(-1, aSound->biggieShotLoop, -1);
+        biggiePlaying = true;
+    }
+
+    // Stop loop if all biggie projectiles are gone
+    if (currentBiggieCount < lastBiggieCount - 6 && biggiePlaying || currentBiggieCount == 0 && biggiePlaying ) {
+        Mix_HaltChannel(biggieChannel);
+        biggieChannel = -1;
+        biggiePlaying = false;
+    }
+
+    lastBiggieCount = currentBiggieCount;
+}
+
+
 void SOUND_projectileSoundOnce(Sound aSound, int projectileType, int projIndex, bool isActive) {
     static bool played[MAX_CLIENT_PROJ] = { false };
-    static int biggieShotIndex = 0;  // Shared index for cycling
 
     if (!isActive) {
         played[projIndex] = false;  // Reset flag when projectile slot is empty
@@ -151,9 +181,7 @@ void SOUND_projectileSoundOnce(Sound aSound, int projectileType, int projIndex, 
 
         switch (projectileType) {
             case 1:
-                fx = aSound->biggieShot[biggieShotIndex];
-                biggieShotIndex = (biggieShotIndex + 1) % 16;  // Cycle 0–15
-                //printf("%d\n", biggieShotIndex);
+                
                 break;
             case 3:
                 fx = aSound->blueShot;
@@ -165,10 +193,24 @@ void SOUND_projectileSoundOnce(Sound aSound, int projectileType, int projIndex, 
                 return;
         }
 
-        if (fx) {
+        if (fx && projectileType != 1) {
             Mix_PlayChannel(-1, fx, 0);
             played[projIndex] = true;
         }
+        else if (fx){
+
+        }
+    }
+}
+
+void SOUND_playDash(Sound aSound) {
+    static Uint32 lastPlayedTime = 0;
+    Uint32 now = SDL_GetTicks();
+
+    if (aSound->dashSound && (now - lastPlayedTime >= 4000)) {  // 5000 ms = 5 seconds
+        Mix_VolumeChunk(aSound->dashSound, 64);
+        Mix_PlayChannel(-1, aSound->dashSound, 0);
+        lastPlayedTime = now;
     }
 }
 
@@ -184,7 +226,7 @@ void SOUND_playLoopIfRunning(Sound aSound, int playerIndex, bool isRunning, int 
     
     if (isRunning) {
         if (!playingArray[playerIndex]) {
-            Mix_VolumeChunk(steps, 64);
+            Mix_VolumeChunk(steps, 32);
             channelArray[playerIndex] = Mix_PlayChannel(-1, steps, -1);  // Loop
             playingArray[playerIndex] = true;
         }

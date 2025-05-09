@@ -36,9 +36,13 @@ void renderProjectiles(Client aClient, ClientView *pView) {
     
     float scale = (float)pView->playerRenderSize / RENDER_SIZE;
 
+    int currentBiggieCount = 0;
     for(int i = 0; i < MAX_CLIENT_PROJ; i++) {
         bool isActive = (projList[i].textureIdx != PROJ_TEX_NONE);
-        SOUND_projectileSoundOnce(pView->pSound, (int)projList[i].textureIdx, i, isActive);
+        if (projList[i].textureIdx == PROJ_TEX_BULLET) {
+            currentBiggieCount++;
+        }
+        SOUND_projectileSoundOnce(pView->aSound, (int)projList[i].textureIdx, i, isActive);
         if(isActive) {
             int screenX = (int)roundf(centerX - (float)projList[i].x * scale);
             int screenY = (int)roundf(centerY - (float)projList[i].y * scale);
@@ -55,6 +59,7 @@ void renderProjectiles(Client aClient, ClientView *pView) {
             // SDL_RenderFillRect(pView->pRend, &projRect);
         }
     }
+    SOUND_biggieLoopControl(pView->aSound, projList, currentBiggieCount);
 }
 
 void renderEnemy(Client aClient, ClientView *pView) {
@@ -211,11 +216,11 @@ void renderPlayers(Client aClient, ClientView *pView) {
         switch(NET_clientGetPlayerAnimation(aClient, i)) {
             case ANIMATION_IDLE:
                 src = (SDL_Rect){((frame/2)%24)*SPRITE_SIZE, (direction+8)*SPRITE_SIZE, SPRITE_SIZE, SPRITE_SIZE};
-                SOUND_playLoopIfRunning(pView->pSound, i, false, runningChannels, runningFlags, currentState);
+                SOUND_playLoopIfRunning(pView->aSound, i, false, runningChannels, runningFlags, currentState);
                 break;
             case ANIMATION_RUNNING:
                 src = (SDL_Rect){((frame/2)%24)*SPRITE_SIZE, direction*SPRITE_SIZE, SPRITE_SIZE, SPRITE_SIZE};
-                SOUND_playLoopIfRunning(pView->pSound, i, true, runningChannels, runningFlags, currentState);
+                SOUND_playLoopIfRunning(pView->aSound, i, true, runningChannels, runningFlags, currentState);
                 break;
             default:
                 src = (SDL_Rect){((frame/2)%24)*SPRITE_SIZE, direction*SPRITE_SIZE, SPRITE_SIZE, SPRITE_SIZE};

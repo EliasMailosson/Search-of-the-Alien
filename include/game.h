@@ -68,7 +68,7 @@ typedef struct {
     Mix_Chunk *blueShot;
     Mix_Chunk *biggieShot;
 
-    Sound pSound;
+    Sound aSound;
 
 }ClientView; 
 
