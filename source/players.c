@@ -71,18 +71,21 @@ void sortEntities(Client aClient, int *count, Entity *outputEntityList, EntityCo
 
         n++;
     }
-    for(int i = 0; i < NET_clientGetEnemiesCount(aClient); i++) {
-        outputEntityList[n].instance = NET_clientGetEnemy(aClient, i);
-        outputEntityList[n].type = ENTITY_ENEMY;
+    if(NET_clientGetState(aClient) == NEMUR) {
+        for(int i = 0; i < NET_clientGetEnemiesCount(aClient); i++) {
+            outputEntityList[n].instance = NET_clientGetEnemy(aClient, i);
+            outputEntityList[n].type = ENTITY_ENEMY;
 
-        ClientEnemy enemy = *((ClientEnemy*)outputEntityList[n].instance);
-        int screenX = (int)roundf(context.centerX - (float)enemy.pos.x * context.scale);
-        int screenY = (int)roundf(context.centerY - (float)enemy.pos.y * context.scale);
-        outputEntityList[n].screenX = (int)(screenX - context.renderSizeHalf / 2);
-        outputEntityList[n].screenY = (int)(screenY - context.renderSizeHalf / 2);
+            ClientEnemy enemy = *((ClientEnemy*)outputEntityList[n].instance);
+            int screenX = (int)roundf(context.centerX - (float)enemy.pos.x * context.scale);
+            int screenY = (int)roundf(context.centerY - (float)enemy.pos.y * context.scale);
+            outputEntityList[n].screenX = (int)(screenX - context.renderSizeHalf / 2);
+            outputEntityList[n].screenY = (int)(screenY - context.renderSizeHalf / 2);
 
-        n++;
+            n++;
+        }
     }
+    
     *count = n;
 
     qsort(outputEntityList, n, sizeof(Entity), cmpYPos);
