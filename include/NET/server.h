@@ -53,7 +53,7 @@ bool enemyAttackPlayer(Server aServer, int index, SDL_Rect enemyHitbox);
 void NET_serverUpdateEnemies(Server aServer, Enemies aEnemies, ServerMap aMap);
 void NET_serverSendEnemiesPacket(Server aServer, GameState GS, Enemies aEnemies);
 void NET_serverScenarioCheckForVictory(Server aServer);
-void NET_serverEnemiesSpawnInterval(Server aServer,int *previousTime);
+void NET_serverEnemiesSpawnInterval(Server aServer);
 
 
 //server util

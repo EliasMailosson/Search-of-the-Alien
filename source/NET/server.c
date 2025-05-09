@@ -41,6 +41,7 @@ struct User{
     Player player;
     int colorIndex;
     bool isHubVisible;
+    int spawnTimer;
 };
 
 struct server {
@@ -65,6 +66,7 @@ void* projektil_threads(void *arg);
 void* enemies_threads(void *arg);
 
 int stop = 0;
+mutex_t clients_mutex;
 mutex_t stop_mutex;
 thread_t projThread; 
 thread_t enemyThread;
@@ -89,6 +91,7 @@ int main(int argc, char **argv ){
     }
     
     mutex_init(&stop_mutex);
+    mutex_init(&clients_mutex);
     thread_create(&projThread, projektil_threads,aServer);
     thread_create(&enemyThread,enemies_threads,aServer);
 
@@ -107,7 +110,9 @@ int main(int argc, char **argv ){
                 } 
                 switch (NET_packetGetMessageType(aPacket)){
                 case CONNECT:
+                    mutex_lock(&clients_mutex);
                     NET_serverClientConnected(aPacket, aServer);
+                    mutex_unlock(&clients_mutex);
                     NET_serverSendPlayerPacket(aServer,-1);
                     break;
                 case DISCONNECT:
@@ -170,6 +175,7 @@ int main(int argc, char **argv ){
     thread_join(projThread);
     thread_join(enemyThread);
     mutex_destroy(&stop_mutex);
+    mutex_destroy(&clients_mutex);
 
     NET_enemiesDestroy(aServer->aEnemies);
 
@@ -180,17 +186,15 @@ int main(int argc, char **argv ){
 
 void* enemies_threads(void *arg){
     Server aServer = (Server)arg;
-    int previousTime = (int)SDL_GetTicks();
-    // for (int i = 0; i < 20; i++){
-    //     NET_enemiesPush(aServer->aEnemies,NET_enemyCreate(10+10*i,10+10*i,LIGHT_ENEMY));
-    // }
     while (1){
         mutex_lock(&stop_mutex);
         int should_stop = stop;
         mutex_unlock(&stop_mutex);
         if(should_stop) break;
-        NET_serverEnemiesSpawnInterval(aServer,&previousTime);
+        mutex_lock(&clients_mutex);
+        NET_serverEnemiesSpawnInterval(aServer);
         NET_serverUpdateEnemies(aServer, aServer->aEnemies,aServer->aServerMap);
+        mutex_unlock(&clients_mutex);
         sleep_ms(10);
     }
     printf("Enemise thread exiting. id: %lu\n",(unsigned long)thread_self());
@@ -214,20 +218,19 @@ void* projektil_threads(void *arg){
     return NULL;
 }
 
-void NET_serverEnemiesSpawnInterval(Server aServer,int *previousTime){
+void NET_serverEnemiesSpawnInterval(Server aServer){
     if(aServer->scenario.victory) return;
     switch (aServer->scenario.scenario){
     case ELIMINATIONS:
         for (int i = 0; i < aServer->clientCount; i++){
-        if(aServer->clients[i].State != MENU && 
-        aServer->clients[i].State != LOBBY &&
-        (int)SDL_GetTicks() >= 5000+(*previousTime) -(aServer->scenario.spawnFrequency*100) && 
-        (int)NET_enemiesGetSize(aServer->aEnemies) < MAX_ENEMIES_CLIENT_SIDE)
-        {
-            //printf("enemy count %d\n",(int)NET_enemiesGetSize(aServer->aEnemies));
-            (*previousTime) = SDL_GetTicks();
-            NET_enemiesPush(aServer->aEnemies,NET_enemyCreate(50,50,LIGHT_ENEMY,aServer->scenario.difficulty));
-        }
+            if(aServer->clients[i].State != MENU && 
+            aServer->clients[i].State != LOBBY &&
+            (int)SDL_GetTicks() >= 5000+(aServer->clients[i].spawnTimer) -(aServer->scenario.spawnFrequency*100) && 
+            (int)NET_enemiesGetSize(aServer->aEnemies) < MAX_ENEMIES_CLIENT_SIDE)
+            {
+                aServer->clients[i].spawnTimer = (int)SDL_GetTicks();
+                NET_enemiesPush(aServer->aEnemies,NET_enemyCreate(50,50,LIGHT_ENEMY,aServer->scenario.difficulty));
+            }
         }
         break;
     case WAVE:
@@ -242,12 +245,12 @@ void NET_serverEnemiesSpawnInterval(Server aServer,int *previousTime){
         }
         break;
     case PATH:
-        for (int i = 0; i < aServer->clients; i++){
+        for (int i = 0; i < aServer->clientCount; i++){
             if(aServer->clients[i].State != MENU && aServer->clients[i].State != LOBBY && 
-            (int)SDL_GetTicks() >= 5000+(*previousTime) -(aServer->scenario.spawnFrequency*100) && 
+            (int)SDL_GetTicks() >= 5000+(aServer->clients[i].spawnTimer) -(aServer->scenario.spawnFrequency*100) && 
             (int)NET_enemiesGetSize(aServer->aEnemies) < MAX_ENEMIES_CLIENT_SIDE)
             {
-                (*previousTime) = SDL_GetTicks();
+                aServer->clients[i].spawnTimer = (int)SDL_GetTicks();
                 NET_enemiesPush(aServer->aEnemies,NET_enemyCreate(50,50,LIGHT_ENEMY,aServer->scenario.difficulty));
             }
         }
@@ -546,22 +549,22 @@ void NET_serverUpdatePlayer(Server aServer, Packet aPacket, GameState state){
     int character = aServer->clients[playerIdx].player.character = pip.selecterPlayerCharacter;
     switch(character) {
         case CHARACTER_BLUEFACE:
-        aServer->clients[playerIdx].player.weapon.damage = 4;
+        aServer->clients[playerIdx].player.weapon.damage = 20;
         aServer->clients[playerIdx].player.weapon.projFreq = 30;
         aServer->clients[playerIdx].player.weapon.projSpeed = 14;
         aServer->clients[playerIdx].player.weapon.projType = PROJ_TEX_NEON_LASER;
         break;
 
         case CHARACTER_BIGGIE:
-        aServer->clients[playerIdx].player.weapon.damage = 1;
+        aServer->clients[playerIdx].player.weapon.damage = 2;
         aServer->clients[playerIdx].player.weapon.projFreq = 2;
         aServer->clients[playerIdx].player.weapon.projSpeed = 20;
         aServer->clients[playerIdx].player.weapon.projType = PROJ_TEX_BULLET;
         break;
 
         case CHARACTER_CLEOPATRA:
-        aServer->clients[playerIdx].player.weapon.damage = 10;
-        aServer->clients[playerIdx].player.weapon.projFreq = 40;
+        aServer->clients[playerIdx].player.weapon.damage = 50;
+        aServer->clients[playerIdx].player.weapon.projFreq = 60;
         aServer->clients[playerIdx].player.weapon.projSpeed = 5;
         aServer->clients[playerIdx].player.weapon.projType = PROJ_TEX_PURPLE_LASER;
         break;
@@ -890,6 +893,7 @@ void NET_serverClientConnected(Packet aPacket, Server aServer){
     newUser.State = MENU;
     newUser.colorIndex = NET_serverAssignColorIndex(aServer);
     newUser.isHubVisible = false;
+    newUser.spawnTimer = 0;
     NET_serverAddUser(aServer, newUser);
     NET_serverSendInt(aServer, GLOBAL, CONNECT_RESPONSE, 0, aServer->clientCount - 1);
     printf("username: %s connected to server\n", aServer->clients[aServer->clientCount - 1].username);
