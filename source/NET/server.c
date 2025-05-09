@@ -318,7 +318,7 @@ void NET_serverSetNewMap(Server aServer){
     NET_serverMapSetEdgesToZero(aServer->aServerMap);
     NET_serverSendInt(aServer,GLOBAL,NEW_SEED,(int)NET_serverMapGetSeed(aServer->aServerMap),indexIP);
     printf("%u\n",NET_serverMapGetSeed(aServer->aServerMap));
-    aServer->scenario.scenario =1; //((int)NET_serverMapGetSeed(aServer->aServerMap) % SCENARIO_COUNT);
+    aServer->scenario.scenario = ((int)NET_serverMapGetSeed(aServer->aServerMap) % SCENARIO_COUNT);
     printf("scnareo %d\n",aServer->scenario.scenario);
     NET_serverScenarioUpdate(&aServer->scenario,aServer->scenario.scenario,NET_serverMapGetSeed(aServer->aServerMap));
     NET_enemiesClear(aServer->aEnemies);
