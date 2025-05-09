@@ -586,7 +586,13 @@ void NET_serverUpdatePlayer(Server aServer, Packet aPacket, GameState state){
 }
 
 bool enemyAttackPlayer(Server aServer, int index, SDL_Rect enemyHitbox){
-    if(!SDL_HasIntersection(&aServer->clients[index].player.hitBox, &enemyHitbox)){
+    SDL_Rect tmp = {
+        .x =(enemyHitbox.x - 25), 
+        .y = (enemyHitbox.y - 25),
+        .h = (enemyHitbox.h * 2),
+        .w = (enemyHitbox.w * 2),
+    };
+    if(!SDL_HasIntersection(&aServer->clients[index].player.hitBox, &tmp)){
         return false;
     }
     aServer->clients[index].player.HP -= 10;
