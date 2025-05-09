@@ -42,7 +42,12 @@ int NET_enemiesPush(Enemies aE, Enemy new){
         aE->capacity = new_cap;
     }
     aE->enemyList[aE->size++] = new;
+    //printf("new count e %d\n",(int)aE->size);
     return 0;
+}
+
+void NET_enemiesClear(Enemies aEnemies){
+    aEnemies->size = 0;
 }
 
 Enemy NET_enemiesPopAt(Enemies aE, size_t index){
@@ -254,7 +259,7 @@ size_t NET_enemiesGetSize(Enemies aEnemies){
 
 int enemyDamaged(Enemies aEnemies, int damage, int index, int *pEnemyCount){
     aEnemies->enemyList[index]->HP.currentHP -= damage;
-    printf("%f\n", aEnemies->enemyList[index]->HP.currentHP);
+    //printf("%f\n", aEnemies->enemyList[index]->HP.currentHP);
 
     if (aEnemies->enemyList[index]->HP.currentHP <= 0) {
         //printf("Enemy %d killed\n", index);

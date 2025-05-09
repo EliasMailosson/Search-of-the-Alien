@@ -7,6 +7,7 @@ struct Scenario{
     int difficulty;
     ScenarioState scenario;
     int totalKilldEnemise;
+    int waveCount;
     bool victory;
 };
 
@@ -188,17 +189,7 @@ void* enemies_threads(void *arg){
         int should_stop = stop;
         mutex_unlock(&stop_mutex);
         if(should_stop) break;
-        for (int i = 0; i < aServer->clientCount; i++){
-            if(aServer->clients[i].State != MENU && 
-            aServer->clients[i].State != LOBBY &&
-            (int)SDL_GetTicks() >= 2000+previousTime -(aServer->scenario.spawnFrequency*100) && 
-            (int)NET_enemiesGetSize(aServer->aEnemies) < MAX_ENEMIES_CLIENT_SIDE)// temporery
-            {
-                //printf("enemy count %d\n",(int)NET_enemiesGetSize(aServer->aEnemies));
-                previousTime = SDL_GetTicks();
-                NET_enemiesPush(aServer->aEnemies,NET_enemyCreate(50,50,LIGHT_ENEMY,aServer->scenario.difficulty));
-            }
-        }
+        NET_serverEnemiesSpawnInterval(aServer,&previousTime);
         NET_serverUpdateEnemies(aServer, aServer->aEnemies,aServer->aServerMap);
         sleep_ms(10);
     }
@@ -221,6 +212,49 @@ void* projektil_threads(void *arg){
     }
     printf("Projectile thread exiting. id: %lu\n",(unsigned long)thread_self());
     return NULL;
+}
+
+void NET_serverEnemiesSpawnInterval(Server aServer,int *previousTime){
+    if(aServer->scenario.victory) return;
+    switch (aServer->scenario.scenario){
+    case ELIMINATIONS:
+        for (int i = 0; i < aServer->clientCount; i++){
+        if(aServer->clients[i].State != MENU && 
+        aServer->clients[i].State != LOBBY &&
+        (int)SDL_GetTicks() >= 5000+(*previousTime) -(aServer->scenario.spawnFrequency*100) && 
+        (int)NET_enemiesGetSize(aServer->aEnemies) < MAX_ENEMIES_CLIENT_SIDE)
+        {
+            //printf("enemy count %d\n",(int)NET_enemiesGetSize(aServer->aEnemies));
+            (*previousTime) = SDL_GetTicks();
+            NET_enemiesPush(aServer->aEnemies,NET_enemyCreate(50,50,LIGHT_ENEMY,aServer->scenario.difficulty));
+        }
+        }
+        break;
+    case WAVE:
+        if((int)NET_enemiesGetSize(aServer->aEnemies) == 0){
+            aServer->scenario.waveCount ++;
+            for (int i = 0; i < aServer->clientCount; i++){
+                if(aServer->clients[i].State == MENU || aServer->clients[i].State == LOBBY) continue;
+                for (int i = 0; i < aServer->scenario.waveCount * 2; i++){
+                    NET_enemiesPush(aServer->aEnemies,NET_enemyCreate(50,50,LIGHT_ENEMY,aServer->scenario.difficulty));
+                }
+            }
+        }
+        break;
+    case PATH:
+        for (int i = 0; i < aServer->clients; i++){
+            if(aServer->clients[i].State != MENU && aServer->clients[i].State != LOBBY && 
+            (int)SDL_GetTicks() >= 5000+(*previousTime) -(aServer->scenario.spawnFrequency*100) && 
+            (int)NET_enemiesGetSize(aServer->aEnemies) < MAX_ENEMIES_CLIENT_SIDE)
+            {
+                (*previousTime) = SDL_GetTicks();
+                NET_enemiesPush(aServer->aEnemies,NET_enemyCreate(50,50,LIGHT_ENEMY,aServer->scenario.difficulty));
+            }
+        }
+        break;
+    default:
+        break;
+    }
 }
 
 void NET_serverSendEnemiesPacket(Server aServer, GameState GS, Enemies aEnemies){
@@ -284,13 +318,16 @@ void NET_serverSetNewMap(Server aServer){
     NET_serverMapSetEdgesToZero(aServer->aServerMap);
     NET_serverSendInt(aServer,GLOBAL,NEW_SEED,(int)NET_serverMapGetSeed(aServer->aServerMap),indexIP);
     printf("%u\n",NET_serverMapGetSeed(aServer->aServerMap));
-    aServer->scenario.scenario = ((int)NET_serverMapGetSeed(aServer->aServerMap) % SCENARIO_COUNT);
+    aServer->scenario.scenario =1; //((int)NET_serverMapGetSeed(aServer->aServerMap) % SCENARIO_COUNT);
+    printf("scnareo %d\n",aServer->scenario.scenario);
     NET_serverScenarioUpdate(&aServer->scenario,aServer->scenario.scenario,NET_serverMapGetSeed(aServer->aServerMap));
+    NET_enemiesClear(aServer->aEnemies);
 }
 
 void NET_serverScenarioUpdate(Scenario *s, ScenarioState state, uint32_t seed){
     s->totalKilldEnemise = 0;
     s->victory = false;
+    s->waveCount = 0;
     switch (state){
     case ELIMINATIONS:
         s->difficulty = 1;
