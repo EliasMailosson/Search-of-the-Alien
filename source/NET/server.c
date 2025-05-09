@@ -186,17 +186,17 @@ void* enemies_threads(void *arg){
         int should_stop = stop;
         mutex_unlock(&stop_mutex);
         if(should_stop) break;
-
+        int sizeOfSpawnZone;
         for (int i = 0; i < aServer->clientCount; i++){
 
             if(aServer->clients[i].State != MENU && 
             aServer->clients[i].State != LOBBY &&
-            (int)SDL_GetTicks() >= 2000+previousTime -(aServer->scenario.spawnFrequency*100) && 
+            (int)SDL_GetTicks() >= 5000+previousTime -(aServer->scenario.spawnFrequency*100) && 
             (int)NET_enemiesGetSize(aServer->aEnemies) <= MAX_ENEMIES_CLIENT_SIDE)// temporery
             {
                 previousTime = SDL_GetTicks();
 
-                SDL_Rect spawnZone = NET_getEnemySpawnZone(aServer->clients[i].player.hitBox, 2); 
+                SDL_Rect spawnZone = NET_getEnemySpawnZone(aServer->clients[i].player.hitBox, sizeOfSpawnZone); // sizeOfSpawnZone är radius på rekten som är redan +9 tiles bort från spelaren
                 SDL_Rect otherZones[MAX_CLIENTS];
                 int otherCount = 0;
                 
@@ -205,7 +205,7 @@ void* enemies_threads(void *arg){
                     if(j == i){
                         continue;
                     }
-                    otherZones[otherCount++] = NET_getEnemySpawnZone(NET_serverGetPlayerHitbox(aServer, j), 2);
+                    otherZones[otherCount++] = NET_getEnemySpawnZone(NET_serverGetPlayerHitbox(aServer, j), sizeOfSpawnZone);
                 }
 
                 int spawnX, spawnY;
