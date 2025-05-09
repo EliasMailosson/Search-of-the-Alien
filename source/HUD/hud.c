@@ -166,6 +166,8 @@ void updateHudPlayerList(Client aClient, Hud aHud, SDL_Renderer *pRend, int wind
         UI_labelRefreshTexture(pRend, aHud->playerList.usernames[i]);
     }
     aHud->playerList.count = newCount;
+
+    updateHudObjectives(aHud, pRend, windowW, windowH);
 }
 
 void updateHudObjectives(Hud aHud, SDL_Renderer *pRend, int windowW, int windowH) {
@@ -174,7 +176,8 @@ void updateHudObjectives(Hud aHud, SDL_Renderer *pRend, int windowW, int windowH
     for (int i = 0; i < OBJECTIVECOUNT; i++) {
         aHud->objectives[i].textColor = (SDL_Color){.r = 0, .g = 0, .b = 0, .a = 0};
         UI_labelSetAppearance(pRend, aHud->objectives[i].objectiveLabel, aHud->objectives->x, (20 + 8*40) + i*40, aHud->objectives->textColor, aHud->objectives->pFont);
-        UI_labelSetText(aHud->objectives[i].objectiveLabel)
+        UI_labelSetText(aHud->objectives[i].objectiveLabel, "hej");
+        UI_labelRefreshTexture(pRend, aHud->objectives[i].objectiveLabel);
     }
 }
 
