@@ -82,9 +82,13 @@ void SOUND_destroy(Sound aSound) {
     free(aSound);
 }
 
+
 void SOUND_setVolume(int music, int soundFX){
-    Mix_VolumeMusic(music);
-    Mix_Volume(-1, soundFX);
+    float m = roundf(music * 1.28f);
+    float s = roundf(soundFX   * 1.28f);
+
+    Mix_VolumeMusic(m);
+    Mix_Volume(-1, s);
 }
 
 static Mix_Music *newMusic(Sound aSound, MusicTrack newTrack){
@@ -103,6 +107,25 @@ static Mix_Music *newMusic(Sound aSound, MusicTrack newTrack){
         break;
     }
     return NULL;
+}
+
+void SOUND_setMixVolume(Sound aSound){
+    
+    Mix_VolumeChunk(aSound->blueShot, 64);
+    Mix_VolumeChunk(aSound->biggieShotLoop, 128);
+    
+    for (int i = 0; i < 16; i++)
+    {
+        Mix_VolumeChunk(aSound->biggieShot[i], 128);
+    }
+    Mix_VolumeChunk(aSound->dashSound, 24);
+    
+    Mix_VolumeChunk(aSound->cleoShot, 128);
+    Mix_VolumeChunk(aSound->confirmSound, 64);
+    Mix_VolumeChunk(aSound->hoverSound, 64);
+    Mix_VolumeChunk(aSound->lobbySteps, 24);
+    Mix_VolumeChunk(aSound->nemurSteps, 24);
+
 }
 
 void SOUND_playMusicIfChanged(Sound aSound, MusicTrack newTrack){
@@ -145,7 +168,7 @@ bool SOUND_isChunkPlaying(Sound aSound, Mix_Chunk *chunk) {
     }
 }*/
 
-void SOUND_biggieLoopControl(Sound aSound, Proj *projList, int currentBiggieCount) {
+/*void SOUND_biggieLoopControl(Sound aSound, Proj *projList, int currentBiggieCount) {
     static bool biggiePlaying = false;
     static int biggieChannel = -1;
     static int lastBiggieCount = 0;
@@ -165,7 +188,7 @@ void SOUND_biggieLoopControl(Sound aSound, Proj *projList, int currentBiggieCoun
     }
 
     lastBiggieCount = currentBiggieCount;
-}
+}*/
 
 
 void SOUND_projectileSoundOnce(Sound aSound, int projectileType, int projIndex, bool isActive) {
@@ -208,14 +231,14 @@ void SOUND_playDash(Sound aSound) {
     Uint32 now = SDL_GetTicks();
 
     if (aSound->dashSound && (now - lastPlayedTime >= 4000)) {  // 5000 ms = 5 seconds
-        Mix_VolumeChunk(aSound->dashSound, 64);
+        //Mix_VolumeChunk(aSound->dashSound, 64);
         Mix_PlayChannel(-1, aSound->dashSound, 0);
         lastPlayedTime = now;
     }
 }
 
 
-void SOUND_playLoopIfRunning(Sound aSound, int playerIndex, bool isRunning, int *channelArray, bool *playingArray, GameState state) {
+void SOUND_playLoopIfRunning(Sound aSound, int playerIndex, bool isRunning, int *channelArray, bool *playingArray, int state) {
     Mix_Chunk *steps = NULL;
     if(state == LOBBY){
         steps = aSound->lobbySteps;
@@ -226,7 +249,7 @@ void SOUND_playLoopIfRunning(Sound aSound, int playerIndex, bool isRunning, int 
     
     if (isRunning) {
         if (!playingArray[playerIndex]) {
-            Mix_VolumeChunk(steps, 32);
+            // Mix_VolumeChunk(steps, 32);
             channelArray[playerIndex] = Mix_PlayChannel(-1, steps, -1);  // Loop
             playingArray[playerIndex] = true;
         }
@@ -237,4 +260,19 @@ void SOUND_playLoopIfRunning(Sound aSound, int playerIndex, bool isRunning, int 
             playingArray[playerIndex] = false;
         }
     }
+}
+
+void SOUND_UIhoverSound(Sound aSound, bool isHover){
+    static bool wasHovered = false;
+
+    if (isHover && !wasHovered){
+        //Mix_VolumeChunk(aSound->hoverSound, 64);
+        Mix_PlayChannel(-1, aSound->hoverSound, 0);
+    }
+    wasHovered = isHover;
+}
+
+void SOUND_UIclickSound(Sound aSound) {
+    //Mix_VolumeChunk(aSound->hoverSound, 1);
+    Mix_PlayChannel(-1, aSound->confirmSound, 0);
 }

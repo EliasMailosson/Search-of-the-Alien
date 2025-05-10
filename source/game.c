@@ -17,7 +17,8 @@ static void planetFullscreenToggle(Client aClient, ClientControl *pControl, Clie
 void gameLoop(Client aClient, ClientControl *pControl, ClientView *pView){
     NET_clientConnect(aClient);    
 
-    SOUND_setVolume(10, 128);
+    SOUND_setVolume(8, 64);
+    SOUND_setMixVolume(pView->aSound);
 
     Menu menu = initMenu(pView->pRend, pView, aClient);
 
@@ -129,7 +130,7 @@ void runMenu(Client aClient, ClientControl *pControl, ClientView *pView, Menu *p
     //     UI_FriendNameToggle(pMenu->friendList, pControl->mousePos.x, pControl->mousePos.y);
     // }    
     
-    updateMenu(pMenu, pControl, aClient);
+    updateMenu(pMenu, pControl, aClient, pView->aSound);
     if (pMenu->isGameStarted) {
         updateHudPlayerList(aClient, pView->aHud, pView->pRend, pView->windowWidth, pView->windowHeight);
         NET_clientSendInt(aClient, MENU, CHANGE_GAME_STATE, LOBBY);

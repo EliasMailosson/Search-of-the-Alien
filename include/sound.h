@@ -1,6 +1,8 @@
 #ifndef SOUND_H
 #define SOUND_H
 
+#include <SDL_mixer.h>
+
 #define MAX_SOUND_CHANNELS 32
 
 typedef enum {
@@ -39,7 +41,24 @@ Sound SOUND_create(void);
 
 void SOUND_destroy(Sound aSound);
 
+/**
+ * Set Master Volume for Music and Sound Effects
+ *
+ * This function lets you set your game’s overall
+ * music and SFX volumes using a 0–100 range
+ * (where 0 = mute, 100 = full volume).
+ * 
+ * Example:  
+ * ```c
+ * SOUND_setVolume(75, 50);
+ * ```
+ * 
+ * \param music    Desired music volume (0 – 100)
+ * \param soundFX  Desired sound effects volume (0 – 100)
+ */
 void SOUND_setVolume(int music, int soundFX);
+
+void SOUND_setMixVolume(Sound aSound);
 
 void SOUND_playMusicIfChanged(Sound aSound , MusicTrack newTrack);
 
@@ -49,13 +68,16 @@ bool SOUND_isChunkPlaying(Sound aSound, Mix_Chunk *chunk);
 
 // void SOUND_projectileSound(int *channel, Mix_Chunk *soundFX, int currentProjectileCount, int lastProjectileCount);
 
-void SOUND_biggieLoopControl(Sound aSound, Proj *projList, int currentBiggieCount);
+// void SOUND_biggieLoopControl(Sound aSound, Proj *projList, int currentBiggieCount);
 
 void SOUND_projectileSoundOnce(Sound aSound, int projectileType, int projIndex, bool isActive);
 
 void SOUND_playDash(Sound aSound);
 
-void SOUND_playLoopIfRunning(Sound aSound, int playerIndex, bool isRunning, int *channelArray, bool *playingArray, GameState state);
+void SOUND_playLoopIfRunning(Sound aSound, int playerIndex, bool isRunning, int *channelArray, bool *playingArray, int state);
 
+void SOUND_UIhoverSound(Sound aSound, bool isHover);
+
+void SOUND_UIclickSound(Sound aSound);
 
 #endif

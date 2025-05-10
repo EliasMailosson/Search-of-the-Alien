@@ -59,7 +59,7 @@ void renderProjectiles(Client aClient, ClientView *pView) {
             // SDL_RenderFillRect(pView->pRend, &projRect);
         }
     }
-    SOUND_biggieLoopControl(pView->aSound, projList, currentBiggieCount);
+    //SOUND_biggieLoopControl(pView->aSound, projList, currentBiggieCount);
 }
 
 void renderEnemy(Client aClient, ClientView *pView) {
