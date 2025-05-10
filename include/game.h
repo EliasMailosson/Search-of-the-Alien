@@ -21,7 +21,7 @@
 #define MAX_PROJECTILE_TEXTURES 5
 
 typedef struct menu Menu;
-
+typedef struct enemies *Enemies;
 typedef struct {
     bool isVisible;
     Button button[MAX_BUTTONS_PAUSE_MENU];

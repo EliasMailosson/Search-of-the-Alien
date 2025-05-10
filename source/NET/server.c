@@ -184,8 +184,11 @@ int main(int argc, char **argv ){
     return 0;
 }
 
+// sizeOfSpawnZone är arean på rekten
 void* enemies_threads(void *arg){
     Server aServer = (Server)arg;
+    int previousTime = (int)SDL_GetTicks();
+
     while (1){
         mutex_lock(&stop_mutex);
         int should_stop = stop;
@@ -193,11 +196,42 @@ void* enemies_threads(void *arg){
         if(should_stop) break;
         mutex_lock(&clients_mutex);
         NET_serverEnemiesSpawnInterval(aServer);
+        int sizeOfSpawnZone=6;
+        for (int i = 0; i < aServer->clientCount; i++){
+
+            if(aServer->clients[i].State != MENU && 
+            aServer->clients[i].State != LOBBY &&
+            (int)SDL_GetTicks() >= 5000+previousTime -(aServer->scenario.spawnFrequency*100) && 
+            (int)NET_enemiesGetSize(aServer->aEnemies) <= MAX_ENEMIES_CLIENT_SIDE)// temporery
+            {
+                previousTime = SDL_GetTicks();
+
+                SDL_Rect spawnZone = NET_getEnemySpawnZone(aServer->clients[i].player.hitBox, sizeOfSpawnZone);
+                SDL_Rect otherZones[MAX_CLIENTS];
+                int otherCount = 0;
+                
+                for (int j = 0; j < aServer->clientCount; j++) {
+                    if(j == i){
+                        continue;
+                    }
+                    otherZones[otherCount++] = NET_getEnemySpawnZone(NET_serverGetPlayerHitbox(aServer, j), sizeOfSpawnZone);
+                }
+
+                int spawnX, spawnY;
+                bool found = NET_findEnemySpawnPoint(aServer->aServerMap, spawnZone, otherZones, otherCount, &spawnX, &spawnY);
+                
+                if (found)
+                {
+                    NET_enemiesPush(aServer->aEnemies,NET_enemyCreate(spawnX,spawnY,LIGHT_ENEMY,aServer->scenario.difficulty));
+                }             
+            }
+        }
+
         NET_serverUpdateEnemies(aServer, aServer->aEnemies,aServer->aServerMap);
         mutex_unlock(&clients_mutex);
         sleep_ms(10);
     }
-    printf("Enemise thread exiting. id: %lu\n",(unsigned long)thread_self());
+    // printf("Enemise thread exiting. id: %lu\n",(unsigned long)thread_self());
     return NULL;
 }
 
@@ -218,49 +252,12 @@ void* projektil_threads(void *arg){
     return NULL;
 }
 
-void NET_serverEnemiesSpawnInterval(Server aServer){
-    if(aServer->scenario.victory) return;
-    switch (aServer->scenario.scenario){
-    case ELIMINATIONS:
-        for (int i = 0; i < aServer->clientCount; i++){
-            if(aServer->clients[i].State != MENU && 
-            aServer->clients[i].State != LOBBY &&
-            (int)SDL_GetTicks() >= 5000+(aServer->clients[i].spawnTimer) -(aServer->scenario.spawnFrequency*100) && 
-            (int)NET_enemiesGetSize(aServer->aEnemies) < MAX_ENEMIES_CLIENT_SIDE)
-            {
-                aServer->clients[i].spawnTimer = (int)SDL_GetTicks();
-                NET_enemiesPush(aServer->aEnemies,NET_enemyCreate(50,50,LIGHT_ENEMY,aServer->scenario.difficulty));
-            }
-        }
-        break;
-    case WAVE:
-        if((int)NET_enemiesGetSize(aServer->aEnemies) == 0){
-            aServer->scenario.waveCount ++;
-            for (int i = 0; i < aServer->clientCount; i++){
-                if(aServer->clients[i].State == MENU || aServer->clients[i].State == LOBBY) continue;
-                for (int i = 0; i < aServer->scenario.waveCount * 2; i++){
-                    NET_enemiesPush(aServer->aEnemies,NET_enemyCreate(50,50,LIGHT_ENEMY,aServer->scenario.difficulty));
-                }
-            }
-        }
-        break;
-    case PATH:
-        for (int i = 0; i < aServer->clientCount; i++){
-            if(aServer->clients[i].State != MENU && aServer->clients[i].State != LOBBY && 
-            (int)SDL_GetTicks() >= 5000+(aServer->clients[i].spawnTimer) -(aServer->scenario.spawnFrequency*100) && 
-            (int)NET_enemiesGetSize(aServer->aEnemies) < MAX_ENEMIES_CLIENT_SIDE)
-            {
-                aServer->clients[i].spawnTimer = (int)SDL_GetTicks();
-                NET_enemiesPush(aServer->aEnemies,NET_enemyCreate(50,50,LIGHT_ENEMY,aServer->scenario.difficulty));
-            }
-        }
-        break;
-    default:
-        break;
-    }
-}
-
 void NET_serverSendEnemiesPacket(Server aServer, GameState GS, Enemies aEnemies){
+    if ((int)NET_enemiesGetSize(aEnemies) < 0 || (int)NET_enemiesGetSize(aEnemies) > MAX_ENEMIES_CLIENT_SIDE) {
+        fprintf(stderr, "Error: invalid pEnemyCount (%d)\n",(int)NET_enemiesGetSize(aEnemies));
+        return;
+    }
+
     EnemyPacket packet[MAX_ENEMIES_CLIENT_SIDE] = {0};
     SDL_Point pos;
     for (int i = 0; i <aServer->clientCount ; i++){
