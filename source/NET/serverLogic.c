@@ -1,7 +1,7 @@
 #include "../../include/NET/serverLogic.h"
 #include "../../include/NET/server.h"
 
-#define PROJ_DESPAWN_DISTANCE 10000
+#define PROJ_DESPAWN_DISTANCE 1000
 
 struct ServerMap
 {
@@ -233,7 +233,16 @@ void NET_projectilesUpdate(Server aServer, Projectile *list) {
         list[i].x += moveX;
         list[i].y += moveY;
 
-        if(abs(list[i].x) > PROJ_DESPAWN_DISTANCE || abs(list[i].y) > PROJ_DESPAWN_DISTANCE) {
+        int playerCount = NET_serverGetClientCount(aServer);
+        bool projIsWithinBounds = false;
+        for(int i = 0; i < playerCount; i++) {
+            SDL_Rect hitbox = NET_serverGetPlayerHitbox(aServer, i);
+            if(abs(list[i].x - hitbox.x) < PROJ_DESPAWN_DISTANCE && abs(list[i].y - hitbox.y) < PROJ_DESPAWN_DISTANCE) {
+                projIsWithinBounds = true;
+            }
+        }
+        
+        if(!projIsWithinBounds) {
             NET_projectileKill(aServer, list, i);
         }
     }
