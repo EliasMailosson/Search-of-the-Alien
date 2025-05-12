@@ -50,6 +50,9 @@ Sound SOUND_create(void) {
     Mix_Chunk *nemurSteps = Mix_LoadWAV("assets/sound/nemurFootsteps.wav");
     aSound->nemurSteps = nemurSteps;
 
+    Mix_Chunk *playerHit = Mix_LoadWAV("assets/sound/Vine Boom.wav");
+    aSound->playerHit = playerHit;
+
     // MENU SOUND FX
     Mix_Chunk *confirmSound = Mix_LoadWAV("assets/sound/confirmSound.wav");
     aSound->confirmSound = confirmSound;
@@ -79,6 +82,7 @@ void SOUND_destroy(Sound aSound) {
     Mix_FreeChunk(aSound->hoverSound);
     Mix_FreeChunk(aSound->lobbySteps);
     Mix_FreeChunk(aSound->nemurSteps);
+    Mix_FreeChunk(aSound->playerHit);
 
     free(aSound);
 }
@@ -127,6 +131,8 @@ void SOUND_setMixVolume(Sound aSound){
     Mix_VolumeChunk(aSound->hoverSound, 64);
     Mix_VolumeChunk(aSound->lobbySteps, 24);
     Mix_VolumeChunk(aSound->nemurSteps, 24);
+    Mix_VolumeChunk(aSound->playerHit, 128);
+
 
 }
 
@@ -274,4 +280,9 @@ void SOUND_UIhoverSound(Sound aSound, bool isHover){
 void SOUND_UIclickSound(Sound aSound) {
     //Mix_VolumeChunk(aSound->hoverSound, 1);
     Mix_PlayChannel(-1, aSound->confirmSound, 0);
+}
+
+void SOUND_playerIsHurt(Sound aSound) {
+    //Mix_VolumeChunk(aSound->hoverSound, 1);
+    Mix_PlayChannel(-1, aSound->playerHit, 0);
 }

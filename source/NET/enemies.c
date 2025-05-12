@@ -254,7 +254,7 @@ size_t NET_enemiesGetSize(Enemies aEnemies){
 
 void enemyDamaged(Enemies aEnemies, int damage, int index, int *pEnemyCount){
     aEnemies->enemyList[index]->HP.currentHP -= damage;
-    printf("%f\n", aEnemies->enemyList[index]->HP.currentHP);
+    // printf("%f\n", aEnemies->enemyList[index]->HP.currentHP);
 
     if (aEnemies->enemyList[index]->HP.currentHP <= 0) {
         printf("Enemy %d killed\n", index);

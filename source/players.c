@@ -241,6 +241,8 @@ void renderPlayers(Client aClient, ClientView *pView) {
 
         if (NET_clientIsPlayerDamaged(aClient, selfIndex)) {
             damageTime = SDL_GetTicks();
+            SOUND_playerIsHurt(pView->aSound);
+
         }
         if (SDL_GetTicks() - damageTime < 250) {
             SDL_RenderCopy(pView->pRend, pView->vignetteTexture, &vignetteRect, &screenRect);

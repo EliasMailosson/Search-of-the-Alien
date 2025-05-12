@@ -28,6 +28,8 @@ typedef struct sound{
     Mix_Chunk *lobbySteps;
     Mix_Chunk *nemurSteps;
 
+    Mix_Chunk *playerHit;
+
     Mix_Chunk *confirmSound;
     Mix_Chunk *hoverSound;
 
@@ -79,5 +81,7 @@ void SOUND_playLoopIfRunning(Sound aSound, int playerIndex, bool isRunning, int 
 void SOUND_UIhoverSound(Sound aSound, bool isHover);
 
 void SOUND_UIclickSound(Sound aSound);
+
+void SOUND_playerIsHurt(Sound aSound);
 
 #endif
