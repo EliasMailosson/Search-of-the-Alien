@@ -68,9 +68,9 @@ typedef struct {
 
 void eventHandler(ClientControl *pControl);
 void gameLoop(Client aClient, ClientControl *pControl, ClientView *pView);
-void runLobby(Client aClient, Map aMap, ClientControl *pControl, ClientView *pView, TerminalHub *pTerminalHub, PauseMenu *pPauseMenu);
-void runMenu(Client aClient, ClientControl *pControl, ClientView *pView, Menu *pMenu, Map aMap);
-void runPlanet(Client aClient, ClientControl *pControl, ClientView *pView, Map aMap, PauseMenu *pPauseMenu, Menu *pMenu);
+void runLobby(Client aClient, Map aMap, ClientControl *pControl, ClientView *pView, TerminalHub *pTerminalHub, PauseMenu *pPauseMenu, Menu *pMenu);
+void runMenu(Client aClient, ClientControl *pControl, ClientView *pView, Menu *pMenu,Map aMap, TerminalHub *pTerminalHub, PauseMenu *pPauseMenu);
+void runPlanet(Client aClient, ClientControl *pControl, ClientView *pView, Map aMap, PauseMenu *pPauseMenu, Menu *pMenu, TerminalHub *pTerminalHub);
 
 void toggleFullscreen(ClientView *pView);
 
