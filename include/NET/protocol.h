@@ -29,6 +29,7 @@ typedef struct PlayerPacket{
 
 typedef struct __attribute__((packed)) enemyPacket{
     int16_t x, y, direction;
+    uint8_t hp;
 }EnemyPacket;  
 
 void NET_protocolSendInt(UDPpacket *pUDPpkg,UDPsocket Socket,IPaddress IP,

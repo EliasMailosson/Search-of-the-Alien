@@ -19,6 +19,8 @@ typedef struct enemies {
 	Enemy *enemyList;
 	size_t size;
 	size_t capacity;
+    SDL_Rect *zones;
+    int zoneCount;
 }enemies;
 
 Enemies NET_enemiesCreate(void){
@@ -42,7 +44,12 @@ int NET_enemiesPush(Enemies aE, Enemy new){
         aE->capacity = new_cap;
     }
     aE->enemyList[aE->size++] = new;
+    //printf("new count e %d\n",(int)aE->size);
     return 0;
+}
+
+void NET_enemiesClear(Enemies aEnemies){
+    aEnemies->size = 0;
 }
 
 Enemy NET_enemiesPopAt(Enemies aE, size_t index){
@@ -56,6 +63,21 @@ Enemy NET_enemiesPopAt(Enemies aE, size_t index){
     aE->enemyList[aE->size - 1] = NULL;
     aE->size--;
     return popped;
+}
+
+SDL_Rect NET_getEnemySpawnZone(SDL_Rect playerRect, int tile) {
+    tile = 1;
+	SDL_Rect zone;
+    int paddingPixels = tile * TILE_SIZE; //hur många "tile" bort, TILE_SIZE konverterar det till en pixel mått
+
+    zone.x = playerRect.x - paddingPixels;
+    zone.y = playerRect.y - paddingPixels;
+    zone.w = playerRect.w + 2 * paddingPixels;
+    zone.h = playerRect.h + 2 * paddingPixels;
+
+	// printf("SpawnZone around player: x=%d y=%d w=%d h=%d\n", zone.x, zone.y, zone.w, zone.h);
+
+    return zone;
 }
 
 Enemy NET_enemyCreate(int pixelX, int pixelY, EnemyID id, const int difficulty){
@@ -252,12 +274,12 @@ size_t NET_enemiesGetSize(Enemies aEnemies){
 }
 
 
-void enemyDamaged(Enemies aEnemies, int damage, int index, int *pEnemyCount){
+int enemyDamaged(Enemies aEnemies, int damage, int index, int *pEnemyCount){
     aEnemies->enemyList[index]->HP.currentHP -= damage;
-    printf("%f\n", aEnemies->enemyList[index]->HP.currentHP);
+    //printf("%f\n", aEnemies->enemyList[index]->HP.currentHP);
 
     if (aEnemies->enemyList[index]->HP.currentHP <= 0) {
-        printf("Enemy %d killed\n", index);
+        //printf("Enemy %d killed\n", index);
 
         // Shift all enemies after the dead one down
         for (size_t i = index; i < aEnemies->size - 1; i++) {
@@ -271,7 +293,9 @@ void enemyDamaged(Enemies aEnemies, int damage, int index, int *pEnemyCount){
         if (pEnemyCount) {
             *pEnemyCount = aEnemies->size;
         }
+        return 1;
     }
+    return 0;
 }
 
 int enemyGetCount(Enemies aEnemies){
@@ -287,4 +311,38 @@ bool enemyColitino(SDL_Rect A,SDL_Rect B){
     }else{
         return false;
     }
+}
+
+float NET_enemiesCompute_dist(const Enemy e, SDL_Rect playerRect){
+    float ex = e->hitbox.x + e->hitbox.w * 0.5f;
+    float ey = e->hitbox.y + e->hitbox.h * 0.5f;
+
+    float px = playerRect.x + playerRect.w * 0.5f;
+    float py = playerRect.y + playerRect.h * 0.5f;
+    
+    float dx = fabsf(ex - px);
+    float dy = fabsf(ey - py);
+    return dx*dx + dy*dy;
+}
+
+int NET_enemiesCompEntries(const void *a, const void *b){
+    const SortEntry *A = a, *B = b;
+    if (A->dist < B->dist) return -1;
+    if (A->dist > B->dist) return 1;
+    return A->enemy->enemyID - B->enemy->enemyID;
+}
+
+SDL_Point NET_enemyGetPos(Enemy aEnemy){
+    return (SDL_Point){.x = aEnemy->hitbox.x, .y = aEnemy->hitbox.y};
+}
+
+int NET_enemyGetDirection(Enemy aEnemy){
+    return aEnemy->direction;
+}
+// int getEnemyHP(Enemies aEnemies, int index){
+//     return aEnemies->enemyList[index]->HP.currentHP;
+// }
+
+int getEnemyHP(Enemy aEnemy){
+    return aEnemy->HP.currentHP;
 }

@@ -16,9 +16,8 @@
 typedef struct Player Player;
 typedef struct Weapon Weapon;
 typedef struct Scenario Scenario;
-
+typedef struct enemies *Enemies;
 typedef struct User User;
-typedef struct enemies* Enemies;
 struct server;
 typedef struct server *Server;
 
@@ -52,6 +51,9 @@ int NET_serverGetProjectileSpeed(Server aServer, int playerIdx);
 bool enemyAttackPlayer(Server aServer, int index, SDL_Rect enemyHitbox);
 void NET_serverUpdateEnemies(Server aServer, Enemies aEnemies, ServerMap aMap);
 void NET_serverSendEnemiesPacket(Server aServer, GameState GS, Enemies aEnemies);
+void NET_serverScenarioCheckForVictory(Server aServer);
+void NET_serverEnemiesSpawnInterval(Server aServer);
+
 
 //server util
 int NET_serverFindPlayerID(Server aServer, const char* str);
@@ -63,6 +65,7 @@ float NET_serverGetPlayerAngle(Server aServer, int playerIdx);
 void NET_serverSetProjCount(Server aServer, int count);
 void NET_serverScenarioUpdate(Scenario *s, ScenarioState state, uint32_t seed);
 uint8_t NET_serverGetPercentage(int currentHP, int maxHP);
+void NET_serverForceGameStateChange(Server aServer, GameState state, int index);
 
 /** Freeing memory after use, for server */
 void NET_serverDestroy(Server aServer);

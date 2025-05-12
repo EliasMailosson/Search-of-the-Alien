@@ -1,13 +1,300 @@
 #include <stdio.h>
 #include <string.h>
 #include <math.h>
+#include <stdlib.h>
 #include "../include/players.h"
 #include "../include/NET/client.h"
 #include "../include/game.h"
 #include "../include/clientLife.h"
 
-#define SPRITE_SIZE 256
+#define MAX_ENTITIES (MAX_CLIENTS + MAX_ENEMIES_CLIENT_SIDE)
 #define RENDER_SIZE 128
+
+enum EntityType{ENTITY_ENEMY, ENTITY_PLAYER};
+
+typedef struct entity{
+    void *instance;
+    int type;
+    int screenX, screenY;
+}Entity;
+typedef struct entityContext {
+    Entity currentEntity;
+    int graphicsMode;
+    int spriteSize;
+    int frame;
+    int selfIndex;
+    SDL_Point selfPos;
+    int centerX;
+    int centerY;
+    int renderSizeHalf;
+    float scale;
+}EntityContext;
+
+int cmpYPos(const void* a, const void* b) {
+    Entity *ea = (Entity*)a;
+    Entity *eb = (Entity*)b;
+    int aY = ea->screenY;
+    int bY = eb->screenY;
+
+    if (aY < bY) return -1;
+    else if (aY > bY) return 1;
+    else return 0;
+}
+
+void sortEntities(Client aClient, int *count, Entity *outputEntityList, EntityContext context, ClientView *pView) {
+    int n = 0;
+    for(int i = 0; i < NET_clientGetPlayerCount(aClient); i++) {
+        if(NET_clientGetState(aClient) != NET_clientGetClientState(aClient, i)) {
+            continue;
+        }
+        outputEntityList[n].instance = NET_clientGetPlayer(aClient, i);
+        outputEntityList[n].type = ENTITY_PLAYER;
+
+        Player player = *((Player*)outputEntityList[n].instance);
+        player.pos.x -= context.renderSizeHalf;
+        player.pos.y -= pView->playerRenderSize;
+
+        int worldOffsetX = player.pos.x - context.selfPos.x;
+        int worldOffsetY = player.pos.y - context.selfPos.y;
+        float screenOffsetX = worldOffsetX * context.scale;
+        float screenOffsetY = worldOffsetY * context.scale;
+
+        if(NET_clientGetSelfIndex(aClient) == i) {
+            outputEntityList[n].screenX = context.centerX - context.renderSizeHalf;
+            outputEntityList[n].screenY = context.centerY - context.renderSizeHalf;
+        }
+        else {
+            outputEntityList[n].screenX = (int)(context.centerX + screenOffsetX - pView->playerRenderSize/6);
+            outputEntityList[n].screenY = (int)(context.centerY + screenOffsetY + pView->playerRenderSize/5);
+        }
+        pView->PlayerPos[i] = (SDL_Point){.x = outputEntityList[n].screenX, .y = outputEntityList[n].screenY};
+
+        n++;
+    }
+    if(NET_clientGetState(aClient) == NEMUR) {
+        for(int i = 0; i < NET_clientGetEnemiesCount(aClient); i++) {
+            outputEntityList[n].instance = NET_clientGetEnemy(aClient, i);
+            outputEntityList[n].type = ENTITY_ENEMY;
+
+            ClientEnemy enemy = *((ClientEnemy*)outputEntityList[n].instance);
+            int screenX = (int)roundf(context.centerX - (float)enemy.pos.x * context.scale);
+            int screenY = (int)roundf(context.centerY - (float)enemy.pos.y * context.scale);
+            outputEntityList[n].screenX = (int)(screenX - context.renderSizeHalf / 2);
+            outputEntityList[n].screenY = (int)(screenY - context.renderSizeHalf / 2);
+
+            n++;
+        }
+    }
+    
+    *count = n;
+
+    qsort(outputEntityList, n, sizeof(Entity), cmpYPos);
+}
+
+void renderPlayer(EntityContext context, ClientView *pView) {
+    Player player = *((Player*)context.currentEntity.instance);
+    SDL_Rect playerRect = {
+        .x = context.currentEntity.screenX,
+        .y = context.currentEntity.screenY,
+        .w = pView->playerRenderSize,
+        .h = pView->playerRenderSize
+    };
+
+    int shootAnimationOffset = 0;
+    if(player.isShooting) shootAnimationOffset = 3;
+    
+    int graphicsModePow2 = (int)pow(2, context.graphicsMode);
+    int currentPlayerFrame = ( (context.frame/graphicsModePow2) % (24/((int)pow(2, context.graphicsMode-1))) );
+
+    SDL_Rect src;
+    switch(player.currentPlayerAnimation) {
+        case ANIMATION_IDLE:
+            src = (SDL_Rect){currentPlayerFrame*context.spriteSize, (player.direction+8)*context.spriteSize, context.spriteSize, context.spriteSize};
+            break;
+        case ANIMATION_RUNNING:
+            src = (SDL_Rect){currentPlayerFrame*context.spriteSize, player.direction*context.spriteSize, context.spriteSize, context.spriteSize};
+            break;
+        default:
+            src = (SDL_Rect){currentPlayerFrame*context.spriteSize, player.direction*context.spriteSize, context.spriteSize, context.spriteSize};
+    }
+    
+    int playerCharacter = player.playerCharacter + shootAnimationOffset;
+    SDL_RenderCopy(pView->pRend, pView->playerTexture[playerCharacter], &src, &playerRect);
+    RenderPlayerName(pView, player, playerRect);
+}
+
+void renderEnemy(EntityContext context, ClientView *pView) {
+    ClientEnemy enemy = *((ClientEnemy*)context.currentEntity.instance);
+
+    if (enemy.direction < 0 || enemy.direction > 7) {
+        fprintf(stderr, "ERROR: Invalid direction: %d\n", enemy.direction);
+        enemy.direction = 0;
+    }
+
+    SDL_Rect enemyRect;
+    enemyRect = (SDL_Rect){
+            .x = context.currentEntity.screenX,
+            .y = context.currentEntity.screenY,
+            .w = pView->playerRenderSize / 2,
+            .h = pView->playerRenderSize / 2
+    };
+    SDL_Rect src;
+
+    int graphicsModePow2 = (int)pow(2, context.graphicsMode);
+    int currentFrame = ( (context.frame/graphicsModePow2) % (24/((int)pow(2, context.graphicsMode-1))) );
+    src = (SDL_Rect){currentFrame*context.spriteSize, enemy.direction*context.spriteSize, context.spriteSize, context.spriteSize};
+
+    SDL_RenderCopy(pView->pRend, pView->enemyTexture, &src, &enemyRect);
+
+    int enemyHealth = enemy.hpEnemy;
+    if(enemyHealth < 100){
+        SDL_SetRenderDrawColor(pView->pRend, 150, 150, 150, 180);
+        SDL_RenderFillRect(pView->pRend, &((SDL_Rect){enemyRect.x, enemyRect.y-20, 100 * 0.4, 4}));
+        SDL_SetRenderDrawColor(pView->pRend, 255, 0, 0, 180);
+        SDL_RenderFillRect(pView->pRend, &((SDL_Rect){enemyRect.x, enemyRect.y-20, enemyHealth * 0.4, 4}));
+    }
+}
+
+void renderShadows(EntityContext context, Entity *entityList, ClientView *pView, int count) {
+    for(int i = 0; i < count; i++) {
+        context.currentEntity = entityList[i];
+        SDL_Rect rect;
+        if(context.currentEntity.type == ENTITY_PLAYER) {
+            rect = (SDL_Rect){
+                .x = context.currentEntity.screenX,
+                .y = context.currentEntity.screenY + context.renderSizeHalf + context.renderSizeHalf/6,
+                .w = pView->playerRenderSize,
+                .h = context.renderSizeHalf
+            };
+        }
+        else if(context.currentEntity.type == ENTITY_ENEMY) {
+            rect = (SDL_Rect){
+                .x = context.currentEntity.screenX,
+                .y = context.currentEntity.screenY + context.renderSizeHalf*2/3,
+                .w = pView->playerRenderSize/2,
+                .h = context.renderSizeHalf/2
+            };
+        }
+        
+        SDL_RenderCopy(pView->pRend, pView->shadowTexture, NULL, &rect);
+    }
+}
+
+void renderEntities(Client aClient, ClientView *pView) {
+    Entity entityList[MAX_ENTITIES];
+    int count = 0;
+
+    EntityContext context;
+    context.graphicsMode = NET_clientGetGraphicsQuality(aClient);
+    context.spriteSize = 256/pow(2, context.graphicsMode-1);
+    static int frame = 0; frame++;
+    context.frame = frame;
+    int playerCount = NET_clientGetPlayerCount(aClient);
+    static Uint32 damageTime = 0;
+    context.selfIndex = NET_clientGetSelfIndex(aClient);
+    context.selfPos = NET_clientGetPlayerPos(aClient, context.selfIndex);
+    context.centerX = pView->windowWidth/2;
+    context.centerY = pView->windowHeight/2;
+    context.renderSizeHalf = pView->playerRenderSize/2;
+    context.scale = (float)pView->playerRenderSize / RENDER_SIZE;
+
+    sortEntities(aClient, &count, entityList, context, pView);
+    renderShadows(context, entityList, pView, count);
+    for(int i = 0; i < count; i++) {
+        context.currentEntity = entityList[i];
+        switch(entityList[i].type) {
+            case ENTITY_ENEMY:
+                renderEnemy(context, pView);
+                break;
+
+            case ENTITY_PLAYER:
+                renderPlayer(context, pView);
+                break;
+        }
+    }
+
+    SDL_Rect vignetteRect = {.x = 0, .y = 0, .w = 1920, .h = 1080};
+    SDL_Rect screenRect = {.x = 0, .y = 0, .w = pView->windowWidth, .h = pView->windowHeight};
+    if (NET_clientIsPlayerDamaged(aClient, context.selfIndex)) {
+        damageTime = SDL_GetTicks();
+    }
+    if (SDL_GetTicks() - damageTime < 250) {
+        SDL_RenderCopy(pView->pRend, pView->vignetteTexture, &vignetteRect, &screenRect);
+    }
+}
+
+PlayerInputPacket prepareInputArray(ClientControl *pControl, int windowWidth, int windowHeight) {
+    static bool mouseDown = false;
+    if(pControl->isMouseDown) {
+        mouseDown = true;
+    } else if(pControl->isMouseUp) {
+        mouseDown = false;
+    }
+    PlayerInputPacket pip = {
+        .mousePos = {
+            .x = pControl->mousePos.x  - (windowWidth / 2),
+            .y = pControl->mousePos.y - (windowHeight / 2)
+        },
+        .keys = {
+            pControl->keys[SDL_SCANCODE_W],
+            pControl->keys[SDL_SCANCODE_S],
+            pControl->keys[SDL_SCANCODE_D],
+            pControl->keys[SDL_SCANCODE_A],
+            pControl->keys[SDL_SCANCODE_E],
+            pControl->keys[SDL_SCANCODE_SPACE],
+            mouseDown,
+            // pControl->isMouseUp,
+        },
+        .selecterPlayerCharacter = pControl->selectedCharacter
+    };
+    return pip;
+}
+
+void updatepos(){
+
+}
+void RenderPlayerName(ClientView *pView, Player player, SDL_Rect playerRect){
+    if (strlen(player.username) == 0 || !pView->fonts){
+        printf("%s",player.username);
+        printf("Font: %p", (void*)pView->fonts);
+        return;
+    }
+
+    SDL_Color nameColor = player.color;
+    SDL_Color shadowColor = {0,0,0,255};
+
+    SDL_Surface* shadowSurface = TTF_RenderText_Blended(pView->fonts, player.username, shadowColor);
+    SDL_Texture* shadowTexture = SDL_CreateTextureFromSurface(pView->pRend, shadowSurface);
+
+    int nameWidth = shadowSurface->w;
+    int nameHeight = shadowSurface->h;
+
+    SDL_Rect nameRect = {
+        .x = playerRect.x + (playerRect.w - nameWidth)/2,
+        .y = playerRect.y - nameHeight - 5,
+        .w = nameWidth,
+        .h = nameHeight
+    };
+
+    SDL_Rect shadowRect = {
+        .x = nameRect.x + 1,
+        .y = nameRect.y + 1,
+        .w = nameWidth,
+        .h = nameHeight
+    };
+
+    SDL_RenderCopy(pView->pRend,shadowTexture,NULL,&shadowRect);
+    SDL_FreeSurface(shadowSurface);
+    SDL_DestroyTexture(shadowTexture);
+
+    SDL_Surface* nameSurface = TTF_RenderText_Blended(pView->fonts, player.username, nameColor);
+    SDL_Texture* nameTexture = SDL_CreateTextureFromSurface(pView->pRend, nameSurface);
+
+    SDL_RenderCopy(pView->pRend, nameTexture, NULL, &nameRect);
+
+    SDL_FreeSurface(nameSurface);
+    SDL_DestroyTexture(nameTexture);
+}
 
 void sortByYaxis(Client aClient, int playerCount, int indices[]){
     for (int i = 0; i < playerCount - 1; i++) {
@@ -54,259 +341,4 @@ void renderProjectiles(Client aClient, ClientView *pView) {
             // SDL_RenderFillRect(pView->pRend, &projRect);
         }
     }
-}
-
-void renderEnemy(Client aClient, ClientView *pView) {
-    static int frame = 0;
-    frame++;
-    // int playerCount = NET_clientGetPlayerCount(aClient);
-    int selfIndex = NET_clientGetSelfIndex(aClient);
-    SDL_Point selfPos = NET_clientGetPlayerPos(aClient, selfIndex);
-    int centerX = pView->windowWidth/2;
-    int centerY = pView->windowHeight/2;
-    int renderSizeHalf = pView->playerRenderSize/2;
-    for(int i = 0; i < NET_clientGetEnemiesCount(aClient); i++) {
-        SDL_Point pos = NET_clientGetEnemyPos(aClient, i);
-        printf("index %d, X: %d, Y: %d \n",i,pos.x,pos.y);
-        int worldOffsetX = pos.x - selfPos.x;
-        int worldOffsetY = pos.y - selfPos.y;
-        float scale = (float)pView->playerRenderSize / RENDER_SIZE;
-        float screenOffsetX = worldOffsetX * scale;
-        float screenOffsetY = worldOffsetY * scale;
-        int direction = NET_clientGetEnemyDirection(aClient, i);
-        if (direction < 0 || direction > 7) {
-            fprintf(stderr, "ERROR: Invalid direction: %d\n", direction);
-            direction = 0;  // or clamp, or skip rendering
-        }
-
-        SDL_Rect enemyRect;
-        enemyRect = (SDL_Rect){
-                .x = (int)(centerX + screenOffsetX) + renderSizeHalf,
-                .y = (int)(centerY + screenOffsetY) + renderSizeHalf,
-                .w = pView->playerRenderSize / 2,
-                .h = pView->playerRenderSize / 2
-            };
-        SDL_Rect src;
-        src = (SDL_Rect){((frame/2)%24)*SPRITE_SIZE, direction*SPRITE_SIZE, SPRITE_SIZE, SPRITE_SIZE};
-
-        //pView->PlayerPos[i] = (SDL_Point){.x = playerRect.x, .y = playerRect.y};
-        // SDL_SetRenderDrawColor(pView->pRend, 255, 0, 0, 255);
-        // SDL_RenderFillRect(pView->pRend, &enemyRect);
-
-        SDL_RenderCopy(pView->pRend, pView->enemyTexture, &src, &enemyRect);
-    }
-}
-
-void renderPlayers(Client aClient, ClientView *pView) {
-    static int frame = 0;
-    frame++;
-    int playerCount = NET_clientGetPlayerCount(aClient);
-    static Uint32 damageTime = 0;
-
-    int selfIndex = NET_clientGetSelfIndex(aClient);
-    SDL_Point selfPos = NET_clientGetPlayerPos(aClient, selfIndex);
-    int centerX = pView->windowWidth/2;
-    int centerY = pView->windowHeight/2;
-    int renderSizeHalf = pView->playerRenderSize/2;
-
-    int sortedIndex[playerCount];
-
-    for (int i = 0; i < playerCount; i++) {
-        sortedIndex[i] = i;
-    }
-
-    sortByYaxis(aClient, playerCount, sortedIndex);
-
-    // shadow
-    for(int n = 0; n < playerCount; n++) {
-        int i = sortedIndex[n];
-        if(NET_clientGetState(aClient) != NET_clientGetClientState(aClient, i)) {
-            continue;
-        }
-
-        SDL_Point pos = NET_clientGetPlayerPos(aClient, i);
-        pos.x -= renderSizeHalf;
-        pos.y -= pView->playerRenderSize;
-
-        int worldOffsetX = pos.x - selfPos.x;
-        int worldOffsetY = pos.y - selfPos.y;
-        float scale = (float)pView->playerRenderSize / RENDER_SIZE;
-        float screenOffsetX = worldOffsetX * scale;
-        float screenOffsetY = worldOffsetY * scale;
-
-        SDL_Rect playerRect;
-        if(selfIndex == i) {
-            playerRect = (SDL_Rect){
-                .x = centerX - renderSizeHalf,
-                .y = centerY + renderSizeHalf/6,
-                .w = pView->playerRenderSize,
-                .h = renderSizeHalf
-            };
-        }
-        else {
-            playerRect = (SDL_Rect){
-                .x = (int)(centerX + screenOffsetX - pView->playerRenderSize/6),
-                .y = (int)(centerY + screenOffsetY + pView->playerRenderSize/5) + renderSizeHalf + renderSizeHalf/6,
-                .w = pView->playerRenderSize,
-                .h = renderSizeHalf
-            };
-        }
-        pView->PlayerPos[i] = (SDL_Point){.x = playerRect.x, .y = playerRect.y};
-        
-        SDL_RenderCopy(pView->pRend, pView->shadowTexture, NULL, &playerRect);
-
-    }
-
-    // character
-    for(int n = 0; n < playerCount; n++) {
-        int i = sortedIndex[n];
-        if(NET_clientGetState(aClient) != NET_clientGetClientState(aClient, i)) {
-            continue;
-        }
-
-        SDL_Point pos = NET_clientGetPlayerPos(aClient, i);
-        pos.x -= renderSizeHalf;
-        pos.y -= pView->playerRenderSize;
-        int direction = NET_clientGetPlayerDirection(aClient, i);
-
-        int worldOffsetX = pos.x - selfPos.x;
-        int worldOffsetY = pos.y - selfPos.y;
-        float scale = (float)pView->playerRenderSize / RENDER_SIZE;
-        float screenOffsetX = worldOffsetX * scale;
-        float screenOffsetY = worldOffsetY * scale;
-
-        SDL_Rect playerRect;
-        if(selfIndex == i) {
-            playerRect = (SDL_Rect){
-                .x = centerX - renderSizeHalf,
-                .y = centerY - renderSizeHalf,
-                .w = pView->playerRenderSize,
-                .h = pView->playerRenderSize
-            };
-        }
-        else {
-            playerRect = (SDL_Rect){
-                .x = (int)(centerX + screenOffsetX - pView->playerRenderSize/6),
-                .y = (int)(centerY + screenOffsetY + pView->playerRenderSize/5),
-                .w = pView->playerRenderSize,
-                .h = pView->playerRenderSize
-            };
-        }
-
-        pView->PlayerPos[i] = (SDL_Point){.x = playerRect.x, .y = playerRect.y};
-
-        int shootAnimationOffset = 0;
-        if(NET_clientIsShooting(aClient, i)) shootAnimationOffset = 3;
-        
-        SDL_Rect src;
-        switch(NET_clientGetPlayerAnimation(aClient, i)) {
-            case ANIMATION_IDLE:
-                src = (SDL_Rect){((frame/2)%24)*SPRITE_SIZE, (direction+8)*SPRITE_SIZE, SPRITE_SIZE, SPRITE_SIZE};
-                break;
-            case ANIMATION_RUNNING:
-                src = (SDL_Rect){((frame/2)%24)*SPRITE_SIZE, direction*SPRITE_SIZE, SPRITE_SIZE, SPRITE_SIZE};
-                break;
-            default:
-                src = (SDL_Rect){((frame/2)%24)*SPRITE_SIZE, direction*SPRITE_SIZE, SPRITE_SIZE, SPRITE_SIZE};
-        }
-        
-        int playerCharacter = NET_clientGetPlayerCharacter(aClient, i) + shootAnimationOffset;
-        SDL_RenderCopy(pView->pRend, pView->playerTexture[playerCharacter], &src, &playerRect);
-        RenderPlayerName(aClient, pView, i, playerRect);
-
-        //printf("Players HP: %d\n", (int)NET_clientGetHP(aClient, i));
-        /*if(NET_clientGetHP(aClient, i) < 100){ 
-            SDL_SetRenderDrawColor(pView->pRend, 255, 0, 0, 255);
-            SDL_RenderFillRect(pView->pRend, &playerRect);
-        }*/
-
-        SDL_Rect vignetteRect = {.x = 0, .y = 0, .w = 1920, .h = 1080};
-        SDL_Rect screenRect = {.x = 0, .y = 0, .w = pView->windowWidth, .h = pView->windowHeight};
-
-        if (NET_clientIsPlayerDamaged(aClient, selfIndex)) {
-            damageTime = SDL_GetTicks();
-        }
-        if (SDL_GetTicks() - damageTime < 250) {
-            SDL_RenderCopy(pView->pRend, pView->vignetteTexture, &vignetteRect, &screenRect);
-        }
-        // SDL_Rect rpoint = {centerX-5,centerY-5 + renderSizeHalf, 10, 10};
-    }
-}
-
-PlayerInputPacket prepareInputArray(ClientControl *pControl, int windowWidth, int windowHeight) {
-    static bool mouseDown = false;
-    if(pControl->isMouseDown) {
-        mouseDown = true;
-    } else if(pControl->isMouseUp) {
-        mouseDown = false;
-    }
-    PlayerInputPacket pip = {
-        // Later: let mousePos x and y be float between 0.0 and 1.0, normalized to the screen size. 
-        .mousePos = {
-            .x = pControl->mousePos.x  - (windowWidth / 2),
-            .y = pControl->mousePos.y - (windowHeight / 2)
-        },
-        .keys = {
-            pControl->keys[SDL_SCANCODE_W],
-            pControl->keys[SDL_SCANCODE_S],
-            pControl->keys[SDL_SCANCODE_D],
-            pControl->keys[SDL_SCANCODE_A],
-            pControl->keys[SDL_SCANCODE_E],
-            pControl->keys[SDL_SCANCODE_SPACE],
-            mouseDown,
-            // pControl->isMouseUp,
-        },
-        .selecterPlayerCharacter = pControl->selectedCharacter
-    };
-    return pip;
-}
-
-void updatepos(){
-
-}
-void RenderPlayerName(Client aClient, ClientView *pView, int i, SDL_Rect playerRect){
-    char username[MAX_USERNAME_LEN] = {0};
-    username[MAX_USERNAME_LEN - 1] = '\0';
-    NET_clientGetPlayerName(aClient, i, username);
-
-    if (strlen(username) == 0 || !pView->fonts){
-        printf("%s",username);
-        printf("Font: %p", (void*)pView->fonts);
-        return;
-    }
-
-    SDL_Color nameColor = NET_GetPlayerColor(aClient, i); // Server ska välja färgerna på namnen
-    SDL_Color shadowColor = {0,0,0,255}; //skuggan 
-
-    SDL_Surface* shadowSurface = TTF_RenderText_Blended(pView->fonts, username, shadowColor);
-    SDL_Texture* shadowTexture = SDL_CreateTextureFromSurface(pView->pRend, shadowSurface);
-
-    int nameWidth = shadowSurface->w;
-    int nameHeight = shadowSurface->h;
-
-    SDL_Rect nameRect = {
-        .x = playerRect.x + (playerRect.w - nameWidth)/2,
-        .y = playerRect.y - nameHeight - 5,
-        .w = nameWidth,
-        .h = nameHeight
-    };
-
-    SDL_Rect shadowRect = {
-        .x = nameRect.x + 1,
-        .y = nameRect.y + 1,
-        .w = nameWidth,
-        .h = nameHeight
-    };
-
-    SDL_RenderCopy(pView->pRend,shadowTexture,NULL,&shadowRect);
-    SDL_FreeSurface(shadowSurface);
-    SDL_DestroyTexture(shadowTexture);
-
-    SDL_Surface* nameSurface = TTF_RenderText_Blended(pView->fonts, username, nameColor);
-    SDL_Texture* nameTexture = SDL_CreateTextureFromSurface(pView->pRend, nameSurface);
-
-    SDL_RenderCopy(pView->pRend, nameTexture, NULL, &nameRect);
-
-    SDL_FreeSurface(nameSurface);
-    SDL_DestroyTexture(nameTexture);
 }

@@ -3,11 +3,6 @@
 #include "../../include/menu.h"
 #include <stdio.h>
 
-typedef struct clientEnemy{
-    SDL_Point pos;
-    int direction;
-}ClientEnemy;
-
 struct scenC{
     ScenarioState state;
     SDL_Point objectivePoint; 
@@ -16,19 +11,11 @@ struct WeaponStats {
     int type;
     int level;
 };
-struct Player{
-    GameState state;
-    char username[MAX_USERNAME_LEN]; //myusername
-    SDL_Point pos;
-    int direction;
-    int currentPlayerAnimation;
-    int colorIndex;
-    SDL_Color color;
-    int playerCharacter;
-    bool isShooting;
-    int dashCooldown;
-    uint8_t HpProcent;
-};
+
+typedef struct gameConfig {
+    int nextGraphicsQuality;
+    int graphicsQuality; // 1: high, 2: medium
+}GameConfig;
 
 struct client{
     SDLNet_SocketSet socketSet;
@@ -37,7 +24,7 @@ struct client{
     UDPpacket *pSendPacket;
     IPaddress serverAddr;
     char selfUsername[MAX_USERNAME_LEN]; //andras usernames // va?
-
+    GameConfig config;
     int PlayerCount;
     Player playerList[MAX_CLIENTS];
     int EnemiesCount;
@@ -58,6 +45,10 @@ bool NET_clientConnect(Client aClient){
     return true;
 }
 
+int NET_clientGetGraphicsQuality(Client aClient) {
+    return aClient->config.graphicsQuality;
+}
+
 void NET_clientGetProjList(Client aClient, Proj *outputProjList) {
     for(int i = 0; i < MAX_CLIENT_PROJ; i++) {
         outputProjList[i].angle = aClient->projList[i].angle;
@@ -69,6 +60,20 @@ void NET_clientGetProjList(Client aClient, Proj *outputProjList) {
 
 int NET_clientGetProjTexture(Client aClient, int projIdx) {
     return aClient->projList[projIdx].textureIdx;
+}
+
+ClientEnemy *NET_clientGetEnemy(Client aClient, int idx) {
+    return &aClient->enemies[idx];
+}
+
+Player *NET_clientGetPlayer(Client aClient, int idx) {
+    return &aClient->playerList[idx];
+}
+
+bool NET_clientIsMyUsername(Client aClient, char *name) {
+    if(strcmp(name, aClient->selfUsername) == 0) {
+        return true;
+    } else return false;
 }
 
 Client NET_clientCreate(){
@@ -100,6 +105,10 @@ Client NET_clientCreate(){
         SDLNet_UDP_Close(aClient->clientSocket);
         return NULL;
     }
+
+    NET_clientReadGraphicsConfig(aClient);
+    aClient->config.nextGraphicsQuality = aClient->config.graphicsQuality;
+
     aClient->PlayerCount = 1;
     aClient->playerList[0].state = MENU;
     strcpy(aClient->playerList[0].username,"None");
@@ -109,6 +118,7 @@ Client NET_clientCreate(){
     aClient->EnemiesCount = 0;
     aClient->showPauseMenu = 0;
     NET_clientLoadWeaponStats(aClient);
+    
     return aClient;
 }
 void NET_clientGetPlayerName(Client aClient, int playerIndex, char* username) {
@@ -118,6 +128,34 @@ void NET_clientGetPlayerName(Client aClient, int playerIndex, char* username) {
     } else {
         strcpy(username, "Starta om spelet om du vill ha ett namn bror");
     }
+}
+
+void NET_clientReadGraphicsConfig(Client aClient) {
+    FILE *file = fopen("data/graphics.config", "r");
+    if (!file) {
+        aClient->config.graphicsQuality = 2;
+        return;
+    }
+
+    char buf[256];
+    while (fgets(buf, sizeof(buf), file)) {
+        sscanf(buf, "QUALITY=%d", &aClient->config.graphicsQuality);
+    }
+    fclose(file);
+}
+
+void NET_clientSetNextGraphicsConfig(Client aClient, int value) {
+    aClient->config.nextGraphicsQuality = value;
+}
+
+int NET_clientGetNextGraphicsConfig(Client aClient) {
+    return aClient->config.nextGraphicsQuality;
+}
+
+void NET_clientSaveGraphicsConfig(Client aClient) {
+    FILE *file = fopen("data/graphics.config", "w");
+    fprintf(file, "QUALITY=%d", aClient->config.nextGraphicsQuality);
+    fclose(file);
 }
 
 void NET_clientSetPlayerAnimation(Client aClient, int playerIdx, int newAnimation) {
@@ -161,6 +199,10 @@ int NET_clientGetState(Client aClient) {
         int hp = (int)aClient->playerList[selfIndex].HpProcent;
         //printf("Your HP = %d\n", hp);
         return true;
+    }else{
+        if(aClient->playerList[selfIndex].HpProcent == 100){
+            lastHealth[selfIndex] = 100;
+        }
     }
     return false;
 }
@@ -189,6 +231,7 @@ SDL_Point NET_clientGetEnemyPos(Client aClient, int index){
 
 void NET_clientDestroy(Client aClient){
     NET_clientSaveWeaponStats(aClient);
+    NET_clientSaveGraphicsConfig(aClient);
 
     if(aClient->pReceivePacket != NULL){
         SDLNet_FreePacket(aClient->pReceivePacket);
@@ -362,6 +405,7 @@ void NET_clientUpdateEnemy(Client aClient, Packet aPacket){
         aClient->enemies[i].pos.x = (int)packets[i].x;
         aClient->enemies[i].pos.y = (int)packets[i].y;
         aClient->enemies[i].direction = (int)packets[i].direction;
+        aClient->enemies[i].hpEnemy = (uint8_t)packets[i].hp;
     }
 
     for (int i = aClient->EnemiesCount; i < MAX_ENEMIES_CLIENT_SIDE; i++) {
@@ -471,4 +515,8 @@ void NET_clientSaveWeaponStats(Client aClient) {
     }
 
     fclose(fp);
+}
+
+int NET_clientGetEnemyHP(Client aClient, int index){
+    return aClient->enemies[index].hpEnemy;
 }

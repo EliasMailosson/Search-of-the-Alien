@@ -5,6 +5,7 @@
 #include "../../include/NET/serverLogic.h"
 
 #define MAX_ENEMIES_CLIENT_SIDE 25
+#define MAX_ENEMIES_RANGE 1200
 
 typedef struct enemy *Enemy;
 typedef struct enemies* Enemies;
@@ -17,16 +18,27 @@ typedef enum {
     BOSS_ENEMY
 }EnemyID;
 
+typedef struct {
+    Enemy enemy;
+    float dist;
+} SortEntry;
+
 //Enemies enemyCreate();
 Enemies NET_enemiesCreate(void);
 int NET_enemiesPush(Enemies aE, Enemy new);
 Enemy NET_enemiesPopAt(Enemies aE, size_t index);
-Enemy NET_enemiesPopAt(Enemies aE, size_t index);
+// Enemy NET_enemiesPopAt(Enemies aE, size_t index);
 Enemy NET_enemyCreate(int pixelX, int pixelY, EnemyID id, const int difficulty);
 Enemy NET_enemiesGetAt(Enemies aE, size_t index);
 void NET_enemiesDestroy(Enemies aEnemies);
 size_t NET_enemiesGetSize(Enemies aEnemies);
+void NET_enemiesClear(Enemies aEnemies);
 
+int NET_enemiesCompEntries(const void *a, const void *b);
+float NET_enemiesCompute_dist(const Enemy e, SDL_Rect playerRect);
+SDL_Point NET_enemyGetPos(Enemy aEnemy);
+int NET_enemyGetDirection(Enemy aEnemy);
+SDL_Rect NET_getEnemySpawnZone(SDL_Rect playerRect, int tile);
 
 SDL_Point enemyGetPoint(Enemies aEnemies, int index);
 
@@ -47,13 +59,15 @@ Uint32 enemyGetAttackTime(Enemies aEnemies, int enemyindex);
 
 void enemySetAttackTime(Enemies aEnemies, int enemyindex);
 
-SDL_Rect enemyGetRect(Enemies aEnemies, int index);
+// SDL_Rect enemyGetRect(Enemies aEnemies, int index);
 
-void enemyDamaged(Enemies aEnemies, int damage, int index, int *enemyCount);
+int enemyDamaged(Enemies aEnemies, int damage, int index, int *pEnemyCount);
 
 int enemyGetCount(Enemies aEnemies);
 
 bool enemyColitino(SDL_Rect A,SDL_Rect B);
+
+int getEnemyHP(Enemy aEnemy);
 
 
 #endif

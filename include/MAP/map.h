@@ -39,7 +39,7 @@ PlanetLUT MAP_mapGetPlanetLUT(Map aMap);
 void MAP_mapNewMap(Map aMap,uint32_t seed);
 void MAP_mapSetPlanet(GameState state,Map aMap);
 
-void MAP_MapRender(SDL_Renderer *pRend, Map aMap);
+void MAP_MapRenderLobby(SDL_Renderer *pRend, Map aMap);
 void MAP_MapNewRender(SDL_Renderer* rend, Map map, SDL_Window* win);
 
 
@@ -54,7 +54,8 @@ void MAP_MapRefresh(Map aMap, int winW, int winH);
 void MAP_MapDestroy(Map aMap);
 
 void MAP_TilesFillWithBlank(int tileID[MAP_HEIGHT][MAP_WIDTH]);
-void MAP_MapGetTilesFromLobby(int tileID[MAP_HEIGHT][MAP_WIDTH]);
+void MAP_MapGetTilesFromLobby(int lobbyTileID[LOBBY_HEIGHT][LOBBY_WIDTH]);
+
 
 void MAP_MapMoveMap(Map aMap, SDL_Point playerOffset);
 void printMap(Map aMap);

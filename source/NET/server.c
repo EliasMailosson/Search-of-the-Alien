@@ -7,6 +7,8 @@ struct Scenario{
     int difficulty;
     ScenarioState scenario;
     int totalKilldEnemise;
+    int waveCount;
+    bool victory;
 };
 
 struct Weapon{
@@ -39,6 +41,7 @@ struct User{
     Player player;
     int colorIndex;
     bool isHubVisible;
+    int spawnTimer;
 };
 
 struct server {
@@ -63,6 +66,7 @@ void* projektil_threads(void *arg);
 void* enemies_threads(void *arg);
 
 int stop = 0;
+mutex_t clients_mutex;
 mutex_t stop_mutex;
 thread_t projThread; 
 thread_t enemyThread;
@@ -87,6 +91,7 @@ int main(int argc, char **argv ){
     }
     
     mutex_init(&stop_mutex);
+    mutex_init(&clients_mutex);
     thread_create(&projThread, projektil_threads,aServer);
     thread_create(&enemyThread,enemies_threads,aServer);
 
@@ -105,7 +110,9 @@ int main(int argc, char **argv ){
                 } 
                 switch (NET_packetGetMessageType(aPacket)){
                 case CONNECT:
+                    mutex_lock(&clients_mutex);
                     NET_serverClientConnected(aPacket, aServer);
+                    mutex_unlock(&clients_mutex);
                     NET_serverSendPlayerPacket(aServer,-1);
                     break;
                 case DISCONNECT:
@@ -157,10 +164,9 @@ int main(int argc, char **argv ){
                 }
                 if(aPacket) NET_packetDestroy(aPacket);
             }
-
+            NET_serverScenarioCheckForVictory(aServer);
             if(aServer->isOff)break;
         }
-
     }
     mutex_lock(&stop_mutex);
     stop = 1;
@@ -169,6 +175,7 @@ int main(int argc, char **argv ){
     thread_join(projThread);
     thread_join(enemyThread);
     mutex_destroy(&stop_mutex);
+    mutex_destroy(&clients_mutex);
 
     NET_enemiesDestroy(aServer->aEnemies);
 
@@ -177,28 +184,19 @@ int main(int argc, char **argv ){
     return 0;
 }
 
+// sizeOfSpawnZone är arean på rekten
 void* enemies_threads(void *arg){
     Server aServer = (Server)arg;
-    int previousTime = (int)SDL_GetTicks();
-    // for (int i = 0; i < 20; i++){
-    //     NET_enemiesPush(aServer->aEnemies,NET_enemyCreate(10+10*i,10+10*i,LIGHT_ENEMY));
-    // }
     while (1){
         mutex_lock(&stop_mutex);
         int should_stop = stop;
         mutex_unlock(&stop_mutex);
         if(should_stop) break;
-        for (int i = 0; i < aServer->clientCount; i++){
-            if(aServer->clients[i].State != MENU && 
-            aServer->clients[i].State != LOBBY &&
-            (int)SDL_GetTicks() >= 5000+previousTime -(aServer->scenario.spawnFrequency*100) && 
-            (int)NET_enemiesGetSize(aServer->aEnemies) <= MAX_ENEMIES_CLIENT_SIDE)// temporery
-            {
-                previousTime = SDL_GetTicks();
-                NET_enemiesPush(aServer->aEnemies,NET_enemyCreate(50,50,LIGHT_ENEMY,aServer->scenario.difficulty));
-            }
-        }
+        mutex_lock(&clients_mutex);
+
+        NET_serverEnemiesSpawnInterval(aServer);
         NET_serverUpdateEnemies(aServer, aServer->aEnemies,aServer->aServerMap);
+        mutex_unlock(&clients_mutex);
         sleep_ms(10);
     }
     printf("Enemise thread exiting. id: %lu\n",(unsigned long)thread_self());
@@ -230,23 +228,39 @@ void NET_serverSendEnemiesPacket(Server aServer, GameState GS, Enemies aEnemies)
 
     EnemyPacket packet[MAX_ENEMIES_CLIENT_SIDE] = {0};
     SDL_Point pos;
-    for (int i = 0; i < (int)NET_enemiesGetSize(aEnemies); i++){
-        pos = enemyGetPoint(aEnemies, i); 
-        packet[i].x = (int16_t)(pos.x);
-        packet[i].y = (int16_t)(pos.y);
-        packet[i].direction = (int16_t)(enemyGetDirection(aEnemies, i));
-
-    }
-    Uint32 payloadSize = (int)NET_enemiesGetSize(aEnemies) * sizeof(EnemyPacket);
-    if((int)NET_enemiesGetSize(aEnemies) == 0) payloadSize = 1;
-    UDPpacket* SendEnemies = SDLNet_AllocPacket(512);
-    for (int i = 0; i < aServer->clientCount; i++){
-        if(aServer->clients[i].State == GS || GS == -1){
-            NET_protocolSendArray(SendEnemies,aServer->serverSocket, aServer->clients[i].IP, GLOBAL, ENEMY_POS, packet, payloadSize);
-            //NET_serverSendArray(aServer, GLOBAL, ENEMY_POS, packet, payloadSize, i);
+    for (int i = 0; i <aServer->clientCount ; i++){
+        User p = aServer->clients[i];
+        if(p.State == MENU || p.State == LOBBY) continue;
+        int enemySendCount = 0;
+        size_t n = NET_enemiesGetSize(aServer->aEnemies);
+        SortEntry *entries = malloc(n * sizeof *entries);
+        for (size_t i = 0; i < n; ++i) {
+            entries[i].enemy = NET_enemiesGetAt(aServer->aEnemies,i);
+            entries[i].dist = NET_enemiesCompute_dist(entries[i].enemy, p.player.hitBox);
         }
+        qsort(entries, n, sizeof *entries, NET_enemiesCompEntries);
+        for (int i = 0; i < (int)NET_enemiesGetSize(aEnemies); i++){
+            Enemy en = entries[i].enemy;
+            pos = NET_enemyGetPos(en);
+            if( abs(p.player.hitBox.y - pos.y) < MAX_ENEMIES_RANGE &&
+                abs(p.player.hitBox.x - pos.x) < MAX_ENEMIES_RANGE){
+                    if(enemySendCount < MAX_ENEMIES_CLIENT_SIDE - 1){
+                        packet[enemySendCount].x = (int16_t)(p.player.hitBox.x - pos.x);
+                        packet[enemySendCount].y = (int16_t)(p.player.hitBox.y - pos.y);
+                        packet[enemySendCount].direction = (int16_t)(NET_enemyGetDirection(en));
+                        packet[enemySendCount].hp = (uint8_t)getEnemyHP(en);
+                        enemySendCount++;
+                    }
+            }
+        }
+        free(entries);
+        Uint32 payloadSize = enemySendCount * sizeof(EnemyPacket);
+        if((int)NET_enemiesGetSize(aEnemies) == 0) payloadSize = 1;
+        UDPpacket* SendEnemies = SDLNet_AllocPacket(512);
+        NET_protocolSendArray(SendEnemies,aServer->serverSocket, aServer->clients[i].IP, GLOBAL, ENEMY_POS, packet, payloadSize);
+        //NET_serverSendArray(aServer, GLOBAL, ENEMY_POS, packet, payloadSize, i);
+        SDLNet_FreePacket(SendEnemies);
     }
-    SDLNet_FreePacket(SendEnemies);
 }
 
 void NET_serverSetNewMap(Server aServer){
@@ -273,11 +287,15 @@ void NET_serverSetNewMap(Server aServer){
     NET_serverSendInt(aServer,GLOBAL,NEW_SEED,(int)NET_serverMapGetSeed(aServer->aServerMap),indexIP);
     printf("%u\n",NET_serverMapGetSeed(aServer->aServerMap));
     aServer->scenario.scenario = ((int)NET_serverMapGetSeed(aServer->aServerMap) % SCENARIO_COUNT);
+    printf("scnareo %d\n",aServer->scenario.scenario);
     NET_serverScenarioUpdate(&aServer->scenario,aServer->scenario.scenario,NET_serverMapGetSeed(aServer->aServerMap));
+    NET_enemiesClear(aServer->aEnemies);
 }
 
 void NET_serverScenarioUpdate(Scenario *s, ScenarioState state, uint32_t seed){
     s->totalKilldEnemise = 0;
+    s->victory = false;
+    s->waveCount = 0;
     switch (state){
     case ELIMINATIONS:
         s->difficulty = 1;
@@ -298,8 +316,36 @@ void NET_serverScenarioUpdate(Scenario *s, ScenarioState state, uint32_t seed){
         s->objectivePoint = (SDL_Point){.x = seed % MAP_HEIGHT, .y = seed % MAP_WIDTH};
         break;
     default:
+        printf("Not a Scenario\n");
         break;
     }
+}
+
+void NET_serverScenarioCheckForVictory(Server aServer){
+    switch(aServer->scenario.scenario){
+        case ELIMINATIONS:
+            if(aServer->scenario.totalKilldEnemise == 50 * aServer->scenario.difficulty){
+                aServer->scenario.victory = true;
+            }
+        break;
+        case WAVE:
+            if(aServer->scenario.totalKilldEnemise == 50 * aServer->scenario.difficulty){
+                aServer->scenario.victory = true;
+            }
+        break;
+        case PATH:
+            for(int i = 0;i < aServer->clientCount; i++){
+                if(aServer->clients[i].player.hitBox.x == aServer->scenario.objectivePoint.x &&
+                    aServer->clients[i].player.hitBox.y == aServer->scenario.objectivePoint.y){
+                    aServer->scenario.victory = true;
+                }
+            }
+        break;
+        default:
+            //printf("Not a Scenario\n");
+        break;
+    }
+    //printf("kill count\n %d",aServer->scenario.totalKilldEnemise);
 }
 
 uint8_t NET_serverGetPercentage(int currentHP, int maxHP){
@@ -308,7 +354,97 @@ uint8_t NET_serverGetPercentage(int currentHP, int maxHP){
     return (uint8_t)(percent); 
 }
 
-
+void NET_serverEnemiesSpawnInterval(Server aServer){
+    if(aServer->scenario.victory) return;
+    switch (aServer->scenario.scenario){
+    case ELIMINATIONS:
+        for (int i = 0; i < aServer->clientCount; i++){
+            if(aServer->clients[i].State != MENU && 
+            aServer->clients[i].State != LOBBY &&
+            (int)SDL_GetTicks() >= 5000+(aServer->clients[i].spawnTimer) -(aServer->scenario.spawnFrequency*100) && 
+            (int)NET_enemiesGetSize(aServer->aEnemies) < MAX_ENEMIES_CLIENT_SIDE)
+            {
+                aServer->clients[i].spawnTimer = (int)SDL_GetTicks();
+                //NET_enemiesPush(aServer->aEnemies,NET_enemyCreate(50,50,LIGHT_ENEMY,aServer->scenario.difficulty));
+                SDL_Rect spawnZone = NET_getEnemySpawnZone(aServer->clients[i].player.hitBox, TILE_SIZE * 5);
+                SDL_Rect otherZones[MAX_CLIENTS];
+                int otherCount = 0;
+                for (int j = 0; j < aServer->clientCount; j++) {
+                    if(j == i){
+                        continue;
+                    }
+                    otherZones[otherCount++] = NET_getEnemySpawnZone(NET_serverGetPlayerHitbox(aServer, j), TILE_SIZE * 5);
+                }
+                int spawnX, spawnY;
+                bool found = NET_findEnemySpawnPoint(spawnZone, otherZones, otherCount, &spawnX, &spawnY);
+                if (found)
+                {
+                    NET_enemiesPush(aServer->aEnemies,NET_enemyCreate(spawnX,spawnY,LIGHT_ENEMY,aServer->scenario.difficulty));
+                } 
+            }
+        }
+        break;
+    case WAVE:
+        if((int)NET_enemiesGetSize(aServer->aEnemies) == 0){
+            aServer->scenario.waveCount ++;
+            int indexIP = NET_serverCompIP(aServer);
+            if(indexIP == -1){
+                printf("NET_serverCompIP == -1\n");
+                return;
+            }
+            for (int i = 0; i < aServer->clientCount; i++){
+                if(aServer->clients[i].State == MENU || aServer->clients[i].State == LOBBY) continue;
+                for (int y = 0; y < aServer->scenario.waveCount * 2; y++){
+                    //NET_enemiesPush(aServer->aEnemies,NET_enemyCreate(50,50,LIGHT_ENEMY,aServer->scenario.difficulty));
+                    SDL_Rect spawnZone = NET_getEnemySpawnZone(aServer->clients[i].player.hitBox, TILE_SIZE * 5);
+                    SDL_Rect otherZones[MAX_CLIENTS];
+                    int otherCount = 0;
+                    for (int j = 0; j < aServer->clientCount; j++) {
+                        if(j == i){
+                            continue;
+                        }
+                        otherZones[otherCount++] = NET_getEnemySpawnZone(NET_serverGetPlayerHitbox(aServer, j), TILE_SIZE * 5);
+                    }
+                    int spawnX, spawnY;
+                    bool found = NET_findEnemySpawnPoint(spawnZone, otherZones, otherCount, &spawnX, &spawnY);
+                    if (found)
+                    {
+                        NET_enemiesPush(aServer->aEnemies,NET_enemyCreate(spawnX,spawnY,LIGHT_ENEMY,aServer->scenario.difficulty));
+                    } 
+                }
+            }
+        }
+        break;
+    case PATH:
+        for (int i = 0; i < aServer->clientCount; i++){
+            if(aServer->clients[i].State != MENU && aServer->clients[i].State != LOBBY && 
+            (int)SDL_GetTicks() >= 5000+(aServer->clients[i].spawnTimer) -(aServer->scenario.spawnFrequency*100) && 
+            (int)NET_enemiesGetSize(aServer->aEnemies) < MAX_ENEMIES_CLIENT_SIDE)
+            {
+                aServer->clients[i].spawnTimer = (int)SDL_GetTicks();
+                //NET_enemiesPush(aServer->aEnemies,NET_enemyCreate(50,50,LIGHT_ENEMY,aServer->scenario.difficulty));
+                SDL_Rect spawnZone = NET_getEnemySpawnZone(aServer->clients[i].player.hitBox, TILE_SIZE * 5);
+                SDL_Rect otherZones[MAX_CLIENTS];
+                int otherCount = 0;
+                for (int j = 0; j < aServer->clientCount; j++) {
+                    if(j == i){
+                        continue;
+                    }
+                    otherZones[otherCount++] = NET_getEnemySpawnZone(NET_serverGetPlayerHitbox(aServer, j), TILE_SIZE * 5);
+                }
+                int spawnX, spawnY;
+                bool found = NET_findEnemySpawnPoint(spawnZone, otherZones, otherCount, &spawnX, &spawnY);
+                if (found)
+                {
+                    NET_enemiesPush(aServer->aEnemies,NET_enemyCreate(spawnX,spawnY,LIGHT_ENEMY,aServer->scenario.difficulty));
+                } 
+            }
+        }
+        break;
+    default:
+        break;
+    }
+}
 
 void NET_serverSendPlayerPacket(Server aServer,GameState GS){
     PlayerPacket packet[MAX_CLIENTS] = {0};
@@ -407,7 +543,10 @@ static void calcMovement(Server aServer, PlayerInputPacket *pip, int playerIdx){
         dy = dy / 2;
     }
 
-    if(MAP_TileNotWalkable(aServer->aServerMap, aServer->clients[playerIdx].player.hitBox.x + (int)dx * speed, aServer->clients[playerIdx].player.hitBox.y + (int)dy * speed)) return;
+    // if(MAP_TileNotWalkable(aServer->aServerMap,
+    //     aServer->clients[playerIdx].player.hitBox.x + (int)dx * speed,
+    //     aServer->clients[playerIdx].player.hitBox.y + (int)dy * speed,
+    //     aServer->clients[playerIdx].State)) return;
 
     int collisionType;
     NET_serverCheckPlayerCollision(aServer, playerIdx, &collisionType);
@@ -465,22 +604,22 @@ void NET_serverUpdatePlayer(Server aServer, Packet aPacket, GameState state){
     int character = aServer->clients[playerIdx].player.character = pip.selecterPlayerCharacter;
     switch(character) {
         case CHARACTER_BLUEFACE:
-        aServer->clients[playerIdx].player.weapon.damage = 4;
+        aServer->clients[playerIdx].player.weapon.damage = 20;
         aServer->clients[playerIdx].player.weapon.projFreq = 30;
         aServer->clients[playerIdx].player.weapon.projSpeed = 14;
         aServer->clients[playerIdx].player.weapon.projType = PROJ_TEX_NEON_LASER;
         break;
 
         case CHARACTER_BIGGIE:
-        aServer->clients[playerIdx].player.weapon.damage = 1;
+        aServer->clients[playerIdx].player.weapon.damage = 2;
         aServer->clients[playerIdx].player.weapon.projFreq = 2;
         aServer->clients[playerIdx].player.weapon.projSpeed = 20;
         aServer->clients[playerIdx].player.weapon.projType = PROJ_TEX_BULLET;
         break;
 
         case CHARACTER_CLEOPATRA:
-        aServer->clients[playerIdx].player.weapon.damage = 10;
-        aServer->clients[playerIdx].player.weapon.projFreq = 40;
+        aServer->clients[playerIdx].player.weapon.damage = 50;
+        aServer->clients[playerIdx].player.weapon.projFreq = 60;
         aServer->clients[playerIdx].player.weapon.projSpeed = 5;
         aServer->clients[playerIdx].player.weapon.projType = PROJ_TEX_PURPLE_LASER;
         break;
@@ -502,20 +641,51 @@ void NET_serverUpdatePlayer(Server aServer, Packet aPacket, GameState state){
 }
 
 bool enemyAttackPlayer(Server aServer, int index, SDL_Rect enemyHitbox){
-    if(!SDL_HasIntersection(&aServer->clients[index].player.hitBox, &enemyHitbox)){
+    SDL_Rect tmp = {
+        .x =(enemyHitbox.x - 25), 
+        .y = (enemyHitbox.y - 25),
+        .h = (enemyHitbox.h * 2),
+        .w = (enemyHitbox.w * 2),
+    };
+    if(!SDL_HasIntersection(&aServer->clients[index].player.hitBox, &tmp)){
         return false;
     }
     aServer->clients[index].player.HP -= 10;
     if(aServer->clients[index].player.HP <= 0){
         aServer->clients[index].player.HP = 0;
+        NET_serverForceGameStateChange(aServer,LOBBY,index);
+        aServer->clients[index].State = LOBBY;
     }
     // printf("Current HP: %d\n", aServer->clients[index].player.HP);
     return true;
 }
 
+void NET_serverForceGameStateChange(Server aServer, GameState state, int index){
+    switch (state){
+    case MENU:
+        break;
+    case LOBBY:
+        aServer->clients[index].player.HP = aServer->clients[index].player.maxHP;
+        aServer->clients[index].player.hitBox.x = 200;
+        aServer->clients[index].player.hitBox.y = 800;
+        aServer->clients[index].isHubVisible = !aServer->clients[index].isHubVisible;
+        NET_serverSendInt(aServer,GLOBAL,CHANGE_GAME_STATE_RESPONSE,state,index);
+        NET_serverSendInt(aServer,GLOBAL,TRY_OPEN_TERMINAL_HUB,aServer->clients[index].isHubVisible,index);
+        break;
+    case NEMUR:
+        break;
+    case CINDORA:
+        break;
+    case AURANTIC:
+        break;
+    default:
+        //printf("do not support thet State\n");
+        break;
+    }
+}
+
 void NET_serverUpdateEnemies(Server aServer, Enemies aEnemies, ServerMap aMap){
     int enemyCount = (int)NET_enemiesGetSize(aEnemies);
-    int damage = 5;
     if (enemyCount >= 0){
         for (int i = 0; i < enemyCount; i++) {
             float closestDist = INT_MAX;
@@ -524,6 +694,7 @@ void NET_serverUpdateEnemies(Server aServer, Enemies aEnemies, ServerMap aMap){
             SDL_Point enemyPos = enemyGetPoint(aEnemies, i);
 
             for (int j = 0; j < aServer->clientCount; j++) {
+                if(aServer->clients[j].State == LOBBY || aServer->clients[j].State == MENU) continue;
                 SDL_Rect playerHitbox = aServer->clients[j].player.hitBox;
                 int dx = playerHitbox.x - enemyPos.x;
                 int dy = playerHitbox.y - enemyPos.y;
@@ -543,9 +714,10 @@ void NET_serverUpdateEnemies(Server aServer, Enemies aEnemies, ServerMap aMap){
                     aServer->clients[closestPlayerIndex].player.hitBox.y
                 };
                 Uint32 currentTime = SDL_GetTicks(); 
-                if(currentTime > enemyGetAttackTime(aEnemies, i) + 1000 && aServer->clients[closestPlayerIndex].State == NEMUR){
+                if(currentTime > enemyGetAttackTime(aEnemies, i) + 1000){
                     if(enemyAttackPlayer(aServer, closestPlayerIndex, enemyHitbox)){
                         NET_serverSendPlayerPacket(aServer, aServer->clients[closestPlayerIndex].State);
+                        
                     }
                     enemySetAttackTime(aEnemies, i);
                 }
@@ -559,9 +731,8 @@ void NET_serverUpdateEnemies(Server aServer, Enemies aEnemies, ServerMap aMap){
                     .w = PROJECTILEWIDTH,
                     .h = PROJECTILEWIDTH
                 };
-               
                 if (enemyColitino(projectileRect, enemyHitbox)){
-                    enemyDamaged(aEnemies, damage, i, &enemyCount);
+                    aServer->scenario.totalKilldEnemise += enemyDamaged(aEnemies, aServer->clients[aServer->projList[j].srcPlayerIdx].player.weapon.damage, i, &enemyCount);
                     NET_projectileKill(aServer, &aServer->projList[j], j);
                 }
             }
@@ -783,6 +954,7 @@ void NET_serverClientConnected(Packet aPacket, Server aServer){
     newUser.State = MENU;
     newUser.colorIndex = NET_serverAssignColorIndex(aServer);
     newUser.isHubVisible = false;
+    newUser.spawnTimer = 0;
     NET_serverAddUser(aServer, newUser);
     NET_serverSendInt(aServer, GLOBAL, CONNECT_RESPONSE, 0, aServer->clientCount - 1);
     printf("username: %s connected to server\n", aServer->clients[aServer->clientCount - 1].username);

@@ -1,11 +1,12 @@
 #include "../../include/NET/serverLogic.h"
 #include "../../include/NET/server.h"
 
-#define PROJ_DESPAWN_DISTANCE 10000
+#define PROJ_DESPAWN_DISTANCE 1000
 
 struct ServerMap
 {
     int MapTileId[MAP_HEIGHT][MAP_WIDTH];
+    int LobbyTileId[LOBBY_HEIGHT][LOBBY_WIDTH];
     SDL_Rect tileRect;
     uint32_t seed;
 };
@@ -14,7 +15,7 @@ ServerMap NET_serverMapCreate() {
     ServerMap aServerMap = malloc(sizeof *aServerMap);
 
     MAP_TilesFillWithBlank(aServerMap->MapTileId);
-    MAP_MapGetTilesFromLobby(aServerMap->MapTileId);
+    MAP_MapGetTilesFromLobby(aServerMap->LobbyTileId);
 
     aServerMap->tileRect = (SDL_Rect) {.x = 0, .y = 0, .w = TILE_SIZE, .h = TILE_SIZE};
 
@@ -64,12 +65,12 @@ void MAP_ScreenToTile(ServerMap aServerMap, int screenX, int screenY, int *outTi
     *outTileY = ty;
 }
 
-bool NET_serverFindSpawnTile(ServerMap aServerMap, int *freekoordX, int *freekoordY) {
-    const int maxAttempts = 1000;
+bool NET_serverSpawnForObj(ServerMap aServerMap, int *freekoordX, int *freekoordY) {
+    const int maxAttempts = 100;
 
     for (int attempt = 0; attempt < maxAttempts; attempt++) {
         int x = rand() % MAP_WIDTH;
-        int y = rand();
+        int y = rand()% MAP_HEIGHT;
 
         if (aServerMap->MapTileId[y][x] != 0) {
             *freekoordX = x;
@@ -80,17 +81,64 @@ bool NET_serverFindSpawnTile(ServerMap aServerMap, int *freekoordX, int *freekoo
     return false;
 }
 
-bool MAP_TileNotWalkable(ServerMap aServerMap, int screenX, int screenY) {
-    int tileX, tileY;
-    MAP_ScreenToTile(aServerMap, screenX, screenY, &tileX, &tileY);
-    // printf("tileY: %d, tileX: %d ,tileID:%d\n", tileY, tileX, aServerMap->MapTileId[tileX][tileY]);
-    if (aServerMap->MapTileId[tileY][tileX] == 0){
+bool NET_findEnemySpawnPoint(SDL_Rect spawnZone, SDL_Rect *otherZones, int otherZoneCount, int *outX, int *outY) {
+    const int maxAttempts = 100;
+
+    for (int attempt = 0; attempt < maxAttempts; attempt++) {
+    int side = rand() % 4; 
+
+        SDL_Point spawnpoint;
+
+        switch (side) {
+            case 0: // Toppen
+                spawnpoint.x = spawnZone.x + (rand() % spawnZone.w);
+                spawnpoint.y = spawnZone.y;
+                break;
+            case 1: // Botten
+                spawnpoint.x = spawnZone.x + (rand() % spawnZone.w);
+                spawnpoint.y = spawnZone.y + spawnZone.h - 1;
+                break;
+            case 2: // Vänster
+                spawnpoint.x = spawnZone.x;
+                spawnpoint.y = spawnZone.y + (rand() % spawnZone.h);
+                break;
+            case 3: // Höger
+                spawnpoint.x = spawnZone.x + spawnZone.w - 1;
+                spawnpoint.y = spawnZone.y + (rand() % spawnZone.h);
+                break;
+        }
+
+        // Kontrollera överlappning
+        bool overlaps = false;
+        for (int i = 0; i < otherZoneCount; i++) {
+            if (SDL_PointInRect(&spawnpoint, &otherZones[i])) {
+                overlaps = true;
+                break;
+            }
+        }
+
+        if (overlaps) continue;
+
+        *outX = spawnpoint.x;
+        *outY = spawnpoint.y;
         return true;
     }
-    else 
-    {
-        return false;
+
+    return false;
+}
+
+bool MAP_TileNotWalkable(ServerMap aServerMap, int screenX, int screenY, GameState state){
+    int tileX, tileY;
+    MAP_ScreenToTile(aServerMap, screenX, screenY, &tileX, &tileY);
+    switch (state){
+    case LOBBY:
+        if(aServerMap->LobbyTileId[tileY][tileX] == 0) return true;
+        break;
+    default:
+        if (aServerMap->MapTileId[tileY][tileX] == 0) return true;
+        break;
     }
+    return false;
 }
 
 void NET_serverCheckPlayerCollision(Server aServer, int selfIdx, int *collide) {
@@ -185,7 +233,16 @@ void NET_projectilesUpdate(Server aServer, Projectile *list) {
         list[i].x += moveX;
         list[i].y += moveY;
 
-        if(abs(list[i].x) > PROJ_DESPAWN_DISTANCE || abs(list[i].y) > PROJ_DESPAWN_DISTANCE) {
+        int playerCount = NET_serverGetClientCount(aServer);
+        bool projIsWithinBounds = false;
+        for(int i = 0; i < playerCount; i++) {
+            SDL_Rect hitbox = NET_serverGetPlayerHitbox(aServer, i);
+            if(abs(list[i].x - hitbox.x) < PROJ_DESPAWN_DISTANCE && abs(list[i].y - hitbox.y) < PROJ_DESPAWN_DISTANCE) {
+                projIsWithinBounds = true;
+            }
+        }
+        
+        if(!projIsWithinBounds) {
             NET_projectileKill(aServer, list, i);
         }
     }

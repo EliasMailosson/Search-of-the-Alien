@@ -13,6 +13,25 @@ typedef struct __attribute__((packed)) Proj {
     uint8_t textureIdx;
 }Proj;
 
+typedef struct clientEnemy{
+    SDL_Point pos;
+    int direction;
+    uint8_t hpEnemy;
+}ClientEnemy;
+struct Player{
+    GameState state;
+    char username[MAX_USERNAME_LEN]; //myusername
+    SDL_Point pos;
+    int direction;
+    int currentPlayerAnimation;
+    int colorIndex;
+    SDL_Color color;
+    int playerCharacter;
+    bool isShooting;
+    int dashCooldown;
+    uint8_t HpProcent;
+};
+
 typedef struct WeaponStats WeaponStats;
 typedef struct Player Player;
 struct client;
@@ -25,6 +44,7 @@ bool NET_clientConnect(Client aClient);
 Client NET_clientCreate();
 /** Freeing client memory after use and sett to NULL */
 void NET_clientDestroy(Client aClient);
+void NET_clientReadGraphicsConfig(Client aClient);
 
 int NET_clientGetPlayerCount(Client aClient);
 const Player* NET_clientGetPlayerList(Client aClient);
@@ -32,16 +52,21 @@ SDL_Point NET_clientGetPlayerPos(Client aClient, int playerIdx);
 void NET_clientGetFriendsName(Client aClient, char outputNames[][MAX_USERNAME_LEN]);
 int NET_clientGetState(Client aClient);
 
+ClientEnemy *NET_clientGetEnemy(Client aClient, int idx);
+Player *NET_clientGetPlayer(Client aClient, int idx);
+
 void NET_clientSendInt(Client aClient,GameState GS, MessageType msgType,int placeHolder);
 void NET_clientSendString(Client aClient,GameState GS, MessageType msgType,const char* str);
 void NET_clientSendArray(Client aClient,GameState GS, MessageType msgType,const void* array, Uint32 arraySize);
 int NET_clientGetClientState(Client aClient, int playerIdx);
+bool NET_clientIsMyUsername(Client aClient, char *name);
 
 void NET_clientSetSelfName(Client aClient, char* newName);
 int NET_clientGetProjTexture(Client aClient, int projIdx);
 
 void NET_clientSetPlayerAnimation(Client aClient, int playerIdx, int newAnimation);
 int NET_clientGetPlayerAnimation(Client aClient, int playerIdx);
+void NET_clientSetNextGraphicsConfig(Client aClient, int value);
 
 void NET_clientGetPlayerName(Client aClient, int playerIndex, char* username);
 int NET_clientGetPlayerDirection(Client aClient, int playerIdx);
@@ -50,7 +75,8 @@ int NET_clientGetSelfIndex(Client aClient);
 int NET_clientGetPlayerColorIndex(Client aClient,int index);
 int NET_clientIsShooting(Client aClient, int playerIdx);
 bool NET_clientIsPlayerDamaged(Client aClient, int selfIndex);
-
+int NET_clientGetGraphicsQuality(Client aClient);
+int NET_clientGetNextGraphicsConfig(Client aClient);
 
 int NET_clientGetPlayerCharacter(Client aClient, int playerIdx);
 void NET_clientGetProjList(Client aClient, Proj *outputProjList);
@@ -83,7 +109,6 @@ SDL_Point NET_clientGetEnemyPos(Client aClient, int index);
 int NET_clientGetEnemyDirection(Client aClient, int index);
 void NET_clientScenarioUpdate(Client aClient,uint32_t seed);
 int NET_clientGetEnemiesCount(Client aClinet);
-
-int NET_enemyGetCount(Client aClient);
+int NET_clientGetEnemyHP(Client aClient, int index);
 
 #endif
