@@ -13,7 +13,7 @@ typedef struct playerList {
 typedef struct Objectives {
     int x, y;
     Label objectiveLabel;
-    char labelText[50];
+    Label objectiveProgress;
     TTF_Font *pFont;
     SDL_Color textColor;
 } Objectives;
@@ -90,9 +90,10 @@ Hud hudCreate(SDL_Renderer *pRend){
     }
 
     //OBJECTIVES
-    aHud->objectives->pFont = TTF_OpenFont("assets/fonts/jura.ttf", 20);
     for (int i = 0; i < OBJECTIVECOUNT; i++) {
-       aHud->objectives[i].objectiveLabel = UI_labelCreate(); 
+        aHud->objectives[i].pFont = TTF_OpenFont("assets/fonts/jura.ttf", 15);
+        aHud->objectives[i].objectiveLabel = UI_labelCreate(); 
+        aHud->objectives[i].objectiveProgress = UI_labelCreate();
     }
     
 
@@ -129,7 +130,8 @@ void hudDestroy(Hud aHud){
     TTF_CloseFont(aHud->objectives->pFont);
     aHud->objectives->pFont = NULL;
     for (int i = 0; i < OBJECTIVECOUNT; i++) {
-       aHud->objectives[i].objectiveLabel = UI_labelCreate(); 
+       UI_labelDestroy(aHud->objectives[i].objectiveLabel); 
+       UI_labelDestroy(aHud->objectives[i].objectiveProgress);
     }
     ////////////
 
@@ -146,6 +148,7 @@ static void arrowRender(Arrow aArrow,SDL_Renderer *pRend,SDL_Texture *pImg){
 }
 
 void updateHudPlayerList(Client aClient, Hud aHud, SDL_Renderer *pRend, int windowW, int windowH) {
+    int objY = 0;
     aHud->playerList.count = NET_clientGetPlayerCount(aClient);
     int sortArr[MAX_CLIENTS];
     int newCount = 0;
@@ -164,21 +167,43 @@ void updateHudPlayerList(Client aClient, Hud aHud, SDL_Renderer *pRend, int wind
         NET_clientGetPlayerName(aClient, i, username);
         UI_labelSetText(aHud->playerList.usernames[i], username);
         UI_labelRefreshTexture(pRend, aHud->playerList.usernames[i]);
+        if (objY < 10 + i*40) objY = (10 + i*40);
+        // printf("Y: %d", objY);
     }
     aHud->playerList.count = newCount;
 
-    updateHudObjectives(aHud, pRend, windowW, windowH);
-}
-
-void updateHudObjectives(Hud aHud, SDL_Renderer *pRend, int windowW, int windowH) {
-    aHud->objectives->x = windowW - 140;
+    //OBJECTIVES
+    for (int i = 0; i < OBJECTIVECOUNT; i++) {
+        aHud->objectives[i].x = aHud->playerList.x - 34; //-34 to start where the picture is rendered
+    }
+    objY += 50; //player slot height +10
     
     for (int i = 0; i < OBJECTIVECOUNT; i++) {
-        aHud->objectives[i].textColor = (SDL_Color){.r = 0, .g = 0, .b = 0, .a = 0};
-        UI_labelSetAppearance(pRend, aHud->objectives[i].objectiveLabel, aHud->objectives->x, (20 + 8*40) + i*40, aHud->objectives->textColor, aHud->objectives->pFont);
-        UI_labelSetText(aHud->objectives[i].objectiveLabel, "hej");
+        aHud->objectives[i].textColor = (SDL_Color){.r = 255, .g = 255, .b = 255};
+        UI_labelSetAppearance(pRend, aHud->objectives[i].objectiveLabel, aHud->objectives[i].x, objY + i*40, aHud->objectives[i].textColor, aHud->objectives[i].pFont);
+        UI_labelSetAppearance(pRend, aHud->objectives[i].objectiveProgress, aHud->objectives[i].x, objY + i*40 + 15, aHud->objectives[i].textColor, aHud->objectives[i].pFont);
+        switch (i)
+        {
+        case ELIMINATIONS:
+            UI_labelSetText(aHud->objectives[i].objectiveLabel, "Kill FIVE enemies");
+            UI_labelSetText(aHud->objectives[i].objectiveProgress, "0/0");
+            break;
+        case WAVE:
+            UI_labelSetText(aHud->objectives[i].objectiveLabel, "Withstand TWO waves");
+            UI_labelSetText(aHud->objectives[i].objectiveProgress, "0/0");
+            break;
+        case PATH:
+            UI_labelSetText(aHud->objectives[i].objectiveLabel, "Go to marked spot");
+            break;
+        default:
+            UI_labelSetText(aHud->objectives[i].objectiveLabel, "No objective yet");
+            UI_labelSetText(aHud->objectives[i].objectiveProgress, "0/0");
+            break;
+        }
         UI_labelRefreshTexture(pRend, aHud->objectives[i].objectiveLabel);
+        UI_labelRefreshTexture(pRend, aHud->objectives[i].objectiveProgress);
     }
+
 }
 
 void hudRender(Client aClient, Hud aHud,SDL_Renderer *pRend, int windowW, int windowH){
@@ -197,11 +222,15 @@ void hudRender(Client aClient, Hud aHud,SDL_Renderer *pRend, int windowW, int wi
         int character = NET_clientGetPlayerCharacter(aClient, i);
         SDL_RenderCopy(pRend, aHud->playerIconTexture[character], NULL, &r);
         UI_labelRender(pRend, aHud->playerList.usernames[i]);
-
+        
         SDL_SetRenderDrawColor(pRend, 255, 255, 255, 255);
         SDL_RenderFillRect(pRend, &((SDL_Rect){aHud->playerList.x, r.y + 24, 100, 4}));
     }
-
+    for (int i = 0; i < OBJECTIVECOUNT; i++) {
+        UI_labelRender(pRend, aHud->objectives[i].objectiveLabel);
+        UI_labelRender(pRend, aHud->objectives[i].objectiveProgress);
+    }
+    
     int dashCooldown = NET_clientGetDashCooldown(aClient);
     int centerX = windowW/2;
     int centerY = windowH/2;
