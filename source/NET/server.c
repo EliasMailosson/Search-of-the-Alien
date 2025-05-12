@@ -195,7 +195,7 @@ void* enemies_threads(void *arg){
         mutex_unlock(&stop_mutex);
         if(should_stop) break;
         mutex_lock(&clients_mutex);
-        NET_serverEnemiesSpawnInterval(aServer);
+        // NET_serverEnemiesSpawnInterval(aServer);
         int sizeOfSpawnZone=6;
         for (int i = 0; i < aServer->clientCount; i++){
 
@@ -218,7 +218,7 @@ void* enemies_threads(void *arg){
                 }
 
                 int spawnX, spawnY;
-                bool found = NET_findEnemySpawnPoint(aServer->aServerMap, spawnZone, otherZones, otherCount, &spawnX, &spawnY);
+                bool found = NET_findEnemySpawnPoint(spawnZone, otherZones, otherCount, &spawnX, &spawnY);
                 
                 if (found)
                 {
@@ -485,10 +485,10 @@ static void calcMovement(Server aServer, PlayerInputPacket *pip, int playerIdx){
         dy = dy / 2;
     }
 
-    if(MAP_TileNotWalkable(aServer->aServerMap,
-        aServer->clients[playerIdx].player.hitBox.x + (int)dx * speed,
-        aServer->clients[playerIdx].player.hitBox.y + (int)dy * speed,
-        aServer->clients[playerIdx].State)) return;
+    // if(MAP_TileNotWalkable(aServer->aServerMap,
+    //     aServer->clients[playerIdx].player.hitBox.x + (int)dx * speed,
+    //     aServer->clients[playerIdx].player.hitBox.y + (int)dy * speed,
+    //     aServer->clients[playerIdx].State)) return;
 
     int collisionType;
     NET_serverCheckPlayerCollision(aServer, playerIdx, &collisionType);
