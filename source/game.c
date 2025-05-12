@@ -71,7 +71,7 @@ void runLobby(Client aClient, Map aMap, ClientControl *pControl, ClientView *pVi
     for (int i = 0; i < NET_clientGetEnemiesCount(aClient); i++)
     {
         SDL_Point point = NET_clientGetEnemyPos(aClient, i);
-        printf("enemy #%d: pos.x: %d\n pos.y: %d", i, point.x, point.y);
+        // printf("enemy #%d: pos.x: %d\n pos.y: %d", i, point.x, point.y);
     }
 
     enableMouseTexture(pView->crosshair);

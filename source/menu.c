@@ -73,6 +73,7 @@ void updateMenu(Menu *pMenu, ClientControl *pControl, ClientView *pView, Client 
                 if (strcmp("Join-Friend", menuEvent.key) == 0) {
                     
                     printf("Join friend clicked!\n");
+                    pMenu->isGameStarted = true;
                 }
                 if (strcmp("AddFriend-Add", menuEvent.key) == 0){
                     char friend[MAX_USERNAME_LEN];
