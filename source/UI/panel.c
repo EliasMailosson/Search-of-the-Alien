@@ -177,7 +177,6 @@ void UI_panelUpdate(Panel aPanel, MenuEvent *pEvent, bool isMouseUp, bool *keys,
         }
     }
     SOUND_UIhoverSound(aSound, nowHover);
-
 }
 
 void UI_panelRender(SDL_Renderer* pRend, Panel aPanel) {
