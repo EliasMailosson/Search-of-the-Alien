@@ -187,51 +187,19 @@ int main(int argc, char **argv ){
 // sizeOfSpawnZone är arean på rekten
 void* enemies_threads(void *arg){
     Server aServer = (Server)arg;
-    int previousTime = (int)SDL_GetTicks();
-
     while (1){
         mutex_lock(&stop_mutex);
         int should_stop = stop;
         mutex_unlock(&stop_mutex);
         if(should_stop) break;
         mutex_lock(&clients_mutex);
-        // NET_serverEnemiesSpawnInterval(aServer);
-        int sizeOfSpawnZone=6;
-        for (int i = 0; i < aServer->clientCount; i++){
 
-            if(aServer->clients[i].State != MENU && 
-            aServer->clients[i].State != LOBBY &&
-            (int)SDL_GetTicks() >= 5000+previousTime -(aServer->scenario.spawnFrequency*100) && 
-            (int)NET_enemiesGetSize(aServer->aEnemies) <= MAX_ENEMIES_CLIENT_SIDE)// temporery
-            {
-                previousTime = SDL_GetTicks();
-
-                SDL_Rect spawnZone = NET_getEnemySpawnZone(aServer->clients[i].player.hitBox, sizeOfSpawnZone);
-                SDL_Rect otherZones[MAX_CLIENTS];
-                int otherCount = 0;
-                
-                for (int j = 0; j < aServer->clientCount; j++) {
-                    if(j == i){
-                        continue;
-                    }
-                    otherZones[otherCount++] = NET_getEnemySpawnZone(NET_serverGetPlayerHitbox(aServer, j), sizeOfSpawnZone);
-                }
-
-                int spawnX, spawnY;
-                bool found = NET_findEnemySpawnPoint(spawnZone, otherZones, otherCount, &spawnX, &spawnY);
-                
-                if (found)
-                {
-                    NET_enemiesPush(aServer->aEnemies,NET_enemyCreate(spawnX,spawnY,LIGHT_ENEMY,aServer->scenario.difficulty));
-                }             
-            }
-        }
-
+        NET_serverEnemiesSpawnInterval(aServer);
         NET_serverUpdateEnemies(aServer, aServer->aEnemies,aServer->aServerMap);
         mutex_unlock(&clients_mutex);
         sleep_ms(10);
     }
-    // printf("Enemise thread exiting. id: %lu\n",(unsigned long)thread_self());
+    printf("Enemise thread exiting. id: %lu\n",(unsigned long)thread_self());
     return NULL;
 }
 
@@ -386,7 +354,97 @@ uint8_t NET_serverGetPercentage(int currentHP, int maxHP){
     return (uint8_t)(percent); 
 }
 
-
+void NET_serverEnemiesSpawnInterval(Server aServer){
+    if(aServer->scenario.victory) return;
+    switch (aServer->scenario.scenario){
+    case ELIMINATIONS:
+        for (int i = 0; i < aServer->clientCount; i++){
+            if(aServer->clients[i].State != MENU && 
+            aServer->clients[i].State != LOBBY &&
+            (int)SDL_GetTicks() >= 5000+(aServer->clients[i].spawnTimer) -(aServer->scenario.spawnFrequency*100) && 
+            (int)NET_enemiesGetSize(aServer->aEnemies) < MAX_ENEMIES_CLIENT_SIDE)
+            {
+                aServer->clients[i].spawnTimer = (int)SDL_GetTicks();
+                //NET_enemiesPush(aServer->aEnemies,NET_enemyCreate(50,50,LIGHT_ENEMY,aServer->scenario.difficulty));
+                SDL_Rect spawnZone = NET_getEnemySpawnZone(aServer->clients[i].player.hitBox, TILE_SIZE * 5);
+                SDL_Rect otherZones[MAX_CLIENTS];
+                int otherCount = 0;
+                for (int j = 0; j < aServer->clientCount; j++) {
+                    if(j == i){
+                        continue;
+                    }
+                    otherZones[otherCount++] = NET_getEnemySpawnZone(NET_serverGetPlayerHitbox(aServer, j), TILE_SIZE * 5);
+                }
+                int spawnX, spawnY;
+                bool found = NET_findEnemySpawnPoint(spawnZone, otherZones, otherCount, &spawnX, &spawnY);
+                if (found)
+                {
+                    NET_enemiesPush(aServer->aEnemies,NET_enemyCreate(spawnX,spawnY,LIGHT_ENEMY,aServer->scenario.difficulty));
+                } 
+            }
+        }
+        break;
+    case WAVE:
+        if((int)NET_enemiesGetSize(aServer->aEnemies) == 0){
+            aServer->scenario.waveCount ++;
+            int indexIP = NET_serverCompIP(aServer);
+            if(indexIP == -1){
+                printf("NET_serverCompIP == -1\n");
+                return;
+            }
+            for (int i = 0; i < aServer->clientCount; i++){
+                if(aServer->clients[i].State == MENU || aServer->clients[i].State == LOBBY) continue;
+                for (int y = 0; y < aServer->scenario.waveCount * 2; y++){
+                    //NET_enemiesPush(aServer->aEnemies,NET_enemyCreate(50,50,LIGHT_ENEMY,aServer->scenario.difficulty));
+                    SDL_Rect spawnZone = NET_getEnemySpawnZone(aServer->clients[i].player.hitBox, TILE_SIZE * 5);
+                    SDL_Rect otherZones[MAX_CLIENTS];
+                    int otherCount = 0;
+                    for (int j = 0; j < aServer->clientCount; j++) {
+                        if(j == i){
+                            continue;
+                        }
+                        otherZones[otherCount++] = NET_getEnemySpawnZone(NET_serverGetPlayerHitbox(aServer, j), TILE_SIZE * 5);
+                    }
+                    int spawnX, spawnY;
+                    bool found = NET_findEnemySpawnPoint(spawnZone, otherZones, otherCount, &spawnX, &spawnY);
+                    if (found)
+                    {
+                        NET_enemiesPush(aServer->aEnemies,NET_enemyCreate(spawnX,spawnY,LIGHT_ENEMY,aServer->scenario.difficulty));
+                    } 
+                }
+            }
+        }
+        break;
+    case PATH:
+        for (int i = 0; i < aServer->clientCount; i++){
+            if(aServer->clients[i].State != MENU && aServer->clients[i].State != LOBBY && 
+            (int)SDL_GetTicks() >= 5000+(aServer->clients[i].spawnTimer) -(aServer->scenario.spawnFrequency*100) && 
+            (int)NET_enemiesGetSize(aServer->aEnemies) < MAX_ENEMIES_CLIENT_SIDE)
+            {
+                aServer->clients[i].spawnTimer = (int)SDL_GetTicks();
+                //NET_enemiesPush(aServer->aEnemies,NET_enemyCreate(50,50,LIGHT_ENEMY,aServer->scenario.difficulty));
+                SDL_Rect spawnZone = NET_getEnemySpawnZone(aServer->clients[i].player.hitBox, TILE_SIZE * 5);
+                SDL_Rect otherZones[MAX_CLIENTS];
+                int otherCount = 0;
+                for (int j = 0; j < aServer->clientCount; j++) {
+                    if(j == i){
+                        continue;
+                    }
+                    otherZones[otherCount++] = NET_getEnemySpawnZone(NET_serverGetPlayerHitbox(aServer, j), TILE_SIZE * 5);
+                }
+                int spawnX, spawnY;
+                bool found = NET_findEnemySpawnPoint(spawnZone, otherZones, otherCount, &spawnX, &spawnY);
+                if (found)
+                {
+                    NET_enemiesPush(aServer->aEnemies,NET_enemyCreate(spawnX,spawnY,LIGHT_ENEMY,aServer->scenario.difficulty));
+                } 
+            }
+        }
+        break;
+    default:
+        break;
+    }
+}
 
 void NET_serverSendPlayerPacket(Server aServer,GameState GS){
     PlayerPacket packet[MAX_CLIENTS] = {0};
