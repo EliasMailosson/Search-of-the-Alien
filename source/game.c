@@ -71,6 +71,8 @@ void runLobby(Client aClient, Map aMap, ClientControl *pControl, ClientView *pVi
     SDL_Point lastPosition[MAX_CLIENTS];
     SDL_Point playerPos;
 
+    SOUND_playMusicIfChanged(pView->aSound, MUSIC_MENU);
+
     for (int i = 0; i < NET_clientGetEnemiesCount(aClient); i++)
     {
         SDL_Point point = NET_clientGetEnemyPos(aClient, i);
@@ -107,6 +109,10 @@ void runLobby(Client aClient, Map aMap, ClientControl *pControl, ClientView *pVi
 
     SDL_Point mapMovePos = {(playerPos.x/(float)TILE_SIZE)*tileRect.w - pView->windowWidth/2 - pView->playerRenderSize/2 + tileRect.w/2, (playerPos.y/(float)TILE_SIZE)*tileRect.h - pView->windowHeight/2 - pView->playerRenderSize + tileRect.h/2};
     MAP_MapMoveMap(aMap, mapMovePos);
+
+    if(pControl->keys[SDL_SCANCODE_SPACE]){
+        SOUND_playDash(pView->aSound);
+    }
 
     renderLobby(pView, aMap, aClient, *pTerminalHub);
 }
@@ -330,6 +336,10 @@ void runPlanet(Client aClient, ClientControl *pControl, ClientView *pView, Map a
         (playerPos.x/(float)TILE_SIZE)*tileRect.w - pView->windowWidth/2 - pView->playerRenderSize/2 + tileRect.w/2,
         (playerPos.y/(float)TILE_SIZE)*tileRect.h - pView->windowHeight/2 - pView->playerRenderSize + tileRect.h/2};
     MAP_MapMoveMap(aMap, mapMovePos);
+
+    if(pControl->keys[SDL_SCANCODE_SPACE]){
+        SOUND_playDash(pView->aSound);
+    }
     
     renderPlanet(pView,aMap,aClient,pPauseMenu);
 }

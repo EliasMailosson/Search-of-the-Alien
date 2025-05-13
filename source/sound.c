@@ -8,7 +8,7 @@ Sound SOUND_create(void) {
         return NULL;
     }
     aSound->currentTrack = MUSIC_NONE;
-    aSound->masterVolume = 64;  // 50%
+    aSound->masterVolume = 128;  // 50%
     for (int i = 0; i < MAX_SOUND_CHANNELS; i++) {
         aSound->currentChannel[i] = -1;
     }
@@ -25,32 +25,19 @@ Sound SOUND_create(void) {
 
     Mix_Chunk *blueShot = Mix_LoadWAV("assets/sound/blueShot.mp3");
     aSound->blueShot = blueShot;
-    //Mix_Chunk *biggieShot = Mix_LoadWAV("assets/sound/biggieShotShort.wav");
-    //aSound->biggieShot = biggieShot;
+
     Mix_Chunk *cleoShot = Mix_LoadWAV("assets/sound/cleoShot.wav");
     aSound->cleoShot = cleoShot;
 
     Mix_Chunk * biggieShotLoop = Mix_LoadWAV("assets/sound/biggieShot2step.wav");
     aSound->biggieShotLoop = biggieShotLoop;
 
-    /* Mix_Chunk *biggieShot[16];
-    for (int i = 0; i < 16; i++) {
-        char filename[64];
-        sprintf(filename, "assets/sound/biggieShots/biggieShot%d.wav", i + 1);  // 1 to 16
-
-        biggieShot[i] = Mix_LoadWAV(filename);
-        if (!biggieShot[i]) {
-            fprintf(stderr, "Failed to load %s: %s\n", filename, Mix_GetError());
-        }
-        aSound->biggieShot[i] = biggieShot[i];
-    }*/
-
     Mix_Chunk *lobbySteps = Mix_LoadWAV("assets/sound/lobbyFootsteps.wav");
     aSound->lobbySteps = lobbySteps;
     Mix_Chunk *nemurSteps = Mix_LoadWAV("assets/sound/nemurFootsteps.wav");
     aSound->nemurSteps = nemurSteps;
 
-    Mix_Chunk *playerHit = Mix_LoadWAV("assets/sound/player-hurt3.wav");
+    Mix_Chunk *playerHit = Mix_LoadWAV("assets/sound/player-hurt4.wav");
     aSound->playerHit = playerHit;
 
     // MENU SOUND FX
@@ -69,11 +56,7 @@ void SOUND_destroy(Sound aSound) {
     Mix_FreeMusic(aSound->musicNEMUR);
     Mix_FreeChunk(aSound->blueShot);
     Mix_FreeChunk(aSound->biggieShotLoop);
-    
-    /*for (int i = 0; i < 16; i++)
-    {
-        Mix_FreeChunk(aSound->biggieShot[i]);
-    }*/
+
 
     Mix_FreeChunk(aSound->dashSound);
     
@@ -82,6 +65,7 @@ void SOUND_destroy(Sound aSound) {
     Mix_FreeChunk(aSound->hoverSound);
     Mix_FreeChunk(aSound->lobbySteps);
     Mix_FreeChunk(aSound->nemurSteps);
+
     Mix_FreeChunk(aSound->playerHit);
 
     free(aSound);
@@ -129,11 +113,9 @@ void SOUND_setMixVolume(Sound aSound){
     Mix_VolumeChunk(aSound->cleoShot, 128);
     Mix_VolumeChunk(aSound->confirmSound, 64);
     Mix_VolumeChunk(aSound->hoverSound, 64);
-    Mix_VolumeChunk(aSound->lobbySteps, 24);
-    Mix_VolumeChunk(aSound->nemurSteps, 24);
+    Mix_VolumeChunk(aSound->lobbySteps, 32);
+    Mix_VolumeChunk(aSound->nemurSteps, 32);
     Mix_VolumeChunk(aSound->playerHit, 72);
-
-
 }
 
 void SOUND_playMusicIfChanged(Sound aSound, MusicTrack newTrack){
@@ -243,7 +225,10 @@ void SOUND_playDash(Sound aSound) {
 }
 
 
-void SOUND_playLoopIfRunning(Sound aSound, int playerIndex, bool isRunning, int *channelArray, bool *playingArray, int state) {
+void SOUND_playLoopIfRunning(Sound aSound, int playerIndex, bool isRunning, int state) {
+    static int channelArray[MAX_CLIENTS] = {-1};
+    static bool playingArray[MAX_CLIENTS] = {false};
+
     Mix_Chunk *steps = NULL;
     if(state == LOBBY){
         steps = aSound->lobbySteps;
@@ -254,7 +239,6 @@ void SOUND_playLoopIfRunning(Sound aSound, int playerIndex, bool isRunning, int 
     
     if (isRunning) {
         if (!playingArray[playerIndex]) {
-            // Mix_VolumeChunk(steps, 32);
             channelArray[playerIndex] = Mix_PlayChannel(-1, steps, -1);  // Loop
             playingArray[playerIndex] = true;
         }
@@ -271,18 +255,15 @@ void SOUND_UIhoverSound(Sound aSound, bool isHover){
     static bool wasHovered = false;
 
     if (isHover && !wasHovered){
-        //Mix_VolumeChunk(aSound->hoverSound, 64);
         Mix_PlayChannel(-1, aSound->hoverSound, 0);
     }
     wasHovered = isHover;
 }
 
 void SOUND_UIclickSound(Sound aSound) {
-    //Mix_VolumeChunk(aSound->hoverSound, 1);
     Mix_PlayChannel(-1, aSound->confirmSound, 0);
 }
 
 void SOUND_playerIsHurt(Sound aSound) {
-    //Mix_VolumeChunk(aSound->hoverSound, 1);
     Mix_PlayChannel(-1, aSound->playerHit, 0);
 }
