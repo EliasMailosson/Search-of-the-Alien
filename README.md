@@ -17,6 +17,7 @@ Install all [dependencies](./dependencies.md).
 ```bash
 git clone https://github.com/EliasMailosson/Search-of-the-Alien.git && \
 cd Search-of-the-Alien && \
+mkdir build && \
 make client
 ```
 
@@ -24,6 +25,7 @@ make client
 ```bash
 git clone https://github.com/EliasMailosson/Search-of-the-Alien.git && \
 cd Search-of-the-Alien && \
+mkdir build && \
 make server
 ```
 
