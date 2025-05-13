@@ -21,7 +21,7 @@ void renderMenu(SDL_Renderer *pRend, Menu *pMenu) {
     SDL_RenderPresent(pRend);
 }
 
-void updateMenu(Menu *pMenu, ClientControl *pControl, ClientView *pView, Client aClient) {
+void updateMenu(Menu *pMenu, ClientControl *pControl, ClientView *pView, Client aClient, Sound aSound) {
     static MenuEvent menuEvent;
     static int switchDelay = 0;
     switchDelay++;
@@ -35,7 +35,7 @@ void updateMenu(Menu *pMenu, ClientControl *pControl, ClientView *pView, Client 
     strcpy(menuEvent.key, "");
 
     // behöver dubbel kollas med UI gänget om det är hållbart istället för en for loop
-    UI_panelUpdate(pMenu->panels[pMenu->currentPanel], &menuEvent, pControl->isMouseUp, pControl->keys);
+    UI_panelUpdate(pMenu->panels[pMenu->currentPanel], &menuEvent, pControl->isMouseUp, pControl->keys, aSound);
 
         switch(menuEvent.eventType) {
             case PANEL_SWITCH:
