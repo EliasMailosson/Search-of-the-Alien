@@ -320,12 +320,17 @@ void renderProjectiles(Client aClient, ClientView *pView) {
 
     int centerX = pView->windowWidth/2;
     int centerY = pView->windowHeight/2;
-
     
     float scale = (float)pView->playerRenderSize / RENDER_SIZE;
-    
+
+    int currentBiggieCount = 0;
     for(int i = 0; i < MAX_CLIENT_PROJ; i++) {
-        if(projList[i].textureIdx != PROJ_TEX_NONE) {
+        bool isActive = (projList[i].textureIdx != PROJ_TEX_NONE);
+        if (projList[i].textureIdx == PROJ_TEX_BULLET) {
+            currentBiggieCount++;
+        }
+        SOUND_projectileSoundOnce(pView->aSound, (int)projList[i].textureIdx, i, isActive);
+        if(isActive) {
             int screenX = (int)roundf(centerX - (float)projList[i].x * scale);
             int screenY = (int)roundf(centerY - (float)projList[i].y * scale);
             double angleDegrees = (projList[i].angle / 255.0) * 360;
@@ -341,4 +346,5 @@ void renderProjectiles(Client aClient, ClientView *pView) {
             // SDL_RenderFillRect(pView->pRend, &projRect);
         }
     }
+    //SOUND_biggieLoopControl(pView->aSound, projList, currentBiggieCount);
 }

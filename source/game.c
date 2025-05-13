@@ -17,6 +17,9 @@ static void planetFullscreenToggle(Client aClient, ClientControl *pControl, Clie
 void gameLoop(Client aClient, ClientControl *pControl, ClientView *pView){
     NET_clientConnect(aClient);
 
+    SOUND_setVolume(8, 64);
+    SOUND_setMixVolume(pView->aSound);
+
     Menu menu = initMenu(pView->pRend, pView, aClient);
 
     TerminalHub terminalHub;
@@ -120,12 +123,13 @@ void runMenu(Client aClient, ClientControl *pControl, ClientView *pView, Menu *p
         refreshMenu(aClient, pView->pRend, pMenu, pView);
         toggleDelay = 0;
     }
+    SOUND_playMusicIfChanged(pView->aSound, MUSIC_MENU);
 
     // if (pControl->isMouseDown && pMenu->currentPanel == PANEL_FRIENDS) {
     //     UI_FriendNameToggle(pMenu->friendList, pControl->mousePos.x, pControl->mousePos.y);
     // }    
     
-    updateMenu(pMenu, pControl, pView, aClient);
+    updateMenu(pMenu, pControl, pView, aClient, pView->aSound);
     if (pMenu->isGameStarted) {
         updateHudPlayerList(aClient, pView->aHud, pView->pRend, pView->windowWidth, pView->windowHeight);
         NET_clientSendInt(aClient, MENU, CHANGE_GAME_STATE, LOBBY);
@@ -296,6 +300,8 @@ void runPlanet(Client aClient, ClientControl *pControl, ClientView *pView, Map a
     int selfIndex = NET_clientGetSelfIndex(aClient);
     SDL_Point lastPosition[MAX_CLIENTS];
     SDL_Point playerPos;
+
+    SOUND_playMusicIfChanged(pView->aSound, MUSIC_NEMUR);
 
     enableMouseTexture(pView->crosshair);
     updatePositioning(aClient, lastPosition, &playerPos, selfIndex);
