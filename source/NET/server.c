@@ -392,6 +392,7 @@ void NET_serverEnemiesSpawnInterval(Server aServer){
                 printf("NET_serverCompIP == -1\n");
                 return;
             }
+            NET_serverSendInt(aServer,GLOBAL, GET_WAVE, aServer->scenario.waveCount, indexIP);
             for (int i = 0; i < aServer->clientCount; i++){
                 if(aServer->clients[i].State == MENU || aServer->clients[i].State == LOBBY) continue;
                 for (int y = 0; y < aServer->scenario.waveCount * 2; y++){
@@ -732,7 +733,16 @@ void NET_serverUpdateEnemies(Server aServer, Enemies aEnemies, ServerMap aMap){
                     .h = PROJECTILEWIDTH
                 };
                 if (enemyColitino(projectileRect, enemyHitbox)){
-                    aServer->scenario.totalKilldEnemise += enemyDamaged(aEnemies, aServer->clients[aServer->projList[j].srcPlayerIdx].player.weapon.damage, i, &enemyCount);
+                    if (enemyDamaged(aEnemies, aServer->clients[aServer->projList[j].srcPlayerIdx].player.weapon.damage, i, &enemyCount)){
+                        aServer->scenario.totalKilldEnemise++;
+                        int indexIP = NET_serverCompIP(aServer);
+                        if(indexIP == -1) {
+                            printf("Error NET_serverCompIP return -1\n");
+                            return;
+                        }
+                        NET_serverSendInt(aServer, GLOBAL, KILLCOUNT, aServer->scenario.totalKilldEnemise, indexIP);
+                    }
+                    // aServer->scenario.totalKilldEnemise += enemyDamaged(aEnemies, aServer->clients[aServer->projList[j].srcPlayerIdx].player.weapon.damage, i, &enemyCount);
                     NET_projectileKill(aServer, &aServer->projList[j], j);
                 }
             }
