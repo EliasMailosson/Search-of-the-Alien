@@ -6,6 +6,7 @@
 
 #include <math.h>
 
+#define DEFAULT_PROJECTILE_SPEED 15
 typedef struct __attribute__((packed)) Projectile {
     int16_t x, y;
     int8_t angle;
