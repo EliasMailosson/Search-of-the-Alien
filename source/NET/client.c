@@ -120,6 +120,10 @@ Client NET_clientCreate(){
     aClient->EnemiesCount = 0;
     aClient->showPauseMenu = 0;
     NET_clientLoadWeaponStats(aClient);
+
+    //OBJprogress default
+    aClient->scenario.killCount = 0;
+    aClient->scenario.Wave = 0;
     
     return aClient;
 }
