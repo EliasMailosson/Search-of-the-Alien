@@ -91,7 +91,7 @@ void sortEntities(Client aClient, int *count, Entity *outputEntityList, EntityCo
     qsort(outputEntityList, n, sizeof(Entity), cmpYPos);
 }
 
-void renderPlayer(EntityContext context, ClientView *pView) {
+void renderPlayer(EntityContext context, ClientView *pView, int index, int state) {
     Player player = *((Player*)context.currentEntity.instance);
     SDL_Rect playerRect = {
         .x = context.currentEntity.screenX,
@@ -106,13 +106,16 @@ void renderPlayer(EntityContext context, ClientView *pView) {
     int graphicsModePow2 = (int)pow(2, context.graphicsMode);
     int currentPlayerFrame = ( (context.frame/graphicsModePow2) % (24/((int)pow(2, context.graphicsMode-1))) );
 
+
     SDL_Rect src;
     switch(player.currentPlayerAnimation) {
         case ANIMATION_IDLE:
             src = (SDL_Rect){currentPlayerFrame*context.spriteSize, (player.direction+8)*context.spriteSize, context.spriteSize, context.spriteSize};
+            SOUND_playLoopIfRunning(pView->aSound, index, false, state);
             break;
         case ANIMATION_RUNNING:
             src = (SDL_Rect){currentPlayerFrame*context.spriteSize, player.direction*context.spriteSize, context.spriteSize, context.spriteSize};
+            SOUND_playLoopIfRunning(pView->aSound, index, true, state);
             break;
         default:
             src = (SDL_Rect){currentPlayerFrame*context.spriteSize, player.direction*context.spriteSize, context.spriteSize, context.spriteSize};
@@ -198,6 +201,8 @@ void renderEntities(Client aClient, ClientView *pView) {
     context.renderSizeHalf = pView->playerRenderSize/2;
     context.scale = (float)pView->playerRenderSize / RENDER_SIZE;
 
+    int actualPlayerIndex = 0;
+
     sortEntities(aClient, &count, entityList, context, pView);
     renderShadows(context, entityList, pView, count);
     for(int i = 0; i < count; i++) {
@@ -208,7 +213,9 @@ void renderEntities(Client aClient, ClientView *pView) {
                 break;
 
             case ENTITY_PLAYER:
-                renderPlayer(context, pView);
+                int state = NET_clientGetClientState(aClient, actualPlayerIndex);
+                renderPlayer(context, pView, actualPlayerIndex, state);
+                actualPlayerIndex++;
                 break;
         }
     }
@@ -217,6 +224,7 @@ void renderEntities(Client aClient, ClientView *pView) {
     SDL_Rect screenRect = {.x = 0, .y = 0, .w = pView->windowWidth, .h = pView->windowHeight};
     if (NET_clientIsPlayerDamaged(aClient, context.selfIndex)) {
         damageTime = SDL_GetTicks();
+        SOUND_playerIsHurt(pView->aSound);
     }
     if (SDL_GetTicks() - damageTime < 250) {
         SDL_RenderCopy(pView->pRend, pView->vignetteTexture, &vignetteRect, &screenRect);

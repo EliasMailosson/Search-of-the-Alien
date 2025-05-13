@@ -76,7 +76,7 @@ void SOUND_projectileSoundOnce(Sound aSound, int projectileType, int projIndex, 
 
 void SOUND_playDash(Sound aSound);
 
-void SOUND_playLoopIfRunning(Sound aSound, int playerIndex, bool isRunning, int *channelArray, bool *playingArray, int state);
+void SOUND_playLoopIfRunning(Sound aSound, int playerIndex, bool isRunning, int state);
 
 void SOUND_UIhoverSound(Sound aSound, bool isHover);
 
