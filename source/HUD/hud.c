@@ -167,12 +167,18 @@ void updateHudPlayerList(Client aClient, Hud aHud, SDL_Renderer *pRend, int wind
         NET_clientGetPlayerName(aClient, i, username);
         UI_labelSetText(aHud->playerList.usernames[i], username);
         UI_labelRefreshTexture(pRend, aHud->playerList.usernames[i]);
-        if (objY < 10 + i*40) objY = (10 + i*40);
-        // printf("Y: %d", objY);
+        if (objY < 10 + i*40) {
+            objY = (10 + i*40);
+        } else objY = (10 + i*40); //Disconnected player
     }
     aHud->playerList.count = newCount;
 
     //OBJECTIVES
+    char bufProg[32];
+
+    int currentKills = NET_clientGetKillCount(aClient);
+    int currentWave = NET_clientGetWaveCount(aClient);
+
     for (int i = 0; i < OBJECTIVECOUNT; i++) {
         aHud->objectives[i].x = aHud->playerList.x - 34; //-34 to start where the picture is rendered
     }
@@ -186,14 +192,17 @@ void updateHudPlayerList(Client aClient, Hud aHud, SDL_Renderer *pRend, int wind
         {
         case ELIMINATIONS:
             UI_labelSetText(aHud->objectives[i].objectiveLabel, "Kill FIVE enemies");
-            UI_labelSetText(aHud->objectives[i].objectiveProgress, "0/0");
+            snprintf(bufProg, sizeof(bufProg), "%d / %d", currentKills, TARGET_KILLS);
+            UI_labelSetText(aHud->objectives[i].objectiveProgress, bufProg);
             break;
         case WAVE:
             UI_labelSetText(aHud->objectives[i].objectiveLabel, "Withstand TWO waves");
-            UI_labelSetText(aHud->objectives[i].objectiveProgress, "0/0");
+            snprintf(bufProg, sizeof(bufProg), "%d / %d", currentWave, TARGET_WAVES);
+            UI_labelSetText(aHud->objectives[i].objectiveProgress, bufProg);
             break;
         case PATH:
             UI_labelSetText(aHud->objectives[i].objectiveLabel, "Go to marked spot");
+            UI_labelSetText(aHud->objectives[i].objectiveProgress, "Not done");
             break;
         default:
             UI_labelSetText(aHud->objectives[i].objectiveLabel, "No objective yet");

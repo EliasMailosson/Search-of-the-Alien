@@ -111,4 +111,11 @@ void NET_clientScenarioUpdate(Client aClient,uint32_t seed);
 int NET_clientGetEnemiesCount(Client aClinet);
 int NET_clientGetEnemyHP(Client aClient, int index);
 
+//Getters for objectives
+int NET_clientGetEnemyHP(Client aClient, int index);
+int NET_clientGetKillCount(Client aClient);
+int NET_clientGetWaveCount(Client aClient);
+ScenarioState NET_clientGetScenarioState(Client aClient);
+SDL_Point NET_clientGetObjectivePoint(Client aClient);
+
 #endif

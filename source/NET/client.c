@@ -527,3 +527,19 @@ void NET_clientSaveWeaponStats(Client aClient) {
 int NET_clientGetEnemyHP(Client aClient, int index){
     return aClient->enemies[index].hpEnemy;
 }
+
+int NET_clientGetKillCount(Client aClient) {
+    return aClient->scenario.killCount;
+}
+
+int NET_clientGetWaveCount(Client aClient) {
+    return aClient->scenario.Wave;
+}
+
+ScenarioState NET_clientGetScenarioState(Client aClient) {
+    return aClient->scenario.state;
+}
+
+SDL_Point NET_clientGetObjectivePoint(Client aClient) {
+    return aClient->scenario.objectivePoint;
+}
