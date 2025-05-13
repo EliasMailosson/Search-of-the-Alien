@@ -86,9 +86,10 @@ void UI_panelSetAppearance(Panel aPanel, SDL_Rect rect, SDL_Color src_bg) {
     aPanel->rect = rect;
 }
 
-void UI_panelUpdate(Panel aPanel, MenuEvent *pEvent, bool isMouseUp, bool *keys) {
+void UI_panelUpdate(Panel aPanel, MenuEvent *pEvent, bool isMouseUp, bool *keys, Sound aSound) {
     if(aPanel == NULL) return;
     if(!aPanel->active) return;
+    bool nowHover = false;
 
     pEvent->eventType = PANEL_IDLE;
 
@@ -101,10 +102,14 @@ void UI_panelUpdate(Panel aPanel, MenuEvent *pEvent, bool isMouseUp, bool *keys)
 
         case UI_BUTTON:
             if(UI_buttonIsHovered((Button)aPanel->compList[i].pComp, mouseX, mouseY)) {
+                nowHover = true;
                 if(isMouseUp) {
+                    SOUND_UIclickSound(aSound);
+
                     // pEvent->eventType = BUTTON_CLICKED;
                     // printf("Button Clicked! (key: %s)\n", aPanel->compList[i].key);
                     if(aPanel->compList[i].hasPanelLink) {
+                        
                         pEvent->eventType = PANEL_SWITCH;
                         pEvent->newPanel = aPanel->compList[i].panelLink;
                         strcpy(pEvent->key, aPanel->compList[i].key);
@@ -116,6 +121,7 @@ void UI_panelUpdate(Panel aPanel, MenuEvent *pEvent, bool isMouseUp, bool *keys)
                     return;
                 }
             }
+            
             break;
         
         case UI_CHECKLIST:
@@ -170,6 +176,7 @@ void UI_panelUpdate(Panel aPanel, MenuEvent *pEvent, bool isMouseUp, bool *keys)
             }
         }
     }
+    SOUND_UIhoverSound(aSound, nowHover);
 }
 
 void UI_panelRender(SDL_Renderer* pRend, Panel aPanel) {

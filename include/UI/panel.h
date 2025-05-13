@@ -3,6 +3,7 @@
 
 #include <stdbool.h>
 #include <SDL.h>
+#include "../../include/sound.h"
 
 enum CompTypes{UI_BUTTON, UI_LABEL, UI_CHECKLIST, UI_INPUTFIELD, UI_FRIENDLIST, UI_ANIMATION};
 
@@ -31,7 +32,7 @@ void UI_panelAddComponent(Panel aPanel, void *comp, int type, char *key);
 void UI_panelRender(SDL_Renderer *pRend, Panel aPanel);
 
 /*Updates all child-components and poll for interaction*/
-void UI_panelUpdate(Panel aPanel, MenuEvent *pEvent, bool isMouseUp, bool *keys);
+void UI_panelUpdate(Panel aPanel, MenuEvent *pEvent, bool isMouseUp, bool *keys, Sound aSound);
 
 /*Toggle the visibility and activity of a panel*/
 void UI_panelSetActive(Panel aPanel, bool active);

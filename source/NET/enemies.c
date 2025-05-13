@@ -22,7 +22,7 @@ typedef struct enemies {
     SDL_Rect *zones;
     int zoneCount;
 }enemies;
-
+    
 Enemies NET_enemiesCreate(void){
 	Enemies aEnemies =  malloc(sizeof(*aEnemies));
 	if(aEnemies == NULL){

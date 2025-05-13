@@ -17,6 +17,9 @@ static void planetFullscreenToggle(Client aClient, ClientControl *pControl, Clie
 void gameLoop(Client aClient, ClientControl *pControl, ClientView *pView){
     NET_clientConnect(aClient);
 
+    SOUND_setVolume(8, 64);
+    SOUND_setMixVolume(pView->aSound);
+
     Menu menu = initMenu(pView->pRend, pView, aClient);
 
     TerminalHub terminalHub;
@@ -68,6 +71,8 @@ void runLobby(Client aClient, Map aMap, ClientControl *pControl, ClientView *pVi
     SDL_Point lastPosition[MAX_CLIENTS];
     SDL_Point playerPos;
 
+    SOUND_playMusicIfChanged(pView->aSound, MUSIC_MENU);
+
     for (int i = 0; i < NET_clientGetEnemiesCount(aClient); i++)
     {
         SDL_Point point = NET_clientGetEnemyPos(aClient, i);
@@ -105,6 +110,10 @@ void runLobby(Client aClient, Map aMap, ClientControl *pControl, ClientView *pVi
     SDL_Point mapMovePos = {(playerPos.x/(float)TILE_SIZE)*tileRect.w - pView->windowWidth/2 - pView->playerRenderSize/2 + tileRect.w/2, (playerPos.y/(float)TILE_SIZE)*tileRect.h - pView->windowHeight/2 - pView->playerRenderSize + tileRect.h/2};
     MAP_MapMoveMap(aMap, mapMovePos);
 
+    if(pControl->keys[SDL_SCANCODE_SPACE]){
+        SOUND_playDash(pView->aSound);
+    }
+
     renderLobby(pView, aMap, aClient, *pTerminalHub);
 }
 
@@ -120,12 +129,13 @@ void runMenu(Client aClient, ClientControl *pControl, ClientView *pView, Menu *p
         refreshMenu(aClient, pView->pRend, pMenu, pView);
         toggleDelay = 0;
     }
+    SOUND_playMusicIfChanged(pView->aSound, MUSIC_MENU);
 
     // if (pControl->isMouseDown && pMenu->currentPanel == PANEL_FRIENDS) {
     //     UI_FriendNameToggle(pMenu->friendList, pControl->mousePos.x, pControl->mousePos.y);
     // }    
     
-    updateMenu(pMenu, pControl, pView, aClient);
+    updateMenu(pMenu, pControl, pView, aClient, pView->aSound);
     if (pMenu->isGameStarted) {
         updateHudPlayerList(aClient, pView->aHud, pView->pRend, pView->windowWidth, pView->windowHeight);
         NET_clientSendInt(aClient, MENU, CHANGE_GAME_STATE, LOBBY);
@@ -297,6 +307,8 @@ void runPlanet(Client aClient, ClientControl *pControl, ClientView *pView, Map a
     SDL_Point lastPosition[MAX_CLIENTS];
     SDL_Point playerPos;
 
+    SOUND_playMusicIfChanged(pView->aSound, MUSIC_NEMUR);
+
     enableMouseTexture(pView->crosshair);
     updatePositioning(aClient, lastPosition, &playerPos, selfIndex);
     if(!pPauseMenu->isVisible) {
@@ -324,6 +336,10 @@ void runPlanet(Client aClient, ClientControl *pControl, ClientView *pView, Map a
         (playerPos.x/(float)TILE_SIZE)*tileRect.w - pView->windowWidth/2 - pView->playerRenderSize/2 + tileRect.w/2,
         (playerPos.y/(float)TILE_SIZE)*tileRect.h - pView->windowHeight/2 - pView->playerRenderSize + tileRect.h/2};
     MAP_MapMoveMap(aMap, mapMovePos);
+
+    if(pControl->keys[SDL_SCANCODE_SPACE]){
+        SOUND_playDash(pView->aSound);
+    }
     
     renderPlanet(pView,aMap,aClient,pPauseMenu);
 }

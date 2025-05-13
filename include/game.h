@@ -6,6 +6,7 @@
 #include <SDL_image.h>
 #include <SDL_ttf.h>
 #include <SDL_net.h>
+#include <SDL_mixer.h>
 #include "../include/UI/panel.h"
 #include "../include/NET/client.h"
 #include "../include/NET/shared.h"
@@ -13,6 +14,7 @@
 #include "UI/button.h"
 #include "UI/friend.h"
 #include "../include/HUD/hud.h"
+#include "../include/sound.h"
 
 #define MAX_PLAYER_CHARACTERS 3
 #define MAX_PLAYER_TEXTURES 6
@@ -51,6 +53,16 @@ typedef struct {
     SDL_Point PlayerPos[MAX_CLIENTS];
     SDL_Texture *projectileTexture[MAX_PROJECTILE_TEXTURES];
     SDL_Texture *shadowTexture;
+
+    Mix_Music *backgroundMusic1;
+    Mix_Music *backgroundMusicNEMUR;
+    MusicTrack currentMusic;
+
+    Mix_Chunk *blueShot;
+    Mix_Chunk *biggieShot;
+
+    Sound aSound;
+
 }ClientView; 
 
 typedef struct {
@@ -73,5 +85,7 @@ void runMenu(Client aClient, ClientControl *pControl, ClientView *pView, Menu *p
 void runPlanet(Client aClient, ClientControl *pControl, ClientView *pView, Map aMap, PauseMenu *pPauseMenu, Menu *pMenu, TerminalHub *pTerminalHub);
 
 void toggleFullscreen(ClientView *pView);
+
+//void playMusicIfChanged(Mix_Music *newMusic, MusicTrack newTrack, MusicTrack *currentTrack);
 
 #endif

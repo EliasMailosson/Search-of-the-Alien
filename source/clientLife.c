@@ -23,6 +23,10 @@ void startClient(Client *aClient, ClientView *pView,ClientControl *pControl){
         printf("Net_Init error: %s\n", SDLNet_GetError());
     }
 
+    SDL_Init(SDL_INIT_AUDIO);
+    Mix_OpenAudio(44100, MIX_DEFAULT_FORMAT, 2, 2048);
+    Mix_AllocateChannels(MAX_SOUND_CHANNELS);
+
     pView->pWin = SDL_CreateWindow("main",SDL_WINDOWPOS_CENTERED,SDL_WINDOWPOS_CENTERED,pView->windowWidth,pView->windowHeight,0);
     if (!pView->pWin) {
         printf("Error creating window: %s\n", SDL_GetError());
@@ -94,6 +98,9 @@ void startClient(Client *aClient, ClientView *pView,ClientControl *pControl){
     pView->vignetteTexture = SDL_CreateTextureFromSurface(pView->pRend, surface13);
     SDL_FreeSurface(surface13);
 
+    pView->aSound = SOUND_create();
+
+
     pView->crosshair = createScaledCursor("assets/images/cursor/crosshair.png", 50, 50, 25, 25);
 
     pView->playerRenderSize = 128;
@@ -155,7 +162,11 @@ SDL_Cursor* createScaledCursor(const char *filePath, int newWidth, int newHeight
 }
 
 void killClient(Client *aClient, ClientView *pView){
+    
     SDL_FreeCursor(pView->crosshair);
+
+    SOUND_destroy(pView->aSound);
+
     for(int i = 0; i < MAX_PLAYER_CHARACTERS; i++) {
         SDL_DestroyTexture(pView->playerTexture[i]);
         pView->playerTexture[i] = NULL;
