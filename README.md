@@ -18,7 +18,6 @@ Install all [dependencies](./dependencies.md).
 git clone https://github.com/EliasMailosson/Search-of-the-Alien.git && \
 cd Search-of-the-Alien && \
 make client
-# make setup
 ```
 
 ### Server installation
@@ -42,5 +41,4 @@ make server
 1. Clone this repo: ```git clone https://github.com/EliasMailosson/Search-of-the-Alien.git```
 2. Install all [dependencies](./dependencies.md).
 3. Run ```make all```, ```make client```, or ```make server``` depending on your case.
-<!-- 4. ```make setup``` -->
 4. Start the server with ```make run_server``` and the client with ```make run_client```

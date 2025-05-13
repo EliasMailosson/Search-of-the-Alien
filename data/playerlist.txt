@@ -1,7 +1,1 @@
-6
-Sardor
-Linus
-Elias
-printf
-Caspar
-Karar 
+0
