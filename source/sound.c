@@ -50,7 +50,7 @@ Sound SOUND_create(void) {
     Mix_Chunk *nemurSteps = Mix_LoadWAV("assets/sound/nemurFootsteps.wav");
     aSound->nemurSteps = nemurSteps;
 
-    Mix_Chunk *playerHit = Mix_LoadWAV("assets/sound/Vine Boom.wav");
+    Mix_Chunk *playerHit = Mix_LoadWAV("assets/sound/player-hurt3.wav");
     aSound->playerHit = playerHit;
 
     // MENU SOUND FX
@@ -131,7 +131,7 @@ void SOUND_setMixVolume(Sound aSound){
     Mix_VolumeChunk(aSound->hoverSound, 64);
     Mix_VolumeChunk(aSound->lobbySteps, 24);
     Mix_VolumeChunk(aSound->nemurSteps, 24);
-    Mix_VolumeChunk(aSound->playerHit, 128);
+    Mix_VolumeChunk(aSound->playerHit, 72);
 
 
 }
