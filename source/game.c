@@ -15,7 +15,7 @@ static void lobbyFullscreenToggle(Client aClient, ClientControl *pControl, Clien
 static void planetFullscreenToggle(Client aClient, ClientControl *pControl, ClientView *pView, Map aMap, int *pDelay, PauseMenu *pPauseMenu, TerminalHub *pTerminalHub, Menu *pMenu);
 
 void gameLoop(Client aClient, ClientControl *pControl, ClientView *pView){
-    NET_clientConnect(aClient);    
+    NET_clientConnect(aClient);
 
     SOUND_setVolume(8, 64);
     SOUND_setMixVolume(pView->aSound);
@@ -108,18 +108,12 @@ void runLobby(Client aClient, Map aMap, ClientControl *pControl, ClientView *pVi
     SDL_Point mapMovePos = {(playerPos.x/(float)TILE_SIZE)*tileRect.w - pView->windowWidth/2 - pView->playerRenderSize/2 + tileRect.w/2, (playerPos.y/(float)TILE_SIZE)*tileRect.h - pView->windowHeight/2 - pView->playerRenderSize + tileRect.h/2};
     MAP_MapMoveMap(aMap, mapMovePos);
 
-    if (pControl->keys[SDL_SCANCODE_SPACE]) {
-        SOUND_playDash(pView->aSound);
-    }
     renderLobby(pView, aMap, aClient, *pTerminalHub);
 }
 
 void runMenu(Client aClient, ClientControl *pControl, ClientView *pView, Menu *pMenu,Map aMap, TerminalHub *pTerminalHub, PauseMenu *pPauseMenu) {
     static int toggleDelay = 0;
     toggleDelay++;
-
-    SOUND_playMusicIfChanged(pView->aSound, MUSIC_MENU);
-
     if(pControl->keys[SDL_SCANCODE_F] && toggleDelay > 12) {
         toggleFullscreen(pView);
         MAP_MapRefresh(aMap, pView->windowWidth, pView->windowHeight);
@@ -129,6 +123,7 @@ void runMenu(Client aClient, ClientControl *pControl, ClientView *pView, Menu *p
         refreshMenu(aClient, pView->pRend, pMenu, pView);
         toggleDelay = 0;
     }
+    SOUND_playMusicIfChanged(pView->aSound, MUSIC_MENU);
 
     // if (pControl->isMouseDown && pMenu->currentPanel == PANEL_FRIENDS) {
     //     UI_FriendNameToggle(pMenu->friendList, pControl->mousePos.x, pControl->mousePos.y);
@@ -192,11 +187,11 @@ static void renderLobby(ClientView *pView, Map aMap, Client aClient, TerminalHub
     SDL_SetRenderDrawColor(pView->pRend, 0,0,0,0);
     SDL_RenderClear(pView->pRend);
 
-    MAP_MapNewRender(pView->pRend, aMap, pView->pWin);
-
+    //MAP_MapNewRender(pView->pRend, aMap, pView->pWin);
+    MAP_MapRenderLobby(pView->pRend,aMap);
     
-    
-    renderPlayers(aClient, pView);
+    // renderPlayers(aClient, pView);
+    renderEntities(aClient, pView);
     hudRender(aClient, pView->aHud,pView->pRend, pView->windowWidth, pView->windowHeight);
 
     if (terminalHub.isVisible) {
@@ -336,9 +331,5 @@ void runPlanet(Client aClient, ClientControl *pControl, ClientView *pView, Map a
         (playerPos.y/(float)TILE_SIZE)*tileRect.h - pView->windowHeight/2 - pView->playerRenderSize + tileRect.h/2};
     MAP_MapMoveMap(aMap, mapMovePos);
     
-    if (pControl->keys[SDL_SCANCODE_SPACE]) {
-        SOUND_playDash(pView->aSound);
-    }
-
     renderPlanet(pView,aMap,aClient,pPauseMenu);
 }
