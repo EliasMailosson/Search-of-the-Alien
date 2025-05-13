@@ -220,6 +220,54 @@ void* projektil_threads(void *arg){
     return NULL;
 }
 
+void NET_serverEnemiesSpawnInterval(Server aServer){
+    if(aServer->scenario.victory) return;
+    switch (aServer->scenario.scenario){
+    case ELIMINATIONS:
+        for (int i = 0; i < aServer->clientCount; i++){
+            if(aServer->clients[i].State != MENU && 
+            aServer->clients[i].State != LOBBY &&
+            (int)SDL_GetTicks() >= 5000+(aServer->clients[i].spawnTimer) -(aServer->scenario.spawnFrequency*100) && 
+            (int)NET_enemiesGetSize(aServer->aEnemies) < MAX_ENEMIES_CLIENT_SIDE)
+            {
+                aServer->clients[i].spawnTimer = (int)SDL_GetTicks();
+                NET_enemiesPush(aServer->aEnemies,NET_enemyCreate(50,50,LIGHT_ENEMY,aServer->scenario.difficulty));
+            }
+        }
+        break;
+    case WAVE:
+        if((int)NET_enemiesGetSize(aServer->aEnemies) == 0){
+            aServer->scenario.waveCount ++;
+            int indexIP = NET_serverCompIP(aServer);
+            if(indexIP == -1){
+                printf("NET_serverCompIP == -1\n");
+                return;
+            }
+            NET_serverSendInt(aServer,GLOBAL, GET_WAVE, aServer->scenario.waveCount, indexIP);
+            for (int i = 0; i < aServer->clientCount; i++){
+                if(aServer->clients[i].State == MENU || aServer->clients[i].State == LOBBY) continue;
+                for (int i = 0; i < aServer->scenario.waveCount * 2; i++){
+                    NET_enemiesPush(aServer->aEnemies,NET_enemyCreate(50,50,LIGHT_ENEMY,aServer->scenario.difficulty));
+                }
+            }
+        }
+        break;
+    case PATH:
+        for (int i = 0; i < aServer->clientCount; i++){
+            if(aServer->clients[i].State != MENU && aServer->clients[i].State != LOBBY && 
+            (int)SDL_GetTicks() >= 5000+(aServer->clients[i].spawnTimer) -(aServer->scenario.spawnFrequency*100) && 
+            (int)NET_enemiesGetSize(aServer->aEnemies) < MAX_ENEMIES_CLIENT_SIDE)
+            {
+                aServer->clients[i].spawnTimer = (int)SDL_GetTicks();
+                NET_enemiesPush(aServer->aEnemies,NET_enemyCreate(50,50,LIGHT_ENEMY,aServer->scenario.difficulty));
+            }
+        }
+        break;
+    default:
+        break;
+    }
+}
+
 void NET_serverSendEnemiesPacket(Server aServer, GameState GS, Enemies aEnemies){
     if ((int)NET_enemiesGetSize(aEnemies) < 0 || (int)NET_enemiesGetSize(aEnemies) > MAX_ENEMIES_CLIENT_SIDE) {
         fprintf(stderr, "Error: invalid pEnemyCount (%d)\n",(int)NET_enemiesGetSize(aEnemies));
@@ -732,7 +780,16 @@ void NET_serverUpdateEnemies(Server aServer, Enemies aEnemies, ServerMap aMap){
                     .h = PROJECTILEWIDTH
                 };
                 if (enemyColitino(projectileRect, enemyHitbox)){
-                    aServer->scenario.totalKilldEnemise += enemyDamaged(aEnemies, aServer->clients[aServer->projList[j].srcPlayerIdx].player.weapon.damage, i, &enemyCount);
+                    if (enemyDamaged(aEnemies, aServer->clients[aServer->projList[j].srcPlayerIdx].player.weapon.damage, i, &enemyCount)){
+                        aServer->scenario.totalKilldEnemise++;
+                        int indexIP = NET_serverCompIP(aServer);
+                        if(indexIP == -1) {
+                            printf("Error NET_serverCompIP return -1\n");
+                            return;
+                        }
+                        NET_serverSendInt(aServer, GLOBAL, KILLCOUNT, aServer->scenario.totalKilldEnemise, indexIP);
+                    }
+                    // aServer->scenario.totalKilldEnemise += enemyDamaged(aEnemies, aServer->clients[aServer->projList[j].srcPlayerIdx].player.weapon.damage, i, &enemyCount);
                     NET_projectileKill(aServer, &aServer->projList[j], j);
                 }
             }

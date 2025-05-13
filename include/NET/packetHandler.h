@@ -30,7 +30,9 @@ typedef enum{
     NEW_SEED,
     PROJ_LIST,
     PAUSE_MENU_REQUEST, 
-    PAUSE_MENU_CONFIRM
+    PAUSE_MENU_CONFIRM,
+    GET_WAVE,
+    KILLCOUNT
 } MessageType;
 
 typedef enum{
