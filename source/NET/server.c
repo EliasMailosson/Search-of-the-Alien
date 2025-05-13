@@ -68,6 +68,7 @@ void* enemies_threads(void *arg);
 int stop = 0;
 mutex_t clients_mutex;
 mutex_t stop_mutex;
+mutex_t proj_mutex;
 thread_t projThread; 
 thread_t enemyThread;
 
@@ -92,6 +93,7 @@ int main(int argc, char **argv ){
     
     mutex_init(&stop_mutex);
     mutex_init(&clients_mutex);
+    mutex_init(&proj_mutex);
     thread_create(&projThread, projektil_threads,aServer);
     thread_create(&enemyThread,enemies_threads,aServer);
 
@@ -212,7 +214,10 @@ void* projektil_threads(void *arg){
         mutex_unlock(&stop_mutex);
         if(should_stop) break;
 
+        mutex_lock(&proj_mutex);
         NET_projectilesUpdate(aServer, aServer->projList);
+        mutex_unlock(&proj_mutex);
+
         NET_serverSendProjPacket(aServer);
         sleep_ms(10);
     }
@@ -585,6 +590,9 @@ static void keyPressedListener(Server aServer, int playerIdx, ServerMap aServerM
 }
 
 int NET_serverGetProjectileSpeed(Server aServer, int playerIdx) {
+    if (playerIdx < 0 || playerIdx >= aServer->clientCount) {
+        return DEFAULT_PROJECTILE_SPEED;
+    }
     return aServer->clients[playerIdx].player.weapon.projSpeed;
 }
 
@@ -635,7 +643,9 @@ void NET_serverUpdatePlayer(Server aServer, Packet aPacket, GameState state){
     if(pip.keys[PLAYER_INPUT_MOUSEDOWN] && !pip.keys[PLAYER_INPUT_SPACE] && 
         (aServer->clients[playerIdx].player.projCounter)++%freq == 0) // TODO: change frequency depending on weapon/character
     {
+        mutex_lock(&proj_mutex);
         NET_projectileSpawn(aServer, aServer->projList, playerIdx);
+        mutex_unlock(&proj_mutex);
     }
 
     NET_serverSendPlayerPacket(aServer,state); 
