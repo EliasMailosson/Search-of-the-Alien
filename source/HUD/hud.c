@@ -186,8 +186,8 @@ void updateHudPlayerList(Client aClient, Hud aHud, SDL_Renderer *pRend, int wind
     
     for (int i = 0; i < OBJECTIVECOUNT; i++) {
         aHud->objectives[i].textColor = (SDL_Color){.r = 255, .g = 255, .b = 255};
-        UI_labelSetAppearance(pRend, aHud->objectives[i].objectiveLabel, aHud->objectives[i].x, objY + i*40, aHud->objectives[i].textColor, aHud->objectives[i].pFont);
-        UI_labelSetAppearance(pRend, aHud->objectives[i].objectiveProgress, aHud->objectives[i].x, objY + i*40 + 15, aHud->objectives[i].textColor, aHud->objectives[i].pFont);
+        UI_labelSetAppearance(pRend, aHud->objectives[i].objectiveLabel, aHud->objectives[i].x, objY, aHud->objectives[i].textColor, aHud->objectives[i].pFont);
+        UI_labelSetAppearance(pRend, aHud->objectives[i].objectiveProgress, aHud->objectives[i].x, objY + 15, aHud->objectives[i].textColor, aHud->objectives[i].pFont);
         switch (i)
         {
         case ELIMINATIONS:
@@ -235,9 +235,12 @@ void hudRender(Client aClient, Hud aHud,SDL_Renderer *pRend, int windowW, int wi
         SDL_SetRenderDrawColor(pRend, 255, 255, 255, 255);
         SDL_RenderFillRect(pRend, &((SDL_Rect){aHud->playerList.x, r.y + 24, NET_clientGetHP(aClient, i), 4}));
     }
-    for (int i = 0; i < OBJECTIVECOUNT; i++) {
-        UI_labelRender(pRend, aHud->objectives[i].objectiveLabel);
-        UI_labelRender(pRend, aHud->objectives[i].objectiveProgress);
+
+    int currentScenario = NET_clientGetScenarioState(aClient);
+
+    if (NET_clientGetState(aClient) == 3) {
+        UI_labelRender(pRend, aHud->objectives[currentScenario].objectiveLabel);
+        UI_labelRender(pRend, aHud->objectives[currentScenario].objectiveProgress);
     }
     
     int dashCooldown = NET_clientGetDashCooldown(aClient);

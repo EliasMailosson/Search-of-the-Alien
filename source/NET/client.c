@@ -124,6 +124,7 @@ Client NET_clientCreate(){
     //OBJprogress default
     aClient->scenario.killCount = 0;
     aClient->scenario.Wave = 0;
+    aClient->scenario.state = 0;
     
     return aClient;
 }
@@ -346,7 +347,7 @@ void NET_clientReceiver(Client aClient, Map aMap,SDL_Window *pScreen){
 
 
 void NET_clientScenarioUpdate(Client aClient,uint32_t seed){
-    aClient->scenario.state = seed % SCENARIO_COUNT;
+    aClient->scenario.state = abs(seed % SCENARIO_COUNT);
     switch (aClient->scenario.state){
     case ELIMINATIONS:
         aClient->scenario.objectivePoint = (SDL_Point){.x = 0, .y = 0};

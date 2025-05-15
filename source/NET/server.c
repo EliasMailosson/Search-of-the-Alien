@@ -339,7 +339,7 @@ void NET_serverSetNewMap(Server aServer){
     NET_serverMapSetEdgesToZero(aServer->aServerMap);
     NET_serverSendInt(aServer,GLOBAL,NEW_SEED,(int)NET_serverMapGetSeed(aServer->aServerMap),indexIP);
     printf("%u\n",NET_serverMapGetSeed(aServer->aServerMap));
-    aServer->scenario.scenario = ((int)NET_serverMapGetSeed(aServer->aServerMap) % SCENARIO_COUNT);
+    aServer->scenario.scenario = abs(((int)NET_serverMapGetSeed(aServer->aServerMap) % SCENARIO_COUNT));
     printf("scnareo %d\n",aServer->scenario.scenario);
     NET_serverScenarioUpdate(&aServer->scenario,aServer->scenario.scenario,NET_serverMapGetSeed(aServer->aServerMap));
     NET_enemiesClear(aServer->aEnemies);
@@ -504,10 +504,10 @@ static void calcMovement(Server aServer, PlayerInputPacket *pip, int playerIdx){
         dy = dy / 2;
     }
 
-    // if(MAP_TileNotWalkable(aServer->aServerMap,
-    //     aServer->clients[playerIdx].player.hitBox.x + (int)dx * speed,
-    //     aServer->clients[playerIdx].player.hitBox.y + (int)dy * speed,
-    //     aServer->clients[playerIdx].State)) return;
+    if(MAP_TileNotWalkable(aServer->aServerMap,
+        aServer->clients[playerIdx].player.hitBox.x + (int)dx * speed,
+        aServer->clients[playerIdx].player.hitBox.y + (int)dy * speed,
+        aServer->clients[playerIdx].State)) return;
 
     int collisionType;
     NET_serverCheckPlayerCollision(aServer, playerIdx, &collisionType);
