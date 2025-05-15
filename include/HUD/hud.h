@@ -17,8 +17,8 @@
 
 #define ARROW_SIZE (TILE_SIZE / 2.0f)
 #define OBJECTIVECOUNT 3
-#define TARGET_KILLS 20
-#define TARGET_WAVES 3
+#define TARGET_KILLS 25
+#define TARGET_WAVES 8
 
 typedef struct Hud *Hud;
 typedef struct Arrow *Arrow;

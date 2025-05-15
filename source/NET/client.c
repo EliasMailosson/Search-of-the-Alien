@@ -318,6 +318,8 @@ void NET_clientReceiver(Client aClient, Map aMap,SDL_Window *pScreen){
                 MAP_mapSetPlanet(NET_clientGetState(aClient),aMap);
                 MAP_mapNewMap(aMap,aClient->seed);
                 NET_clientScenarioUpdate(aClient,aClient->seed);
+                aClient->scenario.killCount = 0;
+                aClient->scenario.Wave = 0;
                 break;
             case PROJ_LIST:
                 NET_clientUpdateProjList(aClient, aPacket);

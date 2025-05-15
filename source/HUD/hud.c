@@ -191,12 +191,12 @@ void updateHudPlayerList(Client aClient, Hud aHud, SDL_Renderer *pRend, int wind
         switch (i)
         {
         case ELIMINATIONS:
-            UI_labelSetText(aHud->objectives[i].objectiveLabel, "Kill FIVE enemies");
+            UI_labelSetText(aHud->objectives[i].objectiveLabel, "Kill TWENTYFIVE enemies");
             snprintf(bufProg, sizeof(bufProg), "%d / %d", currentKills, TARGET_KILLS);
             UI_labelSetText(aHud->objectives[i].objectiveProgress, bufProg);
             break;
         case WAVE:
-            UI_labelSetText(aHud->objectives[i].objectiveLabel, "Withstand TWO waves");
+            UI_labelSetText(aHud->objectives[i].objectiveLabel, "Withstand EIGHT waves");
             snprintf(bufProg, sizeof(bufProg), "%d / %d", currentWave, TARGET_WAVES);
             UI_labelSetText(aHud->objectives[i].objectiveProgress, bufProg);
             break;
