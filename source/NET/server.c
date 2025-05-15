@@ -236,7 +236,22 @@ void NET_serverEnemiesSpawnInterval(Server aServer){
             (int)NET_enemiesGetSize(aServer->aEnemies) < MAX_ENEMIES_CLIENT_SIDE)
             {
                 aServer->clients[i].spawnTimer = (int)SDL_GetTicks();
-                NET_enemiesPush(aServer->aEnemies,NET_enemyCreate(50,50,LIGHT_ENEMY,aServer->scenario.difficulty));
+                //NET_enemiesPush(aServer->aEnemies,NET_enemyCreate(50,50,LIGHT_ENEMY,aServer->scenario.difficulty));
+                SDL_Rect spawnZone = NET_getEnemySpawnZone(aServer->clients[i].player.hitBox, TILE_SIZE * 5);
+                SDL_Rect otherZones[MAX_CLIENTS];
+                int otherCount = 0;
+                for (int j = 0; j < aServer->clientCount; j++) {
+                    if(j == i){
+                        continue;
+                    }
+                    otherZones[otherCount++] = NET_getEnemySpawnZone(NET_serverGetPlayerHitbox(aServer, j), TILE_SIZE * 5);
+                }
+                int spawnX, spawnY;
+                bool found = NET_findEnemySpawnPoint(spawnZone, otherZones, otherCount, &spawnX, &spawnY);
+                if (found)
+                {
+                    NET_enemiesPush(aServer->aEnemies,NET_enemyCreate(spawnX,spawnY,LIGHT_ENEMY,aServer->scenario.difficulty));
+                } 
             }
         }
         break;
@@ -252,7 +267,22 @@ void NET_serverEnemiesSpawnInterval(Server aServer){
             for (int i = 0; i < aServer->clientCount; i++){
                 if(aServer->clients[i].State == MENU || aServer->clients[i].State == LOBBY) continue;
                 for (int i = 0; i < aServer->scenario.waveCount * 2; i++){
-                    NET_enemiesPush(aServer->aEnemies,NET_enemyCreate(50,50,LIGHT_ENEMY,aServer->scenario.difficulty));
+                    //NET_enemiesPush(aServer->aEnemies,NET_enemyCreate(50,50,LIGHT_ENEMY,aServer->scenario.difficulty));
+                    SDL_Rect spawnZone = NET_getEnemySpawnZone(aServer->clients[i].player.hitBox, TILE_SIZE * 5);
+                    SDL_Rect otherZones[MAX_CLIENTS];
+                    int otherCount = 0;
+                    for (int j = 0; j < aServer->clientCount; j++) {
+                        if(j == i){
+                            continue;
+                        }
+                        otherZones[otherCount++] = NET_getEnemySpawnZone(NET_serverGetPlayerHitbox(aServer, j), TILE_SIZE * 5);
+                    }
+                    int spawnX, spawnY;
+                    bool found = NET_findEnemySpawnPoint(spawnZone, otherZones, otherCount, &spawnX, &spawnY);
+                    if (found)
+                    {
+                        NET_enemiesPush(aServer->aEnemies,NET_enemyCreate(spawnX,spawnY,LIGHT_ENEMY,aServer->scenario.difficulty));
+                    } 
                 }
             }
         }
@@ -264,7 +294,22 @@ void NET_serverEnemiesSpawnInterval(Server aServer){
             (int)NET_enemiesGetSize(aServer->aEnemies) < MAX_ENEMIES_CLIENT_SIDE)
             {
                 aServer->clients[i].spawnTimer = (int)SDL_GetTicks();
-                NET_enemiesPush(aServer->aEnemies,NET_enemyCreate(50,50,LIGHT_ENEMY,aServer->scenario.difficulty));
+                //NET_enemiesPush(aServer->aEnemies,NET_enemyCreate(50,50,LIGHT_ENEMY,aServer->scenario.difficulty));
+                SDL_Rect spawnZone = NET_getEnemySpawnZone(aServer->clients[i].player.hitBox, TILE_SIZE * 5);
+                SDL_Rect otherZones[MAX_CLIENTS];
+                int otherCount = 0;
+                for (int j = 0; j < aServer->clientCount; j++) {
+                    if(j == i){
+                        continue;
+                    }
+                    otherZones[otherCount++] = NET_getEnemySpawnZone(NET_serverGetPlayerHitbox(aServer, j), TILE_SIZE * 5);
+                }
+                int spawnX, spawnY;
+                bool found = NET_findEnemySpawnPoint(spawnZone, otherZones, otherCount, &spawnX, &spawnY);
+                if (found)
+                {
+                    NET_enemiesPush(aServer->aEnemies,NET_enemyCreate(spawnX,spawnY,LIGHT_ENEMY,aServer->scenario.difficulty));
+                } 
             }
         }
         break;
