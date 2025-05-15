@@ -100,7 +100,7 @@ void runLobby(Client aClient, Map aMap, ClientControl *pControl, ClientView *pVi
         lobbyTerminalHubToggle(pControl, &toggleDelay, aClient);
     }
 
-    NET_clientReceiver(aClient,aMap,pView->pWin);
+    NET_clientReceiver(aClient,aMap,pView->pWin, pView->aSound);
     updatePlayerAnimation(aClient, lastPosition);
 
     // update HUD?
@@ -142,7 +142,7 @@ void runMenu(Client aClient, ClientControl *pControl, ClientView *pView, Menu *p
         updateHudPlayerList(aClient, pView->aHud, pView->pRend, pView->windowWidth, pView->windowHeight);
         NET_clientSendInt(aClient, MENU, CHANGE_GAME_STATE, LOBBY);
     }
-    NET_clientReceiver(aClient,aMap,pView->pWin);
+    NET_clientReceiver(aClient,aMap,pView->pWin, pView->aSound);
     renderMenu(pView->pRend, pMenu);
 }
 
@@ -324,12 +324,12 @@ void runPlanet(Client aClient, ClientControl *pControl, ClientView *pView, Map a
     
     toggleDelay++;
 
-    NET_clientReceiver(aClient,aMap,pView->pWin);
+    NET_clientReceiver(aClient,aMap,pView->pWin, pView->aSound);
 
     for(int i = 0; i < NET_clientGetEnemiesCount(aClient); i++){
         if(NET_clientIsEnemyDamaged(aClient, i)){
             SOUND_enemyIsHurt(pView->aSound);
-            printf("ENEMY HURT #%d!!\n", i);
+            // printf("ENEMY HURT #%d!!\n", i);
         }
     }
 

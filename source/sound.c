@@ -57,7 +57,11 @@ Sound SOUND_create(void) {
     }
 
     // OBJECTIVE CALLS
-    
+    Mix_Chunk *objectiveCall1 = Mix_LoadWAV("assets/sound/linus-mission-call1.2.wav");
+    aSound->objectiveCall1 = objectiveCall1;
+
+    Mix_Chunk *objectiveCall2 = Mix_LoadWAV("assets/sound/linus-mission-call2.2.wav");
+    aSound->objectiveCall2 = objectiveCall2;
 
     // MENU SOUND FX
     Mix_Chunk *confirmSound = Mix_LoadWAV("assets/sound/confirmSound.wav");
@@ -80,6 +84,9 @@ void SOUND_destroy(Sound aSound) {
     Mix_FreeChunk(aSound->dashSound);
 
     Mix_FreeChunk(aSound->vine);
+
+    Mix_FreeChunk(aSound->objectiveCall1);
+    Mix_FreeChunk(aSound->objectiveCall2);
     
     Mix_FreeChunk(aSound->cleoShot);
     Mix_FreeChunk(aSound->confirmSound);
@@ -92,7 +99,6 @@ void SOUND_destroy(Sound aSound) {
     for (int i = 0; i < 5; i++){
         Mix_FreeChunk(aSound->enemyFX[i]);
     }
-    
     free(aSound);
 }
 
@@ -127,6 +133,7 @@ void SOUND_setMixVolume(Sound aSound){
     
     Mix_VolumeChunk(aSound->blueShot, 64);
     Mix_VolumeChunk(aSound->biggieShotLoop, 128);
+    Mix_VolumeChunk(aSound->vine, 128);
     
     /*for (int i = 0; i < 16; i++)
     {
@@ -134,6 +141,9 @@ void SOUND_setMixVolume(Sound aSound){
     }
     */
     Mix_VolumeChunk(aSound->dashSound, 32);
+
+    Mix_VolumeChunk(aSound->objectiveCall1, 70);
+    Mix_VolumeChunk(aSound->objectiveCall1, 70);
     
     Mix_VolumeChunk(aSound->cleoShot, 128);
     Mix_VolumeChunk(aSound->confirmSound, 64);
@@ -314,17 +324,17 @@ void SOUND_enemyIsHurt(Sound aSound) {
     }
 }
 
-void SOUND_objectiveSoundCall(int objective){
+void SOUND_objectiveSoundCall(Sound aSound, int objective){
     switch (objective)
     {
     case 0:
-        // Mix_PlayChannel(-1, aSound->playerHit, 0);
+        Mix_PlayChannel(-1, aSound->objectiveCall1, 0);
         break;
     case 1:
-        // Mix_PlayChannel(-1, aSound->playerHit, 0);
+        Mix_PlayChannel(-1, aSound->objectiveCall2, 0);
         break;
     case 2:
-        // Mix_PlayChannel(-1, aSound->playerHit, 0);
+        Mix_PlayChannel(-1, aSound->objectiveCall2, 0);
         break;
     
     default:

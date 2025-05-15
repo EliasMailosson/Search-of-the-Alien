@@ -30,6 +30,9 @@ typedef struct sound{
 
     Mix_Chunk *playerHit;
 
+    Mix_Chunk *objectiveCall1;
+    Mix_Chunk *objectiveCall2;
+
     Mix_Chunk *vine;
 
     Mix_Chunk *enemyFX[5];
@@ -90,5 +93,6 @@ void SOUND_playerIsHurt(Sound aSound);
 
 void SOUND_enemyIsHurt(Sound aSound);
 
+void SOUND_objectiveSoundCall(Sound aSound, int objective);
 
 #endif
