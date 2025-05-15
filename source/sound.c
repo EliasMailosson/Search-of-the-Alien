@@ -8,7 +8,7 @@ Sound SOUND_create(void) {
         return NULL;
     }
     aSound->currentTrack = MUSIC_NONE;
-    aSound->masterVolume = 128;  // 50%
+    aSound->masterVolume = 128;
     for (int i = 0; i < MAX_SOUND_CHANNELS; i++) {
         aSound->currentChannel[i] = -1;
     }
@@ -56,6 +56,15 @@ Sound SOUND_create(void) {
         aSound->enemyFX[i] = enemyFX[i];
     }
 
+    Mix_Chunk *biggiesShots[4] = {NULL};
+    biggiesShots[0] = Mix_LoadWAV("assets/sound/biggieShots/biggieshotS1.wav");
+    biggiesShots[1] = Mix_LoadWAV("assets/sound/biggieShots/biggieshotS1.wav");
+    biggiesShots[2] = Mix_LoadWAV("assets/sound/biggieShots/biggieshotS1.wav");
+    biggiesShots[3] = Mix_LoadWAV("assets/sound/biggieShots/biggieshotS1.wav");
+    for (int i = 0; i < 4; i++){
+        aSound->biggiesShots[i] = biggiesShots[i];
+    }
+
     // OBJECTIVE CALLS
     Mix_Chunk *objectiveCall1 = Mix_LoadWAV("assets/sound/linus-mission-call1.2.wav");
     aSound->objectiveCall1 = objectiveCall1;
@@ -80,6 +89,9 @@ void SOUND_destroy(Sound aSound) {
     Mix_FreeChunk(aSound->blueShot);
     Mix_FreeChunk(aSound->biggieShotLoop);
     Mix_FreeChunk(aSound->biggieShot);
+    for (int i = 0; i < 4; i++){
+        Mix_FreeChunk(aSound->biggiesShots[i]);
+    }
 
     Mix_FreeChunk(aSound->dashSound);
 
@@ -132,18 +144,22 @@ static Mix_Music *newMusic(Sound aSound, MusicTrack newTrack){
 void SOUND_setMixVolume(Sound aSound){
     
     Mix_VolumeChunk(aSound->blueShot, 64);
-    Mix_VolumeChunk(aSound->biggieShotLoop, 128);
-    Mix_VolumeChunk(aSound->vine, 128);
-    
-    /*for (int i = 0; i < 16; i++)
-    {
-        Mix_VolumeChunk(aSound->biggieShot[i], 128);
+    Mix_VolumeChunk(aSound->biggieShotLoop, 20);
+    Mix_VolumeChunk(aSound->biggieShot, 16);
+    for (int i = 0; i < 4; i++){
+        Mix_VolumeChunk(aSound->biggiesShots[i], 48);
     }
-    */
+
+    for (int i = 0; i < 5; i++){
+        Mix_VolumeChunk(aSound->enemyFX[i], 48);
+    }
+
+    Mix_VolumeChunk(aSound->vine, 128);
+
     Mix_VolumeChunk(aSound->dashSound, 32);
 
-    Mix_VolumeChunk(aSound->objectiveCall1, 70);
-    Mix_VolumeChunk(aSound->objectiveCall1, 70);
+    Mix_VolumeChunk(aSound->objectiveCall1, 48);
+    Mix_VolumeChunk(aSound->objectiveCall2, 48);
     
     Mix_VolumeChunk(aSound->cleoShot, 128);
     Mix_VolumeChunk(aSound->confirmSound, 64);
@@ -161,64 +177,10 @@ void SOUND_playMusicIfChanged(Sound aSound, MusicTrack newTrack){
     }
 }
 
-bool SOUND_timedSoundFX(Uint32 *lastPlayedTime, Uint32 timeMs){
-    Uint32 now = SDL_GetTicks();
-    if (now - *lastPlayedTime >= timeMs) {
-        *lastPlayedTime = now;
-        return true;
-    }
-    return false;
-}
-
-bool SOUND_isChunkPlaying(Sound aSound, Mix_Chunk *chunk) {
-    for (int ch = 0; ch < MAX_SOUND_CHANNELS; ++ch) {
-        if (Mix_GetChunk(ch) == chunk && Mix_Playing(ch)) {
-            return 1;  // Yes, this chunk is playing on channel ch
-        }
-    }
-    return 0;
-}
-
-/* void SOUND_projectileSound(int *channel, Mix_Chunk *soundFX, int currentProjectileCount, int lastProjectileCount){
-    if (currentProjectileCount > lastProjectileCount){
-        if (*channel == -1 || !Mix_Playing(*channel)){
-            *channel = Mix_PlayChannel(-1, soundFX, currentProjectileCount - 1);  // Loop while projectiles exist
-        }
-    } 
-    else if(currentProjectileCount <= lastProjectileCount){
-        if (*channel != -1 && Mix_Playing(*channel)){
-            Mix_HaltChannel(*channel);
-            *channel = -1;
-        }
-    }
-}*/
-
-/*void SOUND_biggieLoopControl(Sound aSound, Proj *projList, int currentBiggieCount) {
-    static bool biggiePlaying = false;
-    static int biggieChannel = -1;
-    static int lastBiggieCount = 0;
-
-
-    // Start loop if new biggie projectiles appeared
-    if (currentBiggieCount > lastBiggieCount && !biggiePlaying) {
-        biggieChannel = Mix_PlayChannel(-1, aSound->biggieShotLoop, -1);
-        biggiePlaying = true;
-    }
-
-    // Stop loop if all biggie projectiles are gone
-    if (currentBiggieCount < lastBiggieCount - 6 && biggiePlaying || currentBiggieCount == 0 && biggiePlaying ) {
-        Mix_HaltChannel(biggieChannel);
-        biggieChannel = -1;
-        biggiePlaying = false;
-    }
-
-    lastBiggieCount = currentBiggieCount;
-}*/
-
-
 void SOUND_projectileSoundOnce(Sound aSound, int projectileType, int projIndex, bool isActive) {
     static bool played[MAX_CLIENT_PROJ] = { false };
     static int playedChannel[MAX_CLIENT_PROJ] = { -1 };  // track the channel per projectile
+    static int index = 0;
 
     if (!isActive) {
         played[projIndex] = false;  // Reset flag when projectile slot is empty
@@ -230,7 +192,8 @@ void SOUND_projectileSoundOnce(Sound aSound, int projectileType, int projIndex, 
 
         switch (projectileType) {
             case 1:
-                fx = aSound->biggieShot;
+                fx = aSound->biggiesShots[index % 4];
+                index++;
                 break;
             case 3:
                 fx = aSound->blueShot;
@@ -254,7 +217,6 @@ void SOUND_projectileSoundOnce(Sound aSound, int projectileType, int projIndex, 
             }
         }
     }
-
 }
 
 void SOUND_playDash(Sound aSound) {

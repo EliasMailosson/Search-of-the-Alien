@@ -20,8 +20,8 @@ typedef struct sound{
     Mix_Chunk *blueShot;
     Mix_Chunk *biggieShot;
     Mix_Chunk *cleoShot;
-
     Mix_Chunk *biggieShotLoop;
+    Mix_Chunk *biggiesShots[4];
 
     Mix_Chunk *dashSound;
 
@@ -70,14 +70,6 @@ void SOUND_setVolume(int music, int soundFX);
 void SOUND_setMixVolume(Sound aSound);
 
 void SOUND_playMusicIfChanged(Sound aSound , MusicTrack newTrack);
-
-bool SOUND_timedSoundFX(Uint32 *lastPlayedTime, Uint32 timeMs);
-
-bool SOUND_isChunkPlaying(Sound aSound, Mix_Chunk *chunk);
-
-// void SOUND_projectileSound(int *channel, Mix_Chunk *soundFX, int currentProjectileCount, int lastProjectileCount);
-
-// void SOUND_biggieLoopControl(Sound aSound, Proj *projList, int currentBiggieCount);
 
 void SOUND_projectileSoundOnce(Sound aSound, int projectileType, int projIndex, bool isActive);
 
