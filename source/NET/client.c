@@ -527,3 +527,18 @@ void NET_clientSaveWeaponStats(Client aClient) {
 int NET_clientGetEnemyHP(Client aClient, int index){
     return aClient->enemies[index].hpEnemy;
 }
+
+bool NET_clientIsEnemyDamaged(Client aClient, int index){
+    static int enemyLastHP[MAX_ENEMIES_CLIENT_SIDE] = {100};
+
+    if(aClient->enemies[index].hpEnemy == 100){
+        enemyLastHP[index] = 100;
+    }
+    if(aClient->enemies[index].hpEnemy < enemyLastHP[index]){
+        enemyLastHP[index] = aClient->enemies[index].hpEnemy;
+        return true;
+    }
+    
+    
+    return false;
+}

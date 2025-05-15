@@ -29,8 +29,11 @@ Sound SOUND_create(void) {
     Mix_Chunk *cleoShot = Mix_LoadWAV("assets/sound/cleoShot.wav");
     aSound->cleoShot = cleoShot;
 
-    Mix_Chunk * biggieShotLoop = Mix_LoadWAV("assets/sound/biggieShot2step.wav");
+    Mix_Chunk *biggieShotLoop = Mix_LoadWAV("assets/sound/biggieShotLong.wav");
     aSound->biggieShotLoop = biggieShotLoop;
+
+    Mix_Chunk *biggieShot = Mix_LoadWAV("assets/sound/biggieShot2step.wav");
+    aSound->biggieShot = biggieShot;
 
     Mix_Chunk *lobbySteps = Mix_LoadWAV("assets/sound/lobbyFootsteps.wav");
     aSound->lobbySteps = lobbySteps;
@@ -39,6 +42,22 @@ Sound SOUND_create(void) {
 
     Mix_Chunk *playerHit = Mix_LoadWAV("assets/sound/player-hurt4.wav");
     aSound->playerHit = playerHit;
+
+    Mix_Chunk *vine = Mix_LoadWAV("assets/sound/Vine Boom.wav");
+    aSound->vine = vine;
+
+    Mix_Chunk *enemyFX[5] = {NULL};
+    enemyFX[0] = Mix_LoadWAV("assets/sound/elias-is-hurt1.wav");
+    enemyFX[1] = Mix_LoadWAV("assets/sound/elias-is-hurt2.wav");
+    enemyFX[2] = Mix_LoadWAV("assets/sound/elias-is-hurt3.wav");
+    enemyFX[3] = Mix_LoadWAV("assets/sound/elias-is-hurt4.wav");
+    enemyFX[4] = Mix_LoadWAV("assets/sound/elias-is-hurt5.wav");
+    for (int i = 0; i < 5; i++){
+        aSound->enemyFX[i] = enemyFX[i];
+    }
+
+    // OBJECTIVE CALLS
+    
 
     // MENU SOUND FX
     Mix_Chunk *confirmSound = Mix_LoadWAV("assets/sound/confirmSound.wav");
@@ -56,9 +75,11 @@ void SOUND_destroy(Sound aSound) {
     Mix_FreeMusic(aSound->musicNEMUR);
     Mix_FreeChunk(aSound->blueShot);
     Mix_FreeChunk(aSound->biggieShotLoop);
-
+    Mix_FreeChunk(aSound->biggieShot);
 
     Mix_FreeChunk(aSound->dashSound);
+
+    Mix_FreeChunk(aSound->vine);
     
     Mix_FreeChunk(aSound->cleoShot);
     Mix_FreeChunk(aSound->confirmSound);
@@ -68,6 +89,10 @@ void SOUND_destroy(Sound aSound) {
 
     Mix_FreeChunk(aSound->playerHit);
 
+    for (int i = 0; i < 5; i++){
+        Mix_FreeChunk(aSound->enemyFX[i]);
+    }
+    
     free(aSound);
 }
 
@@ -183,6 +208,7 @@ bool SOUND_isChunkPlaying(Sound aSound, Mix_Chunk *chunk) {
 
 void SOUND_projectileSoundOnce(Sound aSound, int projectileType, int projIndex, bool isActive) {
     static bool played[MAX_CLIENT_PROJ] = { false };
+    static int playedChannel[MAX_CLIENT_PROJ] = { -1 };  // track the channel per projectile
 
     if (!isActive) {
         played[projIndex] = false;  // Reset flag when projectile slot is empty
@@ -194,7 +220,7 @@ void SOUND_projectileSoundOnce(Sound aSound, int projectileType, int projIndex, 
 
         switch (projectileType) {
             case 1:
-                
+                fx = aSound->biggieShot;
                 break;
             case 3:
                 fx = aSound->blueShot;
@@ -206,11 +232,19 @@ void SOUND_projectileSoundOnce(Sound aSound, int projectileType, int projIndex, 
                 return;
         }
 
-        if (fx && projectileType != 1) {
-            Mix_PlayChannel(-1, fx, 0);
-            played[projIndex] = true;
+        static Uint32 lastPlayedTime = 0;
+        Uint32 now = SDL_GetTicks();
+
+        if (fx) {
+            int channel = Mix_PlayChannel(-1, fx, 0);
+            if (channel >= 0) {
+                
+                playedChannel[projIndex] = channel;  // track the channel
+                played[projIndex] = true;
+            }
         }
     }
+
 }
 
 void SOUND_playDash(Sound aSound) {
@@ -266,4 +300,35 @@ void SOUND_UIclickSound(Sound aSound) {
 
 void SOUND_playerIsHurt(Sound aSound) {
     Mix_PlayChannel(-1, aSound->playerHit, 0);
+}
+
+void SOUND_enemyIsHurt(Sound aSound) {
+    static Uint32 lastTime = 0;
+    Uint32 delay = 500;
+
+    Uint32 currentTime = SDL_GetTicks();
+    if (currentTime - lastTime >= delay) {
+        int randomNumber = rand() % 5;
+        Mix_PlayChannel(-1, aSound->enemyFX[randomNumber], 0);
+        lastTime = SDL_GetTicks();
+    }
+}
+
+void SOUND_objectiveSoundCall(int objective){
+    switch (objective)
+    {
+    case 0:
+        // Mix_PlayChannel(-1, aSound->playerHit, 0);
+        break;
+    case 1:
+        // Mix_PlayChannel(-1, aSound->playerHit, 0);
+        break;
+    case 2:
+        // Mix_PlayChannel(-1, aSound->playerHit, 0);
+        break;
+    
+    default:
+        break;
+    }
+
 }

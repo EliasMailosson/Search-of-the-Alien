@@ -18,7 +18,7 @@ typedef struct sound{
     MusicTrack currentTrack;
 
     Mix_Chunk *blueShot;
-    Mix_Chunk *biggieShot[16];
+    Mix_Chunk *biggieShot;
     Mix_Chunk *cleoShot;
 
     Mix_Chunk *biggieShotLoop;
@@ -29,6 +29,10 @@ typedef struct sound{
     Mix_Chunk *nemurSteps;
 
     Mix_Chunk *playerHit;
+
+    Mix_Chunk *vine;
+
+    Mix_Chunk *enemyFX[5];
 
     Mix_Chunk *confirmSound;
     Mix_Chunk *hoverSound;
@@ -83,5 +87,8 @@ void SOUND_UIhoverSound(Sound aSound, bool isHover);
 void SOUND_UIclickSound(Sound aSound);
 
 void SOUND_playerIsHurt(Sound aSound);
+
+void SOUND_enemyIsHurt(Sound aSound);
+
 
 #endif

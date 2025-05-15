@@ -34,6 +34,8 @@ void gameLoop(Client aClient, ClientControl *pControl, ClientView *pView){
     if(strcmp(username, "None") != 0) {
         NET_clientSendString(aClient,MENU,CONNECT,username);
     }
+
+    Mix_PlayChannel(-1, pView->aSound->vine, 0);
     
     Map aMap = MAP_MapCreate(pView->pRend, pView->windowWidth, pView->windowHeight);
     while (pControl->isRunning){
@@ -296,6 +298,7 @@ void renderPlanet(ClientView *pView, Map aMap, Client aClient, PauseMenu *pPause
     if (pPauseMenu->isVisible) {
         renderPauseMenu(pView, pPauseMenu);
     }
+    
 
     hudRender(aClient, pView->aHud, pView->pRend, pView->windowWidth, pView->windowHeight);
     SDL_RenderPresent(pView->pRend);
@@ -322,6 +325,13 @@ void runPlanet(Client aClient, ClientControl *pControl, ClientView *pView, Map a
     toggleDelay++;
 
     NET_clientReceiver(aClient,aMap,pView->pWin);
+
+    for(int i = 0; i < NET_clientGetEnemiesCount(aClient); i++){
+        if(NET_clientIsEnemyDamaged(aClient, i)){
+            SOUND_enemyIsHurt(pView->aSound);
+            printf("ENEMY HURT #%d!!\n", i);
+        }
+    }
 
     pPauseMenu->isVisible = NET_clientGetPauseState(aClient);
 
