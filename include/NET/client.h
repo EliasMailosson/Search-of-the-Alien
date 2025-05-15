@@ -30,6 +30,9 @@ struct Player{
     bool isShooting;
     int dashCooldown;
     uint8_t HpProcent;
+
+    uint8_t xp;
+    uint8_t lvl;
 };
 
 typedef struct WeaponStats WeaponStats;
@@ -64,6 +67,8 @@ bool NET_clientIsMyUsername(Client aClient, char *name);
 void NET_clientSetSelfName(Client aClient, char* newName);
 int NET_clientGetProjTexture(Client aClient, int projIdx);
 
+int NET_clientGetPlayerXP(Client aClient, int idx);
+int NET_clientGetPlayerLvl(Client aClient, int idx);
 void NET_clientSetPlayerAnimation(Client aClient, int playerIdx, int newAnimation);
 int NET_clientGetPlayerAnimation(Client aClient, int playerIdx);
 void NET_clientSetNextGraphicsConfig(Client aClient, int value);

@@ -253,6 +253,20 @@ void hudRender(Client aClient, Hud aHud,SDL_Renderer *pRend, int windowW, int wi
         SDL_RenderFillRect(pRend, &((SDL_Rect){centerX - 10, centerY+20, dashCooldown/5, 2}));
     }
     
+    // XP Bar
+    int selfIdx = NET_clientGetSelfIndex(aClient);
+    int xp = NET_clientGetPlayerXP(aClient, selfIdx);
+    int lvl = NET_clientGetPlayerLvl(aClient, selfIdx);
+    SDL_SetRenderDrawColor(pRend, 180, 180, 180, 120);
+    SDL_RenderDrawRect(pRend, &((SDL_Rect){centerX-101, 9, 202, 10}));
+    SDL_SetRenderDrawColor(pRend, 150, 150, 150, 150);
+    SDL_RenderFillRect(pRend, &((SDL_Rect){centerX-100, 10, 200, 8}));
+    SDL_SetRenderDrawColor(pRend, 180, 120, 240, 240);
+    SDL_RenderFillRect(pRend, &((SDL_Rect){centerX-100, 10, xp*2, 8}));
+    for(int i = 0; i < lvl; i++) {
+        SDL_SetRenderDrawColor(pRend, 200, 150, 255, 240);
+        SDL_RenderFillRect(pRend, &((SDL_Rect){centerX-100+(i*8), 20, 6, 6}));
+    }
 }
 
 SDL_Point hudGettArrowPos(Hud aHud, int index){

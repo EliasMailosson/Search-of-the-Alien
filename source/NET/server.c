@@ -42,6 +42,9 @@ struct User{
     int colorIndex;
     bool isHubVisible;
     int spawnTimer;
+
+    uint8_t xp;
+    uint8_t lvl;
 };
 
 struct server {
@@ -470,6 +473,8 @@ void NET_serverSendPlayerPacket(Server aServer,GameState GS){
         packet[i].isShooting = aServer->clients[i].player.isShooting;
         packet[i].dashCoolDown = aServer->clients[i].player.dashCooldown;
         packet[i].HpProcent = NET_serverGetPercentage(aServer->clients[i].player.HP , aServer->clients[i].player.maxHP);
+        packet[i].xp = aServer->clients[i].xp;
+        packet[i].lvl = aServer->clients[i].lvl;
     }
     Uint32 payloadSize = aServer->clientCount * sizeof(PlayerPacket);
     for (int i = 0; i < aServer->clientCount; i++){
@@ -751,6 +756,13 @@ void NET_serverUpdateEnemies(Server aServer, Enemies aEnemies, ServerMap aMap){
                             return;
                         }
                         NET_serverSendInt(aServer, GLOBAL, KILLCOUNT, aServer->scenario.totalKilldEnemise, indexIP);
+
+                        int srcPlayerIdx = aServer->projList[j].srcPlayerIdx;
+                        aServer->clients[srcPlayerIdx].xp += (20/(aServer->clients[srcPlayerIdx].lvl+1));
+                        if(aServer->clients[srcPlayerIdx].xp >= 100) {
+                            aServer->clients[srcPlayerIdx].lvl++;
+                            aServer->clients[srcPlayerIdx].xp = 0;
+                        }
                     }
                     // aServer->scenario.totalKilldEnemise += enemyDamaged(aEnemies, aServer->clients[aServer->projList[j].srcPlayerIdx].player.weapon.damage, i, &enemyCount);
                     NET_projectileKill(aServer, &aServer->projList[j], j);
@@ -975,6 +987,8 @@ void NET_serverClientConnected(Packet aPacket, Server aServer){
     newUser.colorIndex = NET_serverAssignColorIndex(aServer);
     newUser.isHubVisible = false;
     newUser.spawnTimer = 0;
+    newUser.xp = 0;
+    newUser.lvl = 0;
     NET_serverAddUser(aServer, newUser);
     NET_serverSendInt(aServer, GLOBAL, CONNECT_RESPONSE, 0, aServer->clientCount - 1);
     printf("username: %s connected to server\n", aServer->clients[aServer->clientCount - 1].username);

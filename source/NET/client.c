@@ -72,6 +72,14 @@ Player *NET_clientGetPlayer(Client aClient, int idx) {
     return &aClient->playerList[idx];
 }
 
+int NET_clientGetPlayerXP(Client aClient, int idx) {
+    return (int)aClient->playerList[idx].xp;
+}
+
+int NET_clientGetPlayerLvl(Client aClient, int idx) {
+    return (int)aClient->playerList[idx].lvl;
+}
+
 bool NET_clientIsMyUsername(Client aClient, char *name) {
     if(strcmp(name, aClient->selfUsername) == 0) {
         return true;
@@ -404,6 +412,8 @@ void NET_clientUpdatePlayerList(Client aClient, Packet aPacket){
         aClient->playerList[i].isShooting = packets[i].isShooting;
         aClient->playerList[i].dashCooldown = packets[i].dashCoolDown;
         aClient->playerList[i].HpProcent = packets[i].HpProcent;
+        aClient->playerList[i].xp = packets[i].xp;
+        aClient->playerList[i].lvl = packets[i].lvl;
     }
 }
 
