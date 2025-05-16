@@ -557,21 +557,21 @@ SDL_Point NET_clientGetObjectivePoint(Client aClient) {
 char* NET_clientReadFileOne(char* file){
     FILE *fp = fopen(file,"r");
     if(!fp){
-        printf("Error openig: %s",file);
+        printf("Error openig: %s\n",file);
         return strdup("127.0.0.1");
     }
     char buf[MAX_LINE];
-    if (!fgets(buf, sizeof buf, fp)) {
-        fclose(fp);
-        return strdup("127.0.0.1");
+    char *out;
+    if (fgets(buf, sizeof buf, fp)) {
+        buf[strcspn(buf, "\n")] = '\0';
+        out = strdup(buf);
+        if (!out) {
+            printf("strdup\n");
+            out = strdup("127.0.0.1");
+        }
+    } else {
+        out = strdup("127.0.0.1");
     }
-    buf[strcspn(buf, "\n")] = '\0';
-    size_t len = strlen(buf);
-    char *out = malloc(len + 1);
-    if (!out) {
-        printf("Error using malloc in (NET_clientReadFileOne)\n");
-        return strdup("127.0.0.1");
-    }
-    memcpy(out, buf, len + 1);
+    fclose(fp);
     return out;
 }
