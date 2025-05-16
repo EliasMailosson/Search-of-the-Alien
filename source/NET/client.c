@@ -40,10 +40,13 @@ struct client{
 }; 
 
 bool NET_clientConnect(Client aClient){
-    if (SDLNet_ResolveHost(&aClient->serverAddr,JON_IP, PORT) < 0) {
+    char* serverIP = NET_clientReadFileOne(SERVER_IP_PAHT);
+    if (SDLNet_ResolveHost(&aClient->serverAddr,serverIP, PORT) < 0) {
         printf("SDLNet_ResolveHost failed: %s\n", SDLNet_GetError());
+        free(serverIP);
         return false;
     }
+    free(serverIP);
     return true;
 }
 
@@ -567,4 +570,26 @@ bool NET_clientIsEnemyDamaged(Client aClient, int index){
     
     
     return false;
+}
+
+char* NET_clientReadFileOne(char* file){
+    FILE *fp = fopen(file,"r");
+    if(!fp){
+        printf("Error openig: %s\n",file);
+        return strdup("127.0.0.1");
+    }
+    char buf[MAX_LINE];
+    char *out;
+    if (fgets(buf, sizeof buf, fp)) {
+        buf[strcspn(buf, "\n")] = '\0';
+        out = strdup(buf);
+        if (!out) {
+            printf("strdup\n");
+            out = strdup("127.0.0.1");
+        }
+    } else {
+        out = strdup("127.0.0.1");
+    }
+    fclose(fp);
+    return out;
 }

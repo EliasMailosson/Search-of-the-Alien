@@ -6,6 +6,8 @@
 #include "../../include/MAP/map.h"
 #include "../../include/NET/enemies.h"
 #include "../../include/sound.h"
+#define SERVER_IP_PAHT "data/server_ip.config"
+#define MAX_LINE 1024
 
 enum PlayerAnimationTypes{ANIMATION_IDLE, ANIMATION_RUNNING, EMOTE_TPOSE};
 
@@ -121,5 +123,8 @@ int NET_clientGetKillCount(Client aClient);
 int NET_clientGetWaveCount(Client aClient);
 ScenarioState NET_clientGetScenarioState(Client aClient);
 SDL_Point NET_clientGetObjectivePoint(Client aClient);
+
+char* NET_clientReadFileOne(char* file);
+
 
 #endif

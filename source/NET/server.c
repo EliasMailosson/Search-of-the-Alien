@@ -266,7 +266,7 @@ void NET_serverEnemiesSpawnInterval(Server aServer){
             NET_serverSendInt(aServer,GLOBAL, GET_WAVE, aServer->scenario.waveCount, indexIP);
             for (int i = 0; i < aServer->clientCount; i++){
                 if(aServer->clients[i].State == MENU || aServer->clients[i].State == LOBBY) continue;
-                for (int i = 0; i < aServer->scenario.waveCount * 2; i++){
+                for (int c = 0; c < aServer->scenario.waveCount * 2; c++){
                     //NET_enemiesPush(aServer->aEnemies,NET_enemyCreate(50,50,LIGHT_ENEMY,aServer->scenario.difficulty));
                     SDL_Rect spawnZone = NET_getEnemySpawnZone(aServer->clients[i].player.hitBox, TILE_SIZE * 5);
                     SDL_Rect otherZones[MAX_CLIENTS];
