@@ -32,8 +32,14 @@ Sound SOUND_create(void) {
     Mix_Chunk *biggieShotLoop = Mix_LoadWAV("assets/sound/biggieShotLong.wav");
     aSound->biggieShotLoop = biggieShotLoop;
 
-    Mix_Chunk *biggieShot = Mix_LoadWAV("assets/sound/biggieShot2step.wav");
-    aSound->biggieShot = biggieShot;
+    Mix_Chunk *biggiesShots[4] = {NULL};
+    biggiesShots[0] = Mix_LoadWAV("assets/sound/biggieShots/biggieshotS1.wav");
+    biggiesShots[1] = Mix_LoadWAV("assets/sound/biggieShots/biggieshotS1.wav");
+    biggiesShots[2] = Mix_LoadWAV("assets/sound/biggieShots/biggieshotS1.wav");
+    biggiesShots[3] = Mix_LoadWAV("assets/sound/biggieShots/biggieshotS1.wav");
+    for (int i = 0; i < 4; i++){
+        aSound->biggiesShots[i] = biggiesShots[i];
+    }
 
     Mix_Chunk *lobbySteps = Mix_LoadWAV("assets/sound/lobbyFootsteps.wav");
     aSound->lobbySteps = lobbySteps;
@@ -54,15 +60,6 @@ Sound SOUND_create(void) {
     enemyFX[4] = Mix_LoadWAV("assets/sound/elias-is-hurt5.wav");
     for (int i = 0; i < 5; i++){
         aSound->enemyFX[i] = enemyFX[i];
-    }
-
-    Mix_Chunk *biggiesShots[4] = {NULL};
-    biggiesShots[0] = Mix_LoadWAV("assets/sound/biggieShots/biggieshotS1.wav");
-    biggiesShots[1] = Mix_LoadWAV("assets/sound/biggieShots/biggieshotS1.wav");
-    biggiesShots[2] = Mix_LoadWAV("assets/sound/biggieShots/biggieshotS1.wav");
-    biggiesShots[3] = Mix_LoadWAV("assets/sound/biggieShots/biggieshotS1.wav");
-    for (int i = 0; i < 4; i++){
-        aSound->biggiesShots[i] = biggiesShots[i];
     }
 
     // OBJECTIVE CALLS
@@ -179,14 +176,12 @@ void SOUND_playMusicIfChanged(Sound aSound, MusicTrack newTrack){
 
 void SOUND_projectileSoundOnce(Sound aSound, int projectileType, int projIndex, bool isActive) {
     static bool played[MAX_CLIENT_PROJ] = { false };
-    static int playedChannel[MAX_CLIENT_PROJ] = { -1 };  // track the channel per projectile
     static int index = 0;
 
     if (!isActive) {
         played[projIndex] = false;  // Reset flag when projectile slot is empty
         return;
     }
-
     if (!played[projIndex]) {
         Mix_Chunk *fx = NULL;
 
@@ -209,12 +204,8 @@ void SOUND_projectileSoundOnce(Sound aSound, int projectileType, int projIndex, 
         Uint32 now = SDL_GetTicks();
 
         if (fx) {
-            int channel = Mix_PlayChannel(-1, fx, 0);
-            if (channel >= 0) {
-                
-                playedChannel[projIndex] = channel;  // track the channel
-                played[projIndex] = true;
-            }
+            Mix_PlayChannel(-1, fx, 0);
+            played[projIndex] = true;
         }
     }
 }
@@ -223,8 +214,7 @@ void SOUND_playDash(Sound aSound) {
     static Uint32 lastPlayedTime = 0;
     Uint32 now = SDL_GetTicks();
 
-    if (aSound->dashSound && (now - lastPlayedTime >= 4000)) {  // 5000 ms = 5 seconds
-        //Mix_VolumeChunk(aSound->dashSound, 64);
+    if (aSound->dashSound && (now - lastPlayedTime >= 4000)) {
         Mix_PlayChannel(-1, aSound->dashSound, 0);
         lastPlayedTime = now;
     }
@@ -245,7 +235,7 @@ void SOUND_playLoopIfRunning(Sound aSound, int playerIndex, bool isRunning, int 
     
     if (isRunning) {
         if (!playingArray[playerIndex]) {
-            channelArray[playerIndex] = Mix_PlayChannel(-1, steps, -1);  // Loop
+            channelArray[playerIndex] = Mix_PlayChannel(-1, steps, -1);
             playingArray[playerIndex] = true;
         }
     } else {
