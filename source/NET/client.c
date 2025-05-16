@@ -271,7 +271,7 @@ void NET_clientSendArray(Client aClient,GameState GS, MessageType msgType,const 
     NET_protocolSendArray(aClient->pSendPacket, aClient->clientSocket, aClient->serverAddr, GS, msgType, array, arraySize);
 }
 
-void NET_clientReceiver(Client aClient, Map aMap,SDL_Window *pScreen){
+void NET_clientReceiver(Client aClient, Map aMap,SDL_Window *pScreen, Sound aSound){
     int numReady = SDLNet_CheckSockets(aClient->socketSet, 10); 
     if (numReady == -1) {
         fprintf(stderr, "SDLNet_CheckSockets error: %s\n", SDLNet_GetError());
@@ -317,7 +317,7 @@ void NET_clientReceiver(Client aClient, Map aMap,SDL_Window *pScreen){
                 printf("new seed: %u\n",aClient->seed);
                 MAP_mapSetPlanet(NET_clientGetState(aClient),aMap);
                 MAP_mapNewMap(aMap,aClient->seed);
-                NET_clientScenarioUpdate(aClient,aClient->seed);
+                NET_clientScenarioUpdate(aClient,aClient->seed, aSound);
                 aClient->scenario.killCount = 0;
                 aClient->scenario.Wave = 0;
                 break;
@@ -348,17 +348,20 @@ void NET_clientReceiver(Client aClient, Map aMap,SDL_Window *pScreen){
 }
 
 
-void NET_clientScenarioUpdate(Client aClient,uint32_t seed){
+void NET_clientScenarioUpdate(Client aClient,uint32_t seed, Sound aSound){
     aClient->scenario.state = abs(seed % SCENARIO_COUNT);
     switch (aClient->scenario.state){
     case ELIMINATIONS:
         aClient->scenario.objectivePoint = (SDL_Point){.x = 0, .y = 0};
+        SOUND_objectiveSoundCall(aSound, ELIMINATIONS);
         break;
     case WAVE:
         aClient->scenario.objectivePoint = (SDL_Point){.x = 0, .y = 0};
+        SOUND_objectiveSoundCall(aSound, WAVE);
         break;
     case PATH:
         aClient->scenario.objectivePoint = (SDL_Point){.x = seed % MAP_HEIGHT, .y = seed % MAP_WIDTH};
+        SOUND_objectiveSoundCall(aSound, PATH);
         break;
     default:
         printf("NO SCENARIO\n");
@@ -549,4 +552,19 @@ ScenarioState NET_clientGetScenarioState(Client aClient) {
 
 SDL_Point NET_clientGetObjectivePoint(Client aClient) {
     return aClient->scenario.objectivePoint;
+}
+
+bool NET_clientIsEnemyDamaged(Client aClient, int index){
+    static int enemyLastHP[MAX_ENEMIES_CLIENT_SIDE] = {100};
+
+    if(aClient->enemies[index].hpEnemy == 100){
+        enemyLastHP[index] = 100;
+    }
+    if(aClient->enemies[index].hpEnemy < enemyLastHP[index]){
+        enemyLastHP[index] = aClient->enemies[index].hpEnemy;
+        return true;
+    }
+    
+    
+    return false;
 }

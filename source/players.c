@@ -325,7 +325,7 @@ void sortByYaxis(Client aClient, int playerCount, int indices[]){
 void renderProjectiles(Client aClient, ClientView *pView) {
     Proj projList[MAX_CLIENT_PROJ];
     NET_clientGetProjList(aClient, projList);
-
+    
     int centerX = pView->windowWidth/2;
     int centerY = pView->windowHeight/2;
     
@@ -338,6 +338,7 @@ void renderProjectiles(Client aClient, ClientView *pView) {
             currentBiggieCount++;
         }
         SOUND_projectileSoundOnce(pView->aSound, (int)projList[i].textureIdx, i, isActive);
+
         if(isActive) {
             int screenX = (int)roundf(centerX - (float)projList[i].x * scale);
             int screenY = (int)roundf(centerY - (float)projList[i].y * scale);

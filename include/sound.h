@@ -18,10 +18,10 @@ typedef struct sound{
     MusicTrack currentTrack;
 
     Mix_Chunk *blueShot;
-    Mix_Chunk *biggieShot[16];
+    Mix_Chunk *biggieShot;
     Mix_Chunk *cleoShot;
-
     Mix_Chunk *biggieShotLoop;
+    Mix_Chunk *biggiesShots[4];
 
     Mix_Chunk *dashSound;
 
@@ -29,6 +29,13 @@ typedef struct sound{
     Mix_Chunk *nemurSteps;
 
     Mix_Chunk *playerHit;
+
+    Mix_Chunk *objectiveCall1;
+    Mix_Chunk *objectiveCall2;
+
+    Mix_Chunk *vine;
+
+    Mix_Chunk *enemyFX[5];
 
     Mix_Chunk *confirmSound;
     Mix_Chunk *hoverSound;
@@ -64,14 +71,6 @@ void SOUND_setMixVolume(Sound aSound);
 
 void SOUND_playMusicIfChanged(Sound aSound , MusicTrack newTrack);
 
-bool SOUND_timedSoundFX(Uint32 *lastPlayedTime, Uint32 timeMs);
-
-bool SOUND_isChunkPlaying(Sound aSound, Mix_Chunk *chunk);
-
-// void SOUND_projectileSound(int *channel, Mix_Chunk *soundFX, int currentProjectileCount, int lastProjectileCount);
-
-// void SOUND_biggieLoopControl(Sound aSound, Proj *projList, int currentBiggieCount);
-
 void SOUND_projectileSoundOnce(Sound aSound, int projectileType, int projIndex, bool isActive);
 
 void SOUND_playDash(Sound aSound);
@@ -83,5 +82,9 @@ void SOUND_UIhoverSound(Sound aSound, bool isHover);
 void SOUND_UIclickSound(Sound aSound);
 
 void SOUND_playerIsHurt(Sound aSound);
+
+void SOUND_enemyIsHurt(Sound aSound);
+
+void SOUND_objectiveSoundCall(Sound aSound, int objective);
 
 #endif

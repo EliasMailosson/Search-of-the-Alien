@@ -5,6 +5,8 @@
 #include "../../include/NET/shared.h"
 #include "../../include/MAP/map.h"
 #include "../../include/NET/enemies.h"
+#include "../../include/sound.h"
+
 enum PlayerAnimationTypes{ANIMATION_IDLE, ANIMATION_RUNNING, EMOTE_TPOSE};
 
 typedef struct __attribute__((packed)) Proj {
@@ -83,7 +85,7 @@ void NET_clientGetProjList(Client aClient, Proj *outputProjList);
 void NET_clientUpdateProjList(Client aClient, Packet aPacket);
 
 bool NET_clientGetTerminalHub(Client aClient);
-void NET_clientReceiver(Client aClient, Map aMap,SDL_Window *pScreen);
+void NET_clientReceiver(Client aClient, Map aMap,SDL_Window *pScreen, Sound aSound);
 
 int NET_clientGetDashCooldown(Client aClient);
 
@@ -107,9 +109,11 @@ int NET_clientGetHP(Client aClient, int index);
 void NET_clientUpdateEnemy(Client aClient, Packet aPacket);
 SDL_Point NET_clientGetEnemyPos(Client aClient, int index);
 int NET_clientGetEnemyDirection(Client aClient, int index);
-void NET_clientScenarioUpdate(Client aClient,uint32_t seed);
+void NET_clientScenarioUpdate(Client aClient,uint32_t seed, Sound aSound);
 int NET_clientGetEnemiesCount(Client aClinet);
 int NET_clientGetEnemyHP(Client aClient, int index);
+bool NET_clientIsEnemyDamaged(Client aClient, int index);
+
 
 //Getters for objectives
 int NET_clientGetEnemyHP(Client aClient, int index);
