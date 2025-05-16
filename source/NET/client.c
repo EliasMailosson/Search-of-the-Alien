@@ -40,10 +40,13 @@ struct client{
 }; 
 
 bool NET_clientConnect(Client aClient){
-    if (SDLNet_ResolveHost(&aClient->serverAddr,JON_IP, PORT) < 0) {
+    char* serverIP = NET_clientReadFileOne(SERVER_IP_PAHT);
+    if (SDLNet_ResolveHost(&aClient->serverAddr,serverIP, PORT) < 0) {
         printf("SDLNet_ResolveHost failed: %s\n", SDLNet_GetError());
+        free(serverIP);
         return false;
     }
+    free(serverIP);
     return true;
 }
 
@@ -549,4 +552,26 @@ ScenarioState NET_clientGetScenarioState(Client aClient) {
 
 SDL_Point NET_clientGetObjectivePoint(Client aClient) {
     return aClient->scenario.objectivePoint;
+}
+
+char* NET_clientReadFileOne(char* file){
+    FILE *fp = fopen(file,"r");
+    if(!fp){
+        printf("Error openig: %s",file);
+        return strdup("127.0.0.1");
+    }
+    char buf[MAX_LINE];
+    if (!fgets(buf, sizeof buf, fp)) {
+        fclose(fp);
+        return strdup("127.0.0.1");
+    }
+    buf[strcspn(buf, "\n")] = '\0';
+    size_t len = strlen(buf);
+    char *out = malloc(len + 1);
+    if (!out) {
+        printf("Error using malloc in (NET_clientReadFileOne)\n");
+        return strdup("127.0.0.1");
+    }
+    memcpy(out, buf, len + 1);
+    return out;
 }
