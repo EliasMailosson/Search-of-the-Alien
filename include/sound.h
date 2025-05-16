@@ -18,7 +18,6 @@ typedef struct sound{
     MusicTrack currentTrack;
 
     Mix_Chunk *blueShot;
-    Mix_Chunk *biggieShot;
     Mix_Chunk *cleoShot;
     Mix_Chunk *biggieShotLoop;
     Mix_Chunk *biggiesShots[4];

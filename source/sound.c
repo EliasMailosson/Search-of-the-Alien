@@ -34,9 +34,9 @@ Sound SOUND_create(void) {
 
     Mix_Chunk *biggiesShots[4] = {NULL};
     biggiesShots[0] = Mix_LoadWAV("assets/sound/biggieShots/biggieshotS1.wav");
-    biggiesShots[1] = Mix_LoadWAV("assets/sound/biggieShots/biggieshotS1.wav");
-    biggiesShots[2] = Mix_LoadWAV("assets/sound/biggieShots/biggieshotS1.wav");
-    biggiesShots[3] = Mix_LoadWAV("assets/sound/biggieShots/biggieshotS1.wav");
+    biggiesShots[1] = Mix_LoadWAV("assets/sound/biggieShots/biggieshotS2.wav");
+    biggiesShots[2] = Mix_LoadWAV("assets/sound/biggieShots/biggieshotS3.wav");
+    biggiesShots[3] = Mix_LoadWAV("assets/sound/biggieShots/biggieshotS4.wav");
     for (int i = 0; i < 4; i++){
         aSound->biggiesShots[i] = biggiesShots[i];
     }
@@ -46,7 +46,7 @@ Sound SOUND_create(void) {
     Mix_Chunk *nemurSteps = Mix_LoadWAV("assets/sound/nemurFootsteps.wav");
     aSound->nemurSteps = nemurSteps;
 
-    Mix_Chunk *playerHit = Mix_LoadWAV("assets/sound/player-hurt4.wav");
+    Mix_Chunk *playerHit = Mix_LoadWAV("assets/sound/player-hurt.wav");
     aSound->playerHit = playerHit;
 
     Mix_Chunk *vine = Mix_LoadWAV("assets/sound/Vine Boom.wav");
@@ -84,8 +84,8 @@ void SOUND_destroy(Sound aSound) {
     Mix_FreeMusic(aSound->musicMENU);
     Mix_FreeMusic(aSound->musicNEMUR);
     Mix_FreeChunk(aSound->blueShot);
+    Mix_FreeChunk(aSound->cleoShot);
     Mix_FreeChunk(aSound->biggieShotLoop);
-    Mix_FreeChunk(aSound->biggieShot);
     for (int i = 0; i < 4; i++){
         Mix_FreeChunk(aSound->biggiesShots[i]);
     }
@@ -97,9 +97,9 @@ void SOUND_destroy(Sound aSound) {
     Mix_FreeChunk(aSound->objectiveCall1);
     Mix_FreeChunk(aSound->objectiveCall2);
     
-    Mix_FreeChunk(aSound->cleoShot);
     Mix_FreeChunk(aSound->confirmSound);
     Mix_FreeChunk(aSound->hoverSound);
+
     Mix_FreeChunk(aSound->lobbySteps);
     Mix_FreeChunk(aSound->nemurSteps);
 
@@ -142,7 +142,6 @@ void SOUND_setMixVolume(Sound aSound){
     
     Mix_VolumeChunk(aSound->blueShot, 64);
     Mix_VolumeChunk(aSound->biggieShotLoop, 20);
-    Mix_VolumeChunk(aSound->biggieShot, 16);
     for (int i = 0; i < 4; i++){
         Mix_VolumeChunk(aSound->biggiesShots[i], 48);
     }
