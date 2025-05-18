@@ -1,4 +1,4 @@
-# Search of the Älien - Your universe, your rules
+# Search of the Älien
 
 
 # How to install
