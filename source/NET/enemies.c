@@ -113,7 +113,7 @@ Enemy NET_enemiesGetAt(Enemies aE, size_t index){
     return aE->enemyList[index];
 }
 
-void PlayerTracker(Enemies aEnemies, Server aServer, int playerIndex, int enemyIndex) {
+void NET_playerTracker(Enemies aEnemies, Server aServer, int playerIndex, int enemyIndex) {
     const float speed       = 1.0f;
     const float seekWeight  = 1.0f;
     const float sepWeight   = 3.0f;// styr hur stark separationen är
@@ -178,13 +178,13 @@ void PlayerTracker(Enemies aEnemies, Server aServer, int playerIndex, int enemyI
     }
 }
 
-void checkEnemyCollision(Enemies aEnemies, int enemyindex, int *collide){
-	Enemy movingEnemy = aEnemies->enemyList[enemyindex];
+void NET_checkEnemyCollision(Enemies aEnemies, int index, int *collide){
+	Enemy movingEnemy = aEnemies->enemyList[index];
 	SDL_Rect *movingHitbox = &movingEnemy->hitbox;
 
 	*collide = 0;
 	for (int i = 0; i < (int)aEnemies->size; i++) {
-		if (i == enemyindex) continue; 
+		if (i == index) continue; 
 	
 		Enemy otherEnemy = aEnemies->enemyList[i];
 		SDL_Rect *otherHitbox = &otherEnemy->hitbox;
@@ -197,8 +197,8 @@ void checkEnemyCollision(Enemies aEnemies, int enemyindex, int *collide){
 }
 
 
-void enemyAngleTracker(Enemies aEnemies, SDL_Point playerPos, int enemyIndex) {
-	Enemy enemy = aEnemies->enemyList[enemyIndex];
+void NET_enemyAngleTracker(Enemies aEnemies, SDL_Point playerPos, int index) {
+	Enemy enemy = aEnemies->enemyList[index];
 	playerPos.x+=64;
 	playerPos.y+=64;
 
@@ -212,46 +212,33 @@ void enemyAngleTracker(Enemies aEnemies, SDL_Point playerPos, int enemyIndex) {
 	enemy->direction = (raw + 3 + 8) % 8;         
 }
 
-int enemyGetDirection(Enemies aEnemies, int index){
-    if (!aEnemies || index >= (int)aEnemies->size) {
-        return 0;
-    }
-	return aEnemies->enemyList[index]->direction;
-}
-
-float enemyGetAngle(Enemies aEnemies, int index){
+float NET_enemyGetAngle(Enemies aEnemies, int index){
     if (!aEnemies || index >= (int)aEnemies->size) {
         return 0.0f;
     }
 	return aEnemies->enemyList[index]->angle;
 }
 
-void SetEnemyHitbox(Enemies aEnemies, int enemyindex, SDL_Rect HB){
-    if (!aEnemies || enemyindex >= (int)aEnemies->size) {
+void NET_setEnemyHitbox(Enemies aEnemies, int index, SDL_Rect HB){
+    if (!aEnemies || index >= (int)aEnemies->size) {
         return;
     }
-	aEnemies->enemyList[enemyindex]->hitbox = HB;
+	aEnemies->enemyList[index]->hitbox = HB;
 }
 
-Uint32 enemyGetAttackTime(Enemies aEnemies, int enemyindex){
-	return aEnemies->enemyList[enemyindex]->attackTime;
+Uint32 NET_enemyGetAttackTime(Enemies aEnemies, int index){
+	return aEnemies->enemyList[index]->attackTime;
 }
 
-void enemySetAttackTime(Enemies aEnemies, int enemyindex){
-	aEnemies->enemyList[enemyindex]->attackTime = SDL_GetTicks();
+void NET_enemySetAttackTime(Enemies aEnemies, int index){
+	aEnemies->enemyList[index]->attackTime = SDL_GetTicks();
 }
 
-SDL_Rect enemyGetHitbox(Enemies aEnemies, int index){
-    SDL_Rect hitbox = {
-        .x = aEnemies->enemyList[index]->hitbox.x,
-        .y = aEnemies->enemyList[index]->hitbox.y,
-        .w = aEnemies->enemyList[index]->hitbox.w,
-        .h = aEnemies->enemyList[index]->hitbox.h
-    };
-    return hitbox;
+SDL_Rect NET_enemyGetHitbox(Enemies aEnemies, int index){
+    return aEnemies->enemyList[index]->hitbox;
 }
 
-SDL_Point enemyGetPoint(Enemies aEnemies, int index) {
+SDL_Point NET_enemyGetPoint(Enemies aEnemies, int index) {
     if (!aEnemies || index < 0 || (size_t)index >= aEnemies->size) {
         fprintf(stderr, "enemyGetPoint: Invalid index %d (size: %zu)\n", index, aEnemies ? aEnemies->size : 0);
         return (SDL_Point){0, 0}; // or handle differently
@@ -274,7 +261,7 @@ size_t NET_enemiesGetSize(Enemies aEnemies){
 }
 
 
-int enemyDamaged(Enemies aEnemies, int damage, int index, int *pEnemyCount){
+int NET_enemyDamaged(Enemies aEnemies, int damage, int index, int *pEnemyCount){
     aEnemies->enemyList[index]->HP.currentHP -= damage;
     //printf("%f\n", aEnemies->enemyList[index]->HP.currentHP);
 
@@ -298,11 +285,11 @@ int enemyDamaged(Enemies aEnemies, int damage, int index, int *pEnemyCount){
     return 0;
 }
 
-int enemyGetCount(Enemies aEnemies){
+int NET_enemyGetCount(Enemies aEnemies){
     return aEnemies->size;
 }
 
-bool enemyColitino(SDL_Rect A,SDL_Rect B){
+bool NET_enemyColitino(SDL_Rect A,SDL_Rect B){
     if(A.x + A.w >= B.x && 
         A.x <= B.x + B.w &&
         A.y + A.h >= B.y &&
@@ -343,6 +330,6 @@ int NET_enemyGetDirection(Enemy aEnemy){
 //     return aEnemies->enemyList[index]->HP.currentHP;
 // }
 
-int getEnemyHP(Enemy aEnemy){
+int NET_getEnemyHP(Enemy aEnemy){
     return aEnemy->HP.currentHP;
 }
