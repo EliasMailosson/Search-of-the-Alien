@@ -40,34 +40,31 @@ SDL_Point NET_enemyGetPos(Enemy aEnemy);
 int NET_enemyGetDirection(Enemy aEnemy);
 SDL_Rect NET_getEnemySpawnZone(SDL_Rect playerRect, int tile);
 
-SDL_Point enemyGetPoint(Enemies aEnemies, int index);
+SDL_Point NET_enemyGetPoint(Enemies aEnemies, int index);
 
-void checkEnemyCollision(Enemies aEnemies, int enemyindex, int *collide);
-SDL_Rect enemyGetHitbox(Enemies aEnemies, int index);
+void NET_checkEnemyCollision(Enemies aEnemies, int index, int *collide);
+SDL_Rect NET_enemyGetHitbox(Enemies aEnemies, int index);
 // int GetEnemyCount(Enemies aEnemies);
-void SetEnemyHitbox(Enemies aEnemies, int enemyindex, SDL_Rect H);
+void NET_setEnemyHitbox(Enemies aEnemies, int index, SDL_Rect H);
 
-void PlayerTracker(Enemies aEnemies, Server aServer,int playerindex, int enemyindex);
+void NET_playerTracker(Enemies aEnemies, Server aServer, int playerIndex, int enemyIndex);
 
-void enemyAngleTracker(Enemies aEnemies, SDL_Point playerPos, int enemyIndex);
+void NET_enemyAngleTracker(Enemies aEnemies, SDL_Point playerPos, int index);
 
-int enemyGetDirection(Enemies aEnemies, int index);
+float NET_enemyGetAngle(Enemies aEnemies, int index);
 
-float enemyGetAngle(Enemies aEnemies, int index);
+Uint32 NET_enemyGetAttackTime(Enemies aEnemies, int index);
 
-Uint32 enemyGetAttackTime(Enemies aEnemies, int enemyindex);
-
-void enemySetAttackTime(Enemies aEnemies, int enemyindex);
+void NET_enemySetAttackTime(Enemies aEnemies, int index);
 
 // SDL_Rect enemyGetRect(Enemies aEnemies, int index);
 
-int enemyDamaged(Enemies aEnemies, int damage, int index);
+int NET_enemyDamaged(Enemies aEnemies, int damage, int index);
 
-int enemyGetCount(Enemies aEnemies);
+int NET_enemyGetCount(Enemies aEnemies);
 
-bool enemyColitino(SDL_Rect A,SDL_Rect B);
+bool NET_enemyColitino(SDL_Rect A,SDL_Rect B);
 
-int getEnemyHP(Enemy aEnemy);
-
+int NET_getEnemyHP(Enemy aEnemy);
 
 #endif

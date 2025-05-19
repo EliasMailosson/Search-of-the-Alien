@@ -349,7 +349,7 @@ void NET_serverSendEnemiesPacket(Server aServer, GameState GS, Enemies aEnemies)
                         packet[enemySendCount].x = (int16_t)(p.player.hitBox.x - pos.x);
                         packet[enemySendCount].y = (int16_t)(p.player.hitBox.y - pos.y);
                         packet[enemySendCount].direction = (int16_t)(NET_enemyGetDirection(en));
-                        packet[enemySendCount].hp = (uint8_t)getEnemyHP(en);
+                        packet[enemySendCount].hp = (uint8_t)NET_getEnemyHP(en);
                         enemySendCount++;
                     }
             }
@@ -656,7 +656,7 @@ void NET_serverUpdatePlayer(Server aServer, Packet aPacket, GameState state){
     NET_serverSendPlayerPacket(aServer,state); 
 }
 
-bool enemyAttackPlayer(Server aServer, int index, SDL_Rect enemyHitbox){
+bool NET_enemyAttackPlayer(Server aServer, int index, SDL_Rect enemyHitbox){
     SDL_Rect tmp = {
         .x =(enemyHitbox.x - 25), 
         .y = (enemyHitbox.y - 25),
@@ -707,7 +707,7 @@ void NET_serverUpdateEnemies(Server aServer, Enemies aEnemies, ServerMap aMap){
             float closestDist = INT_MAX;
             int closestPlayerIndex = -1;
 
-            SDL_Point enemyPos = enemyGetPoint(aEnemies, i);
+            SDL_Point enemyPos = NET_enemyGetPoint(aEnemies, i);
 
             for (int j = 0; j < aServer->clientCount; j++) {
                 if(aServer->clients[j].State == LOBBY || aServer->clients[j].State == MENU) continue;
@@ -721,23 +721,23 @@ void NET_serverUpdateEnemies(Server aServer, Enemies aEnemies, ServerMap aMap){
                     closestPlayerIndex = j;
                 }
             }
-            SDL_Rect enemyHitbox = enemyGetHitbox(aEnemies, i);
+            SDL_Rect enemyHitbox = NET_enemyGetHitbox(aEnemies, i);
             if (closestPlayerIndex != -1) {
-                PlayerTracker(aEnemies, aServer, closestPlayerIndex, i);
+                NET_playerTracker(aEnemies, aServer, closestPlayerIndex, i);
 
                 SDL_Point closestPos = {
                     aServer->clients[closestPlayerIndex].player.hitBox.x,
                     aServer->clients[closestPlayerIndex].player.hitBox.y
                 };
                 Uint32 currentTime = SDL_GetTicks(); 
-                if(currentTime > enemyGetAttackTime(aEnemies, i) + 1000){
-                    if(enemyAttackPlayer(aServer, closestPlayerIndex, enemyHitbox)){
+                if(currentTime > NET_enemyGetAttackTime(aEnemies, i) + 1000){
+                    if(NET_enemyAttackPlayer(aServer, closestPlayerIndex, enemyHitbox)){
                         NET_serverSendPlayerPacket(aServer, aServer->clients[closestPlayerIndex].State);
                         
                     }
-                    enemySetAttackTime(aEnemies, i);
+                    NET_enemySetAttackTime(aEnemies, i);
                 }
-                enemyAngleTracker(aEnemies, closestPos, i);
+                NET_enemyAngleTracker(aEnemies, closestPos, i);
             }
 
             for (int j = 0; j < aServer->projCount; j++) {
@@ -747,8 +747,8 @@ void NET_serverUpdateEnemies(Server aServer, Enemies aEnemies, ServerMap aMap){
                     .w = PROJECTILEWIDTH,
                     .h = PROJECTILEWIDTH
                 };
-                if (enemyColitino(projectileRect, enemyHitbox)){
-                    if (enemyDamaged(aEnemies, aServer->clients[aServer->projList[j].srcPlayerIdx].player.weapon.damage, i)){
+                if (NET_enemyColitino(projectileRect, enemyHitbox)){
+                    if (NET_enemyDamaged(aEnemies, aServer->clients[aServer->projList[j].srcPlayerIdx].player.weapon.damage, i)){
                         aServer->scenario.totalKilldEnemise++;
                         int indexIP = NET_serverCompIP(aServer);
                         if(indexIP == -1) {
