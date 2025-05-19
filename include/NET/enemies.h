@@ -61,7 +61,7 @@ void enemySetAttackTime(Enemies aEnemies, int enemyindex);
 
 // SDL_Rect enemyGetRect(Enemies aEnemies, int index);
 
-int enemyDamaged(Enemies aEnemies, int damage, int index, int *pEnemyCount);
+int enemyDamaged(Enemies aEnemies, int damage, int index);
 
 int enemyGetCount(Enemies aEnemies);
 

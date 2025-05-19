@@ -748,7 +748,7 @@ void NET_serverUpdateEnemies(Server aServer, Enemies aEnemies, ServerMap aMap){
                     .h = PROJECTILEWIDTH
                 };
                 if (enemyColitino(projectileRect, enemyHitbox)){
-                    if (enemyDamaged(aEnemies, aServer->clients[aServer->projList[j].srcPlayerIdx].player.weapon.damage, i, &enemyCount)){
+                    if (enemyDamaged(aEnemies, aServer->clients[aServer->projList[j].srcPlayerIdx].player.weapon.damage, i)){
                         aServer->scenario.totalKilldEnemise++;
                         int indexIP = NET_serverCompIP(aServer);
                         if(indexIP == -1) {
