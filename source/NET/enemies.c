@@ -114,6 +114,14 @@ Enemy NET_enemiesGetAt(Enemies aE, size_t index){
 }
 
 void PlayerTracker(Enemies aEnemies, Server aServer, int playerIndex, int enemyIndex) {
+    if (!aEnemies || enemyIndex < 0 || (size_t)enemyIndex >= aEnemies->size || aEnemies->enemyList[enemyIndex] == NULL){
+        //fprintf(stderr,"enemyGetAttackTime: Invalid index %d (size: %zu)\n", enemyIndex, aEnemies ? aEnemies->size : 0);
+        return;
+    }
+    if (!aServer || playerIndex < 0){
+        //fprintf(stderr, "PlayerTracker: invalid playerIndex %d (clientCount: %d)\n", playerIndex, aServer ? NET_serverGetClientCount(aServer) : 0);
+        return;
+    }
     const float speed       = 1.0f;
     const float seekWeight  = 1.0f;
     const float sepWeight   = 3.0f;// styr hur stark separationen är
@@ -198,6 +206,10 @@ void checkEnemyCollision(Enemies aEnemies, int enemyindex, int *collide){
 
 
 void enemyAngleTracker(Enemies aEnemies, SDL_Point playerPos, int enemyIndex) {
+    if (!aEnemies || enemyIndex < 0 || (size_t)enemyIndex >= aEnemies->size || aEnemies->enemyList[enemyIndex] == NULL){
+        //fprintf(stderr,"enemyGetAttackTime: Invalid index %d (size: %zu)\n", enemyIndex, aEnemies ? aEnemies->size : 0);
+        return;
+    }
 	Enemy enemy = aEnemies->enemyList[enemyIndex];
 	playerPos.x+=64;
 	playerPos.y+=64;
@@ -234,14 +246,26 @@ void SetEnemyHitbox(Enemies aEnemies, int enemyindex, SDL_Rect HB){
 }
 
 Uint32 enemyGetAttackTime(Enemies aEnemies, int enemyindex){
+    if (!aEnemies || enemyindex < 0 || (size_t)enemyindex >= aEnemies->size || aEnemies->enemyList[enemyindex] == NULL){
+        //fprintf(stderr,"enemyGetAttackTime: Invalid index %d (size: %zu)\n", enemyindex, aEnemies ? aEnemies->size : 0);
+        return 0;
+    }
 	return aEnemies->enemyList[enemyindex]->attackTime;
 }
 
 void enemySetAttackTime(Enemies aEnemies, int enemyindex){
+    if (!aEnemies || enemyindex < 0 || (size_t)enemyindex >= aEnemies->size || aEnemies->enemyList[enemyindex] == NULL){
+        //fprintf(stderr,"enemySetAttackTime: Invalid index %d (size: %zu)\n", enemyindex, aEnemies ? aEnemies->size : 0);
+        return;
+    }
 	aEnemies->enemyList[enemyindex]->attackTime = SDL_GetTicks();
 }
 
 SDL_Rect enemyGetHitbox(Enemies aEnemies, int index){
+    if (!aEnemies || index < 0 || (size_t)index >= aEnemies->size || aEnemies->enemyList[index] == NULL){
+        //fprintf(stderr,"enemyGetHitbox: Invalid index %d (size: %zu)\n", index, aEnemies ? aEnemies->size : 0);
+        return (SDL_Rect){0, 0, 0, 0};
+    }
     SDL_Rect hitbox = {
         .x = aEnemies->enemyList[index]->hitbox.x,
         .y = aEnemies->enemyList[index]->hitbox.y,
@@ -253,7 +277,7 @@ SDL_Rect enemyGetHitbox(Enemies aEnemies, int index){
 
 SDL_Point enemyGetPoint(Enemies aEnemies, int index) {
     if (!aEnemies || index < 0 || (size_t)index >= aEnemies->size) {
-        fprintf(stderr, "enemyGetPoint: Invalid index %d (size: %zu)\n", index, aEnemies ? aEnemies->size : 0);
+        //fprintf(stderr, "enemyGetPoint: Invalid index %d (size: %zu)\n", index, aEnemies ? aEnemies->size : 0);
         return (SDL_Point){0, 0}; // or handle differently
     }
     return (SDL_Point){
@@ -274,25 +298,15 @@ size_t NET_enemiesGetSize(Enemies aEnemies){
 }
 
 
-int enemyDamaged(Enemies aEnemies, int damage, int index, int *pEnemyCount){
+int enemyDamaged(Enemies aEnemies, int damage, int index){
+    if (!aEnemies || index < 0 || (size_t)index >= aEnemies->size || aEnemies->enemyList[index] == NULL){
+        //fprintf(stderr,"enemyDamaged: invalid index %d (size = %zu)\n", index, aEnemies ? aEnemies->size : 0);
+        return 0;
+    }
     aEnemies->enemyList[index]->HP.currentHP -= damage;
-    //printf("%f\n", aEnemies->enemyList[index]->HP.currentHP);
 
     if (aEnemies->enemyList[index]->HP.currentHP <= 0) {
-        //printf("Enemy %d killed\n", index);
-
-        // Shift all enemies after the dead one down
-        for (size_t i = index; i < aEnemies->size - 1; i++) {
-            aEnemies->enemyList[i] = aEnemies->enemyList[i + 1];
-        }
-
-        // Clear the now-unused last element (optional but good hygiene)
-        aEnemies->enemyList[aEnemies->size - 1] = (Enemy){0};
-
-        aEnemies->size--;
-        if (pEnemyCount) {
-            *pEnemyCount = aEnemies->size;
-        }
+        NET_enemiesPopAt(aEnemies,(size_t)index);
         return 1;
     }
     return 0;
