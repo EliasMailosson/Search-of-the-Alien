@@ -129,7 +129,7 @@ void refreshMenu(Client aClient, SDL_Renderer *pRend, Menu *pMenu, ClientView *p
     // INPUT MY USERNAME /////////////////////////
     Inputfield f3 = (Inputfield)UI_panelGetComponent(pMenu->panels[PANEL_MYUSERNAME], "MyUsername-input");
     UI_inputfieldSetAppearance(pRend, f3, pView->windowWidth / 2 - 150, 260, BIGBUTTONWIDTH,
-        (SDL_Color){0,0,0,0}, (SDL_Color){255,255,255,255}, pMenu->fonts[1]);
+        (SDL_Color){0,0,0,255}, (SDL_Color){255,255,255,255}, pMenu->fonts[1]);
 
     Button b17 = (Button)UI_panelGetComponent(pMenu->panels[PANEL_MYUSERNAME], "MyUsername");
     UI_buttonConfigure(b17, "Submit Username", pView->windowWidth / 2 - 200, 250 + OFFSET, 400, BIGBUTTONHEIGHT,
@@ -219,7 +219,7 @@ void refreshMenu(Client aClient, SDL_Renderer *pRend, Menu *pMenu, ClientView *p
     //ADDFRIENDS MENU /////////////////////
     Inputfield f2 = (Inputfield)UI_panelGetComponent(pMenu->panels[PANEL_ADDFRIEND], "AddFriend-input");
     UI_inputfieldSetAppearance(pRend, f2, pView->windowWidth / 2 - 150, 150 + OFFSET,
-        BIGBUTTONWIDTH, (SDL_Color){.r = 0, .b = 0, .g = 0, .a = 0}, 
+        BIGBUTTONWIDTH, (SDL_Color){.r = 0, .b = 0, .g = 0, .a = 255}, 
         (SDL_Color){.r = 255, .b = 255, .g = 255, .a =255}, pMenu->fonts[0]);
     
     Button b14 = (Button)UI_panelGetComponent(pMenu->panels[PANEL_ADDFRIEND], "AddFriend-Add");

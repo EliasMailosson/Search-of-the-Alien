@@ -25,7 +25,7 @@ struct client{
     UDPpacket *pReceivePacket;
     UDPpacket *pSendPacket;
     IPaddress serverAddr;
-    char selfUsername[MAX_USERNAME_LEN]; //andras usernames // va?
+    char selfUsername[MAX_USERNAME_LEN];
     GameConfig config;
     int PlayerCount;
     Player playerList[MAX_CLIENTS];
