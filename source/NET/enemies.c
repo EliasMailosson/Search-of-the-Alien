@@ -113,7 +113,7 @@ Enemy NET_enemiesGetAt(Enemies aE, size_t index){
     return aE->enemyList[index];
 }
 
-void NET_PlayerTracker(Enemies aEnemies, Server aServer, int playerIndex, int enemyIndex) {
+void NET_playerTracker(Enemies aEnemies, Server aServer, int playerIndex, int enemyIndex) {
     if (!aEnemies || enemyIndex < 0 || (size_t)enemyIndex >= aEnemies->size || aEnemies->enemyList[enemyIndex] == NULL){
         //fprintf(stderr,"enemyGetAttackTime: Invalid index %d (size: %zu)\n", enemyIndex, aEnemies ? aEnemies->size : 0);
         return;
