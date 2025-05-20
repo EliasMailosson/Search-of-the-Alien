@@ -127,11 +127,11 @@ void hudDestroy(Hud aHud){
     aHud->playerList.pFont = NULL;
     
     //OBJECTIVES
-    TTF_CloseFont(aHud->objectives->pFont);
-    aHud->objectives->pFont = NULL;
     for (int i = 0; i < OBJECTIVECOUNT; i++) {
-       UI_labelDestroy(aHud->objectives[i].objectiveLabel); 
-       UI_labelDestroy(aHud->objectives[i].objectiveProgress);
+        TTF_CloseFont(aHud->objectives[i].pFont);
+        aHud->objectives[i].pFont = NULL;
+        UI_labelDestroy(aHud->objectives[i].objectiveLabel); 
+        UI_labelDestroy(aHud->objectives[i].objectiveProgress);
     }
     ////////////
 
