@@ -323,7 +323,7 @@ void NET_serverEnemiesSpawnInterval(Server aServer){
 
 void NET_serverSendEnemiesPacket(Server aServer, GameState GS, Enemies aEnemies){
     if ((int)NET_enemiesGetSize(aEnemies) < 0 || (int)NET_enemiesGetSize(aEnemies) > MAX_ENEMIES_CLIENT_SIDE) {
-        fprintf(stderr, "Error: invalid pEnemyCount (%d)\n",(int)NET_enemiesGetSize(aEnemies));
+        //fprintf(stderr, "Error: invalid pEnemyCount (%d)\n",(int)NET_enemiesGetSize(aEnemies));
         return;
     }
 

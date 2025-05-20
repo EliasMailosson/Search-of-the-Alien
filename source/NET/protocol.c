@@ -104,7 +104,7 @@ void NET_protocolSendArray(UDPpacket *pUDPpkg, UDPsocket Socket, IPaddress IP,
                            GameState GS, MessageType msgType, const void* array, Uint32 arraySize){
     Uint32 payloadSize = arraySize;
     if (!array || payloadSize == 0) {
-        printf("Invalid array data.\n");
+        //printf("Invalid array data.\n");
         return;
     }
     Packet packet = NET_packetCreate(GS, msgType, payloadSize);
