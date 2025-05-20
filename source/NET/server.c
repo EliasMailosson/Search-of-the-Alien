@@ -800,16 +800,14 @@ void NET_serverChangeGameStateOnClient(Server aServer,Packet aPacket){
 
 void NET_serverClientDisconnect(Server aServer){
     int indexIP = NET_serverCompIP(aServer);
-    int color = aServer->clients[indexIP].colorIndex;
-    if (color >= 0 && color < MAX_COLORS)
-    {
-        aServer->usedColors[color] = false;
-    }
-    
     if(indexIP == -1) {
         printf("Error NET_serverCompIP return -1\n");
         return;
-        }
+    }
+    int color = aServer->clients[indexIP].colorIndex;
+    if (color >= 0 && color < MAX_COLORS){
+        aServer->usedColors[color] = false;
+    }
     int lobbyID = aServer->clients[indexIP].LobbyID;
     for (int i = 0; i < aServer->clientCount; i++){
         if(aServer->clients[i].LobbyID == lobbyID){
