@@ -63,11 +63,11 @@ void startClient(Client *aClient, ClientView *pView,ClientControl *pControl){
     };
 
     for(int i = 0; i < SPRITE_SHEET_COUNT; i++) {
-        SDL_Surface *surface;
+        SDL_Surface *surface=NULL;
         switch(quality) {
             case 1: surface = IMG_Load(spriteSheetsHigh[i]); break;
             case 2: surface = IMG_Load(spriteSheetsMedium[i]); break;
-            default: printf("Invalid graphics setting: %d\n", quality);
+            default: printf("Invalid graphics setting: %d\n", quality); break;
         }
         
         if(i == 6) {

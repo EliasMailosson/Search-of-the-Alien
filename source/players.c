@@ -211,11 +211,12 @@ void renderEntities(Client aClient, ClientView *pView) {
                 renderEnemy(context, pView);
                 break;
 
-            case ENTITY_PLAYER:
+            case ENTITY_PLAYER:{
                 int state = NET_clientGetClientState(aClient, actualPlayerIndex);
                 renderPlayer(context, pView, actualPlayerIndex, state);
                 actualPlayerIndex++;
                 break;
+            }
         }
     }
 
