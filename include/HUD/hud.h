@@ -30,7 +30,7 @@ void hudRender(Client aClient, Hud aHud,SDL_Renderer *pRend, int windowW, int wi
 Arrow arrowCreate();
 void updateArrows(Hud aHud,SDL_Window *pWin,Client aClient, SDL_Point playerPos[MAX_CLIENTS]);
 SDL_Point hudGettArrowPos(Hud aHud, int index);
-void updateHudPlayerList(Client aClient, Hud aHud, SDL_Renderer *pRend, int windowW, int windowH);
+void updateHudPlayerList(Client aClient, Hud aHud, SDL_Renderer *pRend, int windowW);
 
 bool pointInRect(SDL_Rect rect, SDL_Point point);
 

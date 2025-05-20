@@ -214,7 +214,7 @@ int NET_clientGetState(Client aClient) {
     static uint8_t lastHealth[8] = {100, 100, 100, 100, 100, 100, 100, 100};
     if(aClient->playerList[selfIndex].HpProcent < lastHealth[selfIndex]){
         lastHealth[selfIndex] = aClient->playerList[selfIndex].HpProcent;
-        int hp = (int)aClient->playerList[selfIndex].HpProcent;
+        // int hp = (int)aClient->playerList[selfIndex].HpProcent;
         //printf("Your HP = %d\n", hp);
         return true;
     }else{
@@ -337,6 +337,7 @@ void NET_clientReceiver(Client aClient, Map aMap,SDL_Window *pScreen, Sound aSou
                 break;
             case ENEMY_POS:
                 NET_clientUpdateEnemy(aClient, aPacket);
+                break;
             case TRY_OPEN_TERMINAL_HUB:
                 aClient->isHubVisible = !aClient->isHubVisible;
                 break;
@@ -360,7 +361,7 @@ void NET_clientReceiver(Client aClient, Map aMap,SDL_Window *pScreen, Sound aSou
 
 
 void NET_clientScenarioUpdate(Client aClient,uint32_t seed, Sound aSound){
-    aClient->scenario.state = abs(seed % SCENARIO_COUNT);
+    aClient->scenario.state = abs((int)seed % SCENARIO_COUNT);
     switch (aClient->scenario.state){
     case ELIMINATIONS:
         aClient->scenario.objectivePoint = (SDL_Point){.x = 0, .y = 0};

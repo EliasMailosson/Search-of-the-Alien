@@ -75,11 +75,11 @@ void runLobby(Client aClient, Map aMap, ClientControl *pControl, ClientView *pVi
 
     SOUND_playMusicIfChanged(pView->aSound, MUSIC_MENU);
 
-    for (int i = 0; i < NET_clientGetEnemiesCount(aClient); i++)
-    {
-        SDL_Point point = NET_clientGetEnemyPos(aClient, i);
-        // printf("enemy #%d: pos.x: %d\n pos.y: %d", i, point.x, point.y);
-    }
+    // for (int i = 0; i < NET_clientGetEnemiesCount(aClient); i++)
+    // {
+    //     SDL_Point point = NET_clientGetEnemyPos(aClient, i);
+    //     // printf("enemy #%d: pos.x: %d\n pos.y: %d", i, point.x, point.y);
+    // }
 
     enableMouseTexture(pView->crosshair);
     updatePositioning(aClient, lastPosition, &playerPos, selfIndex);
@@ -105,7 +105,7 @@ void runLobby(Client aClient, Map aMap, ClientControl *pControl, ClientView *pVi
 
     // update HUD?
     updateArrows(pView->aHud,pView->pWin,aClient,pView->PlayerPos);
-    if(toggleDelay%20 == 0) updateHudPlayerList(aClient, pView->aHud, pView->pRend, pView->windowWidth, pView->windowHeight);
+    if(toggleDelay%20 == 0) updateHudPlayerList(aClient, pView->aHud, pView->pRend, pView->windowWidth);
     SDL_Rect tileRect = MAP_getTileRect(aMap);
     pView->playerRenderSize = tileRect.h;
 
@@ -127,7 +127,7 @@ void runMenu(Client aClient, ClientControl *pControl, ClientView *pView, Menu *p
         MAP_MapRefresh(aMap, pView->windowWidth, pView->windowHeight);
         refreshTerminalHub(pView, pTerminalHub);
         refreshPauseMenu(pView, pPauseMenu);
-        updateHudPlayerList(aClient, pView->aHud, pView->pRend, pView->windowWidth, pView->windowHeight);
+        updateHudPlayerList(aClient, pView->aHud, pView->pRend, pView->windowWidth);
         refreshMenu(aClient, pView->pRend, pMenu, pView);
         toggleDelay = 0;
     }
@@ -139,7 +139,7 @@ void runMenu(Client aClient, ClientControl *pControl, ClientView *pView, Menu *p
     
     updateMenu(pMenu, pControl, pView, aClient, pView->aSound);
     if (pMenu->isGameStarted) {
-        updateHudPlayerList(aClient, pView->aHud, pView->pRend, pView->windowWidth, pView->windowHeight);
+        updateHudPlayerList(aClient, pView->aHud, pView->pRend, pView->windowWidth);
         NET_clientSendInt(aClient, MENU, CHANGE_GAME_STATE, LOBBY);
     }
     NET_clientReceiver(aClient,aMap,pView->pWin, pView->aSound);
@@ -245,7 +245,7 @@ static void lobbyFullscreenToggle(Client aClient, ClientControl *pControl, Clien
         MAP_MapRefresh(aMap, pView->windowWidth, pView->windowHeight);
         refreshTerminalHub(pView, pTerminalHub);
         refreshPauseMenu(pView, pPauseMenu);
-        updateHudPlayerList(aClient, pView->aHud, pView->pRend, pView->windowWidth, pView->windowHeight);
+        updateHudPlayerList(aClient, pView->aHud, pView->pRend, pView->windowWidth);
         refreshMenu(aClient, pView->pRend, pMenu, pView);
         *pDelay = 0;
     }
@@ -257,7 +257,7 @@ static void planetFullscreenToggle(Client aClient, ClientControl *pControl, Clie
         MAP_MapRefresh(aMap, pView->windowWidth, pView->windowHeight);
         refreshTerminalHub(pView, pTerminalHub);
         refreshPauseMenu(pView, pPauseMenu);
-        updateHudPlayerList(aClient, pView->aHud, pView->pRend, pView->windowWidth, pView->windowHeight);
+        updateHudPlayerList(aClient, pView->aHud, pView->pRend, pView->windowWidth);
         refreshMenu(aClient, pView->pRend, pMenu, pView);
         *pDelay = 0;
     }
@@ -338,7 +338,7 @@ void runPlanet(Client aClient, ClientControl *pControl, ClientView *pView, Map a
     updatePlayerAnimation(aClient, lastPosition);
 
     updateArrows(pView->aHud,pView->pWin,aClient,pView->PlayerPos);
-    if(toggleDelay%20 == 0) updateHudPlayerList(aClient, pView->aHud, pView->pRend, pView->windowWidth, pView->windowHeight);
+    if(toggleDelay%20 == 0) updateHudPlayerList(aClient, pView->aHud, pView->pRend, pView->windowWidth);
     SDL_Rect tileRect = MAP_getTileRect(aMap);
     pView->playerRenderSize = tileRect.h;
 

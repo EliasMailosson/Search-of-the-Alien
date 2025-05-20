@@ -199,9 +199,6 @@ void SOUND_projectileSoundOnce(Sound aSound, int projectileType, int projIndex, 
                 return;
         }
 
-        static Uint32 lastPlayedTime = 0;
-        Uint32 now = SDL_GetTicks();
-
         if (fx) {
             Mix_PlayChannel(-1, fx, 0);
             played[projIndex] = true;

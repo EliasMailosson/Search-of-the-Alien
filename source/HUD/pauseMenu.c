@@ -59,7 +59,6 @@ void updatePauseMenu(PauseMenu *pPauseMenu, Client aClient, ClientControl *pCont
 
 void refreshPauseMenu(ClientView *pView, PauseMenu *pPm){
     int centerX = pView->windowWidth / 2;
-    int centerY = pView->windowHeight / 2;
 
     int firstRowY = pView->windowHeight * 0.45;
 

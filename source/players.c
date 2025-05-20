@@ -192,7 +192,6 @@ void renderEntities(Client aClient, ClientView *pView) {
     context.spriteSize = 256/pow(2, context.graphicsMode-1);
     static int frame = 0; frame++;
     context.frame = frame;
-    int playerCount = NET_clientGetPlayerCount(aClient);
     static Uint32 damageTime = 0;
     context.selfIndex = NET_clientGetSelfIndex(aClient);
     context.selfPos = NET_clientGetPlayerPos(aClient, context.selfIndex);

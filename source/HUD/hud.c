@@ -147,7 +147,7 @@ static void arrowRender(Arrow aArrow,SDL_Renderer *pRend,SDL_Texture *pImg){
     }
 }
 
-void updateHudPlayerList(Client aClient, Hud aHud, SDL_Renderer *pRend, int windowW, int windowH) {
+void updateHudPlayerList(Client aClient, Hud aHud, SDL_Renderer *pRend, int windowW) {
     int objY = 0;
     aHud->playerList.count = NET_clientGetPlayerCount(aClient);
     int sortArr[MAX_CLIENTS];

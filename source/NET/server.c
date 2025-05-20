@@ -200,14 +200,13 @@ void* enemies_threads(void *arg){
         mutex_lock(&clients_mutex);
 
         NET_serverEnemiesSpawnInterval(aServer);
-        NET_serverUpdateEnemies(aServer, aServer->aEnemies,aServer->aServerMap);
+        NET_serverUpdateEnemies(aServer, aServer->aEnemies);
         mutex_unlock(&clients_mutex);
         sleep_ms(10);
     }
     printf("Enemise thread exiting. id: %lu\n",(unsigned long)thread_self());
     return NULL;
 }
-
 
 void* projektil_threads(void *arg){
     Server aServer = (Server)arg;
@@ -478,7 +477,7 @@ void NET_serverSendPlayerPacket(Server aServer,GameState GS){
     }
     Uint32 payloadSize = aServer->clientCount * sizeof(PlayerPacket);
     for (int i = 0; i < aServer->clientCount; i++){
-        if(aServer->clients[i].State == GS || GS == -1){
+        if(aServer->clients[i].State == GS || (int)GS == -1){
             NET_serverSendArray(aServer, GLOBAL, LOBBY_LIST, packet, payloadSize, i);
         }
     }
@@ -700,7 +699,7 @@ void NET_serverForceGameStateChange(Server aServer, GameState state, int index){
     }
 }
 
-void NET_serverUpdateEnemies(Server aServer, Enemies aEnemies, ServerMap aMap){
+void NET_serverUpdateEnemies(Server aServer, Enemies aEnemies){
     int enemyCount = (int)NET_enemiesGetSize(aEnemies);
     if (enemyCount >= 0){
         for (int i = 0; i < enemyCount; i++) {
@@ -770,9 +769,6 @@ void NET_serverUpdateEnemies(Server aServer, Enemies aEnemies, ServerMap aMap){
             }
         }
         NET_serverSendEnemiesPacket(aServer, NEMUR, aEnemies);
-        // if (enemyCount == 0){
-        //     enemyCount--;
-        // }
     }
 }
 
