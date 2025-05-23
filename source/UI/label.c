@@ -48,7 +48,8 @@ void UI_labelSetAppearance(SDL_Renderer* pRend, Label aLabel, int x, int y, SDL_
     aLabel->x = x;
     aLabel->y = y;
     aLabel->pFont = pFont;
-
+    
+    if(aLabel->pTexture) SDL_DestroyTexture(aLabel->pTexture);
     SDL_Surface* surface = TTF_RenderText_Blended(aLabel->pFont, aLabel->text, aLabel->color);
     aLabel->pTexture = SDL_CreateTextureFromSurface(pRend, surface);
     aLabel->textRect = (SDL_Rect){ .x = aLabel->x, .y = aLabel->y, .w = surface->w, .h = surface->h };
@@ -56,6 +57,7 @@ void UI_labelSetAppearance(SDL_Renderer* pRend, Label aLabel, int x, int y, SDL_
 }
 
 void UI_labelRefreshTexture(SDL_Renderer* pRend, Label aLabel) {
+    if(aLabel->pTexture) SDL_DestroyTexture(aLabel->pTexture);
     SDL_Surface* surface = TTF_RenderText_Blended(aLabel->pFont, aLabel->text, aLabel->color);
     aLabel->pTexture = SDL_CreateTextureFromSurface(pRend, surface);
     aLabel->textRect = (SDL_Rect){ .x = aLabel->x, .y = aLabel->y, .w = surface->w, .h = surface->h };

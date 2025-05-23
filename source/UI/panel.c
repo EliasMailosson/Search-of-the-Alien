@@ -42,6 +42,7 @@ Panel UI_panelCreate() {
 }
 
 void UI_panelSetImage(SDL_Renderer* pRend, Panel aPanel, char *imagePath) {
+    if(aPanel->pBgImage) SDL_DestroyTexture(aPanel->pBgImage);
     SDL_Surface *surface = IMG_Load(imagePath);
     aPanel->pBgImage = SDL_CreateTextureFromSurface(pRend, surface);
     SDL_FreeSurface(surface);
