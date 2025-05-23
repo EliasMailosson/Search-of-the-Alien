@@ -145,6 +145,7 @@ void UI_inputfieldRefreshTexture(SDL_Renderer* pRend, Inputfield aInputfield) {
         aInputfield->cursorX = 0;
         return;
     }
+    if (aInputfield->pTexture) SDL_DestroyTexture(aInputfield->pTexture);
     SDL_Surface *surface = TTF_RenderText_Blended(aInputfield->pFont, aInputfield->buffer, aInputfield->fg);
     aInputfield->pTexture = SDL_CreateTextureFromSurface(pRend, surface);
 
