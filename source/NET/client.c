@@ -344,6 +344,7 @@ void NET_clientReceiver(Client aClient, Map aMap,SDL_Window *pScreen, Sound aSou
                 break;
             case ENEMY_POS:
                 NET_clientUpdateEnemy(aClient, aPacket);
+                break;
             case TRY_OPEN_TERMINAL_HUB:
                 aClient->isHubVisible = !aClient->isHubVisible;
                 break;
