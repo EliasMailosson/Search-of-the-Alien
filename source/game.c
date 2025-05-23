@@ -41,8 +41,7 @@ void gameLoop(Client aClient, ClientControl *pControl, ClientView *pView){
     while (pControl->isRunning){
         eventHandler(pControl);
 
-        switch (NET_clientGetState(aClient))
-        {
+        switch (NET_clientGetState(aClient)){
         case MENU:
             runMenu(aClient, pControl, pView, &menu, aMap, &terminalHub, &pauseMenu);
             break;
