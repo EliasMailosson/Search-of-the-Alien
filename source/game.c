@@ -31,7 +31,7 @@ void gameLoop(Client aClient, ClientControl *pControl, ClientView *pView){
     char username[MAX_USERNAME_LEN];
     NET_clientGetSelfname(aClient, username);
 
-    if(strcmp(username, "None") != 0) {
+    if(NET_clientIsUsernameSet(aClient)) {
         NET_clientSendString(aClient,MENU,CONNECT,username);
     }
 
@@ -61,7 +61,7 @@ void gameLoop(Client aClient, ClientControl *pControl, ClientView *pView){
     destroyMenu(&menu);
     MAP_MapDestroy(aMap);
     NET_clientGetSelfname(aClient, username);
-    if(strcmp(username, "None") != 0) {
+    if(NET_clientIsUsernameSet(aClient)) {
         NET_clientSendString(aClient,MENU,DISCONNECT,username);
     }
 }

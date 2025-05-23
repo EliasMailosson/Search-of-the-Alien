@@ -98,6 +98,8 @@ int NET_clientGetDashCooldown(Client aClient);
 
 bool NET_clientGetPauseState(Client aClient);
 
+bool NET_clientIsUsernameSet(Client aClient);
+
 int NET_clientFindPlayer(Client aClient, char* str);
 
 void NET_clientUpdateGameState(Client aClient,Packet aPacket);

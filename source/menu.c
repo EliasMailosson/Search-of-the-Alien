@@ -461,7 +461,7 @@ void checkUsername(Menu *pMenu, Client aClient){
         pMenu->currentPanel = PANEL_START;
         NET_clientSetSelfName(aClient, username);
     }
-    fclose(fp);    
+    fclose(fp);
 }
 
 void createNewUsername(Menu *pMenu, char *output){

@@ -26,6 +26,7 @@ struct client{
     UDPpacket *pSendPacket;
     IPaddress serverAddr;
     char selfUsername[MAX_USERNAME_LEN];
+    bool isUsernameSet;
     GameConfig config;
     int PlayerCount;
     Player playerList[MAX_CLIENTS];
@@ -124,8 +125,9 @@ Client NET_clientCreate(){
 
     aClient->PlayerCount = 1;
     aClient->playerList[0].state = MENU;
-    strcpy(aClient->playerList[0].username,"None");
-    strcpy(aClient->selfUsername,"None");
+    strcpy(aClient->playerList[0].username, "N/A");
+    strcpy(aClient->selfUsername, "N/A");
+    aClient->isUsernameSet = false;
     aClient->isHubVisible = false;
     aClient->seed = 0;
     aClient->EnemiesCount = 0;
@@ -162,6 +164,10 @@ void NET_clientReadGraphicsConfig(Client aClient) {
     fclose(file);
 }
 
+bool NET_clientIsUsernameSet(Client aClient) {
+    return aClient->isUsernameSet;
+}
+
 void NET_clientSetNextGraphicsConfig(Client aClient, int value) {
     aClient->config.nextGraphicsQuality = value;
 }
@@ -187,6 +193,7 @@ int NET_clientGetPlayerAnimation(Client aClient, int playerIdx) {
 void NET_clientSetSelfName(Client aClient, char* newName) {
     strcpy(aClient->selfUsername,newName);
     strcpy(aClient->playerList[0].username, newName);
+    aClient->isUsernameSet = true;
 }
 
 void NET_clientGetSelfname(Client aClient, char* outputName){
