@@ -5,7 +5,7 @@
 #include "../include/UI/inputfield.h"
 #include "../include/UI/friend.h"
 #include "../include/UI/animation.h"
-#include "../include/players.h"
+#include "../include/entities.h"
 #include "../include/NET/client.h"
 #include "../include/game.h"
 #include <stdio.h>

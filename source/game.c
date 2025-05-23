@@ -1,5 +1,5 @@
 #include "../include/game.h"
-#include "../include/players.h"
+#include "../include/entities.h"
 #include "../include/UI/friend.h"
 #include "../include/HUD/terminalHub.h"
 #include "../include/HUD/pauseMenu.h"

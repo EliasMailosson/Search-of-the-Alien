@@ -2,7 +2,7 @@
 #include <string.h>
 #include <math.h>
 #include <stdlib.h>
-#include "../include/players.h"
+#include "../include/entities.h"
 #include "../include/NET/client.h"
 #include "../include/game.h"
 #include "../include/clientLife.h"
