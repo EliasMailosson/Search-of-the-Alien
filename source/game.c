@@ -35,7 +35,7 @@ void gameLoop(Client aClient, ClientControl *pControl, ClientView *pView){
         NET_clientSendString(aClient,MENU,CONNECT,username);
     }
 
-    Mix_PlayChannel(-1, pView->aSound->vine, 0);
+    //Mix_PlayChannel(-1, pView->aSound->vine, 0);
     
     Map aMap = MAP_MapCreate(pView->pRend, pView->windowWidth, pView->windowHeight);
     while (pControl->isRunning){
